@@ -1,0 +1,48 @@
+{
+  "$comment": "Sự vụ ở một mảng công nghệ chưa từng có case nào trong kho: hàn khung, vật tư mới, mã lỗi mới, và mô tả không dùng chung thuật ngữ với case gia công cắt gọt. Đây là phép thử NGƯỢC — hệ thống phải nói thẳng là không có tiền lệ.",
+  "notificationId": "8D-10049003",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Weld seam cracked during frame straightening at the fixture",
+  "status": "In Process",
+  "foundDate": "2026-08-12",
+  "completionDate": null,
+  "quantityExtent": "4 frames scrapped",
+  "teamSize": null,
+  "material": {
+    "materialId": "MAT-12800",
+    "description": "Chassis Frame Weldment F70",
+    "materialGroup": "MG-WELDMENT"
+  },
+  "batch": {
+    "batchId": "B-56010",
+    "materialId": "MAT-12800"
+  },
+  "defect": {
+    "defectCode": "DEF-2210",
+    "defectText": "Weld seam cracked under straightening load"
+  },
+  "workCenter": {
+    "workCenterId": "WC-WELD-11",
+    "description": "Robot Welding Cell 11"
+  },
+  "inspections": [
+    {
+      "characteristic": "Weld penetration depth",
+      "measuredValue": "2.1mm",
+      "specValue": "min 3.5mm"
+    }
+  ],
+  "causesIshikawa": [],
+  "fiveWhyChain": [],
+  "actions": [],
+  "teamAssignments": [],
+  "isIsNot": null,
+  "fmeaLink": null,
+  "costCopq": null,
+  "lessonsLearned": null,
+  "customerReference": {
+    "complaintReference": "N/A - internal defect, no customer reference",
+    "customerPlantContact": "N/A",
+    "slaResponseDue": "N/A"
+  }
+}

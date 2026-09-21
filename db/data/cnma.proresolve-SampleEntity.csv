@@ -1,0 +1,4 @@
+ID;name;description;status
+s1a93e80-5555-4000-8000-000000000001;Sample Item A;Primary demonstration item for Proresolve;Active
+s1a93e80-5555-4000-8000-000000000002;Sample Item B;Secondary request item pending approval;Draft
+s1a93e80-5555-4000-8000-000000000003;Sample Item C;Completed audit item;Approved

@@ -1,0 +1,32 @@
+{
+  "requires": {
+    "db": {
+      "kind": "sqlite",
+      "credentials": {
+        "url": "db.sqlite"
+      }
+    },
+    "auth": {
+      "kind": "mocked",
+      "users": {
+        "admin": {
+          "password": "123",
+          "roles": [
+            "admin",
+            "Admin",
+            "authenticated-user"
+          ]
+        },
+        "developer": {
+          "password": "123",
+          "roles": [
+            "admin",
+            "Admin",
+            "authenticated-user"
+          ]
+        }
+      }
+    }
+  }
+}
+

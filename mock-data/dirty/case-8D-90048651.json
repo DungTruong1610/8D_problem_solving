@@ -1,0 +1,122 @@
+{
+  "notificationId": "8D-90048651",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Lackabplatzung b. WE-Pruefung Kunde festgestellt",
+  "status": "In Process",
+  "foundDate": "01-AUG-26",
+  "completionDate": null,
+  "quantityExtent": "ca. 74 Stk.",
+  "teamSize": 3,
+  "material": {
+    "materialId": "  MAT-10555 ",
+    "description": "Housing Cover C80",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-51890",
+    "materialId": "  MAT-10555 "
+  },
+  "defect": {
+    "defectCode": "DEF-0601",
+    "defectText": "Coating layer peeling"
+  },
+  "workCenter": {
+    "workCenterId": "wc-coat-05",
+    "description": "Powder Coating Line 5"
+  },
+  "inspections": [
+    {
+      "characteristic": "Coating thickness",
+      "measuredValue": "Messung Coating thickness ergab 38um; lt. Zeichnung 60-90um",
+      "specValue": ""
+    },
+    {
+      "characteristic": "Cross-cut adhesion",
+      "measuredValue": "Class 3",
+      "specValue": "Class 0-1"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Measurement",
+      "description": "Thickness gauge GA-0117 calibration expired 2026-05-30; re-calibration on 2026-08-04 confirmed a -22um reading drift, so under-coated parts were passing as in-spec",
+      "metricValue": "-22um drift",
+      "isRootCause": "x",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-COAT05-003, gun voltage and powder flow logged within band",
+      "metricValue": "62 kV avg",
+      "isRootCause": "n.a.",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Material",
+      "description": "Powder lot PWD-2231 within shelf life, cert PASS",
+      "metricValue": null,
+      "isRootCause": "",
+      "source": "SAP: QALS/QAMR (incoming)"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "  ",
+      "answer": "GA-0117 calibration expired on 2026-05-30 and no interlock stops an expired gauge from being used for release decisions",
+      "evidenceCitation": "k.A."
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Sofortmassnahme",
+      "actionText": "Remove GA-0117 from service and re-measure all C80 stock with calibrated gauge GA-0103",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "",
+      "actionText": "Contain 74 units at the customer plant and arrange sorting on site",
+      "status": "Planned"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Korrekturmassnahme",
+      "actionText": "Re-calibrate GA-0117 and re-inspect every C80 lot released since 2026-05-30",
+      "status": "Planned"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100014",
+      "partnerName": "Thien Tu",
+      "functionTitle": "Quality Eng.",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100067",
+      "partnerName": "Marek Nowak",
+      "functionTitle": "Surface Treatment Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": null,
+  "lessonsLearned": {
+    "whatWorked": "Comparing the two coating lines isolated the gauge as the only difference within one shift",
+    "whatDidnt": "Nothing prevented an expired gauge from being used for release - the calibration due date was advisory only"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "k.A.",
+    "isNotWhereWhenItDoesnt": "",
+    "notes": ""
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0511",
+    "customerPlantContact": "Tobias Lang - Plant 4, Ingolstadt",
+    "slaResponseDue": "2026-08-08"
+  }
+}

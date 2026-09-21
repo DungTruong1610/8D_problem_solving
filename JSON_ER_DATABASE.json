@@ -1,0 +1,597 @@
+{
+  "$comment": "Cấu trúc JSON của Golden Dataset 8D — dựng 1:1 từ 'ER Database_Quyen.xlsx', sheet 'GD 0 - Relationships' và các sheet GD 1..GD 15. Không thêm bảng/cột nào ngoài workbook. Ba phần: (1) schema = khai báo cấu trúc, PK/FK, cardinality, nguồn SAP; (2) data = dữ liệu quan hệ phẳng, đúng 1 case Q3 mock; (3) nested_case_view = chính dữ liệu đó lắp theo case để thấy đường đi của khóa.",
+  "meta": {
+    "dataset_name": "8D Copilot Golden Dataset",
+    "version": "1.0",
+    "source_workbook": "ER Database_Quyen.xlsx",
+    "source_sheet_of_truth": "GD 0 - Relationships",
+    "generated_for": "ConaSpark 2026 — 8D Report Copilot (SAP QM)",
+    "case_key": "notification_id",
+    "case_key_note": "Notification ID là case key mà gần như mọi bảng join ngược về — giống số QMEL notification trong SAP thật. Tạo case mới = thêm 1 dòng mỗi sheet và dùng lại cùng Notification ID.",
+    "entity_count": 16,
+    "source_classification_legend": {
+      "real_sap": "Có bảng SAP thật đứng sau (QMEL, QMFE, MARA, MCHA, CRHD, QALS/QAMR, QMMA, COEP/COSP...)",
+      "assumed": "Giả định schema — chưa xác nhận bằng export SAP thật",
+      "custom": "Tự định nghĩa, không có tương đương trong SAP",
+      "placeholder": "Chưa chốt, chờ export SAP của khách"
+    },
+    "origin_scope": {
+      "Q3": "Internal Defect — Priority 1 (case mock trong file này)",
+      "Q1": "Customer Complaint — Priority 2; chỉ Q1 mới có Customer-Facing/Internal-Facing Summary và GD 14 - Customer Reference"
+    }
+  },
+
+  "schema": {
+    "conventions": {
+      "key_markers": {
+        "PK": "Primary key",
+        "PK-part": "Một phần của khóa chính tổ hợp",
+        "FK": "Foreign key",
+        "attr": "Thuộc tính thường"
+      },
+      "null_policy": "null = ô trống trong workbook; chuỗi 'N/A - ...' là giá trị nghiệp vụ có ý nghĩa, KHÔNG phải null.",
+      "id_format": "Mọi ID giữ nguyên định dạng chuỗi của workbook (8D-#######, MAT-#####, B-#####, DEF-####, WC-XXX-##, BP-######, FMEA-XXX-##, EMP-####, EQ-XXX, GA-####, DOC-####)."
+    },
+
+    "entities": {
+      "materials": {
+        "sheet": "GD 1 - Materials",
+        "display_name": "Materials",
+        "sap_source": { "status": "real_sap", "tables": ["MARA", "MAKT"] },
+        "primary_key": ["material_id"],
+        "foreign_keys": [],
+        "cardinality_per_case": "1 material",
+        "columns": [
+          { "name": "material_id", "label": "Material ID (PK)", "key": "PK", "type": "string", "required": true, "sap_field": "MARA-MATNR" },
+          { "name": "description", "label": "Description", "key": "attr", "type": "string", "required": true, "sap_field": "MAKT-MAKTX" }
+        ]
+      },
+
+      "batches": {
+        "sheet": "GD 2 - Batches",
+        "display_name": "Batches",
+        "sap_source": { "status": "real_sap", "tables": ["MCHA"] },
+        "primary_key": ["batch_id"],
+        "foreign_keys": [
+          { "columns": ["material_id"], "references": { "entity": "materials", "columns": ["material_id"] }, "relationship": "many-to-one" }
+        ],
+        "cardinality_per_case": "1 batch",
+        "columns": [
+          { "name": "batch_id", "label": "Batch ID (PK)", "key": "PK", "type": "string", "required": true, "sap_field": "MCHA-CHARG" },
+          { "name": "material_id", "label": "Material ID (FK)", "key": "FK", "type": "string", "required": true, "sap_field": "MCHA-MATNR" }
+        ]
+      },
+
+      "defect_catalog": {
+        "sheet": "GD 3 - Defects",
+        "display_name": "Defect Catalog",
+        "sap_source": { "status": "real_sap", "tables": ["QMFE", "QPCT"] },
+        "primary_key": ["defect_code"],
+        "foreign_keys": [],
+        "cardinality_per_case": "1 defect code",
+        "note": "Catalog dùng lại được giữa các case (standard defect-code text).",
+        "columns": [
+          { "name": "defect_code", "label": "Defect Code (PK)", "key": "PK", "type": "string", "required": true, "sap_field": "QMFE-FECOD" },
+          { "name": "defect_text", "label": "Defect Text", "key": "attr", "type": "string", "required": true, "sap_field": "QPCT-KURZTEXT" }
+        ]
+      },
+
+      "work_centers": {
+        "sheet": "GD 4 - WorkCenters",
+        "display_name": "Work Centers",
+        "sap_source": { "status": "real_sap", "tables": ["AFVC", "CRHD"] },
+        "primary_key": ["work_center_id"],
+        "foreign_keys": [],
+        "cardinality_per_case": "1 work center",
+        "columns": [
+          { "name": "work_center_id", "label": "Work Center ID (PK)", "key": "PK", "type": "string", "required": true, "sap_field": "CRHD-ARBPL" },
+          { "name": "description", "label": "Description", "key": "attr", "type": "string", "required": true, "sap_field": "CRHD-KTEXT" }
+        ]
+      },
+
+      "notifications": {
+        "sheet": "GD 5 - Notifications",
+        "display_name": "Notifications — case header",
+        "sap_source": { "status": "real_sap", "tables": ["QMEL"] },
+        "primary_key": ["notification_id"],
+        "is_case_header": true,
+        "foreign_keys": [
+          { "columns": ["material_id"], "references": { "entity": "materials", "columns": ["material_id"] }, "relationship": "many-to-one" },
+          { "columns": ["batch_id"], "references": { "entity": "batches", "columns": ["batch_id"] }, "relationship": "many-to-one" },
+          { "columns": ["defect_code"], "references": { "entity": "defect_catalog", "columns": ["defect_code"] }, "relationship": "many-to-one" },
+          { "columns": ["work_center_id"], "references": { "entity": "work_centers", "columns": ["work_center_id"] }, "relationship": "many-to-one" }
+        ],
+        "cardinality_per_case": "1 case header",
+        "columns": [
+          { "name": "notification_id", "label": "Notification ID (PK)", "key": "PK", "type": "string", "required": true, "sap_field": "QMEL-QMNUM" },
+          { "name": "material_id", "label": "Material ID (FK)", "key": "FK", "type": "string", "required": true, "sap_field": "QMEL-MATNR" },
+          { "name": "batch_id", "label": "Batch ID (FK)", "key": "FK", "type": "string", "required": true, "sap_field": "QMEL-CHARG" },
+          { "name": "defect_code", "label": "Defect Code (FK)", "key": "FK", "type": "string", "required": true, "sap_field": "QMFE/QPCT" },
+          { "name": "work_center_id", "label": "Work Center ID (FK)", "key": "FK", "type": "string", "required": true, "sap_field": "QMEL-ARBPL" },
+          { "name": "symptom_short_text", "label": "Symptom / Short Text", "key": "attr", "type": "string", "required": true, "sap_field": "QMEL-KURZTEXT" },
+          { "name": "team_size", "label": "Team Size", "key": "attr", "type": "integer|string", "required": false, "sap_field": null, "field_origin": "doubleSlash-style case field", "note": "Phải khớp số dòng của case trong team_assignments." },
+          { "name": "origin", "label": "Origin (Q3 Internal / Q1 Customer)", "key": "attr", "type": "enum", "enum_ref": "origin", "required": true, "sap_field": "QMEL-QMART" },
+          { "name": "customer_facing_summary", "label": "Customer-Facing Summary", "key": "attr", "type": "string|null", "required": false, "sap_field": null, "field_origin": "NEW — Galileon real feature (assumed schema)", "applies_to_origin": ["Q1 - Customer Complaint"] },
+          { "name": "internal_facing_summary", "label": "Internal-Facing Summary", "key": "attr", "type": "string|null", "required": false, "sap_field": null, "field_origin": "NEW — Galileon real feature (assumed schema)", "applies_to_origin": ["Q1 - Customer Complaint"] },
+          { "name": "status", "label": "Status", "key": "attr", "type": "enum", "enum_ref": "notification_status", "required": true, "sap_field": "QMEL status" },
+          { "name": "completion_date", "label": "Completion Date", "key": "attr", "type": "date|null", "required": false, "sap_field": "QMEL / user action date" },
+          { "name": "found_date", "label": "Found Date", "key": "attr", "type": "date|string", "required": true, "sap_field": null, "field_origin": "NEW — added for D2 5W2H (When)" },
+          { "name": "quantity_extent", "label": "Quantity / Extent", "key": "attr", "type": "string", "required": true, "sap_field": null, "field_origin": "NEW — added for D2 5W2H (How Many)" }
+        ]
+      },
+
+      "inspections": {
+        "sheet": "GD 6 - Inspections",
+        "display_name": "Inspection Results",
+        "sap_source": { "status": "real_sap", "tables": ["QALS", "QAMR"] },
+        "primary_key": ["notification_id", "characteristic"],
+        "foreign_keys": [
+          { "columns": ["notification_id"], "references": { "entity": "notifications", "columns": ["notification_id"] }, "relationship": "many-to-one" }
+        ],
+        "cardinality_per_case": "1-to-many rows",
+        "note": "Một case có thể có NHIỀU characteristic — đó là lý do tách sheet riêng thay vì làm cột trên Notifications.",
+        "columns": [
+          { "name": "notification_id", "label": "Notification ID (FK)", "key": "PK-part,FK", "type": "string", "required": true, "sap_field": "QALS-PRUEFLOS -> QMEL" },
+          { "name": "characteristic", "label": "Characteristic", "key": "PK-part", "type": "string", "required": true, "sap_field": "QAMR-MKMNR text" },
+          { "name": "measured_value", "label": "Measured Value", "key": "attr", "type": "string", "required": true, "sap_field": "QAMR-MESSWERT" },
+          { "name": "spec_value", "label": "Spec Value", "key": "attr", "type": "string", "required": true, "sap_field": "QAMR spec (lower/upper)" }
+        ]
+      },
+
+      "causes_ishikawa": {
+        "sheet": "GD 7 - Causes (Ishikawa)",
+        "display_name": "5-Why / Ishikawa Causes",
+        "sap_source": { "status": "assumed", "tables": ["EQUI", "AFIH", "DRAW", "PLPO", "QALS", "QAMR", "Test Equipment Mgmt"], "mixed_note": "Mixed: SAP + 2 assumed (Man, Environment)" },
+        "primary_key": ["notification_id", "category"],
+        "foreign_keys": [
+          { "columns": ["notification_id"], "references": { "entity": "notifications", "columns": ["notification_id"] }, "relationship": "many-to-one" }
+        ],
+        "cardinality_per_case": "đúng 6 rows (1 row / 1 Ishikawa category)",
+        "columns": [
+          { "name": "notification_id", "label": "Notification ID (FK)", "key": "PK-part,FK", "type": "string", "required": true },
+          { "name": "category", "label": "Category", "key": "PK-part", "type": "enum", "enum_ref": "ishikawa_category", "required": true },
+          { "name": "description", "label": "Description", "key": "attr", "type": "string", "required": true },
+          { "name": "metric_value", "label": "Metric Value (if applicable)", "key": "attr", "type": "string|null", "required": false, "field_origin": "NEW column — số có cấu trúc (vd Gauge R&R %) để AI threshold trên số thay vì chỉ đọc free text" },
+          { "name": "is_root_cause", "label": "Is Root Cause?", "key": "attr", "type": "enum", "enum_ref": "yes_no", "required": true, "note": "AI-drafted từ 5-Why chain" },
+          { "name": "source", "label": "Source", "key": "attr", "type": "string", "required": true, "note": "field-level source" }
+        ]
+      },
+
+      "actions": {
+        "sheet": "GD 8 - Actions",
+        "display_name": "Actions",
+        "sap_source": { "status": "real_sap", "tables": ["QMMA"] },
+        "primary_key": ["notification_id", "line_no"],
+        "foreign_keys": [
+          { "columns": ["notification_id"], "references": { "entity": "notifications", "columns": ["notification_id"] }, "relationship": "many-to-one" }
+        ],
+        "cardinality_per_case": "1-to-many rows",
+        "columns": [
+          { "name": "notification_id", "label": "Notification ID (FK)", "key": "PK-part,FK", "type": "string", "required": true },
+          { "name": "line_no", "label": "line no.", "key": "PK-part", "type": "integer", "required": true, "note": "Số dòng trong khóa tổ hợp theo mô tả ở GD 0" },
+          { "name": "action_type", "label": "Action Type", "key": "attr", "type": "enum", "enum_ref": "action_type", "required": true, "field_origin": "NEW column — Containment=D3 / Corrective=D5 / Preventive=D7" },
+          { "name": "action_text", "label": "Action Text", "key": "attr", "type": "string", "required": true, "sap_field": "QMMA-MATXT" },
+          { "name": "status", "label": "Status", "key": "attr", "type": "enum", "enum_ref": "action_status", "required": true, "sap_field": "QMMA status" }
+        ]
+      },
+
+      "fmea_link": {
+        "sheet": "GD 9 - FMEA Link",
+        "display_name": "FMEA Link",
+        "sap_source": { "status": "real_sap", "tables": ["QM_FMEA", "QPCPD_LINK"] },
+        "primary_key": ["notification_id"],
+        "foreign_keys": [
+          { "columns": ["notification_id"], "references": { "entity": "notifications", "columns": ["notification_id"] }, "relationship": "one-to-one" }
+        ],
+        "cardinality_per_case": "0-1 link",
+        "columns": [
+          { "name": "notification_id", "label": "Notification ID (FK)", "key": "PK,FK", "type": "string", "required": true },
+          { "name": "fmea_id", "label": "FMEA ID", "key": "attr", "type": "string|null", "required": false, "sap_field": "QM_FMEA cockpit ID" },
+          { "name": "description", "label": "Description", "key": "attr", "type": "string", "required": true, "sap_field": "QPCPD_LINK failure mode text" }
+        ]
+      },
+
+      "cost_copq": {
+        "sheet": "GD 10 - Cost (COPQ)",
+        "display_name": "Cost of Poor Quality",
+        "sap_source": { "status": "real_sap", "tables": ["COEP", "COSP"] },
+        "primary_key": ["notification_id"],
+        "foreign_keys": [
+          { "columns": ["notification_id"], "references": { "entity": "notifications", "columns": ["notification_id"] }, "relationship": "one-to-one" }
+        ],
+        "cardinality_per_case": "1 cost total",
+        "columns": [
+          { "name": "notification_id", "label": "Notification ID (FK)", "key": "PK,FK", "type": "string", "required": true },
+          { "name": "cost_of_poor_quality_eur", "label": "Cost of Poor Quality (EUR)", "key": "attr", "type": "number|string", "required": true, "sap_field": "COEP/COSP", "note": "Dạng chuỗi khi không có số per-case (vd case Q1 chỉ có thống kê tổng hợp)" }
+        ]
+      },
+
+      "lessons_learned": {
+        "sheet": "GD 11 - Lessons Learned",
+        "display_name": "Lessons Learned",
+        "sap_source": { "status": "custom", "tables": [], "note": "CUSTOM — không có tương đương SAP" },
+        "primary_key": ["notification_id"],
+        "foreign_keys": [
+          { "columns": ["notification_id"], "references": { "entity": "notifications", "columns": ["notification_id"] }, "relationship": "one-to-one" }
+        ],
+        "cardinality_per_case": "1 entry",
+        "columns": [
+          { "name": "notification_id", "label": "Notification ID (FK)", "key": "PK,FK", "type": "string", "required": true },
+          { "name": "what_worked", "label": "What Worked", "key": "attr", "type": "string", "required": true, "field_origin": "CUSTOM FIELD" },
+          { "name": "what_didnt", "label": "What Didn't", "key": "attr", "type": "string", "required": true, "field_origin": "CUSTOM FIELD" }
+        ]
+      },
+
+      "is_is_not": {
+        "sheet": "GD 12 - Is-Is Not",
+        "display_name": "Is / Is-Not Comparison",
+        "sap_source": { "status": "assumed", "tables": [], "note": "Assumed: SAP QM analytics across lots" },
+        "primary_key": ["notification_id"],
+        "foreign_keys": [
+          { "columns": ["notification_id"], "references": { "entity": "notifications", "columns": ["notification_id"] }, "relationship": "one-to-one" }
+        ],
+        "cardinality_per_case": "1 comparison",
+        "field_origin": "NEW sheet",
+        "columns": [
+          { "name": "notification_id", "label": "Notification ID (FK)", "key": "PK,FK", "type": "string", "required": true },
+          { "name": "is_where_when_it_happens", "label": "IS (where/when it happens)", "key": "attr", "type": "string", "required": true },
+          { "name": "is_not_where_when_it_doesnt", "label": "IS NOT (where/when it doesn't)", "key": "attr", "type": "string", "required": true },
+          { "name": "notes", "label": "Notes", "key": "attr", "type": "string|null", "required": false }
+        ]
+      },
+
+      "five_why_chain": {
+        "sheet": "GD 13 - 5-Why Chain",
+        "display_name": "5-Why Chain (with evidence citation)",
+        "sap_source": { "status": "custom", "tables": [], "note": "AI-drafted, cites case data" },
+        "primary_key": ["notification_id", "step_no"],
+        "foreign_keys": [
+          { "columns": ["notification_id"], "references": { "entity": "notifications", "columns": ["notification_id"] }, "relationship": "many-to-one" }
+        ],
+        "cardinality_per_case": "2-5 rows per case",
+        "field_origin": "NEW sheet",
+        "columns": [
+          { "name": "notification_id", "label": "Notification ID (FK)", "key": "PK-part,FK", "type": "string", "required": true },
+          { "name": "step_no", "label": "Step #", "key": "PK-part", "type": "integer", "required": true },
+          { "name": "question", "label": "Question", "key": "attr", "type": "string", "required": true },
+          { "name": "answer", "label": "Answer", "key": "attr", "type": "string", "required": true },
+          { "name": "evidence_citation", "label": "Evidence Citation", "key": "attr", "type": "string|null", "required": false }
+        ]
+      },
+
+      "customer_reference": {
+        "sheet": "GD 14 - Customer Reference",
+        "display_name": "Customer Reference & SLA (Q1 only)",
+        "sap_source": { "status": "assumed", "tables": [], "note": "Assumed: customer portal / email / CRM" },
+        "primary_key": ["notification_id"],
+        "foreign_keys": [
+          { "columns": ["notification_id"], "references": { "entity": "notifications", "columns": ["notification_id"] }, "relationship": "one-to-one" }
+        ],
+        "cardinality_per_case": "1 entry, chỉ Q1 cases",
+        "applies_to_origin": ["Q1 - Customer Complaint"],
+        "field_origin": "NEW sheet",
+        "columns": [
+          { "name": "notification_id", "label": "Notification ID (FK)", "key": "PK,FK", "type": "string", "required": true },
+          { "name": "complaint_reference", "label": "Complaint Reference", "key": "attr", "type": "string", "required": true },
+          { "name": "customer_plant_contact", "label": "Customer Plant / Contact", "key": "attr", "type": "string", "required": true },
+          { "name": "sla_response_due", "label": "SLA Response Due", "key": "attr", "type": "string", "required": true }
+        ]
+      },
+
+      "team_assignments": {
+        "sheet": "GD 15 - Team Assignments",
+        "display_name": "Team Assignments",
+        "sap_source": { "status": "real_sap", "tables": ["Business Partner (BP) master data"], "note": "Mockup's BP_DIRECTORY mô phỏng SAP BP" },
+        "primary_key": ["notification_id", "partner_id"],
+        "foreign_keys": [
+          { "columns": ["notification_id"], "references": { "entity": "notifications", "columns": ["notification_id"] }, "relationship": "many-to-one" },
+          { "columns": ["partner_id"], "references": { "entity": "BP_DIRECTORY (SAP Business Partner)", "columns": ["partner_id"] }, "relationship": "many-to-one", "note": "FK ra ngoài Golden Dataset — BP directory là master data, không phải sheet GD" }
+        ],
+        "cardinality_per_case": "2-4 rows per case",
+        "field_origin": "NEW sheet",
+        "note": "Nguồn cho gợi ý D1 (Suggested Roles, Suggested Individuals).",
+        "columns": [
+          { "name": "notification_id", "label": "Notification ID (FK)", "key": "PK-part,FK", "type": "string", "required": true },
+          { "name": "partner_id", "label": "Partner ID (FK)", "key": "PK-part,FK", "type": "string", "required": true },
+          { "name": "partner_name", "label": "Partner Name", "key": "attr", "type": "string", "required": true },
+          { "name": "function_title", "label": "Function / Title", "key": "attr", "type": "string", "required": true },
+          { "name": "partner_role", "label": "Partner Role", "key": "attr", "type": "enum", "enum_ref": "partner_role", "required": true },
+          { "name": "source", "label": "Source", "key": "attr", "type": "string", "required": true }
+        ]
+      },
+
+      "spc_process_data": {
+        "sheet": "SPC / Process Data (TBD - placeholder)",
+        "display_name": "SPC / Process Data",
+        "sap_source": { "status": "placeholder", "tables": ["QALS", "QAMR", "QASH", "QAST", "QPST", "QPSP"], "note": "CHƯA XÁC MINH — chờ export SAP" },
+        "primary_key": ["material_id", "characteristic", "vendor"],
+        "primary_key_note": "Material ID + Characteristic (+Vendor)",
+        "foreign_keys": [
+          { "columns": ["material_id"], "references": { "entity": "materials", "columns": ["material_id"] }, "relationship": "many-to-one", "note": "Gián tiếp, đi qua Inspections" }
+        ],
+        "cardinality_per_case": "1 control-chart summary / Material+Characteristic — tổng hợp nhiều dòng Inspections, KHÔNG phải 1-per-case",
+        "status": "PLACEHOLDER — chưa chốt cột, nên không có mock data",
+        "columns": [
+          { "name": "material_id", "label": "Material ID", "key": "PK-part,FK", "type": "string", "required": true },
+          { "name": "characteristic", "label": "Characteristic", "key": "PK-part", "type": "string", "required": true },
+          { "name": "vendor", "label": "Vendor", "key": "PK-part", "type": "string|null", "required": false }
+        ]
+      }
+    },
+
+    "enumerations": {
+      "origin": ["Q3 - Internal Defect", "Q1 - Customer Complaint"],
+      "notification_status": ["In Process", "Completed", "Closed"],
+      "ishikawa_category": ["Man", "Machine", "Method", "Material", "Measurement", "Environment"],
+      "yes_no": ["Y", "N"],
+      "action_type": ["Containment", "Corrective", "Preventive"],
+      "action_type_to_8d_step": { "Containment": "D3", "Corrective": "D5", "Preventive": "D7" },
+      "action_status": ["Planned", "Done", "Verified", "Verified in production"],
+      "partner_role": ["8D Team Leader", "8D Team Member"]
+    }
+  },
+
+  "relationships": [
+    { "from": "batches.material_id", "to": "materials.material_id", "type": "FK", "cardinality": "N:1" },
+    { "from": "notifications.material_id", "to": "materials.material_id", "type": "FK", "cardinality": "N:1" },
+    { "from": "notifications.batch_id", "to": "batches.batch_id", "type": "FK", "cardinality": "N:1" },
+    { "from": "notifications.defect_code", "to": "defect_catalog.defect_code", "type": "FK", "cardinality": "N:1" },
+    { "from": "notifications.work_center_id", "to": "work_centers.work_center_id", "type": "FK", "cardinality": "N:1" },
+    { "from": "inspections.notification_id", "to": "notifications.notification_id", "type": "FK", "cardinality": "N:1" },
+    { "from": "causes_ishikawa.notification_id", "to": "notifications.notification_id", "type": "FK", "cardinality": "6:1" },
+    { "from": "actions.notification_id", "to": "notifications.notification_id", "type": "FK", "cardinality": "N:1" },
+    { "from": "fmea_link.notification_id", "to": "notifications.notification_id", "type": "FK", "cardinality": "0..1:1" },
+    { "from": "cost_copq.notification_id", "to": "notifications.notification_id", "type": "FK", "cardinality": "1:1" },
+    { "from": "lessons_learned.notification_id", "to": "notifications.notification_id", "type": "FK", "cardinality": "1:1" },
+    { "from": "is_is_not.notification_id", "to": "notifications.notification_id", "type": "FK", "cardinality": "1:1" },
+    { "from": "five_why_chain.notification_id", "to": "notifications.notification_id", "type": "FK", "cardinality": "2..5:1" },
+    { "from": "customer_reference.notification_id", "to": "notifications.notification_id", "type": "FK", "cardinality": "1:1 (chỉ Q1)" },
+    { "from": "team_assignments.notification_id", "to": "notifications.notification_id", "type": "FK", "cardinality": "2..4:1" },
+    { "from": "team_assignments.partner_id", "to": "BP_DIRECTORY.partner_id", "type": "FK (external master data)", "cardinality": "N:1" },
+    { "from": "spc_process_data.material_id", "to": "materials.material_id", "type": "FK (indirect, via inspections)", "cardinality": "N:1" }
+  ],
+
+  "data": {
+    "$comment": "Dữ liệu quan hệ phẳng — đúng 1 defect case (Q3 - Internal Defect), mock. Master data chỉ chứa các dòng mà case này tham chiếu tới.",
+    "materials": [
+      { "material_id": "MAT-10247", "description": "Bracket Housing X240" }
+    ],
+    "batches": [
+      { "batch_id": "B-49172", "material_id": "MAT-10247" }
+    ],
+    "defect_catalog": [
+      { "defect_code": "DEF-0489", "defect_text": "Flange edge burr above limit" }
+    ],
+    "work_centers": [
+      { "work_center_id": "WC-MILL-07", "description": "CNC Milling Line 7" }
+    ],
+    "notifications": [
+      {
+        "notification_id": "8D-10048412",
+        "material_id": "MAT-10247",
+        "batch_id": "B-49172",
+        "defect_code": "DEF-0489",
+        "work_center_id": "WC-MILL-07",
+        "symptom_short_text": "Flange edge burr above limit after milling",
+        "team_size": 4,
+        "origin": "Q3 - Internal Defect",
+        "customer_facing_summary": null,
+        "internal_facing_summary": null,
+        "status": "In Process",
+        "completion_date": null,
+        "found_date": "2026-08-03",
+        "quantity_extent": "128 units affected"
+      }
+    ],
+    "inspections": [
+      { "notification_id": "8D-10048412", "characteristic": "Flange burr height", "measured_value": "0.32mm", "spec_value": "max 0.10mm" },
+      { "notification_id": "8D-10048412", "characteristic": "Flange flatness", "measured_value": "0.09mm", "spec_value": "0.05mm +/-0" }
+    ],
+    "causes_ishikawa": [
+      { "notification_id": "8D-10048412", "category": "Man", "description": "EMP-2340, Shift C", "metric_value": null, "is_root_cause": "N", "source": "ASSUMED: MES/HR" },
+      { "notification_id": "8D-10048412", "category": "Machine", "description": "EQ-MILL07-002, deburring tool at 11,800 cycles vs 8,000-cycle replacement limit", "metric_value": "11,800 cycles", "is_root_cause": "Y", "source": "SAP: EQUI/AFIH (PM)" },
+      { "notification_id": "8D-10048412", "category": "Method", "description": "DOC-4610 Rev B - Milling & deburring work instruction, unchanged", "metric_value": null, "is_root_cause": "N", "source": "SAP: DRAW/PLPO (DMS+Routing)" },
+      { "notification_id": "8D-10048412", "category": "Material", "description": "Batch cert PASS", "metric_value": null, "is_root_cause": "N", "source": "SAP: QALS/QAMR (incoming)" },
+      { "notification_id": "8D-10048412", "category": "Measurement", "description": "GA-0044, last cal 2026-06-20", "metric_value": "4.2% (illustrative)", "is_root_cause": "N", "source": "SAP: Test Equipment Mgmt" },
+      { "notification_id": "8D-10048412", "category": "Environment", "description": "23.0C at 06:45 (illustrative)", "metric_value": null, "is_root_cause": "N", "source": "ASSUMED: MES/IoT" }
+    ],
+    "actions": [
+      { "notification_id": "8D-10048412", "line_no": 1, "action_type": "Containment", "action_text": "Quarantine remaining stock from batch B-49172 and 100% burr check before packing", "status": "Done" },
+      { "notification_id": "8D-10048412", "line_no": 2, "action_type": "Corrective", "action_text": "Replace worn deburring tool on EQ-MILL07-002", "status": "Done" },
+      { "notification_id": "8D-10048412", "line_no": 3, "action_type": "Preventive", "action_text": "Add tool-life counter alarm at 8,000 cycles on WC-MILL-07", "status": "Planned" }
+    ],
+    "fmea_link": [
+      { "notification_id": "8D-10048412", "fmea_id": "FMEA-MILL07-03", "description": "Deburring tool wear" }
+    ],
+    "cost_copq": [
+      { "notification_id": "8D-10048412", "cost_of_poor_quality_eur": 12750 }
+    ],
+    "lessons_learned": [
+      { "notification_id": "8D-10048412", "what_worked": "Tool-life data in the PM log isolated the root cause within one shift", "what_didnt": "Burr check only ran at final inspection - too late to stop 128 units" }
+    ],
+    "is_is_not": [
+      { "notification_id": "8D-10048412", "is_where_when_it_happens": "X240 flange edge - WC-MILL-07 - after tool-change interval overrun on 2026-08-01", "is_not_where_when_it_doesnt": "X200 / X180 variants - WC-PRESS-12 - mounting-hole features", "notes": "Illustrative Is/Is-Not for this mock Q3 case" }
+    ],
+    "five_why_chain": [
+      { "notification_id": "8D-10048412", "step_no": 1, "question": "Why is the flange edge burr above limit?", "answer": "Burr height measured 0.32mm vs max 0.10mm spec - the deburring tool no longer cuts cleanly", "evidence_citation": "Inspection lot QALS/QAMR" },
+      { "notification_id": "8D-10048412", "step_no": 2, "question": "Why did the tool stop cutting cleanly? (root cause)", "answer": "Deburring tool ran to 11,800 cycles, past the 8,000-cycle replacement limit on EQ-MILL07-002", "evidence_citation": "Equipment maintenance log EQ-MILL07-002" },
+      { "notification_id": "8D-10048412", "step_no": 3, "question": "Why was the limit exceeded unnoticed?", "answer": "No tool-life counter alarm configured at WC-MILL-07", "evidence_citation": "PM plan WC-MILL-07" }
+    ],
+    "customer_reference": [
+      { "notification_id": "8D-10048412", "complaint_reference": "N/A - internal defect, no customer reference", "customer_plant_contact": "N/A", "sla_response_due": "N/A" }
+    ],
+    "team_assignments": [
+      { "notification_id": "8D-10048412", "partner_id": "BP-100001", "partner_name": "Heli Weber", "function_title": "Quality Engineer", "partner_role": "8D Team Leader", "source": "Backfilled from case record" },
+      { "notification_id": "8D-10048412", "partner_id": "BP-100012", "partner_name": "Minh Dinh", "function_title": "Production Engineer", "partner_role": "8D Team Member", "source": "Backfilled from case record" },
+      { "notification_id": "8D-10048412", "partner_id": "BP-100011", "partner_name": "Quyen La", "function_title": "Quality Technician", "partner_role": "8D Team Member", "source": "Backfilled from case record" },
+      { "notification_id": "8D-10048412", "partner_id": "BP-100014", "partner_name": "Thien Tu", "function_title": "Production Worker", "partner_role": "8D Team Member", "source": "Backfilled from case record" }
+    ],
+    "spc_process_data": []
+  },
+
+  "nested_case_view": {
+    "$comment": "Cùng một dữ liệu ở trên, lắp theo case key để thấy rõ đường đi của khóa. Mỗi node con ghi _join cho biết nó nối bằng khóa nào.",
+    "notification_id": "8D-10048412",
+    "_primary_key": { "entity": "notifications", "columns": { "notification_id": "8D-10048412" } },
+    "header": {
+      "_entity": "notifications",
+      "symptom_short_text": "Flange edge burr above limit after milling",
+      "team_size": 4,
+      "origin": "Q3 - Internal Defect",
+      "customer_facing_summary": null,
+      "internal_facing_summary": null,
+      "status": "In Process",
+      "completion_date": null,
+      "found_date": "2026-08-03",
+      "quantity_extent": "128 units affected"
+    },
+    "material": {
+      "_entity": "materials",
+      "_join": "notifications.material_id -> materials.material_id",
+      "material_id": "MAT-10247",
+      "description": "Bracket Housing X240"
+    },
+    "batch": {
+      "_entity": "batches",
+      "_join": "notifications.batch_id -> batches.batch_id",
+      "batch_id": "B-49172",
+      "material_id": "MAT-10247",
+      "_nested_join": "batches.material_id -> materials.material_id (phải khớp notifications.material_id)"
+    },
+    "defect": {
+      "_entity": "defect_catalog",
+      "_join": "notifications.defect_code -> defect_catalog.defect_code",
+      "defect_code": "DEF-0489",
+      "defect_text": "Flange edge burr above limit"
+    },
+    "work_center": {
+      "_entity": "work_centers",
+      "_join": "notifications.work_center_id -> work_centers.work_center_id",
+      "work_center_id": "WC-MILL-07",
+      "description": "CNC Milling Line 7"
+    },
+    "inspections": {
+      "_entity": "inspections",
+      "_join": "inspections.notification_id -> notifications.notification_id",
+      "_cardinality": "1-to-many",
+      "rows": [
+        { "characteristic": "Flange burr height", "measured_value": "0.32mm", "spec_value": "max 0.10mm" },
+        { "characteristic": "Flange flatness", "measured_value": "0.09mm", "spec_value": "0.05mm +/-0" }
+      ]
+    },
+    "causes_ishikawa": {
+      "_entity": "causes_ishikawa",
+      "_join": "causes_ishikawa.notification_id -> notifications.notification_id",
+      "_cardinality": "6 rows",
+      "root_cause_category": "Machine",
+      "rows": [
+        { "category": "Man", "description": "EMP-2340, Shift C", "metric_value": null, "is_root_cause": "N", "source": "ASSUMED: MES/HR" },
+        { "category": "Machine", "description": "EQ-MILL07-002, deburring tool at 11,800 cycles vs 8,000-cycle replacement limit", "metric_value": "11,800 cycles", "is_root_cause": "Y", "source": "SAP: EQUI/AFIH (PM)" },
+        { "category": "Method", "description": "DOC-4610 Rev B - Milling & deburring work instruction, unchanged", "metric_value": null, "is_root_cause": "N", "source": "SAP: DRAW/PLPO (DMS+Routing)" },
+        { "category": "Material", "description": "Batch cert PASS", "metric_value": null, "is_root_cause": "N", "source": "SAP: QALS/QAMR (incoming)" },
+        { "category": "Measurement", "description": "GA-0044, last cal 2026-06-20", "metric_value": "4.2% (illustrative)", "is_root_cause": "N", "source": "SAP: Test Equipment Mgmt" },
+        { "category": "Environment", "description": "23.0C at 06:45 (illustrative)", "metric_value": null, "is_root_cause": "N", "source": "ASSUMED: MES/IoT" }
+      ]
+    },
+    "five_why_chain": {
+      "_entity": "five_why_chain",
+      "_join": "five_why_chain.notification_id -> notifications.notification_id",
+      "_cardinality": "3 rows (allowed 2-5)",
+      "rows": [
+        { "step_no": 1, "question": "Why is the flange edge burr above limit?", "answer": "Burr height measured 0.32mm vs max 0.10mm spec - the deburring tool no longer cuts cleanly", "evidence_citation": "Inspection lot QALS/QAMR" },
+        { "step_no": 2, "question": "Why did the tool stop cutting cleanly? (root cause)", "answer": "Deburring tool ran to 11,800 cycles, past the 8,000-cycle replacement limit on EQ-MILL07-002", "evidence_citation": "Equipment maintenance log EQ-MILL07-002" },
+        { "step_no": 3, "question": "Why was the limit exceeded unnoticed?", "answer": "No tool-life counter alarm configured at WC-MILL-07", "evidence_citation": "PM plan WC-MILL-07" }
+      ]
+    },
+    "is_is_not": {
+      "_entity": "is_is_not",
+      "_join": "is_is_not.notification_id -> notifications.notification_id",
+      "_cardinality": "1:1",
+      "is_where_when_it_happens": "X240 flange edge - WC-MILL-07 - after tool-change interval overrun on 2026-08-01",
+      "is_not_where_when_it_doesnt": "X200 / X180 variants - WC-PRESS-12 - mounting-hole features",
+      "notes": "Illustrative Is/Is-Not for this mock Q3 case"
+    },
+    "actions": {
+      "_entity": "actions",
+      "_join": "actions.notification_id -> notifications.notification_id",
+      "_cardinality": "1-to-many",
+      "rows": [
+        { "line_no": 1, "action_type": "Containment", "action_text": "Quarantine remaining stock from batch B-49172 and 100% burr check before packing", "status": "Done" },
+        { "line_no": 2, "action_type": "Corrective", "action_text": "Replace worn deburring tool on EQ-MILL07-002", "status": "Done" },
+        { "line_no": 3, "action_type": "Preventive", "action_text": "Add tool-life counter alarm at 8,000 cycles on WC-MILL-07", "status": "Planned" }
+      ]
+    },
+    "fmea_link": {
+      "_entity": "fmea_link",
+      "_join": "fmea_link.notification_id -> notifications.notification_id",
+      "_cardinality": "0-1",
+      "fmea_id": "FMEA-MILL07-03",
+      "description": "Deburring tool wear"
+    },
+    "cost_copq": {
+      "_entity": "cost_copq",
+      "_join": "cost_copq.notification_id -> notifications.notification_id",
+      "_cardinality": "1:1",
+      "cost_of_poor_quality_eur": 12750
+    },
+    "lessons_learned": {
+      "_entity": "lessons_learned",
+      "_join": "lessons_learned.notification_id -> notifications.notification_id",
+      "_cardinality": "1:1",
+      "what_worked": "Tool-life data in the PM log isolated the root cause within one shift",
+      "what_didnt": "Burr check only ran at final inspection - too late to stop 128 units"
+    },
+    "customer_reference": {
+      "_entity": "customer_reference",
+      "_join": "customer_reference.notification_id -> notifications.notification_id",
+      "_cardinality": "1:1, chỉ populate cho Q1",
+      "_applicable": false,
+      "complaint_reference": "N/A - internal defect, no customer reference",
+      "customer_plant_contact": "N/A",
+      "sla_response_due": "N/A"
+    },
+    "team_assignments": {
+      "_entity": "team_assignments",
+      "_join": "team_assignments.notification_id -> notifications.notification_id; team_assignments.partner_id -> BP_DIRECTORY.partner_id",
+      "_cardinality": "4 rows (allowed 2-4)",
+      "rows": [
+        { "partner_id": "BP-100001", "partner_name": "Heli Weber", "function_title": "Quality Engineer", "partner_role": "8D Team Leader", "source": "Backfilled from case record" },
+        { "partner_id": "BP-100012", "partner_name": "Minh Dinh", "function_title": "Production Engineer", "partner_role": "8D Team Member", "source": "Backfilled from case record" },
+        { "partner_id": "BP-100011", "partner_name": "Quyen La", "function_title": "Quality Technician", "partner_role": "8D Team Member", "source": "Backfilled from case record" },
+        { "partner_id": "BP-100014", "partner_name": "Thien Tu", "function_title": "Production Worker", "partner_role": "8D Team Member", "source": "Backfilled from case record" }
+      ]
+    },
+    "spc_process_data": {
+      "_entity": "spc_process_data",
+      "_join": "spc_process_data.material_id -> materials.material_id (gián tiếp qua inspections)",
+      "_cardinality": "1 summary / Material+Characteristic - KHÔNG phải 1-per-case",
+      "_status": "PLACEHOLDER - chưa chốt schema, không có dữ liệu",
+      "rows": []
+    }
+  },
+
+  "integrity": {
+    "$comment": "Ràng buộc để validate dataset — suy ra trực tiếp từ GD 0 và các dòng header của từng sheet.",
+    "constraints": [
+      { "id": "PK-UNIQUE", "rule": "Mỗi entity: tổ hợp primary_key phải duy nhất." },
+      { "id": "FK-EXISTS", "rule": "Mọi giá trị FK phải tồn tại trong entity đích (trừ FK ra BP_DIRECTORY — master data ngoài dataset)." },
+      { "id": "BATCH-MATERIAL-MATCH", "rule": "notifications.material_id phải khớp batches[notifications.batch_id].material_id." },
+      { "id": "ISHIKAWA-6-ROWS", "rule": "Mỗi notification_id phải có đúng 6 dòng causes_ishikawa, một dòng cho mỗi category trong enum ishikawa_category." },
+      { "id": "ROOT-CAUSE-CONSISTENCY", "rule": "Category có is_root_cause = 'Y' phải khớp với bước '(root cause)' trong five_why_chain." },
+      { "id": "FIVE-WHY-RANGE", "rule": "2 <= số dòng five_why_chain per case <= 5; step_no liên tục bắt đầu từ 1." },
+      { "id": "TEAM-SIZE-MATCH", "rule": "notifications.team_size = số dòng team_assignments của case đó (khi team_size là số)." },
+      { "id": "TEAM-ONE-LEADER", "rule": "Mỗi case có đúng 1 dòng partner_role = '8D Team Leader'." },
+      { "id": "TEAM-RANGE", "rule": "2 <= số dòng team_assignments per case <= 4." },
+      { "id": "Q1-ONLY-CUSTOMER-FIELDS", "rule": "customer_facing_summary / internal_facing_summary và dữ liệu thật ở customer_reference chỉ có giá trị khi origin = 'Q1 - Customer Complaint'." },
+      { "id": "ACTION-TYPE-COVERAGE", "rule": "action_type ánh xạ D3/D5/D7; case đã đóng phải có đủ Containment + Corrective + Preventive." },
+      { "id": "COMPLETION-DATE-STATUS", "rule": "completion_date chỉ non-null khi status thuộc {'Completed', 'Closed'}." },
+      { "id": "SPC-NOT-PER-CASE", "rule": "spc_process_data tổng hợp theo Material+Characteristic(+Vendor), không join trực tiếp theo notification_id." }
+    ],
+    "validation_result_for_this_file": {
+      "case_count": 1,
+      "origin": "Q3 - Internal Defect",
+      "all_constraints_checked": true,
+      "violations": []
+    }
+  }
+}

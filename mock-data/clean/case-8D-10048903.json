@@ -1,0 +1,171 @@
+{
+  "notificationId": "8D-10048903",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Gloss level rejected at customer goods receipt",
+  "status": "In Process",
+  "foundDate": "2026-08-04",
+  "completionDate": null,
+  "quantityExtent": "204 units affected",
+  "teamSize": 4,
+  "material": {
+    "materialId": "MAT-11388",
+    "description": "Trim Panel T18",
+    "materialGroup": "MG-TRIM"
+  },
+  "batch": {
+    "batchId": "B-54720",
+    "materialId": "MAT-11388"
+  },
+  "defect": {
+    "defectCode": "DEF-1455",
+    "defectText": "Paint gloss out of specification"
+  },
+  "workCenter": {
+    "workCenterId": "WC-PAINT-03",
+    "description": "Topcoat Booth 3"
+  },
+  "inspections": [
+    {
+      "characteristic": "Gloss 60 degree",
+      "measuredValue": "71 GU",
+      "specValue": "82-90 GU"
+    },
+    {
+      "characteristic": "Film build",
+      "measuredValue": "41um",
+      "specValue": "35-45um"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-9755, Shift A - booth parameters set per the released recipe",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-PAINT03-004 bell speed and flow logged within band all shift",
+      "metricValue": "within band",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-12440 Rev E - flash-off time shortened from 90s to 60s in the 2026-06 cycle-time project",
+      "metricValue": "60s vs previous 90s",
+      "isRootCause": "Y",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Paint lot PNT-5540 viscosity and solids within spec, cert PASS",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Gloss meter GA-0844 gauge R&R measured 31% of tolerance at the last MSA study on 2026-07-28, above the 30% acceptance threshold; the study was filed but the meter stayed in service",
+      "metricValue": "R&R 31% vs 30% max",
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Booth 23.1C / 62% RH, within the 20-25C and 55-70% RH window",
+      "metricValue": "23.1C / 62% RH",
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why was gloss rejected at the customer?",
+      "answer": "Gloss measured 71 GU against an 82-90 GU window",
+      "evidenceCitation": "Customer goods receipt report"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why was gloss low despite correct film build and paint? (root cause)",
+      "answer": "Flash-off time was reduced from 90s to 60s in the June cycle-time project, leaving solvent in the film at cure",
+      "evidenceCitation": "DOC-12440 Rev E change record"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why did the change reach production without a gloss impact assessment?",
+      "answer": "The cycle-time project treated flash-off as a throughput parameter rather than a quality-critical one",
+      "evidenceCitation": "Project record CT-2026-07"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "Hold all T18 stock and re-measure a sample on the laboratory gloss meter"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Containment",
+      "status": "Planned",
+      "actionText": "Sort the 204 units at the customer against the drawing gloss requirement"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Corrective",
+      "status": "Planned",
+      "actionText": "Restore the flash-off time to 90s in DOC-12440 and re-qualify the booth"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100067",
+      "partnerName": "Marek Nowak",
+      "functionTitle": "Surface Treatment Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100147",
+      "partnerName": "Lena Hoffmann",
+      "functionTitle": "Metrology Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 26900
+  },
+  "lessonsLearned": {
+    "whatWorked": "Holding the stock quickly limited further shipments",
+    "whatDidnt": "The line and the laboratory reported different gloss on the same panels and the disagreement was not resolved before assigning a cause"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "T18 panels measured on gloss meter GA-0844 at the Booth 3 inspection station",
+    "isNotWhereWhenItDoesnt": "T18 panels from the same booth and same shift re-measured on GA-0851 at the lab, which read 84-87 GU",
+    "notes": "The lab and the line disagree on the same panels"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0533",
+    "customerPlantContact": "Sofia Marino - Plant 5, Turin",
+    "slaResponseDue": "2026-08-11"
+  }
+}

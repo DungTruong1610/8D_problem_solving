@@ -1,0 +1,174 @@
+{
+  "notificationId": "8D-10048412",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Flange edge burr above limit after milling",
+  "status": "In Process",
+  "foundDate": "2026-08-03",
+  "completionDate": null,
+  "quantityExtent": "128 units affected",
+  "teamSize": 4,
+  "material": {
+    "materialId": "MAT-10247",
+    "description": "Bracket Housing X240",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-49172",
+    "materialId": "MAT-10247"
+  },
+  "defect": {
+    "defectCode": "DEF-0489",
+    "defectText": "Flange edge burr above limit"
+  },
+  "workCenter": {
+    "workCenterId": "WC-MILL-07",
+    "description": "CNC Milling Line 7"
+  },
+  "inspections": [
+    {
+      "characteristic": "Flange burr height",
+      "measuredValue": "0.32mm",
+      "specValue": "max 0.10mm"
+    },
+    {
+      "characteristic": "Flange flatness",
+      "measuredValue": "0.09mm",
+      "specValue": "0.05mm +/-0"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-2340, Shift C",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-MILL07-002, deburring tool at 11,800 cycles vs 8,000-cycle replacement limit",
+      "metricValue": "11,800 cycles",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-4610 Rev B - Milling & deburring work instruction, unchanged",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Batch cert PASS",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "GA-0044, last cal 2026-06-20",
+      "metricValue": "4.2% (illustrative)",
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "23.0C at 06:45 (illustrative)",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why is the flange edge burr above limit?",
+      "answer": "Burr height measured 0.32mm vs max 0.10mm spec - the deburring tool no longer cuts cleanly",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did the tool stop cutting cleanly? (root cause)",
+      "answer": "Deburring tool ran to 11,800 cycles, past the 8,000-cycle replacement limit on EQ-MILL07-002",
+      "evidenceCitation": "Equipment maintenance log EQ-MILL07-002"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was the limit exceeded unnoticed?",
+      "answer": "No tool-life counter alarm configured at WC-MILL-07",
+      "evidenceCitation": "PM plan WC-MILL-07"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Quarantine remaining stock from batch B-49172 and 100% burr check before packing",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "actionText": "Replace worn deburring tool on EQ-MILL07-002",
+      "status": "Done"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "actionText": "Add tool-life counter alarm at 8,000 cycles on WC-MILL-07",
+      "status": "Planned"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "100012",
+      "partnerName": "Minh Dinh",
+      "functionTitle": "Production Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "100014",
+      "partnerName": "Thien Tu",
+      "functionTitle": "Production Worker",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-MILL07-03",
+    "description": "Deburring tool wear"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 12750
+  },
+  "lessonsLearned": {
+    "whatWorked": "Tool-life data in the PM log isolated the root cause within one shift",
+    "whatDidnt": "Burr check only ran at final inspection - too late to stop 128 units"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "X240 flange edge - WC-MILL-07 - after tool-change interval overrun on 2026-08-01",
+    "isNotWhereWhenItDoesnt": "X200 / X180 variants - WC-PRESS-12 - mounting-hole features",
+    "notes": "Illustrative Is/Is-Not for this mock Q3 case"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - internal defect, no customer reference",
+    "customerPlantContact": "N/A",
+    "slaResponseDue": "N/A"
+  }
+}

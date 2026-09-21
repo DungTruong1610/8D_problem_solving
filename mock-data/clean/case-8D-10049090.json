@@ -1,0 +1,167 @@
+{
+  "notificationId": "8D-10049090",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Exhaust flange weld seam failed helium leak test at customer Tier-1 exhaust plant",
+  "status": "Closed",
+  "foundDate": "2026-08-11",
+  "completionDate": "2026-08-27",
+  "quantityExtent": "92 units affected",
+  "teamSize": 3,
+  "material": {
+    "materialId": "MAT-11170",
+    "description": "Exhaust Flange EF-80",
+    "materialGroup": "MG-EXHAUST"
+  },
+  "batch": {
+    "batchId": "B-50640",
+    "materialId": "MAT-11170"
+  },
+  "defect": {
+    "defectCode": "DEF-0910",
+    "defectText": "Internal porosity in robotic fiber laser welded lap joint"
+  },
+  "workCenter": {
+    "workCenterId": "WC-WELD-02",
+    "description": "4kW Fiber Laser Welding Cell 2"
+  },
+  "inspections": [
+    {
+      "characteristic": "Helium leak rate",
+      "measuredValue": "8.4 mbar*l/s",
+      "specValue": "max 0.5 mbar*l/s"
+    },
+    {
+      "characteristic": "Shielding gas nozzle angle",
+      "measuredValue": "28 deg",
+      "specValue": "12 - 16 deg"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-4109, Shift A - robot welding programmer taught seam coordinates per nominal CAD model",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-WELD02-001 4kW fiber laser power output 3.2 kW and beam focus BPP verified stable",
+      "metricValue": "3.2 kW",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "Shielding gas delivery nozzle bracket bent to 28 deg inclination during robot teaching, creating Venturi turbulent air aspirating into the molten keyhole",
+      "metricValue": "28 deg vs 15 deg design",
+      "isRootCause": "Y",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Stainless steel AISI 304 flange and tube chemical composition and surface oil-free condition verified",
+      "metricValue": "clean",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Mass spectrometer helium leak detector GA-0988 calibration certified",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Welding booth cross-draft exhaust airflow 0.4 m/s compliant",
+      "metricValue": "0.4 m/s",
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did exhaust flange assemblies leak during customer exhaust system leak test?",
+      "answer": "Helium gas passed through connected subsurface gas pore channels across the laser weld bead",
+      "evidenceCitation": "Customer quality claim CC-2026-0940"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why were continuous gas pores formed in the laser weld keyhole?",
+      "answer": "Atmospheric oxygen and nitrogen were drawn into the molten pool, generating gas bubbles during rapid solidification",
+      "evidenceCitation": "Weld metallographic cross-section and gas chromatography"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was the shielding gas envelope compromised during welding? (root cause)",
+      "answer": "The Argon gas nozzle bracket was deflected to 28 deg after colliding with a fixture clamp during robot touch-up, inducing turbulent air vortexing",
+      "evidenceCitation": "Robot cell collision log and nozzle geometry inspection"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "Sort and 100% helium leak test 92 units at customer plant and quarantine 180 units in transit"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "status": "Verified",
+      "actionText": "Replace flexible nozzle bracket with dowel-located rigid steel mounting block set to 15 deg"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "status": "Verified in production",
+      "actionText": "Add optical nozzle alignment check to automated daily robot zeroing routine in cell PLC"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100023",
+      "partnerName": "Luis Moreno",
+      "functionTitle": "Welding Automation Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100031",
+      "partnerName": "Sara Klein",
+      "functionTitle": "Supplier Quality Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-WELD-05",
+    "description": "Laser weld porosity due to shielding gas nozzle misalignment and air turbulence"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 27500
+  },
+  "lessonsLearned": {
+    "whatWorked": "Rigid dowel mounting prevented nozzle bracket angle shift even during tool servicing",
+    "whatDidnt": "Robot minor collision sensor did not force an optical re-alignment check"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "Exhaust Flange EF-80 welded on WC-WELD-02 robot arm 1 on 2026-08-11",
+    "isNotWhereWhenItDoesnt": "Flanges welded on WC-WELD-01 with rigid dowel-pinned nozzle bracket",
+    "notes": "Porosity caused by bent nozzle angle after unrecorded fixture micro-collision"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0940",
+    "customerPlantContact": "Anders Holm - Plant Gothenburg Exhaust Systems",
+    "slaResponseDue": "2026-08-18"
+  }
+}

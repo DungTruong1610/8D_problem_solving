@@ -1,0 +1,809 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>8D Copilot — Kế hoạch Kiểm thử E2E AI Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red-50:#FCF5F5; --red-100:#F9ECEC; --red-200:#F6E2E2; --red-300:#F0CFCF;
+  --red-600:#B20E10; --red-700:#970C0E; --red-800:#7D0A0B;
+  --success:#069669; --success-text:#05714F; --success-bg:#EBF7F3; --error:#D93025;
+  --ink:#1A1A1A; --body:#333333; --muted:#999999; --line:#EBEBEB;
+  --surface:#FFFFFF; --surface-alt:#FAFAFA;
+  --amber:#8A5A00; --amber-bg:#FDF6E7; --amber-line:#F0DCB4;
+  --font-h:'Montserrat','Inter','Helvetica Neue',Arial,sans-serif;
+  --font-b:'Poppins','Inter','Helvetica Neue',Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--surface);color:var(--body);font-family:var(--font-b);font-size:16px;line-height:1.6}
+h1,h2,h3,h4{font-family:var(--font-h);color:var(--ink);margin:0}
+h1{font-size:38px;font-weight:700;letter-spacing:-0.02em;line-height:1.15}
+h2{font-size:28px;font-weight:600;line-height:1.2}
+h3{font-size:20px;font-weight:600;line-height:1.25}
+p{margin:0 0 12px}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em;background:var(--surface-alt);border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--ink)}
+a{color:var(--red-600)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.eyebrow{font-family:var(--font-h);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+
+/* Header */
+header.hero{border-bottom:1px solid var(--line);padding:44px 0 32px}
+header.hero .bar{width:44px;height:4px;background:var(--red-600);border-radius:2px;margin-bottom:18px}
+header.hero p.lede{font-size:17px;max-width:76ch;margin-top:12px}
+
+/* Sticky progress */
+.sticky{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.sticky .inner{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;padding:12px 0}
+.meter{flex:1 1 260px;min-width:220px}
+.meter .row{display:flex;justify-content:space-between;font-size:13px;font-weight:500;margin-bottom:5px}
+.track{height:7px;background:var(--surface-alt);border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--red-600);border-radius:99px;transition:width .25s ease}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.filters button{font-family:var(--font-h);font-weight:600;font-size:13px;padding:7px 13px;border-radius:6px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;transition:.12s}
+.filters button:hover{background:var(--surface-alt)}
+.filters button[aria-pressed="true"]{background:var(--red-600);border-color:var(--red-600);color:#fff}
+.costpill{font-family:var(--font-h);font-weight:600;font-size:12.5px;padding:6px 11px;border-radius:99px;background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber);white-space:nowrap}
+
+/* Sections */
+section.suite{padding:36px 0;border-bottom:1px solid var(--line)}
+.suite-head{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between;margin-bottom:6px}
+.suite-count{font-family:var(--font-h);font-weight:600;font-size:13px;color:var(--muted)}
+.suite-note{max-width:82ch;margin-bottom:20px}
+
+/* Case card */
+.case{border:1px solid var(--line);border-radius:10px;margin-bottom:12px;overflow:hidden;background:#fff}
+.case.done{background:var(--surface-alt)}
+.case-top{display:flex;gap:12px;align-items:flex-start;padding:13px 16px}
+.case-top input[type=checkbox]{margin-top:3px;width:17px;height:17px;accent-color:var(--red-600);flex:0 0 auto;cursor:pointer}
+.case-id{font-family:var(--font-h);font-weight:700;font-size:12.5px;color:var(--red-600);letter-spacing:.02em;white-space:nowrap}
+.case.done .case-id{color:var(--muted)}
+.case-title{font-family:var(--font-h);font-weight:600;font-size:15px;color:var(--ink);flex:1 1 240px;min-width:0;cursor:pointer}
+.case.done .case-title{text-decoration:line-through;color:var(--muted)}
+.tag{font-family:var(--font-h);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.03em;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.tag.free{background:var(--success-bg);border:1px solid #C4E6DA;color:var(--success-text)}
+.tag.paid{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber)}
+.case-body{padding:0 16px 15px 45px;font-size:14.5px}
+.case-body dl{display:grid;grid-template-columns:132px 1fr;gap:6px 14px;margin:0}
+.case-body dt{font-family:var(--font-h);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);padding-top:3px}
+.case-body dd{margin:0;min-width:0}
+.case-body ol,.case-body ul{margin:0;padding-left:18px}
+.case-body li{margin-bottom:3px}
+.delta{border-left:3px solid var(--red-600);background:var(--red-50);padding:9px 12px;border-radius:0 6px 6px 0}
+.delta strong{color:var(--red-800)}
+
+/* Callouts */
+.callout{border:1px solid var(--line);border-left:3px solid var(--red-600);background:var(--red-50);border-radius:0 8px 8px 0;padding:14px 16px;margin:18px 0}
+.callout.warn{border-left-color:var(--error);background:#FDF3F2;border-color:#F5D6D3}
+.callout.neutral{border-left-color:var(--muted);background:var(--surface-alt)}
+.callout h4{font-size:14px;margin-bottom:6px}
+.callout p:last-child{margin-bottom:0}
+
+/* Table */
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;margin:16px 0}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+th{font-family:var(--font-h);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);background:var(--surface-alt);white-space:nowrap}
+td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+
+footer{padding:30px 0 50px;color:var(--muted);font-size:13px}
+.hidden{display:none !important}
+@media (max-width:620px){
+  h1{font-size:30px} h2{font-size:23px}
+  .case-body{padding-left:16px}
+  .case-body dl{grid-template-columns:1fr;gap:2px}
+  .case-body dt{padding-top:8px}
+}
+@media print{.sticky{position:static}.filters{display:none}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <div class="bar"></div>
+    <div class="eyebrow">8D Copilot · CNMA Proresolve</div>
+    <h1>Kế hoạch kiểm thử End-to-end AI Pipeline</h1>
+    <p class="lede">53 test case trải dài trên 6 suite. Trọng tâm cốt lõi là Suite 2: kiểm thử từng cấu hình trong Training Center bằng cách thay đổi giá trị, chạy lại pipeline và xác nhận một <strong>độ lệch (delta) cụ thể, đo lường được</strong>. Một pipeline chỉ chạy xong mà không kiểm chứng sự thay đổi thì không chứng minh được cấu hình có thực sự điều hướng mô hình hay không.</p>
+  </div>
+</header>
+
+<div class="sticky">
+  <div class="wrap inner">
+    <div class="meter">
+      <div class="row"><span id="m-label">0 trên 53 hoàn thành</span><span id="m-pct">0%</span></div>
+      <div class="track"><div class="fill" id="m-fill"></div></div>
+    </div>
+    <div class="filters" role="group" aria-label="Lọc test case">
+      <button data-f="all" aria-pressed="true">Tất cả</button>
+      <button data-f="free" aria-pressed="false">Chỉ miễn phí</button>
+      <button data-f="paid" aria-pressed="false">Chỉ trả phí</button>
+      <button data-f="todo" aria-pressed="false">Chưa tích</button>
+      <button data-f="reset" aria-pressed="false">Đặt lại</button>
+    </div>
+    <span class="costpill" id="m-cost">Số lượt chạy AI trả phí còn lại: 9</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<section class="suite">
+  <div class="suite-head"><h2>Hướng dẫn thực thi kế hoạch này</h2></div>
+  <p class="suite-note">Đọc phần này trước khi thực thi bất kỳ test case nào. Ba sự thật về môi trường dưới đây là nguyên nhân gây ra các lỗi giả (false failure) nhiều hơn bất kỳ lỗi thực tế nào.</p>
+
+  <div class="callout">
+    <h4>Backend không tự động hot-reload</h4>
+    <p>Cả <code>dev</code> và <code>dev:backend</code> đều chạy <code>cds-tsx.js serve</code> — mặc dù script có tên là <code>watch</code>, nhưng thực tế không hề watch. Bất kỳ thay đổi nào trong <code>srv/</code>, bao gồm cả <code>defaults.ts</code>, đều yêu cầu bấm <code>Ctrl+C</code> thủ công và chạy lại <code>npm run dev</code>. Việc khôi phục mặc định của một step <em>trước khi</em> khởi động lại sẽ re-seed DB từ module cũ trong bộ nhớ và âm thầm tạo ra schema cũ.</p>
+  </div>
+
+  <div class="callout neutral">
+    <h4>Layout cập nhật trực tiếp (live), nội dung được lưu snapshot</h4>
+    <p>Báo cáo đọc <code>formSchemaJson</code> trực tiếp từ <code>StepPrompts</code>, do đó thay đổi layout chỉ cần nhấn F5. <code>resultJson</code> được snapshot vào hàng discipline tại thời điểm phân tích, vì vậy bất kỳ bài test nào muốn kiểm tra sự thay đổi trong <em>nội dung</em> do AI tạo ra đều cần một lượt phân tích mới. Việc nhầm lẫn giữa hai cơ chế này sẽ gây ra kết quả sai lệch ở cả hai chiều.</p>
+  </div>
+
+  <div class="callout warn">
+    <h4><code>docs/8D-COPILOT-E2E-GUIDE.md</code> đã cũ — không tham khảo từ tài liệu này</h4>
+    <p>File này được viết trước kiến trúc profile và vẫn mô tả bảng <code>SimilarityCriteria</code> toàn cục đơn lẻ với một bộ trọng số dùng chung. File không có khái niệm về <code>RetrievalProfiles</code>, <code>StepRetrievalBindings</code>, hay trang Object Schema, và mục "4-Step Pipeline" trong đó đã bỏ sót <code>validateDataset</code>, <code>mapCase</code>, và <code>findPrecedentsByStep</code>. Chỉ có các bước Model Registry và General Settings trong đó là còn chính xác; mọi thứ khác đều đã lỗi thời.</p>
+  </div>
+
+  <h3 style="margin-top:22px">Mô hình chi phí (Cost model)</h3>
+  <p>Một lượt phân tích hoàn chỉnh mất 60–120 giây thời gian thực và tiêu tốn token AI thực tế qua ba lệnh gọi model. Mọi test case dưới đây đều được gắn nhãn <span class="tag free">Miễn phí</span> hoặc <span class="tag paid">Trả phí</span>. Miễn phí nghĩa là chạy jest, <code>--no-ai</code>, đọc SQL trực tiếp hoặc kiểm tra thuần UI. Kế hoạch này được thiết kế sao cho toàn bộ suite chỉ tốn <strong>9 lượt chạy trả phí</strong>; suite so sánh vi sai tái sử dụng một lượt chạy baseline thay vì phân tích lại cho từng assertion.</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Lệnh</th><th>Chi phí</th><th>Phạm vi bao phủ</th></tr></thead>
+      <tbody>
+        <tr><td><code>npm test</code></td><td>Miễn phí</td><td>Toàn bộ 14 jest suite — Suite 6</td></tr>
+        <tr><td><code>npx tsx scripts/run-e2e.ts --no-ai</code></td><td>Miễn phí</td><td>Giai đoạn 1–3 cho cả 3 case đầu vào; dừng trước <code>generateReport</code></td></tr>
+        <tr><td><code>npx tsx scripts/run-e2e.ts --only A</code></td><td>Trả phí ×1</td><td>Chạy đầy đủ 7 giai đoạn trên một case</td></tr>
+        <tr><td>UI + F5</td><td>Miễn phí</td><td>Mọi assertion về layout (live schema)</td></tr>
+        <tr><td>SQL trên <code>sqlite.db</code></td><td>Miễn phí</td><td>Mọi assertion về trạng thái đã lưu (persisted state)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <h4>Việc đọc SQLite phải thông qua một bản sao (copy)</h4>
+    <p>Tiến trình CAP đang chạy sẽ chiếm dụng (lock) database. Việc đọc trực tiếp <code>sqlite.db</code> khi server đang hoạt động sẽ trả về lỗi <code>disk I/O error</code> trên mount này. Hãy copy trước, sau đó truy vấn trên bản copy: <code>cp sqlite.db /tmp/probe.db</code>. Tuyệt đối không tự sửa/ghi đè thủ công vào <code>sqlite.db</code> trong quá trình kiểm thử.</p>
+  </div>
+</section>
+<section class="suite" id="s1">
+  <div class="suite-head"><h2>Suite 1 — Luồng xử lý chuẩn của Pipeline (Happy path)</h2><span class="suite-count">8 test case · 3 trả phí</span></div>
+  <p class="suite-note">Mỗi giai đoạn của <code>eightDAnalyzer.ts</code> có một assertion. Chạy <code>--no-ai</code> một lần để vượt qua S1-01 đến S1-04 cho cả 3 case mà không tốn chi phí, sau đó dùng một lượt chạy trả phí cho mỗi case để hoàn thành các case còn lại.</p>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S1-01"><span class="case-id">S1-01</span><label class="case-title" for="S1-01">validateDataset chấp nhận cả ba case đầu vào</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Tiền điều kiện</dt><dd>Backend đang chạy; thư viện đã được seed.</dd>
+      <dt>Các bước</dt><dd><code>npx tsx scripts/run-e2e.ts --no-ai</code></dd>
+      <dt>Kỳ vọng</dt><dd>Cả ba sự vụ (issue) đều đến giai đoạn ① mà không gặp lỗi chặn (blocking issue). Hàm <code>blockingIssues(validateDataset(raw))</code> trả về mảng rỗng, do đó không có lỗi 400 nào được ném ra bởi <code>analyzeFromJson</code>.</dd>
+      <dt>Xác minh</dt><dd>Script in ra <code>① TIẾP NHẬN — report &lt;id&gt;</code> cho A, B, C.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S1-02"><span class="case-id">S1-02</span><label class="case-title" for="S1-02">mapCase tạo ra CaseContext có ghi nhận các khoảng trống dữ liệu (gaps)</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Cùng lượt chạy trên. Đọc <code>Reports(&lt;id&gt;)?$select=caseContext</code>.</dd>
+      <dt>Kỳ vọng</dt><dd><code>caseContext</code> parse thành công; <code>ctx.gaps</code> là một mảng không rỗng đối với các case đầu vào (chúng cố tình được làm mỏng dữ liệu). <code>customer.applicable</code> trả về <code>false</code> cho các case nội bộ Q3 và <code>true</code> cho issue-B.</dd>
+      <dt>Xác minh</dt><dd>Script in ra số lượng gap; xác nhận <code>caseMapper.test.ts</code> passed (xanh).</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S1-03"><span class="case-id">S1-03</span><label class="case-title" for="S1-03">Tạo embedding thành công và tiêu chí ngữ nghĩa được tham gia tính điểm</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Kỳ vọng</dt><dd><code>p.semanticUsed === true</code>. Nếu trả về false, tiêu chí cosine sẽ đóng góp 0 điểm cho mọi ứng viên và mọi assertion xếp hạng phía sau trong Suite 2 sẽ không còn giá trị.</dd>
+      <dt>Xác minh</dt><dd>Script hiển thị dòng <code>nhúng mô tả sự vụ: thành công</code>.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S1-04"><span class="case-id">S1-04</span><label class="case-title" for="S1-04">findPrecedentsByStep trả về đầy đủ 8 key của các bước D</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Kỳ vọng</dt><dd>Dòng log <code>N tiền lệ hợp nhất từ M profile</code> liệt kê binding cho từng bước từ D1–D8. Không thiếu bước nào; các bước chưa liên kết (unbound) sẽ fallback về <code>default</code>.</dd>
+      <dt>Xác minh</dt><dd>Log backend từ <code>findPrecedents.ts</code>.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="paid">
+    <div class="case-top"><input type="checkbox" id="S1-05"><span class="case-id">S1-05</span><label class="case-title" for="S1-05">diagnoseIndependently trả về kết quả chẩn đoán độc lập (blind finding)</label><span class="tag paid">Trả phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd><code>npx tsx scripts/run-e2e.ts --only A</code></dd>
+      <dt>Kỳ vọng</dt><dd><code>aiRootCause</code> là 1 trong 6 danh mục 6M. <code>derivedFiveWhy</code> có từ 1–5 bước (hàm <code>normalizeFinding</code> cắt còn tối đa 5 và đánh số lại từ 1). <code>ruledOut</code> không bao giờ chứa danh mục đã được chọn — <code>normalizeFinding</code> đã lọc bỏ nó.</dd>
+      <dt>Xác minh</dt><dd>Script in ra danh mục được chọn; đối chiếu chéo với <code>Reports.aiRootCause</code>.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="paid">
+    <div class="case-top"><input type="checkbox" id="S1-06"><span class="case-id">S1-06</span><label class="case-title" for="S1-06">generateReport ghi chính xác 8 discipline</label><span class="tag paid">Trả phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Kỳ vọng</dt><dd>8 hàng trong bảng <code>Disciplines</code>, mã D1–D8, không trùng lặp. Schema phản hồi cố định <code>minItems: 8, maxItems: 8</code>, do đó mảng bị thiếu phần tử là lỗi vi phạm schema chứ không phải lỗi nhẹ.</dd>
+      <dt>Xác minh</dt><dd><code>Disciplines?$filter=report_ID eq &lt;id&gt;&amp;$orderby=sequence</code> — số lượng đếm được là 8.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="paid">
+    <div class="case-top"><input type="checkbox" id="S1-07"><span class="case-id">S1-07</span><label class="case-title" for="S1-07">postProcess phân giải các trích dẫn và ghi nhận các sửa lỗi (repairs)</label><span class="tag paid">Trả phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Kỳ vọng</dt><dd>Mọi mục còn lại trong <code>sources</code> đều phân giải được dựa trên <code>CaseContext</code>. Bất kỳ discipline nào có tất cả sources đều không phân giải được sẽ bị đặt <code>dataBacked=false</code>, và việc hạ cấp này được ghi trong <code>validationJson.repairs</code>.</dd>
+      <dt>Xác minh</dt><dd>Đọc <code>validationJson</code> từ bất kỳ hàng discipline nào; so sánh với các chuỗi repair xuất ra bởi <code>postProcess.ts</code>.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S1-08"><span class="case-id">S1-08</span><label class="case-title" for="S1-08">Báo cáo đạt trạng thái Analyzed và lưu vết (run trace) được điền đầy đủ</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Tái sử dụng lượt chạy S1-05. Mở báo cáo trên UI.</dd>
+      <dt>Kỳ vọng</dt><dd><code>status = 'Analyzed'</code>, <code>errorMessage</code> là null, và footer hiển thị cả hai tên model, số lượng token cùng thời gian thực thi. Một lượt chạy bị kẹt ở <code>Analyzing</code> mà không có lỗi nghĩa là tiến trình chạy nền đã bị dừng — hãy kiểm tra <code>sweepStuckAnalyzing</code> ở lần khởi động tiếp theo.</dd>
+      <dt>Xác minh</dt><dd>Footer trên UI + <code>Reports(&lt;id&gt;)?$select=status,errorMessage</code>.</dd>
+    </dl></div>
+  </div>
+</section>
+
+<section class="suite" id="s2">
+  <div class="suite-head"><h2>Suite 2 — So sánh vi sai: Thay đổi cấu hình phải làm thay đổi kết quả đầu ra</h2><span class="suite-count">15 test case · 3 trả phí</span></div>
+  <p class="suite-note">Suite cốt lõi. Mỗi test case nêu rõ đại lượng chính xác cần thay đổi và mức độ thay đổi là bao nhiêu. Thiết lập một baseline chuẩn (S2-00), sau đó chạy các test case miễn phí để so sánh; chỉ có 3 test case cần lượt phân tích mới.</p>
+
+  <div class="callout">
+    <h4>Công thức tính điểm làm cơ sở cho các assertion này</h4>
+    <p>Từ <code>scoreCase()</code>: chỉ các tiêu chí có <code>enabled</code> mới được tính điểm. Mỗi tiêu chí đóng góp giá trị <code>weight</code> vào <code>maxScore</code> bất kể nó có khớp hay không. Khớp không qua cosine sẽ cộng đủ <code>weight</code>; khớp chính thất bại nhưng có fallback được cấu hình sẽ cộng <code>fallbackWeight</code>; tiêu chí cosine sẽ cộng <code>round1(weight × cosine)</code> khi <code>cosine ≥ minSimilarity</code>, ngược lại cộng 0. Điều này giúp mọi độ lệch (delta) bên dưới có thể dự đoán chính xác bằng số học thay vì phỏng đoán cảm tính.</p>
+  </div>
+
+  <div class="case" data-cost="paid">
+    <div class="case-top"><input type="checkbox" id="S2-00"><span class="case-id">S2-00</span><label class="case-title" for="S2-00">Ghi lại dữ liệu chuẩn ban đầu (Baseline)</label><span class="tag paid">Trả phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd><ol><li>Khôi phục mặc định cho tất cả các bước; khởi động lại backend.</li><li><code>npx tsx scripts/run-e2e.ts --only A</code></li><li>Lưu lại toàn bộ chi tiết tiền lệ (precedent breakdown), binding theo từng bước, toàn bộ 8 blob <code>resultJson</code> và report ID.</li></ol></dd>
+      <dt>Kỳ vọng</dt><dd>Một bộ baseline đã ghi nhận. Mọi test case sau trong suite này đều sẽ đối chiếu với baseline này.</dd>
+      <dt>Xác minh</dt><dd>Các artifact baseline được lưu bên ngoài repository.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S2-01"><span class="case-id">S2-01</span><label class="case-title" for="S2-01">Tăng trọng số tiêu chí sẽ làm tăng score và maxScore đúng bằng độ lệch (delta)</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Tab Similarity → tăng trọng số <code>workCenter</code> từ 4 → 6 → Save → <code>--no-ai --only A</code>.</dd>
+      <dt>Kỳ vọng</dt><dd class="delta"><strong>maxScore tăng chính xác 2 điểm</strong> cho mọi ứng viên. Các ứng viên khớp work centre được cộng đúng <strong>+2</strong>; các ứng viên không khớp được cộng <strong>0</strong>. Bất kỳ ứng viên nào có điểm số thay đổi khác giá trị 0 hoặc 2 đều là lỗi (defect).</dd>
+      <dt>Xác minh</dt><dd>Mục <code>breakdown</code> cho <code>workCenter</code> hiển thị <code>maxPoints: 6</code>; <code>points</code> là 6 hoặc 0.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S2-02"><span class="case-id">S2-02</span><label class="case-title" for="S2-02">Vô hiệu hóa một tiêu chí sẽ loại bỏ nó khỏi cả score và maxScore</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Tắt toggle <code>defectCode</code> → Save → <code>--no-ai --only A</code>.</dd>
+      <dt>Kỳ vọng</dt><dd class="delta"><strong>maxScore giảm chính xác bằng trọng số bị tắt</strong>, và tiêu chí đó biến mất hoàn toàn khỏi <code>breakdown</code> — nó bị lọc trước vòng lặp chứ không phải được chấm 0 điểm. Các ứng viên từng khớp tiêu chí này sẽ mất đúng số trọng số đó. Do đó, tỉ lệ như 5/8 vẫn phải được hiểu là một kết quả khớp mạnh, chứ không bị làm suy yếu.</dd>
+      <dt>Xác minh</dt><dd>Không còn key <code>defectCode</code> ở bất kỳ đâu trong <code>breakdown</code>.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S2-03"><span class="case-id">S2-03</span><label class="case-title" for="S2-03">Nâng ngưỡng cosine tối thiểu cao hơn độ tương đồng quan sát được sẽ triệt tiêu tiêu chí đó về 0</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Ghi nhận giá trị <code>cosine 0.xxx</code> của baseline trong <code>matchedOn</code>. Đặt <code>minSimilarity</code> ngay trên mức đó → Save → <code>--no-ai --only A</code>.</dd>
+      <dt>Kỳ vọng</dt><dd class="delta">Tiêu chí đó chuyển sang <code>level: 'none'</code> với <strong>0 điểm</strong>, trong khi <strong>maxScore không đổi</strong> — trọng số vẫn được tính vào mức trần. <code>matchedOn</code> hiển thị <code>cosine 0.xxx &lt; floor</code>, khác biệt với giá trị <code>null</code> (chưa từng được nhúng vector).</dd>
+      <dt>Xác minh</dt><dd>Phân biệt hai chuỗi thông báo lỗi trong <code>breakdown</code>.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S2-04"><span class="case-id">S2-04</span><label class="case-title" for="S2-04">Fallback chỉ kích hoạt khi khớp chính thất bại, và không bao giờ kích hoạt cả hai</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Trên <code>material</code>, bật fallback <code>materialFamily</code> / phương thức family / trọng số 1 → Save → <code>--no-ai --only A</code>.</dd>
+      <dt>Kỳ vọng</dt><dd class="delta">Ứng viên khớp chính xác material vẫn nhận <strong>đầy đủ trọng số</strong> ở mức <code>level: 'exact'</code>. Ứng viên không khớp material nhưng chung family nhận <strong>chính xác 1 điểm</strong> ở mức <code>level: 'fallback'</code>. <strong>Không ứng viên nào nhận cả hai</strong> — mã nguồn có lệnh <code>continue</code> sau khi trúng khớp, vì việc cộng dồn đôi sẽ phá vỡ mức trần điểm.</dd>
+      <dt>Xác minh</dt><dd>Xác nhận <code>scoring.test.ts</code> bao phủ case này, sau đó xác nhận trên dữ liệu thực tế.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S2-05"><span class="case-id">S2-05</span><label class="case-title" for="S2-05">Tăng minScore sẽ cắt bớt danh sách tiền lệ từ dưới lên</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Đặt <code>minScore</code> cao hơn điểm tiền lệ thấp nhất của baseline → Save → <code>--no-ai --only A</code>.</dd>
+      <dt>Kỳ vọng</dt><dd class="delta">Các tiền lệ có điểm dưới ngưỡng sàn mới sẽ <strong>biến mất</strong>; các tiền lệ trên ngưỡng vẫn giữ <strong>nguyên điểm số và thứ tự</strong>. Khi không có tiền lệ nào vượt qua ngưỡng, danh sách sẽ rỗng và <code>reason</code> giải thích nguyên nhân — phân biệt được với trường hợp "thư viện rỗng".</dd>
+      <dt>Xác minh</dt><dd>So sánh danh sách với baseline; đọc <code>p.reason</code>.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S2-06"><span class="case-id">S2-06</span><label class="case-title" for="S2-06">Gán lại binding cho một bước D chỉ thay đổi riêng bước đó</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Nhân bản (clone) profile <code>default</code>, chỉnh sửa trọng số trong bản clone, chỉ gán binding cho <strong>D4</strong> → Save → <code>--no-ai --only A</code>.</dd>
+      <dt>Kỳ vọng</dt><dd class="delta">Dòng log hiển thị <code>D4→&lt;clone&gt;</code> trong khi <strong>D1, D2, D3, D5–D8 vẫn nhận <code>default</code></strong>. Xếp hạng của D4 phản ánh profile clone; 7 bước còn lại giống hệt từng byte so với baseline.</dd>
+      <dt>Xác minh</dt><dd>Log binding theo từng bước từ <code>findPrecedentsByStep</code>.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S2-07"><span class="case-id">S2-07</span><label class="case-title" for="S2-07">Cách đánh số toàn cục vẫn ổn định khi các bước sử dụng profile khác nhau</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Giữ nguyên cấu hình binding tách rời ở S2-06. Kiểm tra kết quả hợp nhất.</dd>
+      <dt>Kỳ vọng</dt><dd class="delta"><code>mergeStepPrecedents</code> giữ lại <strong>điểm số cao nhất của mỗi case trên tất cả các profile</strong>, sắp xếp theo điểm giảm dần rồi đến <code>notificationId</code> tăng dần. <strong><code>precedents#2</code> là cùng một case đối với cả D1 và D4</strong>. Việc đánh số là toàn cục, không bao giờ đánh số riêng theo từng bước.</dd>
+      <dt>Xác minh</dt><dd><code>stepPrecedents.test.ts</code> đảm bảo điều này; xác nhận trên dữ liệu hợp nhất thực tế.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S2-08"><span class="case-id">S2-08</span><label class="case-title" for="S2-08">Chỉnh sửa profile dùng chung từ một bước sẽ làm thay đổi tất cả các bước được liên kết</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Khi D1 và D2 cùng dùng <code>default</code>, thay đổi một trọng số từ bên trong tab Similarity của D1.</dd>
+      <dt>Kỳ vọng</dt><dd class="delta">Cách chấm điểm của D2 thay đổi <strong>hoàn toàn tương tự</strong> — một hàng profile, hai liên kết binding. UI phải đưa ra cảnh báo: <code>StepSimilarityEditor</code> tính toán <code>sharedWith</code> và cần hiển thị cảnh báo này. <strong>Thay đổi âm thầm giữa các bước mà không có cảnh báo là một lỗi về trải nghiệm người dùng (usability defect)</strong>, mặc dù logic tính điểm vẫn chính xác.</dd>
+      <dt>Xác minh</dt><dd>Xác nhận cảnh báo được render và nêu đích danh bước còn lại.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S2-09"><span class="case-id">S2-09</span><label class="case-title" for="S2-09">Object Schema thêm trường ở trạng thái disabled, trọng số 1, giữ nguyên các tinh chỉnh trước đó</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Tinh chỉnh một tiêu chí hiện có thành một trọng số đặc biệt (ví dụ: 7). Sau đó trong Object Schema, kéo một trường mới vào cùng profile đó → Save → mở tab Similarity.</dd>
+      <dt>Kỳ vọng</dt><dd class="delta">Trường mới xuất hiện với <strong><code>weight = 1</code></strong>, <strong><code>enabled = false</code></strong>, <code>minSimilarity</code> là <code>0.7</code> nếu là cosine, ngược lại là <code>null</code>. Tiêu chí đã tinh chỉnh trước đó <strong>vẫn giữ nguyên giá trị 7</strong>. Do trường mới ở trạng thái disabled, <strong>maxScore không đổi</strong> và không có điểm số của báo cáo hiện có nào bị xê dịch.</dd>
+      <dt>Xác minh</dt><dd><code>profileRepository.test.ts</code> đảm bảo logic merge; xác nhận trên UI và SQL.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S2-10"><span class="case-id">S2-10</span><label class="case-title" for="S2-10">Xóa một trường trong Object Schema sẽ loại bỏ nó khỏi tính điểm</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Kéo một trường ra khỏi profile → Save → <code>--no-ai --only A</code>.</dd>
+      <dt>Kỳ vọng</dt><dd class="delta">Tiêu chí đó <strong>không còn trong <code>ProfileCriteria</code></strong> và trong <code>breakdown</code>. Nếu trước đó nó đang được bật (enabled), <strong>maxScore sẽ giảm đúng bằng trọng số của nó</strong>. <code>saveProfile</code> thay thế toàn bộ tập hợp thay vì so sánh diff, nên không còn hàng mồ côi nào sót lại.</dd>
+      <dt>Xác minh</dt><dd>Đếm số lượng bản ghi bằng SQL trên bảng <code>ProfileCriteria</code> cho profile đó.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S2-11"><span class="case-id">S2-11</span><label class="case-title" for="S2-11">Thay đổi layout trong Form Editor hiển thị ngay khi nhấn F5 mà không cần phân tích lại</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Kéo một trường vào nhóm layout của D2 → Save → nhấn F5 trên một báo cáo <strong>đã tồn tại</strong>.</dd>
+      <dt>Kỳ vọng</dt><dd class="delta">Trường đó xuất hiện <strong>ngay lập tức</strong>, không cần lượt phân tích mới. Các trường mà AI chưa từng tạo ra sẽ hiển thị trạng thái rỗng thay vì biến mất — ô <code>w2h-cell</code> vẫn giữ khung và hiển thị <em>Chưa được theo dõi trong tập dữ liệu hiện tại</em>.</dd>
+      <dt>Xác minh</dt><dd>Kiểm tra trực quan trên một báo cáo có trước thời điểm thay đổi.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S2-12"><span class="case-id">S2-12</span><label class="case-title" for="S2-12">Làm rỗng mọi nhóm layout sẽ khiến bước đó hiển thị trống</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Kéo toàn bộ các trường ra khỏi tất cả các nhóm của D2 → Save → F5.</dd>
+      <dt>Kỳ vọng</dt><dd class="delta">D2 hiển thị tiêu đề discipline và <strong>hoàn toàn không có nội dung trường nào</strong>. Cụ thể, nó <strong>không được</strong> fallback về việc render tất cả các trường — cơ chế fallback đó chính là lỗi mà hành vi này đã thay thế.</dd>
+      <dt>Xác minh</dt><dd>Kiểm tra trực quan; sau đó khôi phục lại layout.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="paid">
+    <div class="case-top"><input type="checkbox" id="S2-13"><span class="case-id">S2-13</span><label class="case-title" for="S2-13">Chỉnh sửa hướng dẫn prompt tạo ra đúng thay đổi được yêu cầu chỉ trên bước đó</label><span class="tag paid">Trả phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Thêm một chỉ dẫn có thể kiểm chứng vào <code>combinedPrompt</code> của D4 — ví dụ: <em>"Luôn nêu tên dụng cụ đo lường trong rootCause.statement khi có dữ liệu kiểm tra."</em> Lưu lại, khởi động lại nếu defaults thay đổi, chạy <code>--only A</code>.</dd>
+      <dt>Kỳ vọng</dt><dd class="delta"><strong><code>rootCause.statement</code> của D4 nêu tên dụng cụ</strong>; bản baseline không có. D1, D2, D3, D5–D8 giữ nguyên cấu trúc của baseline. Hãy chọn một chỉ dẫn kiểm chứng được theo kiểu nhị phân (có/không) — một câu mơ hồ như "hãy chi tiết hơn" sẽ khiến test case này không thể bác bỏ được.</dd>
+      <dt>Xác minh</dt><dd>Diff <code>resultJson</code> của D4 so với baseline.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="paid">
+    <div class="case-top"><input type="checkbox" id="S2-14"><span class="case-id">S2-14</span><label class="case-title" for="S2-14">Thêm trường bắt buộc khiến AI phải điền dữ liệu và cơ chế validation phải thực thi kiểm tra</label><span class="tag paid">Trả phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Thêm một trường vào Data Schema + Form Editor của một bước với <code>required: true</code>, khởi động lại, chạy <code>--only A</code>.</dd>
+      <dt>Kỳ vọng</dt><dd class="delta">Key này <strong>tồn tại trong <code>resultJson</code></strong>. Nếu thiếu, <code>validateFlexibleResult</code> đưa ra lỗi vi phạm <code>&lt;label&gt; is required</code> tại đường dẫn <code>data.&lt;key&gt;</code> với mức độ nghiêm trọng <code>error</code> trong <code>validationJson</code>, và báo cáo hiển thị badge lỗi thay vì "Validation passed".</dd>
+      <dt>Xác minh</dt><dd>Đọc <code>validationJson.violations</code>.</dd>
+    </dl></div>
+  </div>
+</section>
+<section class="suite" id="s3">
+  <div class="suite-head"><h2>Suite 3 — Các trường hợp biên và ngoại lệ (Edge cases)</h2><span class="suite-count">15 test case · 2 trả phí</span></div>
+  <p class="suite-note">Các luồng xử lý biên và từ chối. Các test case validation (S3-06 đến S3-12) là các lớp bảo vệ thuần phía server và không tốn chi phí — đây là những bài test giá trị cao với chi phí thấp nhất trong kế hoạch.</p>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S3-01"><span class="case-id">S3-01</span><label class="case-title" for="S3-01">Thư viện tiền lệ rỗng có thể phân biệt được với "không có mục nào đạt điểm đủ cao"</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd><code>clearCaseLibrary</code> → <code>--no-ai --only A</code> → re-seed lại sau đó.</dd>
+      <dt>Kỳ vọng</dt><dd><code>precedents</code> rỗng và <code>reason</code> nêu rõ thư viện bị rỗng. Thông báo này phải khác với thông báo ở S2-05. Chúng trông giống hệt nhau trên UI, và đó chính là lý do vì sao <code>reason</code> tồn tại.</dd>
+      <dt>Xác minh</dt><dd>So sánh trực tiếp hai chuỗi <code>reason</code> cạnh nhau.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S3-02"><span class="case-id">S3-02</span><label class="case-title" for="S3-02">Lỗi tìm kiếm tiền lệ sẽ hạ cấp an toàn thay vì làm sập hệ thống</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Kỳ vọng</dt><dd>Khi gặp lỗi, pipeline sử dụng <code>emptyPerStepPrecedents()</code> — một cấu trúc đầy đủ 8 key, không bao giờ là <code>null</code>. Báo cáo vẫn được tạo ra mà không có tiền lệ. Lỗi <code>TypeError</code> giữa chừng quá trình phân tích chính là lỗi mà lớp bảo vệ này ngăn chặn.</dd>
+      <dt>Xác minh</dt><dd>Xác nhận cấu trúc dữ liệu đầy đủ cho D1–D8 với các mảng rỗng.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="paid">
+    <div class="case-top"><input type="checkbox" id="S3-03"><span class="case-id">S3-03</span><label class="case-title" for="S3-03">Case mới không có nguyên nhân gốc rễ được ghi nhận — KỲ VỌNG PHÁT HIỆN LỖI (DEFECT EXPECTED)</label><span class="tag paid">Trả phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Chạy <code>--only C</code> (không có nguyên nhân gốc được ghi nhận). Đọc <code>Reports.aiAgreesWithRecord</code>.</dd>
+      <dt>Kỳ vọng</dt><dd class="delta"><strong>Case này ĐƯỢC KỲ VỌNG SẼ FAILED với mã nguồn hiện tại.</strong> Hàm <code>compareWithRecorded()</code> trả về <code>agrees: recorded !== null &amp;&amp; recorded === finding.rootCauseCategory</code> — một giá trị boolean trả về <code>false</code> (không bao giờ là <code>null</code>) khi chưa có gì được ghi nhận. <code>eightDRepository</code> sau đó lưu <code>verdict.agrees ?? null</code>, và vì <code>false ?? null</code> bằng <code>false</code>, cột dữ liệu hiển thị giá trị <strong><code>false</code></strong>. Do đó UI hiển thị "AI không đồng ý với kỹ sư" đối với một case mà <strong>hoàn toàn không có câu trả lời nào được ghi nhận để so sánh bất đồng</strong>. Hành vi đúng đắn cần một trạng thái thứ ba.</dd>
+      <dt>Xác minh</dt><dd>SQL: <code>select aiAgreesWithRecord from Reports where ...</code>. Ghi nhận giá trị quan sát được và tạo defect ticket thay vì đánh dấu pass.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="paid">
+    <div class="case-top"><input type="checkbox" id="S3-04"><span class="case-id">S3-04</span><label class="case-title" for="S3-04">Chẩn đoán độc lập trên một case không có kết quả điều tra</label><span class="tag paid">Trả phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Cùng lượt chạy với S3-03. Kiểm tra <code>ruledOut</code>.</dd>
+      <dt>Kỳ vọng</dt><dd>Mỗi mục đều có lý do đi kèm. Chú ý điểm mâu thuẫn về cấu trúc: bước này được thiết kế để chứng minh model không bịa đặt, tuy nhiên một case có <code>causesIshikawa</code> rỗng sẽ không cung cấp bằng chứng nào để rút ra lý do loại trừ. Hãy ghi nhận xem các lý do đưa ra là có căn cứ hay chỉ là nội dung chung chung — các đoạn điền chung chung ở đây là một phát hiện đáng lưu ý.</dd>
+      <dt>Xác minh</dt><dd>Đọc <code>ruledOut</code> và đánh giá từng lý do dựa trên bằng chứng có sẵn.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S3-05"><span class="case-id">S3-05</span><label class="case-title" for="S3-05">Dữ liệu sai định dạng và bẩn sẽ bị từ chối hoặc chuẩn hóa, không bao giờ âm thầm chấp nhận</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd><code>npx jest dirtyData datasetValidator caseMapper</code>; sau đó POST JSON không hợp lệ tới <code>analyzeFromJson</code>.</dd>
+      <dt>Kỳ vọng</dt><dd>JSON không hợp lệ → 400 <em>payload is not valid JSON</em>. Ràng buộc chặn → 400 nêu rõ từng <code>constraintId</code>. Dữ liệu bẩn có thể phục hồi được sẽ được chuẩn hóa bởi <code>mapCase</code> và hiển thị trong <code>gaps</code>. Không có dữ liệu sai lệch nào đến được AI mà không bị phát hiện.</dd>
+      <dt>Xác minh</dt><dd>3 jest suite cộng với một lượt POST thủ công payload lỗi.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S3-06"><span class="case-id">S3-06</span><label class="case-title" for="S3-06">Đầu ra AI bị cắt ngắn (truncated) được phát hiện và KHÔNG được thử lại (retry)</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd><code>npx jest jsonExtract</code></dd>
+      <dt>Kỳ vọng</dt><dd>Một <code>finishReason</code> là <code>length</code> hoặc <code>max_tokens</code> sẽ ném ra lỗi truncation kèm thông báo chỉ ra giới hạn token budget. Hệ thống <strong>cố tình không retry</strong> — một lần thử lại giống hệt sẽ bị cắt ngắn tương tự và chỉ làm tăng gấp đôi chi phí. Cách khắc phục là điều chỉnh <code>BUDGET</code> trong <code>schemas.ts</code>, chứ không phải thử lại.</dd>
+      <dt>Xác minh</dt><dd>Jest suite pass (xanh); xác nhận không có nhánh retry trên luồng này.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S3-07"><span class="case-id">S3-07</span><label class="case-title" for="S3-07">JSON sai định dạng chỉ nhận chính xác một lần thử lại để sửa chữa (repair retry)</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Kỳ vọng</dt><dd>Lỗi parse kích hoạt duy nhất một lần thử lại kèm thông báo lỗi trước đó như một gợi ý sửa chữa. Chỉ một lần retry duy nhất, và JSON hỏng không bao giờ được vá víu thủ công.</dd>
+      <dt>Xác minh</dt><dd><code>jsonExtract.test.ts</code>; đếm các mục repair trong <code>validationJson</code> sau khi chạy thực tế.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S3-08"><span class="case-id">S3-08</span><label class="case-title" for="S3-08">saveProfile từ chối khi criteria và criteriaFields được gửi cùng nhau</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Kỳ vọng</dt><dd>Trả về 400. Lớp bảo vệ này là toàn bộ lý do vì sao Object Schema không thể ghi đè các tinh chỉnh Similarity: việc quản lý trường thuộc về profile và việc chấm điểm đi trên các tham số tách biệt và không bao giờ được gửi trong cùng một lệnh gọi.</dd>
+      <dt>Xác minh</dt><dd><code>profileRepository.test.ts</code> — test case kiểm tra tính loại trừ lẫn nhau.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S3-09"><span class="case-id">S3-09</span><label class="case-title" for="S3-09">Trùng lặp criterionKey bị từ chối trước khi ghi dữ liệu</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Kỳ vọng</dt><dd>400 nêu rõ key bị trùng lặp, và <strong>0 hàng nào được ghi</strong> — validation chạy trước thao tác xóa-và-chèn, do đó một payload bị từ chối không thể để lại profile ở trạng thái cập nhật dở dang.</dd>
+      <dt>Xác minh</dt><dd>Jest khẳng định không có thao tác insert nào diễn ra.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S3-10"><span class="case-id">S3-10</span><label class="case-title" for="S3-10">Cosine trên một trường không có embedding bị từ chối</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Kỳ vọng</dt><dd>400 nêu rõ chỉ có <code>embedding</code> mới chứa vector. Nếu không có kiểm tra này, tiêu chí sẽ luôn nhận 0 điểm mãi mãi trong khi vẫn làm tăng ảo <code>maxScore</code> — một lỗi tính điểm âm thầm mà không hề báo lỗi ở đâu.</dd>
+      <dt>Xác minh</dt><dd><code>profileRepository.test.ts</code>.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S3-11"><span class="case-id">S3-11</span><label class="case-title" for="S3-11">matchType không xác định và mã step không hợp lệ bị từ chối</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Kỳ vọng</dt><dd>Một <code>matchType</code> nằm ngoài <code>exact | keyword | family | cosine</code> → 400 liệt kê tập giá trị hợp lệ. Mã step nằm ngoài D1–D8 → 400. Một step bị lặp lại trong một payload → 400, vì một step chỉ liên kết tới đúng một profile.</dd>
+      <dt>Xác minh</dt><dd><code>profileRepository.test.ts</code>.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S3-12"><span class="case-id">S3-12</span><label class="case-title" for="S3-12">Profile không tồn tại trả về 404 và không ghi dữ liệu gì</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Kỳ vọng</dt><dd>Trả về 404 trước khi thực hiện bất kỳ thay đổi nào.</dd>
+      <dt>Xác minh</dt><dd><code>profileRepository.test.ts</code> — case not-found khẳng định không có insert nào.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S3-13"><span class="case-id">S3-13</span><label class="case-title" for="S3-13">Một bước liên kết với profile không có trường nào sẽ bị chặn khi lưu</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Object Schema: gán một bước D vào profile không có trường nào → thử bấm Save.</dd>
+      <dt>Kỳ vọng</dt><dd>Việc lưu bị chặn kèm thông báo rõ ràng. Nếu cho phép lưu, bước đó sẽ không chấm được điểm gì và âm thầm trả về không có tiền lệ nào.</dd>
+      <dt>Xác minh</dt><dd>Lỗi chặn trên UI; không có gì được ghi vào <code>StepRetrievalBindings</code>.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S3-14"><span class="case-id">S3-14</span><label class="case-title" for="S3-14">Danh sách phân công đội (Team roster): hai leader, trùng lặp partner, các hàng trống</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Trong D1, tạo từng danh sách không hợp lệ và nhấn Save.</dd>
+      <dt>Kỳ vọng</dt><dd>Hai hàng <code>8D Team Leader</code> → 400 <em>An 8D team has exactly one leader; found 2</em>. Cùng một partner xuất hiện 2 lần → 400. <code>partnerRole</code> không hợp lệ → 400 liệt kê các role được phép. Hàng chưa chọn partner sẽ <strong>tự động bị loại bỏ, không báo lỗi</strong> — đó là trạng thái nháp trên UI, và cả client lẫn server đều sẽ bỏ qua nó.</dd>
+      <dt>Xác minh</dt><dd>Phản hồi từ server; sau đó kiểm tra SQL để xác nhận không có hàng trống nào được lưu.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S3-15"><span class="case-id">S3-15</span><label class="case-title" for="S3-15">saveDisciplineField thực thi danh sách cho phép (allowlist) theo từng bước</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Gọi action với <code>fieldKey = 'problem.statement'</code> trên D2; sau đó gọi <code>'team.assignedRoster'</code> trên D2.</dd>
+      <dt>Kỳ vọng</dt><dd>Cả hai đều trả về 400. Danh sách cho phép chỉ cấp cho D1 quyền <code>team.assignedRoster</code> và D2 quyền <code>problem.statementOverride</code>. Một key do AI tạo ra không bao giờ cho phép người dùng ghi đè trực tiếp, và một key hợp lệ ở bước khác thì không hợp lệ ở đây. Chuỗi rỗng sẽ được chuẩn hóa thành <code>null</code> để xóa override thay vì lưu <code>""</code>.</dd>
+      <dt>Xác minh</dt><dd>Phản hồi của action; xác nhận <code>resultJson</code> không đổi.</dd>
+    </dl></div>
+  </div>
+</section>
+
+<section class="suite" id="s4">
+  <div class="suite-head"><h2>Suite 4 — Các cam kết chống ảo giác (Anti-hallucination guarantees)</h2><span class="suite-count">7 test case · 1 trả phí</span></div>
+  <p class="suite-note">Đây là cam kết cốt lõi của sản phẩm. Nếu bất kỳ test case nào ở đây thất bại, hệ thống đang đưa ra những khẳng định mà nó không thể chứng minh.</p>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S4-01"><span class="case-id">S4-01</span><label class="case-title" for="S4-01">Bằng chứng độc lập (blind evidence) ẩn toàn bộ các trường đáp án</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd><code>npx jest blindEvidence</code></dd>
+      <dt>Kỳ vọng</dt><dd>Bằng chứng đã được cắt gọt không chứa cờ <code>isRootCause</code>, không có đáp án 5-Why, không có hành động khắc phục/phòng ngừa, không có mô tả FMEA, không có bài học kinh nghiệm. Kết quả kiểm tra, mô tả Ishikawa không có kết luận, bảng is/is-not và ngữ cảnh tiêu đề được giữ lại — model phải suy luận từ triệu chứng, không được đọc đáp án.</dd>
+      <dt>Xác minh</dt><dd>Jest suite pass (xanh).</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="paid">
+    <div class="case-top"><input type="checkbox" id="S4-02"><span class="case-id">S4-02</span><label class="case-title" for="S4-02">Kiểm toán rò rỉ tại thời điểm chạy (Runtime leak audit) trả về sạch trên một lượt chạy thực tế</label><span class="tag paid">Trả phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Tái sử dụng lượt chạy baseline S2-00 và kiểm tra kết quả kiểm toán (audit output).</dd>
+      <dt>Kỳ vọng</dt><dd><code>auditBlindEvidence()</code> trả về <strong>mảng rò rỉ rỗng</strong>. Bất kỳ mục nào xuất hiện đều nêu đích danh điểm rò rỉ — đáp án 5-Why, hành động, FMEA, bài học kinh nghiệm — và làm vô hiệu hóa tuyên bố về chẩn đoán độc lập cho lượt chạy đó.</dd>
+      <dt>Xác minh</dt><dd>Log backend trong giai đoạn ④.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S4-03"><span class="case-id">S4-03</span><label class="case-title" for="S4-03">Mọi trích dẫn precedents#N đều phân giải tới một case có thật trong thư viện</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Thu thập mọi <code>precedents#N</code> trên cả 8 discipline của baseline; map từng chỉ số với danh sách đã hợp nhất.</dd>
+      <dt>Kỳ vọng</dt><dd>Mọi chỉ số N đều nằm trong phạm vi hợp lệ và map tới một <code>notificationId</code> có thật trong <code>HistoricalCases</code>. Một trích dẫn nằm ngoài phạm vi là một nguồn bị bịa đặt (hallucination).</dd>
+      <dt>Xác minh</dt><dd>Đối chiếu chéo danh sách hợp nhất với SQL.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S4-04"><span class="case-id">S4-04</span><label class="case-title" for="S4-04">precedents#N đại diện cho cùng một case trong mọi discipline</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Kỳ vọng</dt><dd>Việc đánh số được thực hiện một lần duy nhất bởi <code>mergeStepPrecedents</code> trên tập hợp kết quả của tất cả các bước, do đó <code>precedents#2</code> là cùng một case duy nhất trên toàn bộ tài liệu. Đây là bất biến quan trọng khi có các profile theo từng bước; nếu không có nó, các trích dẫn sẽ âm thầm trỏ tới các case khác nhau ở từng phần.</dd>
+      <dt>Xác minh</dt><dd><code>stepPrecedents.test.ts</code>, sau đó xác nhận trực tiếp trên hệ thống.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S4-05"><span class="case-id">S4-05</span><label class="case-title" for="S4-05">dataBacked bị hạ cấp khi không còn nguồn tham chiếu nào sau khi phân giải</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd><code>npx jest postProcess</code></dd>
+      <dt>Kỳ vọng</dt><dd>Một discipline tuyên bố <code>dataBacked=true</code> nhưng không còn nguồn hợp lệ nào sau phân giải sẽ bị ép về <code>false</code> và một dòng repair được ghi nhận. D6 ngoài ra cũng bị ép về <code>false</code> khi tập dữ liệu không có dữ liệu xác minh. D1 bị ép về <code>false</code> khi cả dữ liệu team hiện tại lẫn tiền lệ đều không tồn tại.</dd>
+      <dt>Xác minh</dt><dd>Jest suite; sau đó kiểm tra danh sách repairs trên một báo cáo thực tế.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S4-06"><span class="case-id">S4-06</span><label class="case-title" for="S4-06">Ràng buộc mẫu nguồn (source-pattern constraints) từ chối các trích dẫn ngoài phạm vi</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Kỳ vọng</dt><dd>Nguồn của D1 phải khớp với <code>^(team\.|precedents#)</code>; D2 phải khớp với <code>^(header|product|inspections|isIsNot|derivedFacts)</code>. Lỗi vi phạm xuất hiện trong <code>validationJson.violations</code> ở mức độ nghiêm trọng đã cấu hình — quy tắc cơ sở dữ liệu của D1 là <code>error</code>, quy tắc nguồn của D2 là <code>warning</code>.</dd>
+      <dt>Xác minh</dt><dd><code>runtimeConfig.test.ts</code> cùng với việc đọc <code>validationJson</code> thực tế.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S4-07"><span class="case-id">S4-07</span><label class="case-title" for="S4-07">AI không bao giờ tự ghi đè các key do con người quản lý</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Kỳ vọng</dt><dd>Sau một lượt phân tích mới, <code>team.assignedRoster</code> và <code>problem.statementOverride</code> <strong>không xuất hiện</strong> trong <code>resultJson</code>. Cả hai đều được khai báo là <code>manual_input</code> và prompt của các bước nghiêm cấm việc xuất ra chúng. Nếu một trong hai xuất hiện, AI đang tự tiện bịa đặt quyết định của con người.</dd>
+      <dt>Xác minh</dt><dd>Đọc <code>resultJson</code> của D1 và D2 từ một lượt chạy mới.</dd>
+    </dl></div>
+  </div>
+</section>
+<section class="suite" id="s5">
+  <div class="suite-head"><h2>Suite 5 — Tính bền vững dữ liệu và sự phân tách Người / AI</h2><span class="suite-count">6 test case · 0 trả phí</span></div>
+  <p class="suite-note">Chỉnh sửa của con người phải tồn tại qua các lần tải lại trang mà không bao giờ ghi đè lên kết quả của AI, và ngược lại. Tất cả đều miễn phí — các case này chạy trên một báo cáo đã có sẵn.</p>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S5-01"><span class="case-id">S5-01</span><label class="case-title" for="S5-01">Danh sách thành viên đội (Team roster) vẫn tồn tại sau khi tải lại trang</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>D1 → chỉnh sửa team → Save → F5.</dd>
+      <dt>Kỳ vọng</dt><dd>Các hàng dữ liệu hiển thị chính xác như khi đã lưu. Trước khi lưu, chú thích chân trang hiển thị trạng thái chưa lưu; sau khi lưu nó xác nhận số lượng đã lưu. Khi lưu thất bại, cờ dirty <strong>vẫn được giữ nguyên</strong> và lỗi thực tế của server hiển thị ra — báo thành công trên một thao tác lưu thất bại là kết quả tồi tệ nhất ở đây.</dd>
+      <dt>Xác minh</dt><dd>F5; sau đó đọc <code>team.assignedRoster</code> bằng SQL.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S5-02"><span class="case-id">S5-02</span><label class="case-title" for="S5-02">Lưu đội ngũ không làm ảnh hưởng đến roster do AI đề xuất</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Kỳ vọng</dt><dd><code>team.roster</code> giống nhau từng byte trước và sau khi lưu. Server thực hiện cơ chế read-modify-write trên một key duy nhất thay vì chấp nhận toàn bộ <code>resultJson</code> từ client, do đó một tab bị cũ không thể kéo lùi các key khác về trạng thái cũ.</dd>
+      <dt>Xác minh</dt><dd>Diff <code>resultJson</code> trước/sau; chỉ có <code>team.assignedRoster</code> là khác biệt.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S5-03"><span class="case-id">S5-03</span><label class="case-title" for="S5-03">Danh sách đã lưu rỗng không bị ghi đè bởi đội ngũ của case khi mở lại</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Xóa toàn bộ các hàng trong team → Save → F5.</dd>
+      <dt>Kỳ vọng</dt><dd>Bảng dữ liệu vẫn <strong>trống</strong>. Việc seed từ đội ngũ của case chỉ diễn ra khi chưa từng có dữ liệu nào được lưu; nếu không, một thao tác cố tình lưu rỗng sẽ âm thầm hiển thị lại danh sách ban đầu.</dd>
+      <dt>Xác minh</dt><dd>Giá trị lưu trữ là một mảng rỗng, và UI tuân thủ đúng giá trị này.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S5-04"><span class="case-id">S5-04</span><label class="case-title" for="S5-04">Ghi đè mô tả sự cố (Problem-statement override) được lưu lại và hiển thị rõ nguồn gốc</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>D2 → Chỉnh sửa mô tả → sửa văn bản → Save → F5.</dd>
+      <dt>Kỳ vọng</dt><dd>Đoạn văn bản đã sửa hiển thị và được đánh dấu là do người dùng chỉnh sửa. <code>problem.statement</code> vẫn giữ nguyên văn bản gốc của AI — cả hai phiên bản cùng tồn tại song song, đảm bảo bản nháp của AI luôn có thể kiểm toán được.</dd>
+      <dt>Xác minh</dt><dd>SQL: cả hai key đều tồn tại với các giá trị khác nhau.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S5-05"><span class="case-id">S5-05</span><label class="case-title" for="S5-05">Khôi phục về bản nháp của AI sẽ xóa bỏ giá trị ghi đè</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Sử dụng nút "Khôi phục bản nháp AI" → F5.</dd>
+      <dt>Kỳ vọng</dt><dd><code>problem.statementOverride</code> chuyển thành <code>null</code>, không phải <code>""</code>, và giao diện hiển thị lại văn bản của AI mà không còn nhãn đã chỉnh sửa.</dd>
+      <dt>Xác minh</dt><dd>SQL xác nhận giá trị là <code>null</code>.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S5-06"><span class="case-id">S5-06</span><label class="case-title" for="S5-06">Phân tích lại tạo ra một báo cáo mới và giữ nguyên vẹn báo cáo cũ</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Kỳ vọng</dt><dd>Các chỉnh sửa của con người thuộc về một hàng báo cáo cụ thể. Một lượt phân tích mới tạo ra một hàng mới với các key thủ công rỗng; báo cáo trước đó giữ nguyên các chỉnh sửa và bản snapshot <code>resultJson</code> của nó.</dd>
+      <dt>Xác minh</dt><dd>So sánh cả hai hàng báo cáo.</dd>
+    </dl></div>
+  </div>
+</section>
+
+<section class="suite" id="s6">
+  <div class="suite-head"><h2>Suite 6 — Kiểm thử hồi quy: Các jest suite hiện có</h2><span class="suite-count">2 test case · 0 trả phí · bao phủ 14 jest suite</span></div>
+  <p class="suite-note">Một lệnh <code>npm test</code> kiểm tra toàn bộ 14 suite. Mỗi dòng nêu rõ hành vi sẽ bị phá vỡ nếu suite đó bị báo đỏ, giúp việc phát hiện lỗi trỏ thẳng vào hệ quả thay vì chỉ là một tên file đơn thuần.</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Suite</th><th>Bảo vệ</th></tr></thead>
+      <tbody>
+        <tr><td><code>blindEvidence</code></td><td>Các đáp án luôn được ẩn trong quá trình chẩn đoán độc lập</td></tr>
+        <tr><td><code>caseMapper</code></td><td>Payload thô → CaseContext, bao gồm phân tách tính áp dụng khách hàng Q1/Q3</td></tr>
+        <tr><td><code>datasetValidator</code></td><td>Phân loại ràng buộc chặn (blocking) so với không chặn (non-blocking)</td></tr>
+        <tr><td><code>dirtyData</code></td><td>Payload thực tế lộn xộn được chuẩn hóa thay vì gây crash hệ thống</td></tr>
+        <tr><td><code>disciplineGuide</code></td><td>Hướng dẫn mặc định D1–D8 luôn được giữ nguyên vẹn</td></tr>
+        <tr><td><code>jsonExtract</code></td><td>Bóc tách markdown fence, phát hiện cắt ngắn (truncation), một lần retry sửa lỗi</td></tr>
+        <tr><td><code>postProcess</code></td><td>Phân giải nguồn trích dẫn và mọi quy tắc hạ cấp dataBacked</td></tr>
+        <tr><td><code>runtimeConfig</code></td><td>Chuẩn hóa schema, tính tương đương giữa Data-Schema/Form-Editor, flexible validation</td></tr>
+        <tr><td><code>sourceVocabulary</code></td><td>Chỉ các đường dẫn nguồn đã biết mới được phép trích dẫn</td></tr>
+        <tr><td><code>profileRepository</code></td><td>Phân tách criteria/criteriaFields; trường mới mặc định disabled trọng số 1; giữ nguyên tinh chỉnh</td></tr>
+        <tr><td><code>scoring</code></td><td>Trọng số, fallbacks, mức trần maxScore</td></tr>
+        <tr><td><code>semanticScoring</code></td><td>Ngưỡng sàn cosine và tính điểm liên tục</td></tr>
+        <tr><td><code>sourceFields</code></td><td>Làm phẳng payload giống hệt nhau tại thời điểm seed và tính điểm</td></tr>
+        <tr><td><code>stepPrecedents</code></td><td>Đánh số precedents#N toàn cục trên các profile theo từng bước</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S6-01"><span class="case-id">S6-01</span><label class="case-title" for="S6-01">Toàn bộ 14 jest suite đều pass</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd><code>npm test</code></dd>
+      <dt>Kỳ vọng</dt><dd>14 suite pass, 0 fail. Ghi lại tổng số lượng bài test làm mốc hồi quy cho lần chạy tiếp theo.</dd>
+      <dt>Xác minh</dt><dd>Dòng tổng kết của Jest.</dd>
+    </dl></div>
+  </div>
+
+  <div class="case" data-cost="free">
+    <div class="case-top"><input type="checkbox" id="S6-02"><span class="case-id">S6-02</span><label class="case-title" for="S6-02">Ngôn ngữ của assertion khớp với ngôn ngữ triển khai thực tế</label><span class="tag free">Miễn phí</span></div>
+    <div class="case-body"><dl>
+      <dt>Các bước</dt><dd>Chạy lại sau bất kỳ thay đổi nào đối với chuỗi văn bản hiển thị cho người dùng.</dd>
+      <dt>Kỳ vọng</dt><dd>Không có suite nào assert một thông báo bằng ngôn ngữ khác với ngôn ngữ mã nguồn xuất ra. Điều này đã từng bị lỗi một lần: một bài test kỳ vọng tiếng Việt trong khi hàm <code>discrimination()</code> trả về tiếng Anh. Thông báo lỗi phía server là tiếng Anh; chú thích trong code là tiếng Việt.</dd>
+      <dt>Xác minh</dt><dd>Bất kỳ assertion so khớp chuỗi nào bị thất bại sau khi thay đổi nội dung văn bản.</dd>
+    </dl></div>
+  </div>
+</section>
+
+<section class="suite" id="unverified">
+  <div class="suite-head"><h2>Chưa xác minh — cần xác nhận trước khi kiểm thử</h2><span class="suite-count">4 mục</span></div>
+  <p class="suite-note">Hành vi chưa thể xác nhận từ mã nguồn trong phạm vi chỉ đọc của task này. Mỗi mục được nêu dưới dạng câu hỏi, không phải khẳng định. Không viết test pass cho bất kỳ mục nào ở đây cho đến khi đã được xác nhận.</p>
+
+  <div class="callout neutral">
+    <h4>1 · Báo cáo nào thực sự đọc layout trực tiếp (live)</h4>
+    <p>Trang chi tiết báo cáo ưu tiên đọc <code>formSchemaJson</code> trực tiếp từ <code>StepPrompts</code> thay vì bản snapshot của discipline. Tôi chưa xác minh luồng fallback khi không truy cập được <code>StepPrompts</code> hoặc khi thiếu hàng của một step. <strong>Cần xác nhận trước khi dựa vào S2-11 và S2-12.</strong></p>
+  </div>
+
+  <div class="callout neutral">
+    <h4>2 · Thang nâng cấp phiên bản step-prompt</h4>
+    <p>Hàm <code>seedRetrievalConfig()</code> chỉ đẩy defaults mới khi khớp với quy tắc nâng cấp theo phiên bản. Giá trị thực tế quan sát được là D1 <code>version=13</code> và D2 <code>version=7</code>, đều cao hơn mọi quy tắc tôi đã đọc. Đây là lý do vì sao "Khôi phục D{n}" là cách duy nhất đáng tin cậy để nạp defaults mới. <strong>Cần xác nhận không có quy tắc nâng cấp nào kích hoạt bất ngờ và ghi đè lên layout đã tinh chỉnh của người dùng.</strong></p>
+  </div>
+
+  <div class="callout neutral">
+    <h4>3 · Thay đổi model embedding làm vô hiệu hóa các vector đã lưu</h4>
+    <p>Các vector từ hai model embedding khác nhau không chia sẻ cùng một không gian vector, do đó khoảng cách cosine giữa chúng là vô nghĩa. Tôi chưa xác minh liệu hệ thống có phát hiện việc đổi model để buộc nhúng lại vector hay không, hay sẽ âm thầm so sánh giữa các không gian khác nhau. <strong>Cần xác nhận trước khi coi bất kỳ điểm cosine nào là đáng tin cậy sau khi chuyển đổi model.</strong></p>
+  </div>
+
+  <div class="callout neutral">
+    <h4>4 · Thao tác lưu đồng thời trên cùng một profile</h4>
+    <p>Hàm <code>saveProfile</code> thay thế toàn bộ tập hợp tiêu chí. Hai người dùng cùng lưu một profile từ các màn hình khác nhau sẽ dẫn đến xung đột ghi đè lần cuối (last-write-wins). Tôi không tìm thấy cơ chế kiểm tra optimistic-concurrency. <strong>Cần xác nhận xem điều này có quan trọng đối với môi trường triển khai thực tế hay không trước khi viết test.</strong></p>
+  </div>
+</section>
+
+<footer>
+  <div class="eyebrow" style="margin-bottom:6px">8D Copilot</div>
+  <p style="margin:0">Tiến độ chỉ được lưu trong trình duyệt này. Sử dụng nút Đặt lại để xóa tiến độ. Mọi assertion đều có thể truy vết về file mã nguồn cụ thể hoặc một jest suite hiện có; bất kỳ điều gì chưa thể truy vết đều được đưa vào mục Chưa xác minh thay vì khẳng định như một sự thật.</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var KEY = 'e2e-8d-plan-v1';
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('.case input[type=checkbox]'));
+  var cases = Array.prototype.slice.call(document.querySelectorAll('.case'));
+
+  function load() {
+    try {
+      var raw = window.localStorage.getItem(KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+  function save(state) {
+    try { window.localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* private mode — session only */ }
+  }
+
+  var state = load();
+
+  function totalPaidRemaining() {
+    return cases.filter(function (c) {
+      var b = c.querySelector('input[type=checkbox]');
+      return c.getAttribute('data-cost') === 'paid' && b && !b.checked;
+    }).length;
+  }
+
+  function paint() {
+    var done = 0;
+    boxes.forEach(function (b) {
+      var card = b.closest('.case');
+      if (b.checked) { done++; card.classList.add('done'); }
+      else { card.classList.remove('done'); }
+    });
+    var total = boxes.length;
+    var pct = total ? Math.round((done / total) * 100) : 0;
+    document.getElementById('m-label').textContent = done + ' trên ' + total + ' hoàn thành';
+    document.getElementById('m-pct').textContent = pct + '%';
+    document.getElementById('m-fill').style.width = pct + '%';
+    document.getElementById('m-cost').textContent = 'Số lượt chạy AI trả phí còn lại: ' + totalPaidRemaining();
+    applyFilter();
+  }
+
+  var filter = 'all';
+  function applyFilter() {
+    cases.forEach(function (c) {
+      var b = c.querySelector('input[type=checkbox]');
+      var isPaid = c.getAttribute('data-cost') === 'paid';
+      var show = filter === 'all'
+        || (filter === 'free' && !isPaid)
+        || (filter === 'paid' && isPaid)
+        || (filter === 'todo' && b && !b.checked);
+      c.classList.toggle('hidden', !show);
+    });
+  }
+
+  boxes.forEach(function (b) {
+    if (state[b.id]) b.checked = true;
+    b.addEventListener('change', function () {
+      state[b.id] = b.checked;
+      save(state);
+      paint();
+    });
+  });
+
+  document.querySelectorAll('.filters button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var f = btn.getAttribute('data-f');
+      if (f === 'reset') {
+        if (!window.confirm('Xóa toàn bộ tiến độ trên thiết bị này?')) return;
+        state = {};
+        save(state);
+        boxes.forEach(function (b) { b.checked = false; });
+        paint();
+        return;
+      }
+      filter = f;
+      document.querySelectorAll('.filters button').forEach(function (o) {
+        if (o.getAttribute('data-f') !== 'reset') {
+          o.setAttribute('aria-pressed', String(o === btn));
+        }
+      });
+      applyFilter();
+    });
+  });
+
+  paint();
+})();
+</script>
+</body>
+</html>

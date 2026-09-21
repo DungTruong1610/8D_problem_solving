@@ -1,0 +1,157 @@
+/* =================================================================
+   PROJECT CUSTOMIZATIONS — Theme & Background Color System
+   Overrides and extends @cnma/react-ui design tokens dynamically.
+   ================================================================= */
+
+:root {
+    --palette-informative: #0070f3;
+    --status-positive: var(--palette-positive);
+    --status-negative: var(--palette-negative);
+    --status-informative: var(--palette-informative);
+    --status-neutral: #6b7280;
+    --status-risk: #f59e0b;
+
+    /* Base Default (Proconarum Red & White) */
+    --background: #fdfdfd;
+    --foreground: #32363a;
+    --card: #ffffff;
+    --card-foreground: #32363a;
+    --sidebar: #f1f1f1;
+    --sidebar-foreground: #32363a;
+    --sidebar-border: #d9d9d9;
+    --border: #d9d9d9;
+
+    --color-brand: #b10e10;
+    --color-brand-hover: #990c0e;
+    --color-link: #820a0c;
+    --primary: var(--color-brand);
+    --primary-hover: var(--color-brand-hover);
+    --primary-foreground: #ffffff;
+    --btn-create: var(--color-brand);
+    --btn-create-hover: var(--color-brand-hover);
+    --btn-create-foreground: #ffffff;
+    --sidebar-primary: var(--color-brand);
+    --sidebar-primary-foreground: #ffffff;
+    --input-border-hover: var(--color-brand-hover);
+    --btn-success: #256f3a;
+    --btn-success-hover: #1e592f;
+    --btn-success-foreground: #ffffff;
+}
+
+/* ── Proconarum Theme: Red & White ── */
+:root[data-sap-theme="proconarumv2@"] {
+    --color-brand: #b10e10;
+    --color-brand-hover: #990c0e;
+    --color-link: #820a0c;
+    --primary: #b10e10;
+    --primary-hover: #990c0e;
+    --primary-foreground: #ffffff;
+    --btn-create: #b10e10;
+    --btn-create-hover: #990c0e;
+    --btn-create-foreground: #ffffff;
+    --sidebar-primary: #b10e10;
+    --sidebar-primary-foreground: #ffffff;
+    --input-border-hover: #990c0e;
+
+    --background: #fdfdfd;
+    --foreground: #32363a;
+    --card: #ffffff;
+    --card-foreground: #32363a;
+    --sidebar: #f1f1f1;
+    --sidebar-foreground: #32363a;
+    --sidebar-border: #d9d9d9;
+    --border: #d9d9d9;
+
+    --btn-success: #256f3a;
+    --btn-success-hover: #1e592f;
+    --btn-success-foreground: #ffffff;
+
+    --edited: #c99700;
+    --edited-bg: #fef9e7;
+}
+
+/* ── Horizon / Default: Blue & White ── */
+:root[data-sap-theme="sap_horizon"],
+:root[data-sap-theme="sap-light"] {
+    --color-brand: #0070F2;
+    --color-brand-hover: #0064D9;
+    --color-link: #0056b3;
+    --primary: #0070F2;
+    --primary-hover: #0064D9;
+    --primary-foreground: #ffffff;
+    --btn-create: #0070F2;
+    --btn-create-hover: #0064D9;
+    --btn-create-foreground: #ffffff;
+    --sidebar-primary: #0070F2;
+    --sidebar-primary-foreground: #ffffff;
+    --input-border-hover: #0064D9;
+
+    --background: #f8fafc;
+    --foreground: #32363a;
+    --card: #ffffff;
+    --card-foreground: #32363a;
+    --sidebar: #ffffff;
+    --sidebar-foreground: #32363a;
+    --sidebar-border: #e2e8f0;
+    --border: #d9d9d9;
+}
+
+/* ── Custom Dark Theme (Dark) ── */
+:root[data-sap-theme="sap_fiori_3_dark"],
+:root[data-sap-theme="sap-dark"] {
+    --color-brand: #f0ab00;
+    --color-brand-hover: #d4960a;
+    --color-link: #4db1ff;
+    --primary: #f0ab00;
+    --primary-hover: #d4960a;
+    --primary-foreground: #000000;
+    --btn-create: #f0ab00;
+    --btn-create-hover: #d4960a;
+    --btn-create-foreground: #000000;
+    --sidebar-primary: #f0ab00;
+    --sidebar-primary-foreground: #000000;
+
+    --background: #1d2d3e;
+    --foreground: #ffffff;
+    --card: #24364a;
+    --card-foreground: #ffffff;
+    --popover: #24364a;
+    --popover-foreground: #ffffff;
+    --sidebar: #172433;
+    --sidebar-foreground: #ffffff;
+    --sidebar-border: #3b5066;
+    --border: #3b5066;
+    --input: #556b81;
+    --input-border: #556b81;
+    --input-background: #1d2d3e;
+    --muted: #24364a;
+    --muted-foreground: #a6b5c5;
+    --secondary: #24364a;
+    --secondary-foreground: #ffffff;
+}
+
+@theme inline {
+    --color-status-positive: var(--status-positive);
+    --color-status-positive-text: var(--status-positive);
+    --color-status-negative: var(--status-negative);
+    --color-status-negative-text: var(--status-negative);
+    --color-status-informative: var(--status-informative);
+    --color-status-informative-text: var(--status-informative);
+    --color-status-neutral: var(--status-neutral);
+    --color-status-risk: var(--status-risk);
+
+    --font-size-10px: 10px;
+    --font-size-xxs: 10px;
+}
+
+/* ── Smooth Theme Transitions ── */
+body,
+aside,
+main,
+header,
+.bg-background,
+.bg-sidebar,
+.bg-card {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+

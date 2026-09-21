@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: cnma-proresolve-backend
+    name: 8d-hackathon-backend
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install && npx cds build --production && node scripts/bundle-library.mjs
+    startCommand: node node_modules/@sap/cds/bin/cds.js serve all --profile production --port $PORT
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CDS_CONFIG
+        value: '{"requires":{"db":{"kind":"sqlite","credentials":{"url":"db.sqlite"}},"auth":{"kind":"mocked"}}}'
+      - key: GEMINI_API_KEY
+        sync: false
+

@@ -1,0 +1,55 @@
+{
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Leak test cell rejected 96 pump housings (B-60318) on 2026-02-12. X-ray showed gas porosity >1.5mm on flange face from cavity DIE1 (DIE2 passed); chill vent slot was clogged with oxidized release agent due to missed PM cleaning cycle.",
+  "foundDate": "2026-02-12",
+  "defectQuantity": 96,
+  "defectQuantityUom": "PC",
+  "referenceNumber": "INT-2026-4401",
+  "plant": "1000",
+  "entryMode": "during-inspection",
+  "inspectionLotId": "0010000021",
+  "material": {
+    "materialId": "MAT-10318",
+    "description": "Pump Housing P90",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-60318",
+    "materialId": "MAT-10318"
+  },
+  "workCenter": {
+    "workCenterId": "WC-CAST-03",
+    "description": "Aluminium Die Casting Line 3"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-MAT",
+    "defectCode": "DEF-0512",
+    "defectText": "Porosity at sealing flange face",
+    "defectClass": "Critical"
+  },
+  "inspections": [
+    {
+      "characteristic": "Porosity area ratio",
+      "measuredValue": "12.5000 %",
+      "specLowerLimit": null,
+      "specUpperLimit": 1,
+      "specUom": "%",
+      "valuation": "Rejected",
+      "equipment": "WC-CAST-03-DIE1"
+    },
+    {
+      "characteristic": "Porosity area ratio",
+      "measuredValue": "0.3800 %",
+      "specLowerLimit": null,
+      "specUpperLimit": 1,
+      "specUom": "%",
+      "valuation": "Accepted",
+      "equipment": "WC-CAST-03-DIE2"
+    }
+  ],
+  "responsibility": {
+    "reportedBy": "Quyen La",
+    "coordinator": "Heli (QE)",
+    "department": "Quality Assurance"
+  }
+}

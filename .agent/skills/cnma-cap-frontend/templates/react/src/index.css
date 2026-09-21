@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* === CDK Brand Design Tokens === */
+:root {
+    /* CDK Brand Colors */
+    --brand-red: #b00000;
+    --accent-color: #b00000;
+    --accent-hover: #8a0000;
+    --bg-color: #f0f2f5;
+    --card-bg: #ffffff;
+    --text-primary: #32363a;
+    --text-secondary: #6a6d70;
+    --border-color: #d9d9d9;
+
+    /* Status Colors */
+    --success-bg: #dcfce7;
+    --success-text: #166534;
+    --warning-bg: #fef9c3;
+    --warning-text: #854d0e;
+    --error-bg: #fee2e2;
+    --error-text: #991b1b;
+    --info-bg: #e0f2fe;
+    --info-text: #0369a1;
+
+    /* Typography */
+    font-family: "72", "72full", "Inter", "Segoe UI", Arial, sans-serif;
+
+    /* shadcn/ui CSS vars — oklch color space */
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.476 0.195 29.2);
+    --primary-foreground: oklch(1 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(1 0 0);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.476 0.195 29.2);
+    --radius: 0.625rem;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+}
+
+/* Main content background */
+.main-content {
+    background-color: var(--bg-color);
+}
+
+@layer components {
+    .btn-primary {
+        @apply bg-primary text-primary-foreground hover:bg-primary/90 transition-colors;
+    }
+}

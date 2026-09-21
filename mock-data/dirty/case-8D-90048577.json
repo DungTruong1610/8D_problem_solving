@@ -1,0 +1,136 @@
+{
+  "notificationId": "8D-90048577",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Kunde meldet Kuehlmittelaustritt Dichtflaeche - Reklamation",
+  "status": "Completed",
+  "foundDate": "02.07.2026",
+  "completionDate": "28-JUL-26",
+  "quantityExtent": "ca. 46 Stk.",
+  "teamSize": 4,
+  "material": {
+    "materialId": "  MAT-10318 ",
+    "description": "Pump Housing P90",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-50231",
+    "materialId": "  MAT-10318 "
+  },
+  "defect": {
+    "defectCode": "DEF-0512",
+    "defectText": "Porosity at sealing flange face"
+  },
+  "workCenter": {
+    "workCenterId": "WC-CAST-03",
+    "description": "Aluminium Die Casting Line 3"
+  },
+  "inspections": [
+    {
+      "characteristic": "Porosity area ratio",
+      "measuredValue": "Porosity area ratio = 3,8% (Vorgabe max 1,0%) - iO/niO: niO",
+      "specValue": "k.A."
+    },
+    {
+      "characteristic": "Helium leak rate",
+      "measuredValue": "12 mbar*l/s",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Material",
+      "description": "Ingot lot ING-77412 hydrogen content 0.38 ppm vs max 0.20 ppm - degassing certificate accepted without re-test",
+      "metricValue": "0,38 ppm",
+      "isRootCause": "  ",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Man",
+      "description": "EMP-1187, Shift A - casting operator, no deviation logged",
+      "metricValue": null,
+      "isRootCause": "k.A.",
+      "source": "ASSUMED: MES/HR"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the housing leak at the sealing surface?",
+      "answer": "Porosity area ratio measured 3.8% vs max 1.0% spec - gas pores broke through the machined sealing face",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why was porosity so high in this batch?",
+      "answer": "Ingot lot ING-77412 carried 0.38 ppm hydrogen against a 0.20 ppm limit, so gas came out of solution during solidification",
+      "evidenceCitation": "-"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Eindaemmung",
+      "actionText": "Block remaining stock from batch B-50231 and 100% helium leak test all P90 housings before dispatch",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "SM",
+      "actionText": "Notify customer plant Valencia and sort 46 units already delivered",
+      "status": "Done"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "",
+      "actionText": "Reject and return ingot lot ING-77412 to supplier; release replacement lot ING-77455 after hydrogen re-test",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 4,
+      "actionType": "Vorbeugemassnahme",
+      "actionText": "Add mandatory hydrogen content re-test to the incoming inspection plan for all aluminium ingot lots, independent of supplier certificate",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng.",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100023",
+      "partnerName": "Luis Moreno",
+      "functionTitle": "Foundry Process Eng.",
+      "partnerRole": "",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100031",
+      "partnerName": "Sara Klein",
+      "functionTitle": "Supplier Quality Eng.",
+      "partnerRole": "-",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 28900
+  },
+  "lessonsLearned": {
+    "whatWorked": "-",
+    "whatDidnt": "n.a."
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "  ",
+    "isNotWhereWhenItDoesnt": "n.a.",
+    "notes": ""
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0442",
+    "customerPlantContact": "Ana Ruiz - Plant 2, Valencia",
+    "slaResponseDue": "2026-07-09"
+  }
+}

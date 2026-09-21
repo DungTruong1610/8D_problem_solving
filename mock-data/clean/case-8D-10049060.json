@@ -1,0 +1,167 @@
+{
+  "notificationId": "8D-10049060",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Thread stripping on M4 plastic boss detected by screwdriving angle-torque monitor",
+  "status": "Completed",
+  "foundDate": "2026-08-07",
+  "completionDate": "2026-08-22",
+  "quantityExtent": "62 units affected",
+  "teamSize": 3,
+  "material": {
+    "materialId": "MAT-10950",
+    "description": "Pump Motor Assembly PMA-30",
+    "materialGroup": "MG-ASSEMBLY"
+  },
+  "batch": {
+    "batchId": "B-50522",
+    "materialId": "MAT-10950"
+  },
+  "defect": {
+    "defectCode": "DEF-0630",
+    "defectText": "Stripped plastic thread boss during automated screwdriving"
+  },
+  "workCenter": {
+    "workCenterId": "WC-ASSY-05",
+    "description": "Automated Sub-Assembly Station 5"
+  },
+  "inspections": [
+    {
+      "characteristic": "Tightening torque",
+      "measuredValue": "3.2 Nm (over-torqued)",
+      "specValue": "1.8 +/- 0.2 Nm"
+    },
+    {
+      "characteristic": "Thread engagement depth",
+      "measuredValue": "stripped",
+      "specValue": "min 6.0mm"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-7190, Shift B - changeover operator manually selected fastening Recipe B (metal housing 3.2 Nm) instead of Recipe A (thermoplastic boss 1.8 Nm) on HMI dropdown",
+      "metricValue": "Recipe B selected vs A",
+      "isRootCause": "Y",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-SCREW05-001 electric spindle driver torque transducer calibrated accurately to +/-1.0%",
+      "metricValue": "calibrated",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-5519 Rev B - work instruction lacked visual barcode confirmation requirement before starting screwdriving cycle",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Glass-filled PA66 motor bracket material batch B-50522 tensile strength and boss inner diameter compliant",
+      "metricValue": "compliant",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Torque-angle curve analyzer GA-0711 triggered torque-over-angle NOK alarm immediately",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Assembly station clean and vibration-free",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the motor assembly fail the final end-of-line vibration test?",
+      "answer": "Fastener M4x16 was loose and spinning freely in the plastic housing boss",
+      "evidenceCitation": "End of line assembly test log"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why was the M4 screw stripped in the plastic boss?",
+      "answer": "The automatic screwdriving spindle applied 3.2 Nm peak torque against a 1.8 Nm plastic stripping limit",
+      "evidenceCitation": "Screwdriver controller torque-angle log file"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why did the electric screwdriver apply 3.2 Nm torque? (root cause)",
+      "answer": "The operator manually selected Recipe B on the HMI touchscreen during line changeover without barcode cross-verification",
+      "evidenceCitation": "HMI audit log event timestamp 2026-08-07 14:15"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "100% torque inspection on 62 assembled pump motors and replace stripped plastic housings"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "status": "Verified",
+      "actionText": "Implement 2D barcode scanner interlock on screwdriver controller to select recipe automatically from part label"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "status": "Verified in production",
+      "actionText": "Disable manual HMI program selection dropdown across all automated fastening stations in the plant"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100023",
+      "partnerName": "Luis Moreno",
+      "functionTitle": "Assembly Process Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-ASSY-07",
+    "description": "Plastic thread stripping due to incorrect screwdriving torque program selection"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 9400
+  },
+  "lessonsLearned": {
+    "whatWorked": "Torque-over-angle trace immediately captured the stripped fasteners at station level",
+    "whatDidnt": "Manual dropdown menus on touchscreens created opportunity for operator selection error"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "PMA-30 thermoplastic variants assembled on WC-ASSY-05 on 2026-08-07 afternoon shift",
+    "isNotWhereWhenItDoesnt": "PMA-30 metal housing variants or assemblies produced on morning shift",
+    "notes": "Defect caused exclusively by manual HMI recipe mismatch on plastic variant line run"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

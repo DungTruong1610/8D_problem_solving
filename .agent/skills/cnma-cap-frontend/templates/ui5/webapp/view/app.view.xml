@@ -1,0 +1,13 @@
+<mvc:View controllerName="cnma.template.ui5.controller.App"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.m"
+    xmlns:f="sap.f">
+    <App id="app">
+      <f:FlexibleColumnLayout 
+        id="flexibleColumnLayout" 
+        layout="{UiState>/layout}"
+        stateChange="onStateChanged">
+      </f:FlexibleColumnLayout>
+    </App>
+</mvc:View>

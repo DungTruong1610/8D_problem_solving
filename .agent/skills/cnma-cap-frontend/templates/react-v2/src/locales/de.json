@@ -1,0 +1,51 @@
+{
+    "app": {
+        "title": "{{APP_TITLE}}",
+        "description": "{{APP_DESCRIPTION}}"
+    },
+    "nav": {
+        "home": "Startseite",
+        "settings": "Einstellungen",
+        "admin": "Administrator",
+        "user": "Benutzer",
+        "logOut": "Abmelden"
+    },
+    "common": {
+        "loading": "Wird geladen...",
+        "error": "Ein Fehler ist aufgetreten",
+        "retry": "Wiederholen",
+        "save": "Speichern",
+        "cancel": "Abbrechen",
+        "delete": "Löschen",
+        "edit": "Bearbeiten",
+        "create": "Erstellen",
+        "search": "Suchen",
+        "filter": "Filtern",
+        "reset": "Zurücksetzen",
+        "confirm": "Bestätigen",
+        "yes": "Ja",
+        "no": "Nein",
+        "close": "Schließen",
+        "back": "Zurück",
+        "next": "Weiter",
+        "submit": "Senden",
+        "noData": "Keine Daten verfügbar"
+    },
+    "home": {
+        "title": "Willkommen bei {{APP_TITLE}}",
+        "subtitle": "Ihre SAP CAP-Anwendung ist bereit.",
+        "gettingStarted": "Erste Schritte",
+        "gettingStartedDesc": "Fügen Sie Seiten und Routen in App.tsx hinzu. Verwenden Sie das @cnma/react-ui-Paket für UI-Komponenten."
+    },
+    "errors": {
+        "boundary": {
+            "title": "Etwas ist schiefgelaufen",
+            "description": "Ein unerwarteter Fehler ist aufgetreten. Bitte die Seite aktualisieren.",
+            "retry": "Seite neu laden"
+        }
+    },
+    "auth": {
+        "accessDenied": "Zugriff verweigert",
+        "accessDeniedMessage": "Sie haben keine Berechtigung, diese Seite anzuzeigen. Bitte wenden Sie sich an Ihren Administrator."
+    }
+}

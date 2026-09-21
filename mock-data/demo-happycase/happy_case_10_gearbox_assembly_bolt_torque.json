@@ -1,0 +1,55 @@
+{
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Audit wrench detected 52 gearboxes (B-91611) on 2026-02-22 with retaining bolt torque low at 28.5 Nm (spec 45 Nm). Spindle #4 torque transducer on nutrunner NS-03 drifted after mechanical shock.",
+  "foundDate": "2026-02-22",
+  "defectQuantity": 52,
+  "defectQuantityUom": "PC",
+  "referenceNumber": "INT-2026-4410",
+  "plant": "1000",
+  "entryMode": "during-inspection",
+  "inspectionLotId": "0010000030",
+  "material": {
+    "materialId": "MAT-10611",
+    "description": "Transmission Gear TG-12",
+    "materialGroup": "MG-GEARBOX"
+  },
+  "batch": {
+    "batchId": "B-91611",
+    "materialId": "MAT-10611"
+  },
+  "workCenter": {
+    "workCenterId": "WC-ASSY-08",
+    "description": "Gearbox Assembly Line 8"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-ASM",
+    "defectCode": "DEF-0723",
+    "defectText": "Bolt torque below specification",
+    "defectClass": "Major"
+  },
+  "inspections": [
+    {
+      "characteristic": "Tightening Peak Torque",
+      "measuredValue": "28.5000 Nm",
+      "specLowerLimit": 45,
+      "specUpperLimit": 55,
+      "specUom": "Nm",
+      "valuation": "Rejected",
+      "equipment": "TORQUE-WRENCH-CALIB"
+    },
+    {
+      "characteristic": "Gear Mesh Backlash",
+      "measuredValue": "0.1150 mm",
+      "specLowerLimit": 0.08,
+      "specUpperLimit": 0.15,
+      "specUom": "mm",
+      "valuation": "Accepted",
+      "equipment": "DIAL-GAUGE-02"
+    }
+  ],
+  "responsibility": {
+    "reportedBy": "Marcus Wright",
+    "coordinator": "Sarah Connor",
+    "department": "Production Shop Floor"
+  }
+}

@@ -1,0 +1,4 @@
+ID;name;description;type_ID;isActive;groupEmail;emailNotificationMode
+g1a93e80-3333-4000-8000-000000000001;IT Administrators;System and Identity Administrators;82b9c513-410e-4059-8692-06b23dcaae02;true;it.admin@conarum.com;GROUP_ONLY
+g1a93e80-3333-4000-8000-000000000002;Finance Approvers;Executive approval board for high-value requests;82b9c513-410e-4059-8692-06b23dcaae02;true;finance.approvers@conarum.com;BOTH
+g1a93e80-3333-4000-8000-000000000003;Procurement Team;Purchasing and supplier management team;82b9c513-410e-4059-8692-06b23dcaae03;true;procurement@conarum.com;MEMBERS_ONLY

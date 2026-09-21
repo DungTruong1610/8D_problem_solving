@@ -1,0 +1,55 @@
+{
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Lab audit on 2026-02-19 found pinion case depth 0.82mm vs 1.50mm spec on 85 shafts (B-55901). Inductor coil #2 quench ring orifice was clogged with mineral deposits from deionized water loop.",
+  "foundDate": "2026-02-19",
+  "defectQuantity": 85,
+  "defectQuantityUom": "PC",
+  "referenceNumber": "INT-2026-4409",
+  "plant": "1000",
+  "entryMode": "during-inspection",
+  "inspectionLotId": "0010000029",
+  "material": {
+    "materialId": "MAT-88301",
+    "description": "Shaft Pinion SP-90",
+    "materialGroup": "MG-SHAFT"
+  },
+  "batch": {
+    "batchId": "B-55901",
+    "materialId": "MAT-88301"
+  },
+  "workCenter": {
+    "workCenterId": "WC-GRIND-04",
+    "description": "Cylindrical Grinding Cell 4"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-MAT",
+    "defectCode": "DEF-0822",
+    "defectText": "Insufficient case depth after induction hardening",
+    "defectClass": "Critical"
+  },
+  "inspections": [
+    {
+      "characteristic": "Effective Case Depth (ECD)",
+      "measuredValue": "0.8200 mm",
+      "specLowerLimit": 1.5,
+      "specUpperLimit": 2.5,
+      "specUom": "mm",
+      "valuation": "Rejected",
+      "equipment": "MICRO-VICKERS-01"
+    },
+    {
+      "characteristic": "Surface Hardness Rockwell C",
+      "measuredValue": "60.5000 HRC",
+      "specLowerLimit": 58,
+      "specUpperLimit": 62,
+      "specUom": "HRC",
+      "valuation": "Accepted",
+      "equipment": "ROCKWELL-HR-01"
+    }
+  ],
+  "responsibility": {
+    "reportedBy": "Quyen La",
+    "coordinator": "Heli (QE)",
+    "department": "Quality Assurance"
+  }
+}

@@ -1,0 +1,5 @@
+[
+  "src/gen/EightDService.Worklist.hdbview",
+  "src/gen/cnma.proresolve.Attachments.hdbtable",
+  "src/gen/cnma.proresolve.WorklistItems.hdbtable"
+]

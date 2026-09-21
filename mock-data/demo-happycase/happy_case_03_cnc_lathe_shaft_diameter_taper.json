@@ -1,0 +1,55 @@
+{
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Air gauge flagged positive taper +0.038mm along bearing journal on 212 shafts (B-70402) on 2026-02-18. CNC lathe spindle L2-T1 tailstock quill deflected thermally after chiller pump shutoff.",
+  "foundDate": "2026-02-18",
+  "defectQuantity": 212,
+  "defectQuantityUom": "PC",
+  "referenceNumber": "INT-2026-4403",
+  "plant": "1000",
+  "entryMode": "during-inspection",
+  "inspectionLotId": "0010000023",
+  "material": {
+    "materialId": "MAT-10402",
+    "description": "Drive Shaft S150",
+    "materialGroup": "MG-SHAFT"
+  },
+  "batch": {
+    "batchId": "B-70402",
+    "materialId": "MAT-10402"
+  },
+  "workCenter": {
+    "workCenterId": "WC-TURN-02",
+    "description": "CNC Turning Cell 2"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-DIM",
+    "defectCode": "DEF-0220",
+    "defectText": "Outer diameter taper out of tolerance on CNC lathe",
+    "defectClass": "Major"
+  },
+  "inspections": [
+    {
+      "characteristic": "Outer diameter (OD)",
+      "measuredValue": "44.9620 mm",
+      "specLowerLimit": 45,
+      "specUpperLimit": 45.02,
+      "specUom": "mm",
+      "valuation": "Rejected",
+      "equipment": "AIR-GAUGE-02"
+    },
+    {
+      "characteristic": "Total Radial Runout / Wobble",
+      "measuredValue": "0.0210 mm",
+      "specLowerLimit": 0,
+      "specUpperLimit": 0.04,
+      "specUom": "mm",
+      "valuation": "Accepted",
+      "equipment": "DIAL-INDICATOR-BENCH"
+    }
+  ],
+  "responsibility": {
+    "reportedBy": "Elena Rostova",
+    "coordinator": "Dave Miller",
+    "department": "Maintenance & Tooling"
+  }
+}

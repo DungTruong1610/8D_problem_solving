@@ -1,0 +1,124 @@
+{
+  "notificationId": "8D-90049070",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Customer incoming inspection rejected 150 anodized frames due to surface pitting and color mottling",
+  "status": "Closed",
+  "foundDate": "08.08.2026",
+  "completionDate": "25-AUG-26",
+  "quantityExtent": "150 St",
+  "teamSize": "n.a.",
+  "material": {
+    "materialId": "  MAT-11060 ",
+    "description": "Bezel Frame BF-10",
+    "materialGroup": "MG-FRAME"
+  },
+  "batch": {
+    "batchId": "B-50560",
+    "materialId": "  MAT-11060 "
+  },
+  "defect": {
+    "defectCode": "DEF-0714",
+    "defectText": "Pitting corrosion and dark discoloration on anodized aluminum bezel"
+  },
+  "workCenter": {
+    "workCenterId": "WC-ANOD-01",
+    "description": "Type II Sulfuric Anodizing Line 1"
+  },
+  "inspections": [
+    {
+      "characteristic": "Coating thickness",
+      "measuredValue": "Messung Coating thickness ergab 14,2um; lt. Zeichnung 12,0 - 18,0um",
+      "specValue": "  "
+    },
+    {
+      "characteristic": "DI rinse water conductivity",
+      "measuredValue": "34,5 uS/cm",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Environment",
+      "description": "Deionized (DI) post-anodize rinse water tank conductivity climbed to 34.5 uS/cm (limit 5.0 uS/cm) due to exhausted mixed-bed ion exchange resin, leaving chloride residue that pitted the unsealed oxide pores",
+      "metricValue": "34,5 uS/cm vs 5,0 uS/cm max",
+      "isRootCause": "Y",
+      "source": "ASSUMED: MES/IoT"
+    },
+    {
+      "category": "Material",
+      "description": "Extruded aluminium 6063-T6 alloy certificate compliant, iron and copper content within limits",
+      "metricValue": "Fe 0,18%",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Eddy-current thickness gauge GA-0610 calibrated on ISO reference foils",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    }
+  ],
+  "fiveWhyChain": [],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Sofortmassnahme",
+      "status": "Done",
+      "actionText": "Quarantine 150 frames at customer dock and sort 320 finished frames in central stock"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Abstellmassnahme",
+      "status": "Verified",
+      "actionText": "Dump and recharge DI rinse tank 3; replace exhausted mixed-bed ion exchange resin cylinders"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Vorbeugemassnahme",
+      "status": "Verified in production",
+      "actionText": "Hardwire conductivity sensor high-limit alarm (>5.0 uS/cm) to line conveyor PLC to halt hoist transfer automatically"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng.",
+      "partnerRole": "  ",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100067",
+      "partnerName": "Marek Nowak",
+      "functionTitle": "Surface Treatment Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100031",
+      "partnerName": "Sara Klein",
+      "functionTitle": "Chemical Process Eng.",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 24800
+  },
+  "lessonsLearned": {
+    "whatWorked": "n.a.",
+    "whatDidnt": "k.A."
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "Bezel Frame BF-10 processed through WC-ANOD-01 rinse tank 3 on 2026-08-08 morning run",
+    "isNotWhereWhenItDoesnt": "Frames processed after resin tank replacement on 2026-08-09 reading 1.8 uS/cm",
+    "notes": "Pitting failure directly tracked rinse tank conductivity spike above 30 uS/cm"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0881",
+    "customerPlantContact": "Oliver Braun, Plant Munich",
+    "slaResponseDue": "15.08.2026"
+  }
+}

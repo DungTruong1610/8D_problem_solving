@@ -1,0 +1,48 @@
+{
+  "$comment": "Sự vụ Q1 vừa được ghi trong Create Quality Notification. Khách hàng mô tả bằng chữ của họ, không dùng thuật ngữ trong danh mục lỗi — nên mã lỗi ở đây là mã tạm do người nhận gán.",
+  "notificationId": "8D-10049002",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Customer reports coolant weeping from pump housing joint after 200 operating hours",
+  "status": "In Process",
+  "foundDate": "2026-08-11",
+  "completionDate": null,
+  "quantityExtent": "9 units returned, 120 in the field",
+  "teamSize": null,
+  "material": {
+    "materialId": "MAT-10318",
+    "description": "Pump Housing P90",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-55744",
+    "materialId": "MAT-10318"
+  },
+  "defect": {
+    "defectCode": "DEF-9001",
+    "defectText": "Fluid seeping through casting wall near the joint face"
+  },
+  "workCenter": {
+    "workCenterId": "WC-CAST-03",
+    "description": "Aluminium Die Casting Line 3"
+  },
+  "inspections": [
+    {
+      "characteristic": "Helium leak rate",
+      "measuredValue": "9 mbar*l/s",
+      "specValue": "max 5 mbar*l/s"
+    }
+  ],
+  "causesIshikawa": [],
+  "fiveWhyChain": [],
+  "actions": [],
+  "teamAssignments": [],
+  "isIsNot": null,
+  "fmeaLink": null,
+  "costCopq": null,
+  "lessonsLearned": null,
+  "customerReference": {
+    "complaintReference": "CC-2026-1188",
+    "customerPlantContact": "Vestbeck Motors - Plant 2 - Quality desk",
+    "slaResponseDue": "2026-08-18"
+  }
+}

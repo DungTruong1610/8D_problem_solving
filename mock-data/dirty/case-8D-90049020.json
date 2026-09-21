@@ -1,0 +1,124 @@
+{
+  "notificationId": "8D-90049020",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Customer assembly line jam due to OD taper exceeding 0.015mm cylindrical tolerance",
+  "status": "Closed",
+  "foundDate": "29.07.2026",
+  "completionDate": "18-AUG-26",
+  "quantityExtent": "~120 Teile",
+  "teamSize": "",
+  "material": {
+    "materialId": "  MAT-10510 ",
+    "description": "Bushing Sleeve B45",
+    "materialGroup": "MG-BUSHING"
+  },
+  "batch": {
+    "batchId": "B-50388",
+    "materialId": "  MAT-10510 "
+  },
+  "defect": {
+    "defectCode": "DEF-0220",
+    "defectText": "Outer diameter taper out of tolerance on CNC lathe"
+  },
+  "workCenter": {
+    "workCenterId": "WC-LATHE-02",
+    "description": "CNC Twin-Spindle Lathe 2"
+  },
+  "inspections": [
+    {
+      "characteristic": "Outer diameter taper",
+      "measuredValue": "Outer diameter taper: gemessen 0,028mm, Sollwert max 0,010mm",
+      "specValue": "  "
+    },
+    {
+      "characteristic": "Coolant temperature drift",
+      "measuredValue": "38,5C",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Measurement",
+      "description": "CNC in-process optical touch probe GA-0450 calibrated at 20C; thermal expansion of stylus shank at 38.5C coolant caused false in-cycle offset calculation of +18um",
+      "metricValue": "Delta +18um thermal error",
+      "isRootCause": "Y",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-LATHE02-003 chiller unit thermostat stuck closed, allowing coolant temperature to climb from 22C to 38.5C during afternoon continuous run",
+      "metricValue": "38,5C vs 22C setpoint",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Environment",
+      "description": "Shop floor temperature controlled at 23.0C +/- 1.5C",
+      "metricValue": "23,0C",
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Sofortmassnahme",
+      "status": "Done",
+      "actionText": "Quarantine 120 sleeves at customer plant and sort finished inventory with air-gage OD micrometer"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Korrekturmassnahme",
+      "status": "Verified",
+      "actionText": "Replace faulty coolant chiller thermostat on WC-LATHE-02 and integrate thermal probe compensation macro in CNC program"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Vorbeugemassnahme",
+      "status": "Verified in production",
+      "actionText": "Install automated coolant temperature interlock to halt machining if coolant exceeds 25C across all CNC lathe cells"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng.",
+      "partnerRole": "n.a.",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100147",
+      "partnerName": "Lena Hoffmann",
+      "functionTitle": "Metrology Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100031",
+      "partnerName": "Sara Klein",
+      "functionTitle": "Supplier Quality Eng.",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 22400
+  },
+  "lessonsLearned": {
+    "whatWorked": "-",
+    "whatDidnt": "-"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "Bushing Sleeve B45 machined on WC-LATHE-02 during afternoon shifts between 13:00 and 17:00",
+    "isNotWhereWhenItDoesnt": "Morning shift parts on WC-LATHE-02 or parts machined on WC-LATHE-01 with functional chiller",
+    "notes": "Thermal drift correlated directly with coolant sump temperature climb during prolonged run"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0611",
+    "customerPlantContact": "Jean Dupont, Plant Lyon, Assembly Line 4",
+    "slaResponseDue": "05.08.2026"
+  }
+}

@@ -1,0 +1,3 @@
+object;prefix;currentValue;width;description
+DEFECT;8D-;10049120;8;Quality notification / 8D case number (QMEL)
+INSPLOT;;10000108;10;Inspection lot number (QALS)

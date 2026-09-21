@@ -1,0 +1,32 @@
+/* ── @cnma/react-ui — all design tokens, Tailwind base, and component styles ──
+ * This single import pulls in:
+ *   tailwind.css  → @import "tailwindcss" (Tailwind v4 base)
+ *   font.css      → SAP 72 font stack
+ *   theme.css     → CSS custom properties + @theme inline tokens
+ * ── */
+@import '@cnma/react-ui/styles.css';
+
+/* ═══════════════════════════════════════════════════════════
+   APP-LEVEL OVERRIDES & EXTENSIONS
+   Add tokens here that are specific to this application.
+   The @cnma/react-ui theme.css provides all base tokens.
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+    /* ── Status Colors (entity/domain-specific) ─────────────
+     * These extend the library's status palette.
+     * Add/override here: --status-X: var(--palette-Y);
+     * bg-status-X / text-status-X-text / border-status-X are auto-generated.
+     * ────────────────────────────────────────────────────── */
+}
+
+/* ── Global resets ────────────────────────────────────── */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#root {
+    height: 100%;
+}

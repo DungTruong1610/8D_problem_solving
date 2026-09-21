@@ -1,0 +1,55 @@
+{
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Helium test cell rejected 145 regulator valves (B-88411) on 2026-02-27 at 1.45 sccm leak rate. Teardown showed extruded O-ring sheared by insertion pusher overstroking 0.75mm past stop bracket.",
+  "foundDate": "2026-02-27",
+  "defectQuantity": 145,
+  "defectQuantityUom": "PC",
+  "referenceNumber": "INT-2026-4406",
+  "plant": "1000",
+  "entryMode": "during-inspection",
+  "inspectionLotId": "0010000026",
+  "material": {
+    "materialId": "MAT-88410",
+    "description": "High-Pressure Fuel Regulator Housing Valve",
+    "materialGroup": "MG-VALVES"
+  },
+  "batch": {
+    "batchId": "B-88411",
+    "materialId": "MAT-88410"
+  },
+  "workCenter": {
+    "workCenterId": "WC-TEST-03",
+    "description": "Automatic Leak Testing Cell #3"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-ASM",
+    "defectCode": "DEF-1020",
+    "defectText": "Hydraulic pressure test leak due to O-ring seal extrusion",
+    "defectClass": "Critical"
+  },
+  "inspections": [
+    {
+      "characteristic": "Helium Leak Rate",
+      "measuredValue": "1.4500 sccm",
+      "specLowerLimit": 0,
+      "specUpperLimit": 0.2,
+      "specUom": "sccm",
+      "valuation": "Rejected",
+      "equipment": "PFEIFFER-HELIUM-01"
+    },
+    {
+      "characteristic": "Surface roughness Ra",
+      "measuredValue": "0.3800 µm",
+      "specLowerLimit": 0,
+      "specUpperLimit": 0.8,
+      "specUom": "µm",
+      "valuation": "Accepted",
+      "equipment": "SURF-TESTER-01"
+    }
+  ],
+  "responsibility": {
+    "reportedBy": "Quyen La",
+    "coordinator": "Heli (QE)",
+    "department": "Quality Assurance"
+  }
+}

@@ -1,0 +1,2 @@
+ID,origin,userId,idpUserId,email,firstName,lastName,displayName,isActive
+u1a93e80-2222-4000-8000-000000000000,sap.default,admin@conarum.com,user-uuid-000,admin@conarum.com,Local,Developer,Local Developer,true

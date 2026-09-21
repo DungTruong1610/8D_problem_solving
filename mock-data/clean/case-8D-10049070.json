@@ -1,0 +1,167 @@
+{
+  "notificationId": "8D-10049070",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Customer incoming inspection rejected 150 anodized frames due to surface pitting and color mottling",
+  "status": "Closed",
+  "foundDate": "2026-08-08",
+  "completionDate": "2026-08-25",
+  "quantityExtent": "150 units affected",
+  "teamSize": 3,
+  "material": {
+    "materialId": "MAT-11060",
+    "description": "Bezel Frame BF-10",
+    "materialGroup": "MG-FRAME"
+  },
+  "batch": {
+    "batchId": "B-50560",
+    "materialId": "MAT-11060"
+  },
+  "defect": {
+    "defectCode": "DEF-0714",
+    "defectText": "Pitting corrosion and dark discoloration on anodized aluminum bezel"
+  },
+  "workCenter": {
+    "workCenterId": "WC-ANOD-01",
+    "description": "Type II Sulfuric Anodizing Line 1"
+  },
+  "inspections": [
+    {
+      "characteristic": "Coating thickness",
+      "measuredValue": "14.2um",
+      "specValue": "12.0 - 18.0um"
+    },
+    {
+      "characteristic": "DI rinse water conductivity",
+      "measuredValue": "34.5 uS/cm",
+      "specValue": "max 5.0 uS/cm"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-2281, Shift A - anodizing line operator followed racking spacing and current ramp procedure",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-ANOD01-003 rectifier voltage and temperature bath chilling operated within standard envelope",
+      "metricValue": "18.5V / 19.8C",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-4401 Rev E - black dye immersion time 8 min and nickel acetate sealing 20 min compliant",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Extruded aluminium 6063-T6 alloy certificate compliant, iron and copper content within limits",
+      "metricValue": "Fe 0.18%",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Eddy-current thickness gauge GA-0610 calibrated on ISO reference foils",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Deionized (DI) post-anodize rinse water tank conductivity climbed to 34.5 uS/cm (limit 5.0 uS/cm) due to exhausted mixed-bed ion exchange resin, leaving chloride residue that pitted the unsealed oxide pores",
+      "metricValue": "34.5 uS/cm vs 5.0 uS/cm max",
+      "isRootCause": "Y",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the customer reject the anodized bezel frames?",
+      "answer": "Micro-pitting and white bloom spotting appeared under cosmetic inspection lighting",
+      "evidenceCitation": "Customer defect notification CC-2026-0881"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did micro-pitting develop on the anodized oxide layer?",
+      "answer": "Chloride ions trapped inside unsealed anodic pores initiated localized galvanic micro-corrosion during hot sealing",
+      "evidenceCitation": "Scanning electron microscope (SEM/EDX) surface analysis"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why were chloride ions present in the sealing bath rinse? (root cause)",
+      "answer": "The DI water purification resin bed reached exhaustion over the weekend and the inline conductivity sensor alarm was muted",
+      "evidenceCitation": "DI water plant maintenance log and conductivity alarm historian"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "Quarantine 150 frames at customer dock and sort 320 finished frames in central stock"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "status": "Verified",
+      "actionText": "Dump and recharge DI rinse tank 3; replace exhausted mixed-bed ion exchange resin cylinders"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "status": "Verified in production",
+      "actionText": "Hardwire conductivity sensor high-limit alarm (>5.0 uS/cm) to line conveyor PLC to halt hoist transfer automatically"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100067",
+      "partnerName": "Marek Nowak",
+      "functionTitle": "Surface Treatment Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100031",
+      "partnerName": "Sara Klein",
+      "functionTitle": "Chemical Process Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-ANOD-05",
+    "description": "Pitting corrosion in anodic oxide coating due to contaminated DI rinse water"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 24800
+  },
+  "lessonsLearned": {
+    "whatWorked": "SEM/EDX micro-analysis pinpointed chloride contamination within 4 hours",
+    "whatDidnt": "Alarm acknowledge button allowed line operators to continue running with contaminated water"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "Bezel Frame BF-10 processed through WC-ANOD-01 rinse tank 3 on 2026-08-08 morning run",
+    "isNotWhereWhenItDoesnt": "Frames processed after resin tank replacement on 2026-08-09 reading 1.8 uS/cm",
+    "notes": "Pitting failure directly tracked rinse tank conductivity spike above 30 uS/cm"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0881",
+    "customerPlantContact": "Oliver Braun - Plant Munich",
+    "slaResponseDue": "2026-08-15"
+  }
+}

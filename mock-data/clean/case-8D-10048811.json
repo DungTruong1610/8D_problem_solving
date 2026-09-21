@@ -1,0 +1,179 @@
+{
+  "notificationId": "8D-10048811",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Fittings bottoming out in customer assembly",
+  "status": "Closed",
+  "foundDate": "2026-06-19",
+  "completionDate": "2026-07-30",
+  "quantityExtent": "428 units affected",
+  "teamSize": 3,
+  "material": {
+    "materialId": "MAT-10905",
+    "description": "Manifold Block M12",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-53344",
+    "materialId": "MAT-10905"
+  },
+  "defect": {
+    "defectCode": "DEF-1015",
+    "defectText": "Port thread depth insufficient"
+  },
+  "workCenter": {
+    "workCenterId": "WC-MILL-07",
+    "description": "CNC Milling Line 7"
+  },
+  "inspections": [
+    {
+      "characteristic": "Thread depth",
+      "measuredValue": "9.2mm",
+      "specValue": "min 14.0mm"
+    },
+    {
+      "characteristic": "Thread pitch diameter",
+      "measuredValue": "10.86mm",
+      "specValue": "10.83-10.92mm"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-7201, Shift C - ran the released NC program without deviation",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-DRILL06-003 axis positioning verified 0.01mm, within the 0.03mm limit",
+      "metricValue": "0.01mm",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-9930 Rev D - drawing still carries the pre-revision 9.5mm thread depth after the M12 port was changed to a deeper fitting in 2026-05; the NC program was generated from this drawing",
+      "metricValue": "9.5mm drawn vs 14.0mm required",
+      "isRootCause": "Y",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Aluminium billet lot AL-4420 cert PASS",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Thread plug gauge GA-0511, last cal 2026-05-28, R&R 5.5%",
+      "metricValue": "5.5%",
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "23.4C, nominal",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why do the fittings bottom out?",
+      "answer": "Thread depth measured 9.2mm against a 14.0mm minimum, so the fitting reaches the bottom of the port before sealing",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why was the thread only 9.2mm deep?",
+      "answer": "The NC program drills to the 9.5mm depth carried on drawing DOC-9930 Rev D",
+      "evidenceCitation": "NC program archive WC-MILL-07"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why does the drawing still show 9.5mm after the port change?",
+      "answer": "The 2026-05 design change to a deeper fitting updated the fitting callout but not the port depth dimension",
+      "evidenceCitation": "DMS revision history DOC-9930"
+    },
+    {
+      "stepNo": 4,
+      "question": "Why did the design change ship with an inconsistent drawing? (root cause)",
+      "answer": "The change review checked the fitting selection but had no step requiring the mating feature dimensions to be re-verified against it",
+      "evidenceCitation": "Engineering change record ECR-2026-0412"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "Block all M12 stock and gauge thread depth on every unit at the customer and in transit"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "status": "Verified",
+      "actionText": "Correct DOC-9930 to Rev E with the 14.0mm port depth and regenerate the NC program"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Corrective",
+      "status": "Done",
+      "actionText": "Re-drill 428 affected manifolds to the corrected depth where stock allows, scrap the remainder"
+    },
+    {
+      "lineNo": 4,
+      "actionType": "Preventive",
+      "status": "Verified in production",
+      "actionText": "Add a mandatory mating-feature dimension check to the engineering change review checklist"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100045",
+      "partnerName": "Ingo Braun",
+      "functionTitle": "Manufacturing Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100052",
+      "partnerName": "Petra Vogel",
+      "functionTitle": "Document Control Officer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-DRILL06-01",
+    "description": "Feature dimension not updated after design change"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 63400
+  },
+  "lessonsLearned": {
+    "whatWorked": "Restricting the search to parts touched by the May design change narrowed 40 drawings down to one",
+    "whatDidnt": "The change review treated the fitting and the port it seats in as unrelated items"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "M12 manifolds drilled from DOC-9930 Rev D, produced after the 2026-05 design change",
+    "isNotWhereWhenItDoesnt": "M10 and M16 manifolds - same line, same operators, drawings unaffected by the change",
+    "notes": "Defect is confined to the part touched by the design change"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0455",
+    "customerPlantContact": "Priya Nair - Plant 3, Pune",
+    "slaResponseDue": "2026-06-26"
+  }
+}

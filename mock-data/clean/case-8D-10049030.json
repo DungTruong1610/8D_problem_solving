@@ -1,0 +1,167 @@
+{
+  "notificationId": "8D-10049030",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Burr height 0.22mm exceeding max 0.08mm limit on progressive die station 4",
+  "status": "Completed",
+  "foundDate": "2026-08-03",
+  "completionDate": "2026-08-14",
+  "quantityExtent": "340 units affected",
+  "teamSize": 3,
+  "material": {
+    "materialId": "MAT-10620",
+    "description": "Stamping Bracket SB-12",
+    "materialGroup": "MG-BRACKET"
+  },
+  "batch": {
+    "batchId": "B-50412",
+    "materialId": "MAT-10620"
+  },
+  "defect": {
+    "defectCode": "DEF-0318",
+    "defectText": "Excessive burr and edge micro-cracks on stamped sheet"
+  },
+  "workCenter": {
+    "workCenterId": "WC-PRESS-04",
+    "description": "250T Progressive Stamping Press 4"
+  },
+  "inspections": [
+    {
+      "characteristic": "Burr height",
+      "measuredValue": "0.22mm",
+      "specValue": "max 0.08mm"
+    },
+    {
+      "characteristic": "Punch-to-die cutting clearance",
+      "measuredValue": "0.28mm (uneven)",
+      "specValue": "0.15 +/- 0.02mm"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-5192, Shift C - die setter performed routine die install with torque wrench per checklist",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "Progressive die tool DIE-250-04 guide post bronze bushings worn with 0.12mm radial play, causing cutting punch lateral shift and uneven cutting clearance of 0.28mm on right flank",
+      "metricValue": "0.12mm guide play vs 0.02mm max",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-7721 Rev A - press stroke speed 65 spm within approved process envelope",
+      "metricValue": "65 spm",
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Cold-rolled sheet steel DC04 strip lot ST-8819 thickness 1.50mm and yield strength compliant",
+      "metricValue": "1.50mm",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Optical optical micrometer GA-0311 R&R 14%, calibration valid",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Strip lubrication oil flow rate 12 ml/min evenly distributed",
+      "metricValue": "12 ml/min",
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did stamped brackets show excessive burr height?",
+      "answer": "The blanking punch produced tearing instead of clean shearing along the right-hand contour",
+      "evidenceCitation": "Visual inspection and optical profile measurement"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why was the shearing action tearing the sheet metal?",
+      "answer": "Cutting clearance on the right side opened to 0.28mm against a nominal 0.15mm design specification",
+      "evidenceCitation": "Feeler gage tool inspection record"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why did the punch-to-die cutting clearance shift out of alignment? (root cause)",
+      "answer": "Guide post ball-bearing bronze bushings on DIE-250-04 exceeded 250,000 strokes without replacement, developing 0.12mm radial play",
+      "evidenceCitation": "Tool shop maintenance history DIE-250-04"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "Quarantine 340 stamped brackets and run secondary deburring on vibratory tumbling line"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "status": "Verified",
+      "actionText": "Rebuild DIE-250-04 guide pillar assembly with hardened ball-guide bushings and re-align cutting inserts"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "status": "Verified in production",
+      "actionText": "Implement automated stroke counter PM rule to replace die guide bushings at 150,000 stroke threshold in SAP PM"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100088",
+      "partnerName": "Klaus Richter",
+      "functionTitle": "Tooling Maintenance Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-PRESS-08",
+    "description": "Cutting edge burr due to progressive die guide bushing wear"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 11800
+  },
+  "lessonsLearned": {
+    "whatWorked": "Secondary vibratory deburring recovered 94% of parts without scrapping base material",
+    "whatDidnt": "Tooling PM relied on calendar months rather than actual press stroke count"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "Stamping Bracket SB-12 station 4 blanking on WC-PRESS-04 after 240,000 cumulative strokes",
+    "isNotWhereWhenItDoesnt": "Brackets run on recently refurbished die DIE-250-02 with fresh guide bushings",
+    "notes": "Burr concentrated exclusively on right-side contour where guide play caused punch offset"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

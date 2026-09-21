@@ -1,0 +1,45 @@
+{
+    "app": {
+        "title": "8D Copilot",
+        "description": "CNMA Proresolve Application"
+    },
+    "nav": {
+        "settings": "Einstellungen",
+        "admin": "Administrator",
+        "user": "Benutzer",
+        "logOut": "Abmelden",
+        "workflow": "KI-Konfiguration"
+    },
+    "common": {
+        "loading": "Wird geladen...",
+        "error": "Ein Fehler ist aufgetreten",
+        "retry": "Wiederholen",
+        "save": "Speichern",
+        "cancel": "Abbrechen",
+        "delete": "Löschen",
+        "edit": "Bearbeiten",
+        "create": "Erstellen",
+        "search": "Suchen",
+        "filter": "Filtern",
+        "reset": "Zurücksetzen",
+        "confirm": "Bestätigen",
+        "yes": "Ja",
+        "no": "Nein",
+        "close": "Schließen",
+        "back": "Zurück",
+        "next": "Weiter",
+        "submit": "Senden",
+        "noData": "Keine Daten verfügbar"
+    },
+    "errors": {
+        "boundary": {
+            "title": "Etwas ist schiefgelaufen",
+            "description": "Ein unerwarteter Fehler ist aufgetreten. Bitte die Seite aktualisieren.",
+            "retry": "Seite neu laden"
+        }
+    },
+    "auth": {
+        "accessDenied": "Zugriff verweigert",
+        "accessDeniedMessage": "Sie haben keine Berechtigung, diese Seite anzuzeigen. Bitte wenden Sie sich an Ihren Administrator."
+    }
+}

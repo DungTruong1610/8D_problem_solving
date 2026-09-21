@@ -1,0 +1,186 @@
+{
+  "notificationId": "8D-10048745",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Sensor mounts detaching in customer assembly",
+  "status": "Completed",
+  "foundDate": "2026-07-14",
+  "completionDate": "2026-08-05",
+  "quantityExtent": "310 units affected",
+  "teamSize": 4,
+  "material": {
+    "materialId": "MAT-10744",
+    "description": "Sensor Mount Bracket S22",
+    "materialGroup": "MG-BRACKET"
+  },
+  "batch": {
+    "batchId": "B-52688",
+    "materialId": "MAT-10744"
+  },
+  "defect": {
+    "defectCode": "DEF-0810",
+    "defectText": "Adhesive bond failure"
+  },
+  "workCenter": {
+    "workCenterId": "WC-BOND-02",
+    "description": "Structural Bonding Cell 2"
+  },
+  "inspections": [
+    {
+      "characteristic": "Lap shear strength",
+      "measuredValue": "4.1 MPa",
+      "specValue": "min 12.0 MPa"
+    },
+    {
+      "characteristic": "Bond line thickness",
+      "measuredValue": "0.22mm",
+      "specValue": "0.15-0.30mm"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-5120, Shift A - surface prep steps signed off complete",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-BOND02-001 dispenser volume within +/-2% of target all shift",
+      "metricValue": "+1.3%",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-8815 Rev B - bonding procedure, cure profile unchanged since 2025-08",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Adhesive lot ADH-3391 within shelf life, viscosity and cert PASS",
+      "metricValue": "cert PASS",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Pull tester GA-0355, last cal 2026-04-18, R&R 7.4%",
+      "metricValue": "7.4%",
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Bonding cell relative humidity logged 78-84% RH across 2026-07-06 to 07-09 against a 45% RH maximum; the cell dehumidifier had tripped and was not restarted",
+      "metricValue": "84% RH peak vs 45% max",
+      "isRootCause": "Y",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the sensor mounts detach?",
+      "answer": "Lap shear strength measured 4.1 MPa against a 12.0 MPa minimum, one third of the required bond strength",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why was the bond so weak despite correct adhesive and geometry?",
+      "answer": "Moisture on the bonding surfaces during cure inhibited cross-linking; cell humidity reached 84% RH against a 45% maximum",
+      "evidenceCitation": "Environmental log WC-BOND-02"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was humidity allowed to run at 84% for four days?",
+      "answer": "The cell dehumidifier tripped on 2026-07-06 and was never restarted",
+      "evidenceCitation": "Facility alarm log 2026-07-06"
+    },
+    {
+      "stepNo": 4,
+      "question": "Why did nobody notice the dehumidifier had tripped? (root cause)",
+      "answer": "The humidity alarm reported to a facilities dashboard that production does not monitor, and no interlock stops bonding when the cell is out of its environmental window",
+      "evidenceCitation": "Facility monitoring configuration WC-BOND-02"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "Block all S22 stock bonded in the outage window and pull-test a sample from every pallet"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "Notify the customer and sort the 310 units already delivered"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Corrective",
+      "status": "Verified",
+      "actionText": "Restart and service the WC-BOND-02 dehumidifier, then re-qualify the cell with a bonded test panel"
+    },
+    {
+      "lineNo": 4,
+      "actionType": "Preventive",
+      "status": "Verified in production",
+      "actionText": "Route cell humidity alarms to the production andon and interlock the bonding station above 50% RH"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100102",
+      "partnerName": "Dario Conti",
+      "functionTitle": "Bonding Process Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100115",
+      "partnerName": "Eva Lindqvist",
+      "functionTitle": "Facilities Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100012",
+      "partnerName": "Minh Dinh",
+      "functionTitle": "Production Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-BOND02-02",
+    "description": "Reduced bond strength from humidity during cure"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 41200
+  },
+  "lessonsLearned": {
+    "whatWorked": "Cross-referencing the defect window against facility alarm logs isolated the cause in one afternoon",
+    "whatDidnt": "A process-critical environmental alarm was routed to a dashboard nobody in production watches"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "S22 brackets bonded in WC-BOND-02 between 2026-07-06 and 07-09",
+    "isNotWhereWhenItDoesnt": "S22 bonded before 07-06 or after 07-10 - WC-BOND-05 with a working dehumidifier",
+    "notes": "Defect window matches the dehumidifier outage exactly, not the adhesive lot"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0498",
+    "customerPlantContact": "Jonas Berg - Plant 7, Gothenburg",
+    "slaResponseDue": "2026-07-21"
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "notificationId": "8D-90048788",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Rattermarken auf geschliffenem Durchmesser Rotorwelle",
+  "status": "In Process",
+  "foundDate": "06.08.2026",
+  "completionDate": null,
+  "quantityExtent": "~88 Teile",
+  "teamSize": "n.a.",
+  "material": {
+    "materialId": "  MAT-10820 ",
+    "description": "Rotor Shaft R60",
+    "materialGroup": "MG-SHAFT"
+  },
+  "batch": {
+    "batchId": "B-53001",
+    "materialId": "  MAT-10820 "
+  },
+  "defect": {
+    "defectCode": "DEF-0902",
+    "defectText": "Chatter marks on ground surface"
+  },
+  "workCenter": {
+    "workCenterId": "WC-GRIND-04",
+    "description": "Cylindrical Grinding Cell 4"
+  },
+  "inspections": [
+    {
+      "characteristic": "Surface roughness Ra",
+      "measuredValue": "Surface roughness Ra: gemessen 2,8um, Sollwert max 0,8um",
+      "specValue": "k.A."
+    },
+    {
+      "characteristic": "Roundness",
+      "measuredValue": "0,014mm",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Machine",
+      "description": "EQ-GRIND04-001 spindle bearing vibration 7.9 mm/s RMS against a 2.8 mm/s alarm limit; trend rising since 2026-07-20",
+      "metricValue": "7,9 mm/s vs 2,8 limit",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Environment",
+      "description": "22.1C, coolant temperature 19.6C, both nominal",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    },
+    {
+      "category": "Man",
+      "description": "EMP-6033, Shift A - dressing cycle run at the released interval",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    }
+  ],
+  "fiveWhyChain": [],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "",
+      "status": "Done",
+      "actionText": "Stop WC-GRIND-04, quarantine batch B-53001 and route R60 grinding to WC-GRIND-01"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Korrekturmassnahme",
+      "status": "Planned",
+      "actionText": "Replace the WC-GRIND-04 spindle bearing set and re-qualify the machine with a capability run"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100012",
+      "partnerName": "Minh Dinh",
+      "functionTitle": "Production Eng.",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100091",
+      "partnerName": "Karl Wagner",
+      "functionTitle": "Maintenance Planner",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 15600
+  },
+  "lessonsLearned": {
+    "whatWorked": "n.a.",
+    "whatDidnt": "  "
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "R60 shafts ground on WC-GRIND-04 from 2026-08-01 onward",
+    "isNotWhereWhenItDoesnt": "R60 ground on WC-GRIND-01 - same wheel spec, same bar stock lot",
+    "notes": "Defect follows the machine, not the material or the wheel"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - internal defect, no customer reference",
+    "customerPlantContact": "N/A",
+    "slaResponseDue": "N/A"
+  }
+}

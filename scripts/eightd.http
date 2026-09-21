@@ -1,0 +1,165 @@
+###############################################################################
+# EightDService — thử tay bằng REST Client (VS Code) hoặc IntelliJ HTTP Client
+#
+# Khởi động trước:  npm run dev:backend
+# Đăng nhập local:  admin / 123   (mocked auth, khai trong package.json)
+#
+# LƯU Ý: analyzeFromJson chạy 50-75 giây. Nhiều HTTP client mặc định timeout 30s
+# và sẽ báo lỗi trong khi backend vẫn đang chạy ngon. Nếu client cắt sớm, mở
+# GET Reports bên dưới để xem trạng thái thật — bản ghi được commit ngay từ đầu
+# nên luôn quan sát được.
+###############################################################################
+
+@host = http://localhost:4004
+@srv = {{host}}/api/cnma/EIGHTD_SRV
+@auth = Basic admin:123
+
+
+### Metadata — kiểm tra service đã lên chưa
+GET {{srv}}/$metadata
+Authorization: {{auth}}
+
+
+### [GRAPH DB] Xem trạng thái engine hiện tại
+GET {{host}}/api/cnma/AI_SRV/GraphRetrievalSettings('GLOBAL')
+Authorization: {{auth}}
+
+
+### [GRAPH DB] Gạt sang GRAPH engine (HANA OpenCypher)
+PATCH {{host}}/api/cnma/AI_SRV/GraphRetrievalSettings('GLOBAL')
+Authorization: {{auth}}
+Content-Type: application/json
+
+{
+  "engine": "graph"
+}
+
+
+### [GRAPH DB] Gạt về SCORING engine (Vector Search cũ)
+PATCH {{host}}/api/cnma/AI_SRV/GraphRetrievalSettings('GLOBAL')
+Authorization: {{auth}}
+Content-Type: application/json
+
+{
+  "engine": "scoring"
+}
+
+
+### Danh sách report, mới nhất trước
+GET {{srv}}/Reports?$orderby=createdAt desc&$count=true
+Authorization: {{auth}}
+
+
+### Chỉ các cột cần cho trang list
+GET {{srv}}/Reports?$select=notificationId,origin,symptomShortText,materialId,rootCauseCategory,copqEur,status,analyzedAt&$orderby=createdAt desc
+Authorization: {{auth}}
+
+
+### Một report kèm đủ 8 discipline, sắp đúng thứ tự
+# Thay <ID> bằng giá trị lấy từ request bên trên.
+# $orderby=sequence là BẮT BUỘC — OData không đảm bảo thứ tự nếu không nói rõ.
+@reportID = <ID>
+
+GET {{srv}}/Reports({{reportID}})?$expand=disciplines($orderby=sequence)
+Authorization: {{auth}}
+
+
+### Chỉ những discipline không có dữ liệu chống lưng
+GET {{srv}}/Disciplines?$filter=report_ID eq {{reportID}} and dataBacked eq false&$orderby=sequence
+Authorization: {{auth}}
+
+
+###############################################################################
+# analyzeFromJson
+#
+# `payload` là NỘI DUNG của một file trong mock-data/, dán vào dưới dạng chuỗi
+# JSON đã escape. Dán tay thì rất phiền — dùng script tiện hơn nhiều:
+#
+#   npx tsx scripts/run-analyze.ts mock-data/case-8D-10048412.json
+#
+# Request dưới đây chỉ để kiểm tra tầng HTTP, nên payload cố tình để hỏng.
+###############################################################################
+
+### Payload hỏng → kỳ vọng 400 kèm lý do rõ ràng
+POST {{srv}}/analyzeFromJson
+Authorization: {{auth}}
+Content-Type: application/json
+
+{
+  "payload": "{\"hello\":\"world\"}",
+  "title": "Phải trả về 400"
+}
+
+
+### Payload rỗng → kỳ vọng 400
+POST {{srv}}/analyzeFromJson
+Authorization: {{auth}}
+Content-Type: application/json
+
+{
+  "payload": "",
+  "title": ""
+}
+
+
+### Không phải JSON → kỳ vọng 400
+POST {{srv}}/analyzeFromJson
+Authorization: {{auth}}
+Content-Type: application/json
+
+{
+  "payload": "day khong phai json",
+  "title": ""
+}
+
+
+### Dataset vi phạm ràng buộc → kỳ vọng 400 kèm mã ràng buộc
+# Golden Dataset hợp lệ nhưng đã sửa team_size cho lệch.
+POST {{srv}}/analyzeFromJson
+Authorization: {{auth}}
+Content-Type: application/json
+
+{
+  "payload": "{\"data\":{\"notifications\":[{\"notification_id\":\"8D-TEST\",\"origin\":\"Q3 - Internal Defect\",\"status\":\"In Process\",\"completion_date\":null,\"team_size\":99,\"material_id\":\"M1\",\"batch_id\":\"B1\",\"defect_code\":\"D1\",\"work_center_id\":\"W1\"}],\"materials\":[{\"material_id\":\"M1\"}],\"batches\":[{\"batch_id\":\"B1\",\"material_id\":\"M1\"}],\"defect_catalog\":[{\"defect_code\":\"D1\"}],\"work_centers\":[{\"work_center_id\":\"W1\"}],\"causes_ishikawa\":[],\"five_why_chain\":[],\"actions\":[],\"team_assignments\":[],\"inspections\":[],\"spc_process_data\":[]}}",
+  "title": "Phải liệt kê các ràng buộc bị vi phạm"
+}
+
+
+###############################################################################
+# reanalyze — chạy lại trên sourcePayload đã lưu
+###############################################################################
+
+### Chạy lại một report có thật (mất 50-75 giây)
+POST {{srv}}/reanalyze
+Authorization: {{auth}}
+Content-Type: application/json
+
+{
+  "reportID": "{{reportID}}"
+}
+
+
+### ID không tồn tại → kỳ vọng 404
+POST {{srv}}/reanalyze
+Authorization: {{auth}}
+Content-Type: application/json
+
+{
+  "reportID": "00000000-0000-0000-0000-000000000000"
+}
+
+
+###############################################################################
+# Kiểm tra ghi bị chặn — cả hai entity đều @readonly.
+# Report chỉ được sinh qua analyzeFromJson; mở ghi trực tiếp sẽ tạo ra bản ghi
+# không có sourcePayload và không chạy lại được.
+###############################################################################
+
+### POST thẳng vào Reports → kỳ vọng bị từ chối
+POST {{srv}}/Reports
+Authorization: {{auth}}
+Content-Type: application/json
+
+{
+  "notificationId": "8D-GIA-MAO"
+}

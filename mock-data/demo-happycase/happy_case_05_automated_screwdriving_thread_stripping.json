@@ -1,0 +1,55 @@
+{
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Station 5 aborted on 62 motor housings (B-50522) on 2026-02-24 due to torque collapse on M4 screw at boss #3. PA66 internal threads stripped because screwdriver ran at unramped 850 RPM.",
+  "foundDate": "2026-02-24",
+  "defectQuantity": 62,
+  "defectQuantityUom": "PC",
+  "referenceNumber": "INT-2026-4405",
+  "plant": "1000",
+  "entryMode": "during-inspection",
+  "inspectionLotId": "0010000025",
+  "material": {
+    "materialId": "MAT-10950",
+    "description": "Pump Motor Assembly PMA-30",
+    "materialGroup": "MG-ASSEMBLY"
+  },
+  "batch": {
+    "batchId": "B-50522",
+    "materialId": "MAT-10950"
+  },
+  "workCenter": {
+    "workCenterId": "WC-ASSY-05",
+    "description": "Automated Sub-Assembly Station 5"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-ASM",
+    "defectCode": "DEF-0630",
+    "defectText": "Stripped plastic thread boss during automated screwdriving",
+    "defectClass": "Critical"
+  },
+  "inspections": [
+    {
+      "characteristic": "Tightening Peak Torque",
+      "measuredValue": "0.7200 Nm",
+      "specLowerLimit": 1.6,
+      "specUpperLimit": 2,
+      "specUom": "Nm",
+      "valuation": "Rejected",
+      "equipment": "WC-ASSY-05"
+    },
+    {
+      "characteristic": "Final Screwdriving Angle",
+      "measuredValue": "840.0 deg",
+      "specLowerLimit": 480,
+      "specUpperLimit": 620,
+      "specUom": "deg",
+      "valuation": "Rejected",
+      "equipment": "WC-ASSY-05"
+    }
+  ],
+  "responsibility": {
+    "reportedBy": "Sarah Connor",
+    "coordinator": "Frank Castle",
+    "department": "Production Shop Floor"
+  }
+}

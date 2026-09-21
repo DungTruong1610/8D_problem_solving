@@ -1,0 +1,55 @@
+{
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "AOI detected solder bridging shorts across pins 12-15 of 0.4mm pitch QFN IC U12 on 48 PCBAs (B-50490) on 2026-02-21. Stencil vacuum wiper nozzle clogged, causing paste height excess to 165µm.",
+  "foundDate": "2026-02-21",
+  "defectQuantity": 48,
+  "defectQuantityUom": "PC",
+  "referenceNumber": "INT-2026-4404",
+  "plant": "1000",
+  "entryMode": "during-inspection",
+  "inspectionLotId": "0010000024",
+  "material": {
+    "materialId": "MAT-10840",
+    "description": "Control Board PCBA-900",
+    "materialGroup": "MG-PCBA"
+  },
+  "batch": {
+    "batchId": "B-50490",
+    "materialId": "MAT-10840"
+  },
+  "workCenter": {
+    "workCenterId": "WC-SMT-02",
+    "description": "SMT Placement & Reflow Line 2"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-ASM",
+    "defectCode": "DEF-0580",
+    "defectText": "Solder bridging short circuit on fine-pitch QFN package",
+    "defectClass": "Critical"
+  },
+  "inspections": [
+    {
+      "characteristic": "Solder bridge count",
+      "measuredValue": "4 EA",
+      "specLowerLimit": 0,
+      "specUpperLimit": 0,
+      "specUom": "EA",
+      "valuation": "Rejected",
+      "equipment": "AOI-KOH-YOUNG-01"
+    },
+    {
+      "characteristic": "Solder paste print height",
+      "measuredValue": "165.0 µm",
+      "specLowerLimit": 110,
+      "specUpperLimit": 140,
+      "specUom": "µm",
+      "valuation": "Rejected",
+      "equipment": "SPI-PARMI-02"
+    }
+  ],
+  "responsibility": {
+    "reportedBy": "Marcus Wright",
+    "coordinator": "Minh Dinh",
+    "department": "Quality Assurance"
+  }
+}

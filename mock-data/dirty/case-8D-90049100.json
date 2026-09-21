@@ -1,0 +1,124 @@
+{
+  "notificationId": "8D-90049100",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Pressure drop 1.4 bar detected at 6 bar hydraulic leak test station",
+  "status": "Completed",
+  "foundDate": "12.08.2026",
+  "completionDate": "28-AUG-26",
+  "quantityExtent": "ca. 38 Stk.",
+  "teamSize": "k.A.",
+  "material": {
+    "materialId": "  MAT-10318 ",
+    "description": "Pump Housing P90",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-50672",
+    "materialId": "  MAT-10318 "
+  },
+  "defect": {
+    "defectCode": "DEF-1020",
+    "defectText": "Hydraulic pressure test leak due to O-ring seal extrusion"
+  },
+  "workCenter": {
+    "workCenterId": "WC-ASSY-08",
+    "description": "Final Hydraulic Leak Test Line 8"
+  },
+  "inspections": [
+    {
+      "characteristic": "Hydraulic pressure decay",
+      "measuredValue": "Messung Hydraulic pressure decay ergab 1,4 bar / 30s; lt. Zeichnung max 0,1 bar / 30s",
+      "specValue": "-"
+    },
+    {
+      "characteristic": "O-ring Shore hardness",
+      "measuredValue": "54 Shore A",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Material",
+      "description": "NBR rubber O-ring supplier lot OR-9912 received with incorrect Shore A hardness of 54 vs drawing specification of 70 +/- 5 Shore A; soft material extruded into clearance gap under 6 bar test pressure",
+      "metricValue": "54 Shore A vs 70 required",
+      "isRootCause": "Y",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Environment",
+      "description": "Hydraulic test oil ISO VG 46 temperature 24.1C compliant",
+      "metricValue": "24,1C",
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-2210 Rev D - groove dimensions (width 3.2mm, depth 2.3mm) and assembly sequence compliant",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    }
+  ],
+  "fiveWhyChain": [],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Sofortmassnahme",
+      "status": "Done",
+      "actionText": "Purge all remaining O-ring stock from batch OR-9912 in warehouse and assembly line kitting bins"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "KM",
+      "status": "Verified",
+      "actionText": "Issue supplier corrective action request to rubber vendor and re-qualify replacement batch OR-9920"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "",
+      "status": "Verified in production",
+      "actionText": "Mandate sample Shore A Durometer hardness check on every incoming elastomer lot in SAP QM inspection plan"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng.",
+      "partnerRole": "",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100031",
+      "partnerName": "Sara Klein",
+      "functionTitle": "Supplier Quality Eng.",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 12600
+  },
+  "lessonsLearned": {
+    "whatWorked": "  ",
+    "whatDidnt": "n.a."
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "P90 housings assembled with O-ring batch OR-9912 on 2026-08-12",
+    "isNotWhereWhenItDoesnt": "Housings assembled with O-ring batch OR-9908 with verified 70 Shore A hardness",
+    "notes": "Failure strictly limited to supplier rubber batch OR-9912 compounding error"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

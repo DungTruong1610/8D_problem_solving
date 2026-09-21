@@ -1,0 +1,138 @@
+{
+  "notificationId": "8D-90048811",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Verschraubung setzt auf - Gewinde zu kurz (Kunde)",
+  "status": "Closed",
+  "foundDate": "19-JUN-26",
+  "completionDate": "2026-07-30",
+  "quantityExtent": "ca. 428 Stk.",
+  "teamSize": 4,
+  "material": {
+    "materialId": "  MAT-10905 ",
+    "description": "Manifold Block M12",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-53344",
+    "materialId": "  MAT-10905 "
+  },
+  "defect": {
+    "defectCode": "DEF-1015",
+    "defectText": "Port thread depth insufficient"
+  },
+  "workCenter": {
+    "workCenterId": "wc-mill-07",
+    "description": "CNC Milling Line 7"
+  },
+  "inspections": [
+    {
+      "characteristic": "Thread depth",
+      "measuredValue": "Thread depth: gemessen 9,2mm, Sollwert min 14,0mm",
+      "specValue": ""
+    },
+    {
+      "characteristic": "Thread pitch diameter",
+      "measuredValue": "10.86mm",
+      "specValue": "10.83-10.92mm"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Method",
+      "description": "DOC-9930 Rev D - drawing still carries the pre-revision 9.5mm thread depth after the M12 port was changed to a deeper fitting in 2026-05; the NC program was generated from this drawing",
+      "metricValue": "9,5mm drawn vs 14,0mm required",
+      "isRootCause": "ja",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Environment",
+      "description": "23.4C, nominal",
+      "metricValue": null,
+      "isRootCause": "  ",
+      "source": "ASSUMED: MES/IoT"
+    },
+    {
+      "category": "Man",
+      "description": "EMP-7201, Shift C - ran the released NC program without deviation",
+      "metricValue": null,
+      "isRootCause": "  ",
+      "source": "ASSUMED: MES/HR"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "n.a.",
+      "answer": "The change review checked the fitting selection but had no step requiring the mating feature dimensions to be re-verified against it",
+      "evidenceCitation": "-"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "",
+      "status": "Done",
+      "actionText": "Block all M12 stock and gauge thread depth on every unit at the customer and in transit"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "",
+      "status": "Verified",
+      "actionText": "Correct DOC-9930 to Rev E with the 14.0mm port depth and regenerate the NC program"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "KM",
+      "status": "Done",
+      "actionText": "Re-drill 428 affected manifolds to the corrected depth where stock allows, scrap the remainder"
+    },
+    {
+      "lineNo": 4,
+      "actionType": "",
+      "status": "Verified in production",
+      "actionText": "Add a mandatory mating-feature dimension check to the engineering change review checklist"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng.",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100045",
+      "partnerName": "Ingo Braun",
+      "functionTitle": "Manufacturing Eng.",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100052",
+      "partnerName": "Petra Vogel",
+      "functionTitle": "Document Control Officer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-DRILL06-01",
+    "description": "Feature dimension not updated after design change"
+  },
+  "costCopq": null,
+  "lessonsLearned": {
+    "whatWorked": "Restricting the search to parts touched by the May design change narrowed 40 drawings down to one",
+    "whatDidnt": "The change review treated the fitting and the port it seats in as unrelated items"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "k.A.",
+    "isNotWhereWhenItDoesnt": "k.A.",
+    "notes": "-"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0455",
+    "customerPlantContact": "Priya Nair - Plant 3, Pune",
+    "slaResponseDue": "2026-06-26"
+  }
+}

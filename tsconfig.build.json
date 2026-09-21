@@ -1,0 +1,32 @@
+{
+  "//": [
+    "Biên dịch srv/ sang JavaScript cho artifact deploy.",
+    "",
+    "`@sap/cds` KHÔNG biết đọc TypeScript — hỗ trợ đó nằm ở `cds-dk`, mà cds-dk",
+    "là devDependency nên không có mặt trên Cloud Foundry. Deploy nguyên file",
+    ".ts thì `cds-serve` lặng lẽ bỏ qua `srv/server.ts`: app vẫn khởi động, vẫn",
+    "phục vụ entity, nhưng KHÔNG có handler nào của mình được đăng ký và không",
+    "có gì báo lỗi.",
+    "",
+    "Nên artifact phải chứa .js. Đây là cấu hình biên dịch cho đúng việc đó —",
+    "tsconfig.json gốc vẫn dùng cho typecheck và cho chạy local."
+  ],
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./gen/srv",
+    "rootDir": "./",
+    "declaration": false,
+    "sourceMap": false,
+    "removeComments": false,
+    "types": ["node", "@cap-js/cds-types"]
+  },
+  "include": ["srv/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "app",
+    "gen",
+    "scripts",
+    "srv/**/__tests__/**"
+  ]
+}

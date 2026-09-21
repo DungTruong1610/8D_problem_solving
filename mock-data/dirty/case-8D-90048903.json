@@ -1,0 +1,137 @@
+{
+  "notificationId": "8D-90048903",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Glanzgrad WE-Sperre beim Kunden",
+  "status": "In Process",
+  "foundDate": "04.08.2026",
+  "completionDate": null,
+  "quantityExtent": "204 St",
+  "teamSize": 5,
+  "material": {
+    "materialId": "  MAT-11388 ",
+    "description": "Trim Panel T18",
+    "materialGroup": "MG-TRIM"
+  },
+  "batch": {
+    "batchId": "B-54720",
+    "materialId": "  MAT-11388 "
+  },
+  "defect": {
+    "defectCode": "DEF-1455",
+    "defectText": "Paint gloss out of specification"
+  },
+  "workCenter": {
+    "workCenterId": "WC-PAINT-03",
+    "description": "Topcoat Booth 3"
+  },
+  "inspections": [
+    {
+      "characteristic": "Gloss 60 degree",
+      "measuredValue": "Gloss 60 degree = 71 GU (Vorgabe 82-90 GU) - iO/niO: niO",
+      "specValue": "n.a."
+    },
+    {
+      "characteristic": "Film build",
+      "measuredValue": "41um",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Method",
+      "description": "DOC-12440 Rev E - flash-off time shortened from 90s to 60s in the 2026-06 cycle-time project",
+      "metricValue": "60s vs previous 90s",
+      "isRootCause": "k.A.",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Paint lot PNT-5540 viscosity and solids within spec, cert PASS",
+      "metricValue": null,
+      "isRootCause": "k.A.",
+      "source": "SAP: QALS/QAMR (incoming)"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why was gloss rejected at the customer?",
+      "answer": "Gloss measured 71 GU against an 82-90 GU window",
+      "evidenceCitation": "Customer goods receipt report"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why was gloss low despite correct film build and paint? (root cause)",
+      "answer": "Flash-off time was reduced from 90s to 60s in the June cycle-time project, leaving solvent in the film at cure",
+      "evidenceCitation": "n.a."
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "SM",
+      "status": "Done",
+      "actionText": "Hold all T18 stock and re-measure a sample on the laboratory gloss meter"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Eindaemmung",
+      "status": "Planned",
+      "actionText": "Sort the 204 units at the customer against the drawing gloss requirement"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Abstellmassnahme",
+      "status": "Planned",
+      "actionText": "Restore the flash-off time to 90s in DOC-12440 and re-qualify the booth"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng.",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100067",
+      "partnerName": "Marek Nowak",
+      "functionTitle": "Surface Treatment Specialist",
+      "partnerRole": "  ",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100147",
+      "partnerName": "Lena Hoffmann",
+      "functionTitle": "Metrology Specialist",
+      "partnerRole": "-",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician",
+      "partnerRole": "k.A.",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 26900
+  },
+  "lessonsLearned": {
+    "whatWorked": "k.A.",
+    "whatDidnt": "  "
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "n.a.",
+    "isNotWhereWhenItDoesnt": "  ",
+    "notes": "  "
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0533",
+    "customerPlantContact": "Sofia Marino - Plant 5, Turin",
+    "slaResponseDue": "2026-08-11"
+  }
+}

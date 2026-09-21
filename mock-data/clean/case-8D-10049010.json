@@ -1,0 +1,167 @@
+{
+  "notificationId": "8D-10049010",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Surface roughness Ra 2.8um exceeding max 0.8um spec on flange face due to chatter",
+  "status": "Completed",
+  "foundDate": "2026-08-01",
+  "completionDate": "2026-08-12",
+  "quantityExtent": "85 units affected",
+  "teamSize": 3,
+  "material": {
+    "materialId": "MAT-10247",
+    "description": "Bracket Housing X240",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-50341",
+    "materialId": "MAT-10247"
+  },
+  "defect": {
+    "defectCode": "DEF-0104",
+    "defectText": "Chatter marks and surface waviness on milled flange"
+  },
+  "workCenter": {
+    "workCenterId": "WC-MILL-07",
+    "description": "CNC 5-Axis Milling Center 7"
+  },
+  "inspections": [
+    {
+      "characteristic": "Surface roughness Ra",
+      "measuredValue": "2.8um",
+      "specValue": "max 0.8um"
+    },
+    {
+      "characteristic": "Drawbar retention force",
+      "measuredValue": "6.2 kN",
+      "specValue": "10.5 - 12.0 kN"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-4421, Shift B - operator performed tool change per SOP; toolholder cleaned before loading",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-MILL07-001 spindle drawbar disc spring stack had 4 broken Belleville washers, reducing clamping force from 11.2 kN to 6.2 kN and causing tool micro-slippage under milling load",
+      "metricValue": "6.2 kN vs 11.0 kN nominal",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-8812 Rev C - milling cutting feed and spindle speed within validated machining parameters",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Cast aluminium alloy AlSi10Mg batch B-50341 hardness 82 HBW, within 75-90 HBW spec",
+      "metricValue": "82 HBW",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Profilometer GA-0219 calibrated on 2026-07-15, stylus radius 2um verified",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Ambient shop floor temperature 22.4C, vibration sensor on foundation reading <0.5 mm/s",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why was the flange surface roughness out of specification?",
+      "answer": "Excessive chatter vibration occurred between the end mill and the workpiece during finishing pass",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did excessive tool chatter vibration occur during milling?",
+      "answer": "The toolholder suffered dynamic micro-deflection in the spindle taper under cutting forces",
+      "evidenceCitation": "Vibration frequency spectrum PM log"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why did the spindle allow toolholder micro-deflection? (root cause)",
+      "answer": "Spindle drawbar retention force dropped to 6.2 kN due to fatigue fracture of 4 Belleville disc springs in the internal clamping pack",
+      "evidenceCitation": "Spindle maintenance teardown report EQ-MILL07-001"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "100% surface roughness inspection on all 85 quarantined housings and sort out-of-spec units"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "status": "Verified",
+      "actionText": "Replace complete Belleville disc spring pack and gripper fingers on WC-MILL-07 spindle; re-test retention force to 11.5 kN"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "status": "Verified in production",
+      "actionText": "Introduce preventive drawbar force gauge check into 500-hour PM schedule across all CNC milling centers"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100088",
+      "partnerName": "Klaus Richter",
+      "functionTitle": "CNC Maintenance Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-MILL-04",
+    "description": "Toolholder slippage and chatter due to drawbar clamping spring fatigue"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 14200
+  },
+  "lessonsLearned": {
+    "whatWorked": "Retention force gauge immediately confirmed drawbar spring failure without full spindle removal",
+    "whatDidnt": "Drawbar clamping force was previously checked only during annual major overhaul rather than periodic PM"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "Bracket Housing X240 flange face on WC-MILL-07 using 63mm face mill on 2026-08-01",
+    "isNotWhereWhenItDoesnt": "Other parts machined on WC-MILL-05 and WC-MILL-06 with healthy drawbar force >11 kN",
+    "notes": "Defect tracks machine spindle clamping force degradation, not part geometry or cutting tool batch"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

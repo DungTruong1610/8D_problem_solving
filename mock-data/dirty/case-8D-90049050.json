@@ -1,0 +1,124 @@
+{
+  "notificationId": "8D-90049050",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Automated Optical Inspection (AOI) detected 18 solder bridges on 0.4mm pitch QFN pins",
+  "status": "Completed",
+  "foundDate": "05.08.2026",
+  "completionDate": "16-AUG-26",
+  "quantityExtent": "48 boards affected",
+  "teamSize": "  ",
+  "material": {
+    "materialId": "  MAT-10840 ",
+    "description": "Control Board PCBA-900",
+    "materialGroup": "MG-PCBA"
+  },
+  "batch": {
+    "batchId": "B-50490",
+    "materialId": "  MAT-10840 "
+  },
+  "defect": {
+    "defectCode": "DEF-0580",
+    "defectText": "Solder bridging short circuit on fine-pitch QFN package"
+  },
+  "workCenter": {
+    "workCenterId": "WC-SMT-02",
+    "description": "SMT Placement & Reflow Line 2"
+  },
+  "inspections": [
+    {
+      "characteristic": "Solder paste volume",
+      "measuredValue": "Solder paste volume = 165% (Vorgabe 80 - 120%) - iO/niO: niO",
+      "specValue": "k.A."
+    },
+    {
+      "characteristic": "Stencil nano-coating contact angle",
+      "measuredValue": "52 deg",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Material",
+      "description": "Laser-cut stencil ST-QFN-04 fluoropolymer nano-coating degraded after 65,000 print cycles (limit 40,000), causing solder paste smear along aperture walls onto 0.4mm pads",
+      "metricValue": "65,000 cycles vs 40,000 max",
+      "isRootCause": "Y",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Machine",
+      "description": "Solder paste printer EQ-SMT02-001 squeegee pressure 0.22 kg/cm and separation speed 0.5 mm/s within spec",
+      "metricValue": "0,22 kg/cm",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-6610 Rev D - stencil wipe frequency set to every 3 prints with solvent-assisted vacuum wipe",
+      "metricValue": "every 3 prints",
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    }
+  ],
+  "fiveWhyChain": [],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Sofortmassnahme",
+      "status": "Done",
+      "actionText": "Rework 48 bridged boards using hot-air micro-soldering and 100% X-ray inspection"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Korrekturmassnahme",
+      "status": "Verified",
+      "actionText": "Scrap worn stencil ST-QFN-04 and install new nano-coated laser stencil with verified 105 deg contact angle"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Vorbeugemassnahme",
+      "status": "Verified in production",
+      "actionText": "Integrate RFID stencil life tracker into solder printer to automatically lock out stencils exceeding 40,000 prints"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng.",
+      "partnerRole": "k.A.",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100023",
+      "partnerName": "Luis Moreno",
+      "functionTitle": "SMT Process Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 15400
+  },
+  "lessonsLearned": {
+    "whatWorked": "  ",
+    "whatDidnt": "k.A."
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "PCBA-900 fine-pitch QFN U12 on SMT Line 2 using stencil ST-QFN-04 on 2026-08-05",
+    "isNotWhereWhenItDoesnt": "Large-pitch components (SOIC, 0805) or boards printed on SMT Line 1 with new stencil",
+    "notes": "Defect exclusively concentrated on fine-pitch 0.4mm footprint where aperture wall release is critical"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

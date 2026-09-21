@@ -1,0 +1,145 @@
+{
+  "notificationId": "8D-90048745",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Sensorhalter loesen sich in Kundenmontage",
+  "status": "Completed",
+  "foundDate": "14-JUL-26",
+  "completionDate": "2026-08-05",
+  "quantityExtent": "~310 Teile",
+  "teamSize": 3,
+  "material": {
+    "materialId": "  MAT-10744 ",
+    "description": "Sensor Mount Bracket S22",
+    "materialGroup": "MG-BRACKET"
+  },
+  "batch": {
+    "batchId": "B-52688",
+    "materialId": "  MAT-10744 "
+  },
+  "defect": {
+    "defectCode": "DEF-0810",
+    "defectText": "Adhesive bond failure"
+  },
+  "workCenter": {
+    "workCenterId": "wc-bond-02",
+    "description": "Structural Bonding Cell 2"
+  },
+  "inspections": [
+    {
+      "characteristic": "Lap shear strength",
+      "measuredValue": "Lap shear strength = 4,1 MPa (Vorgabe min 12,0 MPa) - iO/niO: niO",
+      "specValue": "  "
+    },
+    {
+      "characteristic": "Bond line thickness",
+      "measuredValue": "0.22mm",
+      "specValue": "0.15-0.30mm"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Environment",
+      "description": "Bonding cell relative humidity logged 78-84% RH across 2026-07-06 to 07-09 against a 45% RH maximum; the cell dehumidifier had tripped and was not restarted",
+      "metricValue": "84% RH peak vs 45% max",
+      "isRootCause": "x",
+      "source": "ASSUMED: MES/IoT"
+    },
+    {
+      "category": "Measurement",
+      "description": "Pull tester GA-0355, last cal 2026-04-18, R&R 7.4%",
+      "metricValue": "7,4%",
+      "isRootCause": "-",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-BOND02-001 dispenser volume within +/-2% of target all shift",
+      "metricValue": "+1,3%",
+      "isRootCause": "-",
+      "source": "SAP: EQUI/AFIH (PM)"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "k.A.",
+      "answer": "The humidity alarm reported to a facilities dashboard that production does not monitor, and no interlock stops bonding when the cell is out of its environmental window",
+      "evidenceCitation": "k.A."
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "",
+      "status": "Done",
+      "actionText": "Block all S22 stock bonded in the outage window and pull-test a sample from every pallet"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "SM",
+      "status": "Done",
+      "actionText": "Notify the customer and sort the 310 units already delivered"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "KM",
+      "status": "Verified",
+      "actionText": "Restart and service the WC-BOND-02 dehumidifier, then re-qualify the cell with a bonded test panel"
+    },
+    {
+      "lineNo": 4,
+      "actionType": "vorbeugend",
+      "status": "Verified in production",
+      "actionText": "Route cell humidity alarms to the production andon and interlock the bonding station above 50% RH"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng.",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100102",
+      "partnerName": "Dario Conti",
+      "functionTitle": "Bonding Process Eng.",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100115",
+      "partnerName": "Eva Lindqvist",
+      "functionTitle": "Facilities Eng.",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100012",
+      "partnerName": "Minh Dinh",
+      "functionTitle": "Production Eng.",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-BOND02-02",
+    "description": "Reduced bond strength from humidity during cure"
+  },
+  "costCopq": null,
+  "lessonsLearned": {
+    "whatWorked": "Cross-referencing the defect window against facility alarm logs isolated the cause in one afternoon",
+    "whatDidnt": "A process-critical environmental alarm was routed to a dashboard nobody in production watches"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "  ",
+    "isNotWhereWhenItDoesnt": "  ",
+    "notes": ""
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0498",
+    "customerPlantContact": "Jonas Berg - Plant 7, Gothenburg",
+    "slaResponseDue": "2026-07-21"
+  }
+}

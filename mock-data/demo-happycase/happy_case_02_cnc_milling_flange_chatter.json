@@ -1,0 +1,55 @@
+{
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Surface audit on 2026-02-15 flagged chatter waviness on flange face of 128 brackets (B-49172). Roughness Ra reached 2.45 µm on milling spindle SP01 after tool change T04; spindle SP02 nominal.",
+  "foundDate": "2026-02-15",
+  "defectQuantity": 128,
+  "defectQuantityUom": "PC",
+  "referenceNumber": "INT-2026-4402",
+  "plant": "1000",
+  "entryMode": "during-inspection",
+  "inspectionLotId": "0010000022",
+  "material": {
+    "materialId": "MAT-10247",
+    "description": "Bracket Housing X240",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-49172",
+    "materialId": "MAT-10247"
+  },
+  "workCenter": {
+    "workCenterId": "WC-MILL-07",
+    "description": "CNC Milling Line 7"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-SUR",
+    "defectCode": "DEF-0104",
+    "defectText": "Chatter marks and surface waviness on milled flange",
+    "defectClass": "Major"
+  },
+  "inspections": [
+    {
+      "characteristic": "Surface roughness Ra",
+      "measuredValue": "2.4500 µm",
+      "specLowerLimit": 0,
+      "specUpperLimit": 0.8,
+      "specUom": "µm",
+      "valuation": "Rejected",
+      "equipment": "SURF-TESTER-01"
+    },
+    {
+      "characteristic": "Flange Face Flatness",
+      "measuredValue": "0.0420 mm",
+      "specLowerLimit": 0,
+      "specUpperLimit": 0.08,
+      "specUom": "mm",
+      "valuation": "Accepted",
+      "equipment": "CMM-ZEISS-01"
+    }
+  ],
+  "responsibility": {
+    "reportedBy": "Thomas Mueller",
+    "coordinator": "Frank Castle",
+    "department": "Process Engineering"
+  }
+}

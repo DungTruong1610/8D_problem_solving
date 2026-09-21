@@ -1,0 +1,130 @@
+{
+  "notificationId": "8D-90048857",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Bohrungslage ausserhalb Toleranz - Kundenmeldung",
+  "status": "In Process",
+  "foundDate": "08.08.2026",
+  "completionDate": null,
+  "quantityExtent": "156 St",
+  "teamSize": 4,
+  "material": {
+    "materialId": "  MAT-11130 ",
+    "description": "Bearing Cap BC14",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-54012",
+    "materialId": "  MAT-11130 "
+  },
+  "defect": {
+    "defectCode": "DEF-1233",
+    "defectText": "Bore position out of true position"
+  },
+  "workCenter": {
+    "workCenterId": "WC-MILL-11",
+    "description": "CNC Milling Line 11"
+  },
+  "inspections": [
+    {
+      "characteristic": "Bore true position",
+      "measuredValue": "Bore true position = 0,19mm (Vorgabe max 0,08mm) - iO/niO: niO",
+      "specValue": "  "
+    },
+    {
+      "characteristic": "Bore diameter",
+      "measuredValue": "42,012mm",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Measurement",
+      "description": "CMM program CMM-BC14-03 was rebuilt on 2026-07-15 and references datum B on the as-cast face instead of the machined face called out on the drawing; every part since then measured in-tolerance against the wrong datum",
+      "metricValue": "datum offset 0,11mm",
+      "isRootCause": "  ",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Man",
+      "description": "EMP-9022, Shift B - loaded parts per the fixture instruction",
+      "metricValue": null,
+      "isRootCause": "  ",
+      "source": "ASSUMED: MES/HR"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why is the bore out of true position at the customer?",
+      "answer": "True position measured 0.19mm against a 0.08mm maximum when checked against the drawing datum",
+      "evidenceCitation": "Customer incoming inspection report"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did these parts pass our own inspection?",
+      "answer": "CMM program CMM-BC14-03 measures from the as-cast face rather than the machined datum B, understating true position by roughly 0.11mm",
+      "evidenceCitation": ""
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "",
+      "status": "Done",
+      "actionText": "Freeze CMM-BC14-03 and re-measure all BC14 stock against the drawing datum on a manual setup"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "",
+      "status": "Planned",
+      "actionText": "Sort the 156 units at the customer and replace any part outside true position"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "KM",
+      "status": "Planned",
+      "actionText": "Rebuild CMM-BC14-03 against datum B and correlate against a first article before release"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100014",
+      "partnerName": "Thien Tu",
+      "functionTitle": "Quality Eng.",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100147",
+      "partnerName": "Lena Hoffmann",
+      "functionTitle": "Metrology Specialist",
+      "partnerRole": "",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100045",
+      "partnerName": "Ingo Braun",
+      "functionTitle": "Manufacturing Eng.",
+      "partnerRole": "",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 18700
+  },
+  "lessonsLearned": {
+    "whatWorked": "-",
+    "whatDidnt": "n.a."
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "",
+    "isNotWhereWhenItDoesnt": "k.A.",
+    "notes": ""
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0521",
+    "customerPlantContact": "Hugo Martins - Plant 9, Porto",
+    "slaResponseDue": "2026-08-15"
+  }
+}

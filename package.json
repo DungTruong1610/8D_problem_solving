@@ -1,0 +1,166 @@
+{
+  "name": "8d_hackathon",
+  "version": "0.0.1",
+  "description": "8D_Hackathon CAP Service",
+  "repository": "<config>",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "cds-serve",
+    "deploy:sqlite": "cds deploy --to sqlite",
+    "seed:sqlite": "tsx scripts/seed-sqlite.ts",
+    "deploy:pg": "cds deploy --profile postgres",
+    "seed:pg": "tsx scripts/seed-postgres.ts",
+    "verify:pg": "tsx scripts/verify-postgres-pgvector.ts",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "deploy:graph": "cds deploy --to hana --profile graph --for graph",
+    "seed:graph": "cds bind --exec --profile graph -- node --import ./node_modules/tsx/dist/loader.mjs scripts/seed-graph-library.mjs",
+    "dev": "concurrently -k -p \"[{name}]\" -c \"cyan.bold,magenta.bold\" -n \"BE,FE\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:local": "concurrently -k -p \"[{name}]\" -c \"cyan.bold,magenta.bold\" -n \"BE,FE\" \"npm run dev:backend:local\" \"npm run dev:frontend\"",
+    "dev:pg": "concurrently -k -p \"[{name}]\" -c \"cyan.bold,magenta.bold\" -n \"BE,FE\" \"npm run dev:backend:pg\" \"npm run dev:frontend\"",
+    "dev:backend": "tsx node_modules/@sap/cds-dk/bin/cds-tsx.js watch --profile local --port 4008 --exclude app,dist,gen,mock-data,docs,plans,resources,db.sqlite,db.sqlite-wal,db.sqlite-shm < NUL",
+    "dev:backend:local": "tsx node_modules/@sap/cds-dk/bin/cds-tsx.js watch --profile local --port 4008 --exclude app,dist,gen,mock-data,docs,plans,resources,db.sqlite,db.sqlite-wal,db.sqlite-shm < NUL",
+    "dev:backend:pg": "tsx node_modules/@sap/cds-dk/bin/cds-tsx.js watch --profile postgres --port 4008 --exclude app,dist,gen,mock-data,docs,plans,resources,db.sqlite < NUL",
+    "dev:backend:graph": "tsx node_modules/@sap/cds-dk/bin/cds-tsx.js watch --profile graph --port 4009 --exclude app,dist,gen,mock-data,docs,plans,resources,db.sqlite,db.sqlite-wal,db.sqlite-shm < NUL",
+    "dev:frontend": "node scripts/wait-backend.mjs && npm run dev --prefix app/8D_hackathon_ui",
+    "dev:backend:serve": "powershell -Command \"while($true){ node node_modules/tsx/dist/cli.mjs node_modules/@sap/cds-dk/bin/cds-tsx.js serve all --profile local --port 4008; Start-Sleep -Seconds 2 }\"",
+    "watch": "tsx node_modules/@sap/cds-dk/bin/cds-tsx.js watch --profile local --port 4008 --exclude app,dist,gen,mock-data,docs,plans,resources",
+    "dev:all": "powershell -ExecutionPolicy Bypass -File .\\start-dev.ps1",
+    "clean": "node -e \"['gen','dist','ui_resources','app/ui_resources'].forEach(d=>{try{require('fs').rmSync(d,{recursive:true,force:true})}catch(e){}})\"",
+    "build": "npm run bundle:library && cds build --production && npm run compile:srv",
+    "test": "jest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "export:prompts": "node --import ./node_modules/tsx/dist/loader.mjs scripts/export-step-prompts.mjs",
+    "push:prompts": "node scripts/push-step-config.mjs",
+    "bundle:library": "node scripts/bundle-library.mjs",
+    "compile:srv": "node scripts/compile-srv.mjs",
+    "engine:status": "cds bind --exec --profile graph -- node scripts/toggle-graph-engine.mjs status",
+    "engine:graph": "cds bind --exec --profile graph -- node scripts/toggle-graph-engine.mjs graph",
+    "engine:scoring": "cds bind --exec --profile graph -- node scripts/toggle-graph-engine.mjs scoring",
+    "compare:engines": "cds bind --exec --profile graph -- node --import ./node_modules/tsx/dist/loader.mjs scripts/compare-retrieval.mjs",
+    "shadow:graph": "cds bind --exec --profile graph -- node --import ./node_modules/tsx/dist/loader.mjs scripts/shadow-retrieval.mjs",
+    "test:graph": "cds bind --exec --profile graph -- node scripts/run-graph-tests.mjs",
+    "eval:judge": "cds bind --exec --profile graph -- node --import ./node_modules/tsx/dist/loader.mjs scripts/run-eval.mjs"
+  },
+  "dependencies": {
+    "@cap-js/postgres": "^1.11.0",
+    "@cnma/cap-core": "file:./packages/cnma-cap-core-1.0.0.tgz",
+    "@cnma/cap-identity": "file:./packages/cnma-cap-identity-1.0.25.tgz",
+    "@cnma/cap-valuehelp": "file:./packages/cnma-cap-valuehelp-2.7.2.tgz",
+    "@cnma/cap-workflow": "file:./packages/cnma-cap-workflow-1.7.8.tgz",
+    "@cnma/sap-aicore-integrate": "file:./packages/cnma-sap-aicore-integrate-3.0.1.tgz",
+    "@sap-ai-sdk/ai-api": "^2.13.0",
+    "@sap-ai-sdk/orchestration": "^2.13.0",
+    "@sap/cds": "^8.8.0",
+    "@sap/cds-hana": "^2.0.0",
+    "axios": "^1.18.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "passport": "^0.7.0",
+    "pg": "^8.13.1",
+    "pgvector": "^0.2.0"
+  },
+  "devDependencies": {
+    "@cap-js/cds-types": "^0.9.0",
+    "@cap-js/sqlite": "^1.7.0",
+    "@sap/cds-dk": "^8.9.19",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.10",
+    "concurrently": "^10.0.4",
+    "jest": "^29.7.0",
+    "sqlite3": "^6.0.1",
+    "ts-jest": "^29.2.6",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.23.12",
+    "typescript": "^5.7.3"
+  },
+  "cds": {
+    "build": {
+      "target": "gen",
+      "tasks": [
+        {
+          "for": "hana",
+          "src": "db"
+        },
+        {
+          "for": "nodejs",
+          "src": "srv"
+        }
+      ]
+    },
+    "watch": {
+      "exclude": [
+        "app",
+        "dist",
+        "gen",
+        "mock-data",
+        "docs",
+        "plans",
+        "resources"
+      ]
+    },
+    "requires": {
+      "db": {
+        "kind": "sqlite",
+        "credentials": {
+          "url": "db.sqlite"
+        }
+      },
+      "[local]": {
+        "db": {
+          "kind": "sqlite",
+          "credentials": {
+            "url": "db.sqlite"
+          }
+        }
+      },
+      "[development]": {
+        "db": {
+          "kind": "sqlite",
+          "credentials": {
+            "url": "db.sqlite"
+          }
+        }
+      },
+      "[postgres]": {
+        "db": {
+          "kind": "postgres",
+          "credentials": {
+            "host": "localhost",
+            "port": 5432,
+            "database": "proresolve",
+            "user": "postgres",
+            "password": "postgres",
+            "ssl": false
+          }
+        }
+      },
+      "auth": {
+        "kind": "mocked",
+        "users": {
+          "admin": {
+            "password": "123",
+            "roles": [
+              "admin",
+              "Admin",
+              "authenticated-user"
+            ]
+          },
+          "developer": {
+            "password": "123",
+            "roles": [
+              "admin",
+              "Admin",
+              "authenticated-user"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "notificationId": "8D-10048577",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Coolant leak at sealing surface reported by customer",
+  "status": "Completed",
+  "foundDate": "2026-07-02",
+  "completionDate": "2026-07-28",
+  "quantityExtent": "46 units affected",
+  "teamSize": 3,
+  "material": {
+    "materialId": "MAT-10318",
+    "description": "Pump Housing P90",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-50231",
+    "materialId": "MAT-10318"
+  },
+  "defect": {
+    "defectCode": "DEF-0512",
+    "defectText": "Porosity at sealing flange face"
+  },
+  "workCenter": {
+    "workCenterId": "WC-CAST-03",
+    "description": "Aluminium Die Casting Line 3"
+  },
+  "inspections": [
+    {
+      "characteristic": "Porosity area ratio",
+      "measuredValue": "3.8%",
+      "specValue": "max 1.0%"
+    },
+    {
+      "characteristic": "Helium leak rate",
+      "measuredValue": "12 mbar*l/s",
+      "specValue": "max 5 mbar*l/s"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-1187, Shift A - casting operator, no deviation logged",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-CAST03-001, die temperature within band all shift",
+      "metricValue": "681C avg",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-3308 Rev D - die casting parameter sheet, unchanged",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Ingot lot ING-77412 hydrogen content 0.38 ppm vs max 0.20 ppm - degassing certificate accepted without re-test",
+      "metricValue": "0.38 ppm",
+      "isRootCause": "Y",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "GA-0091, last cal 2026-05-11, within interval",
+      "metricValue": "2.8% (illustrative)",
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "24.5C / 58% RH at 14:20 (illustrative)",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the housing leak at the sealing surface?",
+      "answer": "Porosity area ratio measured 3.8% vs max 1.0% spec - gas pores broke through the machined sealing face",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why was porosity so high in this batch?",
+      "answer": "Ingot lot ING-77412 carried 0.38 ppm hydrogen against a 0.20 ppm limit, so gas came out of solution during solidification",
+      "evidenceCitation": "Incoming certificate ING-77412"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why did the out-of-spec ingot reach the casting line? (root cause)",
+      "answer": "Incoming inspection accepted the supplier degassing certificate without an independent hydrogen re-test, so the deviation was never detected",
+      "evidenceCitation": "Incoming inspection plan MAT-10318"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Block remaining stock from batch B-50231 and 100% helium leak test all P90 housings before dispatch",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Containment",
+      "actionText": "Notify customer plant Valencia and sort 46 units already delivered",
+      "status": "Done"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Corrective",
+      "actionText": "Reject and return ingot lot ING-77412 to supplier; release replacement lot ING-77455 after hydrogen re-test",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 4,
+      "actionType": "Preventive",
+      "actionText": "Add mandatory hydrogen content re-test to the incoming inspection plan for all aluminium ingot lots, independent of supplier certificate",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100023",
+      "partnerName": "Luis Moreno",
+      "functionTitle": "Foundry Process Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100031",
+      "partnerName": "Sara Klein",
+      "functionTitle": "Supplier Quality Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-CAST03-07",
+    "description": "Gas porosity from incoming ingot hydrogen content"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 28900
+  },
+  "lessonsLearned": {
+    "whatWorked": "Batch traceability tied every failed unit back to a single ingot lot within two days",
+    "whatDidnt": "Supplier certificates were trusted without verification - the control existed only on paper"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "P90 sealing face - WC-CAST-03 - castings poured from ingot lot ING-77412 between 2026-06-24 and 2026-06-26",
+    "isNotWhereWhenItDoesnt": "P70 / P110 variants - WC-CAST-01 - castings from ingot lots ING-77380 and ING-77455",
+    "notes": "Defect tracks the ingot lot, not the machine or the shift"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0442",
+    "customerPlantContact": "Ana Ruiz - Plant 2, Valencia",
+    "slaResponseDue": "2026-07-09"
+  }
+}

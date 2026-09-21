@@ -1,0 +1,167 @@
+{
+  "notificationId": "8D-10048702",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Loose end cap bolts found at final audit",
+  "status": "Closed",
+  "foundDate": "2026-06-28",
+  "completionDate": "2026-07-22",
+  "quantityExtent": "63 units affected",
+  "teamSize": 3,
+  "material": {
+    "materialId": "MAT-10611",
+    "description": "Gearbox End Cap G45",
+    "materialGroup": "MG-GEARBOX"
+  },
+  "batch": {
+    "batchId": "B-52310",
+    "materialId": "MAT-10611"
+  },
+  "defect": {
+    "defectCode": "DEF-0723",
+    "defectText": "Bolt torque below specification"
+  },
+  "workCenter": {
+    "workCenterId": "WC-ASSY-08",
+    "description": "Gearbox Assembly Line 8"
+  },
+  "inspections": [
+    {
+      "characteristic": "Bolt seating torque",
+      "measuredValue": "18 Nm",
+      "specValue": "34-38 Nm"
+    },
+    {
+      "characteristic": "End cap gap",
+      "measuredValue": "0.41mm",
+      "specValue": "max 0.10mm"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-4471, Shift B - torque wrench sign-off missing on 63 consecutive units; operator ran the final pass by hand after the wrench was sent for calibration",
+      "metricValue": "63 units without sign-off",
+      "isRootCause": "Y",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-ASSY08-002 nutrunner self-test passed each shift start",
+      "metricValue": "all passes",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-7702 Rev F - assembly instruction specifies 36 Nm and a mandatory wrench sign-off; text unchanged",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Bolt lot BLT-8890 tensile and thread gauge PASS",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Audit torque tester GA-0210, last cal 2026-06-02, R&R 6.0%",
+      "metricValue": "6.0%",
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "21.8C / 45% RH, nominal",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why were the end cap bolts loose?",
+      "answer": "Seating torque measured 18 Nm against a 34-38 Nm window, roughly half the required clamp load",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why was the torque only half of specification?",
+      "answer": "The final torque pass was done by hand instead of with the calibrated nutrunner, so no controlled torque was ever applied",
+      "evidenceCitation": "MES sign-off log WC-ASSY-08"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was the pass done by hand? (root cause)",
+      "answer": "The wrench went out for calibration and no replacement was staged; the operator continued production rather than stopping the line, and nothing in the process blocked it",
+      "evidenceCitation": "Test equipment register GA-0210 / shift handover note"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "Recall and re-torque all 63 units from the affected Shift B window"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "status": "Verified",
+      "actionText": "Stage a calibrated backup nutrunner at WC-ASSY-08 before any tool leaves for calibration"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "status": "Verified in production",
+      "actionText": "Make the MES step refuse a unit sign-off unless a calibrated torque tool ID is scanned"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100088",
+      "partnerName": "Rita Fischer",
+      "functionTitle": "Assembly Supervisor",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100091",
+      "partnerName": "Karl Wagner",
+      "functionTitle": "Maintenance Planner",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-ASSY08-04",
+    "description": "Insufficient clamp load from uncontrolled torque"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 9800
+  },
+  "lessonsLearned": {
+    "whatWorked": "Sign-off gaps in the MES log pinpointed the exact production window within hours",
+    "whatDidnt": "The process relied on the operator stopping the line voluntarily; nothing enforced it"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "G45 end caps - WC-ASSY-08 - Shift B units built while the torque wrench was away for calibration",
+    "isNotWhereWhenItDoesnt": "G45 built on Shift A and Shift C - WC-ASSY-11 - wrench available throughout",
+    "notes": "Defect window matches the calibration absence exactly"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - internal defect, no customer reference",
+    "customerPlantContact": "N/A",
+    "slaResponseDue": "N/A"
+  }
+}

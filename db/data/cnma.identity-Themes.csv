@@ -1,0 +1,4 @@
+ID;code;name;description;icon;sortOrder;isEnabled
+4053e695-cfdc-4cf4-8224-c32bfba47816;proconarumv2@;Proconarum Theme;Proconarum Theme;;1;true
+6e8bb4e4-4176-484a-9823-40c77415c455;sap_horizon;Sap default;Sap default;;2;true
+d29ddfb3-80d3-4092-8374-713db1332805;sap_fiori_3_dark;SAP Dark;SAP Dark;;3;true

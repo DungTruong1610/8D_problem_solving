@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8D Copilot — Flagship Mockup (Internal Defect + Customer Complaint)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#B20E10; --red-hover:#970C0E; --red-press:#7D0A0B;
+    --red-50:#FCF5F5; --red-100:#F9ECEC; --red-200:#F6E2E2;
+    --ink:#1A1A1A; --body-c:#333333; --muted:#999999; --line:#EBEBEB; --surface-alt:#FAFAFA;
+    --success:#069669; --success-text:#05714F; --success-bg:#EBF7F3;
+    --error:#D93025;
+    --shell:#223142; --shell-dark:#182432;
+    --blue:#0a6ed1; --blue-bg:#eaf2fd;
+    --orange:#E9730C; --orange-bg:#FDF1E5;
+    --font-h:'Montserrat','Inter','Helvetica Neue',Arial,sans-serif;
+    --font-b:'Poppins','Inter','Helvetica Neue',Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#fff;color:var(--body-c);font-family:var(--font-b);font-size:14px;line-height:1.6;}
+  h1,h2,h3,h4{font-family:var(--font-h);color:var(--ink);margin:0 0 8px;letter-spacing:-0.01em;}
+  h1{font-size:26px;font-weight:700;}
+  h2{font-size:19px;font-weight:600;}
+  h3{font-size:15px;font-weight:600;}
+  h4{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.03em;}
+  a{color:var(--red);}
+  p{margin:0 0 10px;}
+  button{font-family:var(--font-h);font-weight:600;font-size:13px;cursor:pointer;border-radius:6px;border:1px solid transparent;padding:8px 16px;transition:all .12s;}
+  .btn-primary{background:var(--red);color:#fff;}
+  .btn-primary:hover{background:var(--red-hover);}
+  .btn-primary:disabled{background:#ddd;color:#999;cursor:not-allowed;}
+  .btn-secondary{background:#fff;color:var(--ink);border-color:#ccc;}
+  .btn-secondary:hover{background:var(--surface-alt);}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:transparent;padding:6px 10px;}
+  .btn-ghost:hover{background:var(--surface-alt);}
+  .btn-ghost.active{background:var(--red-100);color:var(--red);}
+  /* Shell */
+  #shell{position:sticky;top:0;z-index:50;background:var(--shell);color:#fff;display:flex;align-items:center;gap:24px;padding:0 20px;height:48px;}
+  #shell .logo{font-family:var(--font-h);font-weight:700;font-size:16px;letter-spacing:-0.01em;cursor:pointer;}
+  #shell .logo span{color:#ff6b6c;}
+  #shell nav{display:flex;gap:4px;flex:1;}
+  #shell nav button{background:transparent;color:#cfd8e3;border:none;padding:14px 10px;border-radius:0;font-size:13px;border-bottom:2px solid transparent;}
+  #shell nav button.active{color:#fff;border-bottom:2px solid var(--red);}
+  #shell nav button:hover{color:#fff;}
+  #shell .user{font-size:12px;color:#cfd8e3;display:flex;align-items:center;gap:8px;}
+  #shell .user .avatar{width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:11px;}
+  #view-root{max-width:1360px;margin:0 auto;padding:28px 24px 80px;}
+  .eyebrow{font-family:var(--font-h);font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--red);margin-bottom:6px;}
+  .sub{color:var(--muted);font-size:13.5px;margin-bottom:22px;max-width:760px;}
+  /* Launcher tiles */
+  .tile-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;}
+  .tile{border:1px solid var(--line);border-radius:10px;padding:22px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .tile:hover{box-shadow:0 4px 14px rgba(0,0,0,.08);}
+  .tile .tile-icon{width:44px;height:44px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;}
+  .tile.q3 .tile-icon{background:var(--blue-bg);color:var(--blue);}
+  .tile.q1 .tile-icon{background:var(--orange-bg);color:var(--orange);}
+  .tile .priority-badge{display:inline-block;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:20px;margin-bottom:10px;letter-spacing:.02em;}
+  .tile.q3 .priority-badge{background:var(--blue-bg);color:var(--blue);}
+  .tile.q1 .priority-badge{background:var(--orange-bg);color:var(--orange);}
+  .tile p.desc{font-size:13px;color:var(--body-c);margin-bottom:16px;}
+  .tile .src{font-size:11.5px;color:var(--muted);margin-top:10px;border-top:1px dashed var(--line);padding-top:10px;}
+  /* Card / list */
+  .card{border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:16px;}
+  .card-head{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;}
+  .card-body{padding:18px;}
+  table.list{width:100%;border-collapse:collapse;}
+  table.list th{text-align:left;font-family:var(--font-h);font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);font-weight:600;padding:10px 16px;border-bottom:1px solid var(--line);}
+  table.list td{padding:12px 16px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:middle;}
+  table.list tr.rowlink{cursor:pointer;}
+  table.list tr.rowlink:hover{background:var(--surface-alt);}
+  .badge{display:inline-block;font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:20px;letter-spacing:.02em;}
+  .badge.q3{background:var(--blue-bg);color:var(--blue);}
+  .badge.q1{background:var(--orange-bg);color:var(--orange);}
+  .badge.status-open{background:#FFF4E5;color:#B25E00;}
+  .badge.status-progress{background:var(--red-100);color:var(--red);}
+  .badge.status-done{background:var(--success-bg);color:var(--success-text);}
+  .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;background:var(--surface-alt);border:1px solid var(--line);color:var(--body-c);}
+  /* Defect / complaint detail */
+  .kv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 20px;margin-bottom:6px;}
+  .kv-grid .kv label{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin-bottom:3px;font-family:var(--font-h);font-weight:600;}
+  .kv-grid .kv div{font-size:13.5px;color:var(--ink);font-weight:500;}
+  .attach-row{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;}
+  .attach-chip{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:12px;background:var(--surface-alt);}
+  .attach-chip .ext{font-family:var(--font-h);font-weight:700;font-size:10px;color:#fff;background:#607080;border-radius:4px;padding:2px 5px;}
+  .attach-chip .ext.pdf{background:#c0392b;} .attach-chip .ext.zip{background:#8e6fce;} .attach-chip .ext.xls{background:#1e8e5a;} .attach-chip .ext.img{background:#0a6ed1;}
+  .ai-parsed{background:var(--red-50);border:1px solid var(--red-200);border-radius:8px;padding:12px 14px;font-size:12.5px;color:var(--body-c);margin:14px 0;display:flex;gap:10px;align-items:flex-start;}
+  .ai-parsed .dot{width:8px;height:8px;border-radius:50%;background:var(--red);margin-top:5px;flex-shrink:0;}
+  /* Case workspace */
+  #case-shell{display:grid;grid-template-columns:230px 1fr 260px;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;}
+  #case-top{grid-column:1/-1;padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;background:var(--surface-alt);}
+  #case-top .cid{font-family:var(--font-h);font-weight:700;font-size:16px;}
+  #case-top .title{color:var(--muted);font-size:13px;}
+  #case-top .spacer{flex:1;}
+  .toggle-group{display:flex;border:1px solid #ccc;border-radius:6px;overflow:hidden;}
+  .toggle-group button{border:none;border-radius:0;padding:6px 12px;font-size:12px;background:#fff;color:var(--body-c);}
+  .toggle-group button.active{background:var(--ink);color:#fff;}
+  #stepper{border-right:1px solid var(--line);padding:16px 0;background:var(--surface-alt);}
+  #stepper .step{display:flex;align-items:center;gap:10px;padding:10px 18px;cursor:pointer;font-size:13px;color:var(--body-c);border-left:3px solid transparent;}
+  #stepper .step:hover{background:#F2F2F2;}
+  #stepper .step.active{border-left-color:var(--red);background:#fff;font-weight:600;color:var(--ink);}
+  #stepper .step .dot{width:20px;height:20px;border-radius:50%;background:#fff;border:1.5px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--muted);flex-shrink:0;}
+  #stepper .step.done .dot{background:var(--success);border-color:var(--success);color:#fff;}
+  #stepper .step.active .dot{border-color:var(--red);color:var(--red);}
+  #stepper .completeness{padding:14px 18px 4px;font-size:11px;color:var(--muted);}
+  .cbar-wrap{height:6px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:6px;}
+  .cbar{height:100%;background:var(--success);}
+  #step-body{padding:22px 26px;min-height:420px;}
+  #side-panel{border-left:1px solid var(--line);padding:16px 18px;background:var(--surface-alt);font-size:12.5px;}
+  #side-panel .panel-toggles{display:flex;gap:6px;margin-bottom:14px;}
+  #side-panel .panel-toggles button{flex:1;font-size:11px;padding:6px 4px;}
+  .audit-item{border-left:2px solid var(--line);padding:6px 0 6px 10px;margin-bottom:4px;font-size:11.5px;color:var(--body-c);}
+  .audit-item .t{color:var(--muted);font-size:10px;}
+  .sim-case{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:10px;background:#fff;}
+  .sim-case .score{float:right;font-family:var(--font-h);font-weight:700;color:var(--red);font-size:12px;}
+  .ai-block{background:var(--red-50);border:1px solid var(--red-200);border-radius:8px;padding:14px 16px;margin-bottom:16px;position:relative;}
+  .ai-block .ai-tag{position:absolute;top:-9px;left:14px;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;letter-spacing:.03em;}
+  .ai-block .accept-btn{margin-top:10px;}
+  .ai-block.accepted{background:var(--success-bg);border-color:#bfe3d4;}
+  .ai-block.accepted .ai-tag{background:var(--success);}
+  .field-row{display:grid;grid-template-columns:170px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;}
+  .field-row label{color:var(--muted);font-family:var(--font-h);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.02em;}
+  .ishikawa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0;}
+  .ish-card{border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:#fff;}
+  .ish-card.root{border-color:var(--red);background:var(--red-50);}
+  .ish-card h4{margin-bottom:6px;color:var(--ink);}
+  .ish-card .desc{font-size:12.5px;}
+  .ish-card .metric{display:inline-block;margin-top:8px;font-size:11px;background:var(--surface-alt);border:1px solid var(--line);border-radius:20px;padding:2px 9px;color:var(--body-c);}
+  .root-tag{display:inline-block;font-size:10px;font-weight:700;color:var(--red);letter-spacing:.02em;margin-top:6px;}
+  .why-chain{margin:14px 0;}
+  .why-step{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);}
+  .why-step .n{width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+  .why-step.root .n{background:var(--red);}
+  .why-step .q{font-weight:600;color:var(--ink);font-size:13px;}
+  .why-step .a{font-size:12.5px;margin-top:2px;}
+  .why-step .cite{font-size:11px;color:var(--muted);margin-top:3px;font-style:italic;}
+  .action-card{border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+  .action-card .txt{font-size:13px;}
+  .action-card .type{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin-bottom:3px;}
+  .isisnot-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
+  .isisnot-box{border-radius:8px;padding:14px;}
+  .isisnot-box.is{background:var(--success-bg);border:1px solid #bfe3d4;}
+  .isisnot-box.isnot{background:#F5F5F5;border:1px solid var(--line);}
+  .w2h-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:14px 0;}
+  .w2h-cell{background:var(--surface-alt,#FAFAFA);border:1px solid var(--line);border-radius:8px;padding:10px 12px;}
+  .w2h-cell .w2h-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin-bottom:4px;}
+  .w2h-cell .w2h-val{font-size:13px;color:var(--ink);}
+  .w2h-cell .w2h-val.muted{color:var(--muted);font-style:italic;}
+  .cf-banner{background:var(--orange-bg);border:1px solid #f4d2a8;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12.5px;}
+  .cf-banner b{color:#B25E00;}
+  .gate-msg{background:#FFF4E5;border:1px solid #f4d2a8;border-radius:8px;padding:12px 16px;font-size:12.5px;color:#7a4a00;margin-top:14px;}
+  .gate-msg.ok{background:var(--success-bg);border-color:#bfe3d4;color:var(--success-text);}
+  .footnote{font-size:11px;color:var(--muted);margin-top:24px;border-top:1px solid var(--line);padding-top:12px;}
+  /* Step status + Complete button */
+  .step-head-bar{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-bottom:10px;}
+  .step-status-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:.02em;}
+  .step-status-badge.notstarted{background:#F0F0F0;color:#666;}
+  .step-status-badge.inprocess{background:var(--blue-bg);color:var(--blue);}
+  .step-status-badge.complete{background:var(--success-bg);color:var(--success-text);}
+  .ai-hint{font-size:11px;color:var(--success-text);font-style:italic;}
+  #stepper .step .status-txt{font-size:10px;color:var(--muted);display:block;margin-top:1px;}
+  #stepper .step .dot.notstarted{background:#fff;border-color:#ccc;color:#ccc;}
+  #stepper .step .dot.inprocess{background:var(--blue-bg);border-color:var(--blue);color:var(--blue);}
+  #stepper .step .dot.complete{background:var(--success);border-color:var(--success);color:#fff;}
+  /* D1 tabs + team table */
+  .d1-tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin:14px 0 16px;}
+  .d1-tabs .tabbtn{background:transparent;border:none;border-bottom:2px solid transparent;padding:8px 4px;margin-right:22px;font-size:13px;color:var(--muted);border-radius:0;}
+  .d1-tabs .tabbtn.active{color:var(--ink);border-bottom-color:var(--red);font-weight:600;}
+  .team-table-wrap{border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:#fff;}
+  .team-table{width:100%;border-collapse:collapse;}
+  .team-table th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.02em;color:var(--muted);font-family:var(--font-h);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line);}
+  .team-table td{padding:8px 10px;border-bottom:1px solid var(--line);font-size:12.5px;vertical-align:middle;}
+  .team-table select{font-family:var(--font-b);font-size:12.5px;padding:5px 6px;border:1px solid #ccc;border-radius:5px;background:#fff;max-width:190px;}
+  .avatar-sm{width:28px;height:28px;border-radius:7px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;}
+</style>
+</head>
+<body>
+
+<div id="shell">
+  <div class="logo" onclick="goto_('launcher')">8D <span>Copilot</span></div>
+  <nav>
+    <button data-nav="launcher">Launcher</button>
+    <button data-nav="worklist">8D Worklist</button>
+  </nav>
+  <div class="user"><div class="avatar">QL</div> Quyen La · Quality Engineer</div>
+</div>
+
+<div id="view-root"></div>
+
+<script>
+const DATA = {
+  "materials": [
+    {
+      "Material ID (PK)": "MAT-10234",
+      "Description": "Bracket Housing X200"
+    },
+    {
+      "Material ID (PK)": "MAT-10233",
+      "Description": "Bracket Housing X180"
+    },
+    {
+      "Material ID (PK)": "MAT-GAL-4471L",
+      "Description": "Front-axle bracket 4471-L"
+    }
+  ],
+  "batches": [
+    {
+      "Batch ID (PK)": "B-48213",
+      "Material ID (FK)": "MAT-10234"
+    },
+    {
+      "Batch ID (PK)": "B-48109",
+      "Material ID (FK)": "MAT-10234"
+    },
+    {
+      "Batch ID (PK)": "B-48260",
+      "Material ID (FK)": "MAT-10233"
+    },
+    {
+      "Batch ID (PK)": "B-2605",
+      "Material ID (FK)": "MAT-GAL-4471L"
+    }
+  ],
+  "defects": [
+    {
+      "Defect Code (PK)": "DEF-0451",
+      "Defect Text": "Hairline crack near mounting hole"
+    },
+    {
+      "Defect Code (PK)": "DEF-0473",
+      "Defect Text": "Mounting-hole diameter out of tolerance"
+    },
+    {
+      "Defect Code (PK)": "DEF-0512",
+      "Defect Text": "Surface scratch on housing"
+    },
+    {
+      "Defect Code (PK)": "DEF-BOLT-01",
+      "Defect Text": "Bolt-hole position misalignment"
+    }
+  ],
+  "workcenters": [
+    {
+      "Work Center ID (PK)": "WC-PRESS-12",
+      "Description": "Forming Press Line 2"
+    },
+    {
+      "Work Center ID (PK)": "WC-ASSY-04",
+      "Description": "Manual Assembly Cell 4"
+    },
+    {
+      "Work Center ID (PK)": "WC-OP40",
+      "Description": "Assembly Station 12 - Fixture #2"
+    }
+  ],
+  "notifications": [
+    {
+      "Notification ID (PK)": "8D-10048291",
+      "Material ID (FK)": "MAT-10234",
+      "Batch ID (FK)": "B-48213",
+      "Defect Code (FK)": "DEF-0451",
+      "Work Center ID (FK)": "WC-PRESS-12",
+      "Symptom / Short Text": "Hairline crack near mounting hole",
+      "Team Size": 4,
+      "Origin (Q3 Internal / Q1 Customer)": "Q3 - Internal Defect",
+      "Customer-Facing Summary": null,
+      "Internal-Facing Summary": null,
+      "Status": "Completed",
+      "Completion Date": "2026-08-20",
+      "Found Date": "2026-08-05",
+      "Quantity / Extent": "340 units affected"
+    },
+    {
+      "Notification ID (PK)": "8D-10047950",
+      "Material ID (FK)": "MAT-10234",
+      "Batch ID (FK)": "B-48109",
+      "Defect Code (FK)": "DEF-0473",
+      "Work Center ID (FK)": "WC-PRESS-12",
+      "Symptom / Short Text": "Mounting-hole diameter out of tolerance",
+      "Team Size": 4,
+      "Origin (Q3 Internal / Q1 Customer)": "Q3 - Internal Defect",
+      "Customer-Facing Summary": null,
+      "Internal-Facing Summary": null,
+      "Status": "In Process",
+      "Completion Date": null,
+      "Found Date": "2026-08-09 (illustrative)",
+      "Quantity / Extent": "215 units affected (illustrative)"
+    },
+    {
+      "Notification ID (PK)": "8D-10048150",
+      "Material ID (FK)": "MAT-10233",
+      "Batch ID (FK)": "B-48260",
+      "Defect Code (FK)": "DEF-0512",
+      "Work Center ID (FK)": "WC-ASSY-04",
+      "Symptom / Short Text": "Surface scratch on housing",
+      "Team Size": 3,
+      "Origin (Q3 Internal / Q1 Customer)": "Q3 - Internal Defect",
+      "Customer-Facing Summary": null,
+      "Internal-Facing Summary": null,
+      "Status": "In Process",
+      "Completion Date": null,
+      "Found Date": "2026-07-28 (illustrative)",
+      "Quantity / Extent": "60 units affected (illustrative)"
+    },
+    {
+      "Notification ID (PK)": "8D-2612",
+      "Material ID (FK)": "MAT-GAL-4471L",
+      "Batch ID (FK)": "B-2605",
+      "Defect Code (FK)": "DEF-BOLT-01",
+      "Work Center ID (FK)": "WC-OP40",
+      "Symptom / Short Text": "Bolt-hole position out of alignment at customer assembly: 14 pcs, batch 2605",
+      "Team Size": "Not shown in Galileon's published walkthrough",
+      "Origin (Q3 Internal / Q1 Customer)": "Q1 - Customer Complaint",
+      "Customer-Facing Summary": "Line stop, station 12 - 8D in 24h",
+      "Internal-Facing Summary": "OP 40 - fixture #2 - SPC trend rising since wk 22",
+      "Status": "Closed",
+      "Completion Date": "Not shown",
+      "Found Date": "Since 12 May",
+      "Quantity / Extent": "14 pcs / 2 batches"
+    }
+  ],
+  "inspections": [
+    {
+      "Notification ID (FK)": "8D-10048291",
+      "Characteristic": "Mounting-hole chamfer",
+      "Measured Value": "0.20mm",
+      "Spec Value": "0.50mm +/-0"
+    },
+    {
+      "Notification ID (FK)": "8D-10047950",
+      "Characteristic": "Hole diameter",
+      "Measured Value": "8.65mm",
+      "Spec Value": "8.50mm +/-0.10mm"
+    },
+    {
+      "Notification ID (FK)": "8D-10048150",
+      "Characteristic": "N/A - visual defect",
+      "Measured Value": "N/A",
+      "Spec Value": "N/A"
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "Characteristic": "Hole position",
+      "Measured Value": "0.18mm",
+      "Spec Value": "0.20mm tol"
+    }
+  ],
+  "causes": [
+    {
+      "Notification ID (FK)": "8D-10048291",
+      "Category": "Man",
+      "Description": "EMP-2291, Shift A",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "N",
+      "Source": "ASSUMED: MES/HR"
+    },
+    {
+      "Notification ID (FK)": "8D-10048291",
+      "Category": "Machine",
+      "Description": "EQ-PRESS12-004, last maint 2026-06-15",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "Y",
+      "Source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "Notification ID (FK)": "8D-10048291",
+      "Category": "Method",
+      "Description": "DOC-4471 Rev C - Press-fit assembly work instruction",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "N",
+      "Source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "Notification ID (FK)": "8D-10048291",
+      "Category": "Material",
+      "Description": "Batch cert PASS",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "N",
+      "Source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "Notification ID (FK)": "8D-10048291",
+      "Category": "Measurement",
+      "Description": "GA-0012, last cal 2026-05-01",
+      "Metric Value (if applicable)": "3.1% (illustrative)",
+      "Is Root Cause?": "N",
+      "Source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "Notification ID (FK)": "8D-10048291",
+      "Category": "Environment",
+      "Description": "21.4C at 08:15 (illustrative)",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "N",
+      "Source": "ASSUMED: MES/IoT"
+    },
+    {
+      "Notification ID (FK)": "8D-10047950",
+      "Category": "Man",
+      "Description": "EMP-2305, Shift B",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "N",
+      "Source": "ASSUMED: MES/HR"
+    },
+    {
+      "Notification ID (FK)": "8D-10047950",
+      "Category": "Machine",
+      "Description": "EQ-PRESS12-004, stroke-limit valve worn",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "Y",
+      "Source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "Notification ID (FK)": "8D-10047950",
+      "Category": "Method",
+      "Description": "DOC-4471 Rev C - unchanged",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "N",
+      "Source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "Notification ID (FK)": "8D-10047950",
+      "Category": "Material",
+      "Description": "Batch cert PASS",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "N",
+      "Source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "Notification ID (FK)": "8D-10047950",
+      "Category": "Measurement",
+      "Description": "GA-0031, last cal 2026-04-12",
+      "Metric Value (if applicable)": "2.8% (illustrative)",
+      "Is Root Cause?": "N",
+      "Source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "Notification ID (FK)": "8D-10047950",
+      "Category": "Environment",
+      "Description": "22.1C at 14:00 (illustrative)",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "N",
+      "Source": "ASSUMED: MES/IoT"
+    },
+    {
+      "Notification ID (FK)": "8D-10048150",
+      "Category": "Man",
+      "Description": "EMP-2118, Shift A",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "N",
+      "Source": "ASSUMED: MES/HR"
+    },
+    {
+      "Notification ID (FK)": "8D-10048150",
+      "Category": "Machine",
+      "Description": "EQ-ASSY04-011, guide rail liner missing",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "Y",
+      "Source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "Notification ID (FK)": "8D-10048150",
+      "Category": "Method",
+      "Description": "DOC-4502 Rev A - transfer handling instruction",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "N",
+      "Source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "Notification ID (FK)": "8D-10048150",
+      "Category": "Material",
+      "Description": "Batch cert PASS",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "N",
+      "Source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "Notification ID (FK)": "8D-10048150",
+      "Category": "Measurement",
+      "Description": "N/A - visual defect, no gauge used",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "N",
+      "Source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "Notification ID (FK)": "8D-10048150",
+      "Category": "Environment",
+      "Description": "20.8C at 10:30 (illustrative)",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "N",
+      "Source": "ASSUMED: MES/IoT"
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "Category": "Man",
+      "Description": "Shift-independent (ruled out)",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "N",
+      "Source": "Galileon real (confirmed)"
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "Category": "Machine",
+      "Description": "Fixture #2 clamp pad worn 0.2mm (root cause)",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "Y",
+      "Source": "Galileon real (confirmed)"
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "Category": "Method",
+      "Description": "Offset procedure OK (ruled out)",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "N",
+      "Source": "Galileon real (confirmed)"
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "Category": "Material",
+      "Description": "New blank batch checked, ruled out",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "N",
+      "Source": "Galileon real (confirmed)"
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "Category": "Measurement",
+      "Description": "Gauge R&R 8% - cleared, ruled out",
+      "Metric Value (if applicable)": "8%",
+      "Is Root Cause?": "N",
+      "Source": "Galileon real (confirmed)"
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "Category": "Environment",
+      "Description": "Temp stable (ruled out)",
+      "Metric Value (if applicable)": null,
+      "Is Root Cause?": "N",
+      "Source": "Galileon real (confirmed)"
+    }
+  ],
+  "actions": [
+    {
+      "Notification ID (FK)": "8D-10048291",
+      "Action Type": "Containment",
+      "Action Text": "Quarantine remaining stock from batch B-48213 pending root-cause confirmation",
+      "Status": "Done"
+    },
+    {
+      "Notification ID (FK)": "8D-10048291",
+      "Action Type": "Corrective",
+      "Action Text": "Replace worn forming die",
+      "Status": "Verified"
+    },
+    {
+      "Notification ID (FK)": "8D-10048291",
+      "Action Type": "Preventive",
+      "Action Text": "Shorten die-wear inspection interval from 5,000 to 2,000 cycles",
+      "Status": "Verified"
+    },
+    {
+      "Notification ID (FK)": "8D-10047950",
+      "Action Type": "Containment",
+      "Action Text": "Quarantine remaining stock from batch B-48109 pending confirmation",
+      "Status": "Done"
+    },
+    {
+      "Notification ID (FK)": "8D-10047950",
+      "Action Type": "Corrective",
+      "Action Text": "Replace hydraulic stroke-limit valve",
+      "Status": "Done"
+    },
+    {
+      "Notification ID (FK)": "8D-10047950",
+      "Action Type": "Preventive",
+      "Action Text": "Add in-process stroke-length check",
+      "Status": "Done"
+    },
+    {
+      "Notification ID (FK)": "8D-10048150",
+      "Action Type": "Containment",
+      "Action Text": "100% visual inspection of remaining stock from batch B-48260",
+      "Status": "Planned"
+    },
+    {
+      "Notification ID (FK)": "8D-10048150",
+      "Action Type": "Corrective",
+      "Action Text": "Re-install protective liner on conveyor guide rail at WC-ASSY-04",
+      "Status": "Planned"
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "Action Type": "Containment",
+      "Action Text": "100% CMM check, batches 2605-2612 - sorting at customer",
+      "Status": "Done"
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "Action Type": "Corrective",
+      "Action Text": "Replace clamp pads",
+      "Status": "Verified in production"
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "Action Type": "Preventive",
+      "Action Text": "Add pad-wear check to PM plan @ 10k cycles; re-run stack-up calc (RSS + wear allowance); hardened datum pads",
+      "Status": "Verified in production"
+    }
+  ],
+  "fmea": [
+    {
+      "Notification ID (FK)": "8D-10048291",
+      "FMEA ID": "FMEA-PRESS12-07",
+      "Description": "Forming die wear"
+    },
+    {
+      "Notification ID (FK)": "8D-10047950",
+      "FMEA ID": "FMEA-PRESS12-07",
+      "Description": "Shared failure mode"
+    },
+    {
+      "Notification ID (FK)": "8D-10048150",
+      "FMEA ID": null,
+      "Description": "Not yet linked"
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "FMEA ID": null,
+      "Description": "Not shown in Galileon's published case walkthrough"
+    }
+  ],
+  "cost": [
+    {
+      "Notification ID (FK)": "8D-10048291",
+      "Cost of Poor Quality (EUR)": 18400
+    },
+    {
+      "Notification ID (FK)": "8D-10047950",
+      "Cost of Poor Quality (EUR)": 9200
+    },
+    {
+      "Notification ID (FK)": "8D-10048150",
+      "Cost of Poor Quality (EUR)": 0
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "Cost of Poor Quality (EUR)": "N/A - Galileon shows aggregate stat only (down 2-5% Lower CoPQ), not per-case"
+    }
+  ],
+  "lessons": [
+    {
+      "Notification ID (FK)": "8D-10048291",
+      "What Worked": "Precedent case reuse shortened PM interval",
+      "What Didn't": "Relying on inspection alone without a die-wear trigger"
+    },
+    {
+      "Notification ID (FK)": "8D-10047950",
+      "What Worked": "Fast containment via 100% gauge check",
+      "What Didn't": "No trend monitoring caught the drift before it became out-of-spec"
+    },
+    {
+      "Notification ID (FK)": "8D-10048150",
+      "What Worked": "Quick visual root-cause isolation to one work center",
+      "What Didn't": "A removed liner wasn't flagged because it wasn't on the spare-parts checklist"
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "What Worked": "PM wear check, knowledge-base reuse",
+      "What Didn't": "Visual fixture inspection alone"
+    }
+  ],
+  "isisnot": [
+    {
+      "Notification ID (FK)": "8D-10048291",
+      "IS (where/when it happens)": "Not yet analyzed for this case",
+      "IS NOT (where/when it doesn't)": "Not yet analyzed for this case",
+      "Notes": "Original case draft didn't run a full Is/Is-Not - add if doing full RCA on this case"
+    },
+    {
+      "Notification ID (FK)": "8D-10047950",
+      "IS (where/when it happens)": "Not yet analyzed for this case",
+      "IS NOT (where/when it doesn't)": "Not yet analyzed for this case",
+      "Notes": "Original case draft didn't run a full Is/Is-Not - add if doing full RCA on this case"
+    },
+    {
+      "Notification ID (FK)": "8D-10048150",
+      "IS (where/when it happens)": "Not yet analyzed for this case",
+      "IS NOT (where/when it doesn't)": "Not yet analyzed for this case",
+      "Notes": "Original case draft didn't run a full Is/Is-Not - add if doing full RCA on this case"
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "IS (where/when it happens)": "LH variant - fixture #2 - after 12 May",
+      "IS NOT (where/when it doesn't)": "RH variant - fixture #1 - hole diameter",
+      "Notes": "Real example from galileon.si case walkthrough 8D-2612"
+    }
+  ],
+  "fivewhy": [
+    {
+      "Notification ID (FK)": "8D-10048291",
+      "Step #": 1,
+      "Question": "Why crack near mounting hole?",
+      "Answer": "Mounting-hole chamfer measured 0.20mm vs 0.50mm spec (undersized)",
+      "Evidence Citation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "Notification ID (FK)": "8D-10048291",
+      "Step #": 2,
+      "Question": "Why was the chamfer undersized? (root cause)",
+      "Answer": "Unmonitored forming-die wear on WC-PRESS-12 consumed the tolerance margin",
+      "Evidence Citation": "Equipment maintenance log EQ-PRESS12-004"
+    },
+    {
+      "Notification ID (FK)": "8D-10047950",
+      "Step #": 1,
+      "Question": "Why was the hole diameter out of tolerance?",
+      "Answer": "Press stroke length drifted below spec (8.65mm vs 8.50mm +/-0.10mm)",
+      "Evidence Citation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "Notification ID (FK)": "8D-10047950",
+      "Step #": 2,
+      "Question": "Why did the press stroke drift? (root cause)",
+      "Answer": "Stroke-limit valve worn on EQ-PRESS12-004",
+      "Evidence Citation": "Equipment maintenance log"
+    },
+    {
+      "Notification ID (FK)": "8D-10048150",
+      "Step #": 1,
+      "Question": "Why the surface scratch on housing?",
+      "Answer": "Parts contacted the conveyor guide rail during transfer",
+      "Evidence Citation": "Visual inspection"
+    },
+    {
+      "Notification ID (FK)": "8D-10048150",
+      "Step #": 2,
+      "Question": "Why did contact occur? (root cause)",
+      "Answer": "Guide rail liner missing at WC-ASSY-04 (EQ-ASSY04-011)",
+      "Evidence Citation": "Equipment inspection"
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "Step #": 1,
+      "Question": "Why misalignment?",
+      "Answer": "Position near limit meets mating part at limit",
+      "Evidence Citation": null
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "Step #": 2,
+      "Question": "Why position drift?",
+      "Answer": "Part datum shifted in fixture #2",
+      "Evidence Citation": null
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "Step #": 3,
+      "Question": "Why datum shift? (root cause)",
+      "Answer": "Clamp pad worn 0.2mm",
+      "Evidence Citation": "PDF maintenance log"
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "Step #": 4,
+      "Question": "Why unnoticed?",
+      "Answer": "No pad-wear check in PM plan",
+      "Evidence Citation": null
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "Step #": 5,
+      "Question": "Why critical?",
+      "Answer": "Stack margin 0.06mm, no wear allowance",
+      "Evidence Citation": "PDF stack-up calc"
+    }
+  ],
+  "customerref": [
+    {
+      "Notification ID (FK)": "8D-10048291",
+      "Complaint Reference": "N/A - internal defect, no customer reference",
+      "Customer Plant / Contact": "N/A",
+      "SLA Response Due": "N/A"
+    },
+    {
+      "Notification ID (FK)": "8D-10047950",
+      "Complaint Reference": "N/A - internal defect, no customer reference",
+      "Customer Plant / Contact": "N/A",
+      "SLA Response Due": "N/A"
+    },
+    {
+      "Notification ID (FK)": "8D-10048150",
+      "Complaint Reference": "N/A - internal defect, no customer reference",
+      "Customer Plant / Contact": "N/A",
+      "SLA Response Due": "N/A"
+    },
+    {
+      "Notification ID (FK)": "8D-2612",
+      "Complaint Reference": "8D-2612 (customer email thread)",
+      "Customer Plant / Contact": "QA - Customer plant Graz",
+      "SLA Response Due": "8D requested within 24h"
+    }
+  ],
+  "teamhistory": [
+    {"Notification ID (FK)": "8D-10048291", "Partner ID (FK)": "BP-100001", "Partner Name": "Heli Weber",  "Function / Title": "Quality Engineer",     "Partner Role": "8D Team Leader", "Source": "Backfilled from case record"},
+    {"Notification ID (FK)": "8D-10048291", "Partner ID (FK)": "BP-100012", "Partner Name": "Minh Dinh",   "Function / Title": "Production Engineer",  "Partner Role": "8D Team Member", "Source": "Backfilled from case record"},
+    {"Notification ID (FK)": "8D-10048291", "Partner ID (FK)": "BP-100013", "Partner Name": "Dung Truong", "Function / Title": "Warehouse Clerk",      "Partner Role": "8D Team Member", "Source": "Backfilled from case record"},
+    {"Notification ID (FK)": "8D-10048291", "Partner ID (FK)": "BP-100014", "Partner Name": "Thien Tu",    "Function / Title": "Production Worker",    "Partner Role": "8D Team Member", "Source": "Backfilled from case record"},
+
+    {"Notification ID (FK)": "8D-10047950", "Partner ID (FK)": "BP-100012", "Partner Name": "Minh Dinh",   "Function / Title": "Production Engineer",  "Partner Role": "8D Team Leader", "Source": "Backfilled from case record"},
+    {"Notification ID (FK)": "8D-10047950", "Partner ID (FK)": "BP-100001", "Partner Name": "Heli Weber",  "Function / Title": "Quality Engineer",     "Partner Role": "8D Team Member", "Source": "Backfilled from case record"},
+    {"Notification ID (FK)": "8D-10047950", "Partner ID (FK)": "BP-100013", "Partner Name": "Dung Truong", "Function / Title": "Warehouse Clerk",      "Partner Role": "8D Team Member", "Source": "Backfilled from case record"},
+    {"Notification ID (FK)": "8D-10047950", "Partner ID (FK)": "BP-100014", "Partner Name": "Thien Tu",    "Function / Title": "Production Worker",    "Partner Role": "8D Team Member", "Source": "Backfilled from case record"},
+
+    {"Notification ID (FK)": "8D-10048150", "Partner ID (FK)": "BP-100001", "Partner Name": "Heli Weber",  "Function / Title": "Quality Engineer",     "Partner Role": "8D Team Leader", "Source": "Backfilled from case record"},
+    {"Notification ID (FK)": "8D-10048150", "Partner ID (FK)": "BP-100014", "Partner Name": "Thien Tu",    "Function / Title": "Production Worker",    "Partner Role": "8D Team Member", "Source": "Backfilled from case record"},
+    {"Notification ID (FK)": "8D-10048150", "Partner ID (FK)": "BP-100013", "Partner Name": "Dung Truong", "Function / Title": "Warehouse Clerk",      "Partner Role": "8D Team Member", "Source": "Backfilled from case record"},
+
+    {"Notification ID (FK)": "8D-2612", "Partner ID (FK)": "BP-100001", "Partner Name": "Heli Weber", "Function / Title": "Quality Engineer",     "Partner Role": "8D Team Leader", "Source": "ASSUMED - not published in Galileon's case walkthrough"},
+    {"Notification ID (FK)": "8D-2612", "Partner ID (FK)": "BP-100002", "Partner Name": "Brian Cole", "Function / Title": "Sales Representative", "Partner Role": "8D Team Member", "Source": "ASSUMED - not published in Galileon's case walkthrough"},
+    {"Notification ID (FK)": "8D-2612", "Partner ID (FK)": "BP-100011", "Partner Name": "Quyen La",   "Function / Title": "Quality Technician",   "Partner Role": "8D Team Member", "Source": "ASSUMED - not published in Galileon's case walkthrough"}
+  ],
+  /* GD 17 - Historical Inspection Lots: raw per-lot records (real QALS/QAMR-style fields), the
+     POPULATION an Is/Is-Not comparison needs -- not the same as a GD16-style aggregated summary.
+     Illustrative except the 8D-2612 rows, which are built to reproduce Galileon's real published
+     Is/Is-Not answer ("LH variant - fixture #2 - after 12 May" vs "RH variant - fixture #1"). */
+  "historicallots": [
+    {"Inspection Lot ID (PK)": "INS-90101", "Material ID (FK)": "MAT-10234", "Characteristic": "Mounting-hole chamfer", "Equipment / Fixture": "EQ-PRESS12-009", "Inspection Date": "2026-07-15 (illustrative)", "Measured Value": "0.49mm", "Conforming": "Y", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90102", "Material ID (FK)": "MAT-10234", "Characteristic": "Mounting-hole chamfer", "Equipment / Fixture": "EQ-PRESS12-004", "Inspection Date": "2026-07-15 (illustrative)", "Measured Value": "0.47mm", "Conforming": "Y", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90103", "Material ID (FK)": "MAT-10234", "Characteristic": "Mounting-hole chamfer", "Equipment / Fixture": "EQ-PRESS12-009", "Inspection Date": "2026-07-22 (illustrative)", "Measured Value": "0.50mm", "Conforming": "Y", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90104", "Material ID (FK)": "MAT-10234", "Characteristic": "Mounting-hole chamfer", "Equipment / Fixture": "EQ-PRESS12-004", "Inspection Date": "2026-07-22 (illustrative)", "Measured Value": "0.36mm", "Conforming": "N", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90105", "Material ID (FK)": "MAT-10234", "Characteristic": "Mounting-hole chamfer", "Equipment / Fixture": "EQ-PRESS12-009", "Inspection Date": "2026-07-29 (illustrative)", "Measured Value": "0.48mm", "Conforming": "Y", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90106", "Material ID (FK)": "MAT-10234", "Characteristic": "Mounting-hole chamfer", "Equipment / Fixture": "EQ-PRESS12-004", "Inspection Date": "2026-07-29 (illustrative)", "Measured Value": "0.24mm", "Conforming": "N", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90107", "Material ID (FK)": "MAT-10234", "Characteristic": "Mounting-hole chamfer", "Equipment / Fixture": "EQ-PRESS12-004", "Inspection Date": "2026-08-05", "Measured Value": "0.20mm", "Conforming": "N", "Related Notification ID (FK)": "8D-10048291"},
+
+    {"Inspection Lot ID (PK)": "INS-90201", "Material ID (FK)": "MAT-10234", "Characteristic": "Hole diameter", "Equipment / Fixture": "EQ-PRESS12-011", "Inspection Date": "2026-07-19 (illustrative)", "Measured Value": "8.52mm", "Conforming": "Y", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90202", "Material ID (FK)": "MAT-10234", "Characteristic": "Hole diameter", "Equipment / Fixture": "EQ-PRESS12-004", "Inspection Date": "2026-07-19 (illustrative)", "Measured Value": "8.54mm", "Conforming": "Y", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90203", "Material ID (FK)": "MAT-10234", "Characteristic": "Hole diameter", "Equipment / Fixture": "EQ-PRESS12-011", "Inspection Date": "2026-07-26 (illustrative)", "Measured Value": "8.49mm", "Conforming": "Y", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90204", "Material ID (FK)": "MAT-10234", "Characteristic": "Hole diameter", "Equipment / Fixture": "EQ-PRESS12-004", "Inspection Date": "2026-07-26 (illustrative)", "Measured Value": "8.63mm", "Conforming": "N", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90205", "Material ID (FK)": "MAT-10234", "Characteristic": "Hole diameter", "Equipment / Fixture": "EQ-PRESS12-011", "Inspection Date": "2026-08-02 (illustrative)", "Measured Value": "8.51mm", "Conforming": "Y", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90206", "Material ID (FK)": "MAT-10234", "Characteristic": "Hole diameter", "Equipment / Fixture": "EQ-PRESS12-004", "Inspection Date": "2026-08-02 (illustrative)", "Measured Value": "8.66mm", "Conforming": "N", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90207", "Material ID (FK)": "MAT-10234", "Characteristic": "Hole diameter", "Equipment / Fixture": "EQ-PRESS12-004", "Inspection Date": "2026-08-09 (illustrative)", "Measured Value": "8.65mm", "Conforming": "N", "Related Notification ID (FK)": "8D-10047950"},
+
+    {"Inspection Lot ID (PK)": "INS-90301", "Material ID (FK)": "MAT-GAL-4471L", "Characteristic": "Hole position", "Equipment / Fixture": "Fixture #1 (RH variant)", "Inspection Date": "2026-05-05 (illustrative)", "Measured Value": "0.19mm", "Conforming": "Y", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90302", "Material ID (FK)": "MAT-GAL-4471L", "Characteristic": "Hole position", "Equipment / Fixture": "Fixture #2 (LH variant)", "Inspection Date": "2026-05-05 (illustrative)", "Measured Value": "0.19mm", "Conforming": "Y", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90303", "Material ID (FK)": "MAT-GAL-4471L", "Characteristic": "Hole position", "Equipment / Fixture": "Fixture #1 (RH variant)", "Inspection Date": "2026-05-19 (illustrative)", "Measured Value": "0.18mm", "Conforming": "Y", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90304", "Material ID (FK)": "MAT-GAL-4471L", "Characteristic": "Hole position", "Equipment / Fixture": "Fixture #2 (LH variant)", "Inspection Date": "2026-05-19 (illustrative)", "Measured Value": "0.24mm", "Conforming": "Y", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90305", "Material ID (FK)": "MAT-GAL-4471L", "Characteristic": "Hole position", "Equipment / Fixture": "Fixture #1 (RH variant)", "Inspection Date": "2026-05-26 (illustrative)", "Measured Value": "0.19mm", "Conforming": "Y", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90306", "Material ID (FK)": "MAT-GAL-4471L", "Characteristic": "Hole position", "Equipment / Fixture": "Fixture #2 (LH variant)", "Inspection Date": "2026-05-26 (illustrative)", "Measured Value": "0.26mm", "Conforming": "N", "Related Notification ID (FK)": null},
+    {"Inspection Lot ID (PK)": "INS-90307", "Material ID (FK)": "MAT-GAL-4471L", "Characteristic": "Hole position", "Equipment / Fixture": "Fixture #2 (LH variant)", "Inspection Date": "Since 12 May", "Measured Value": "0.18mm", "Conforming": "Y", "Related Notification ID (FK)": "8D-2612"}
+  ]
+};
+
+/* ---------- lookups ---------- */
+const find = (arr,k,v)=>arr.find(r=>r[k]===v);
+const filterBy = (arr,k,v)=>arr.filter(r=>r[k]===v);
+const getNotif = id=>find(DATA.notifications,"Notification ID (PK)",id);
+const getMaterial = id=>find(DATA.materials,"Material ID (PK)",id);
+const getBatch = id=>find(DATA.batches,"Batch ID (PK)",id);
+const getDefect = id=>find(DATA.defects,"Defect Code (PK)",id);
+const getWC = id=>find(DATA.workcenters,"Work Center ID (PK)",id);
+const getInspections = id=>filterBy(DATA.inspections,"Notification ID (FK)",id);
+const getCauses = id=>filterBy(DATA.causes,"Notification ID (FK)",id);
+const getActions = (id,type)=>{const a=filterBy(DATA.actions,"Notification ID (FK)",id);return type?a.filter(x=>x["Action Type"]===type):a;};
+const getFmea = id=>find(DATA.fmea,"Notification ID (FK)",id);
+const getCost = id=>find(DATA.cost,"Notification ID (FK)",id);
+const getLessons = id=>find(DATA.lessons,"Notification ID (FK)",id);
+const getIsIsNot = id=>find(DATA.isisnot,"Notification ID (FK)",id);
+const getHistoricalLots = (matId,characteristic)=>DATA.historicallots.filter(r=>r["Material ID (FK)"]===matId && r["Characteristic"]===characteristic);
+const getFiveWhy = id=>filterBy(DATA.fivewhy,"Notification ID (FK)",id).sort((a,b)=>a["Step #"]-b["Step #"]);
+const getCustRef = id=>find(DATA.customerref,"Notification ID (FK)",id);
+const getTeamHistory = id=>filterBy(DATA.teamhistory,"Notification ID (FK)",id);
+const isQ1 = id=>getNotif(id)["Origin (Q3 Internal / Q1 Customer)"].startsWith("Q1");
+
+/* ---------- AI drafting (mirrors 8d_ai_backend.py draft_d2 logic) ---------- */
+function draftD2(id){
+  const n=getNotif(id), mat=getMaterial(n["Material ID (FK)"]), batch=getBatch(n["Batch ID (FK)"]),
+        def=getDefect(n["Defect Code (FK)"]), wc=getWC(n["Work Center ID (FK)"]), insp=getInspections(id);
+  let text="";
+  if(!isQ1(id)){
+    text = `${mat["Description"]} (${mat["Material ID (PK)"]}), Batch ${batch["Batch ID (PK)"]}, was found with ${def["Defect Text"].toLowerCase()} during in-process inspection at ${wc["Description"]} (${wc["Work Center ID (PK)"]}).`;
+    insp.forEach(i=>{ if(i["Characteristic"]!=="N/A - visual defect"){
+      text += ` Inspection characteristic '${i["Characteristic"]}' measured ${i["Measured Value"]} against a specification of ${i["Spec Value"]}.`; }});
+    text += ` Logged under notification ${id}, created from the Record Defects app (production order + material attached). Remaining stock from the batch has been quarantined pending root-cause confirmation.`;
+  } else {
+    const cref=getCustRef(id);
+    text = `${n["Symptom / Short Text"]}. Reported by ${cref["Customer Plant / Contact"]}, reference ${cref["Complaint Reference"]}. Response SLA: ${cref["SLA Response Due"]}. Material ${mat["Description"]} (${mat["Material ID (PK)"]}), Batch ${batch["Batch ID (PK)"]}, produced at ${wc["Description"]}.`;
+    insp.forEach(i=>{ text += ` Inspection characteristic '${i["Characteristic"]}' measured ${i["Measured Value"]} against a specification of ${i["Spec Value"]}.`; });
+  }
+  return text;
+}
+/* ---------- 5W2H grid (structured view of the same D2 facts, Galileon/Praxie-style) ----------
+   Deliberately reuses the exact same source fields as draftD2 above -- this is a second
+   presentation of the same case facts, not a second data source. */
+function draft5W2H(id){
+  const n=getNotif(id), def=getDefect(n["Defect Code (FK)"]), wc=getWC(n["Work Center ID (FK)"]),
+        insp=getInspections(id), q1=isQ1(id);
+  const primaryInsp = insp.find(i=>i["Characteristic"]!=="N/A - visual defect");
+  const what = primaryInsp
+    ? `${def["Defect Text"]} — ${primaryInsp["Characteristic"]}: ${primaryInsp["Measured Value"]} vs spec ${primaryInsp["Spec Value"]}`
+    : def["Defect Text"];
+  const where = `${wc["Description"]} (${wc["Work Center ID (PK)"]})`;
+  const when = n["Found Date"] || null;
+  const who = q1 ? (getCustRef(id)["Customer Plant / Contact"] || "Found at customer") : null;
+  const how = q1 ? "Reported via customer complaint" : "Found during in-process inspection";
+  const howMany = n["Quantity / Extent"] || null;
+  return {what, where, when, who, how, howMany};
+}
+function render5W2HGrid(id){
+  const g = draft5W2H(id);
+  const cell = (label, val) => `<div class="w2h-cell"><div class="w2h-label">${label}</div><div class="w2h-val${val?'':' muted'}">${val || 'Not tracked in current dataset'}</div></div>`;
+  return `<div class="w2h-grid">
+    ${cell("What", g.what)}
+    ${cell("Where", g.where)}
+    ${cell("When", g.when)}
+    ${cell("Who", g.who)}
+    ${cell("How", g.how)}
+    ${cell("How Many", g.howMany)}
+  </div>`;
+}
+function draftD4(id){
+  const causes=getCauses(id), root=causes.find(c=>c["Is Root Cause?"]==="Y");
+  const why=getFiveWhy(id);
+  if(!root) return {text:"No root cause confirmed yet.", cite:""};
+  // Prefer the why-step explicitly marked as the root cause (not just the last question asked —
+  // later steps can be follow-on severity/detection questions, e.g. 8D-2612's steps 4-5).
+  const rootWhy = why.find(w=>/\(root cause\)/i.test(w["Question"])) || why[why.length-1];
+  return { text: rootWhy ? rootWhy["Answer"] : root["Description"],
+           cite: rootWhy && rootWhy["Evidence Citation"] ? rootWhy["Evidence Citation"] : root["Source"] };
+}
+
+/* ---------- Is/Is-Not comparison (reads GD 17's raw lot population, NOT a GD16-style summary --
+   a summary alone can't tell you WHICH fixture/variant is the problem, only the overall limits) ---------- */
+function analyzeIsIsNot(id){
+  const n = getNotif(id);
+  const insp = getInspections(id).find(i=>i["Characteristic"]!=="N/A - visual defect");
+  if(!insp) return {status:"not_applicable"};
+  const lots = getHistoricalLots(n["Material ID (FK)"], insp["Characteristic"]);
+  if(lots.length===0) return {status:"not_applicable"};
+
+  const groups = {};
+  lots.forEach(l=>{
+    const key = l["Equipment / Fixture"];
+    if(!groups[key]) groups[key] = {equipment:key, total:0, nonconforming:0, lots:[]};
+    groups[key].total++;
+    if(l["Conforming"]==="N") groups[key].nonconforming++;
+    groups[key].lots.push(l["Inspection Lot ID (PK)"]);
+  });
+  const groupList = Object.values(groups).map(g=>({...g, rate: g.nonconforming/g.total}));
+  groupList.sort((a,b)=>b.rate-a.rate);
+
+  if(groupList.length<2) return {status:"no_contrast", groups:groupList};
+  const isGroup = groupList[0], isNotGroup = groupList[groupList.length-1];
+  if(isGroup.rate<=isNotGroup.rate) return {status:"no_contrast", groups:groupList};
+  return {status:"ok", is:isGroup, isNot:isNotGroup, characteristic:insp["Characteristic"], lotsUsed:lots.length};
+}
+function draftIsIsNotText(id){
+  const a = analyzeIsIsNot(id);
+  if(a.status!=="ok") return null;
+  const pct = g=>Math.round(g.rate*100);
+  return {
+    is: `${a.is.equipment} — ${a.is.nonconforming}/${a.is.total} lots nonconforming (${pct(a.is)}%) for ${a.characteristic}`,
+    isNot: `${a.isNot.equipment} — ${a.isNot.nonconforming}/${a.isNot.total} lots nonconforming (${pct(a.isNot)}%) for ${a.characteristic}`,
+    citation: `Based on ${a.lotsUsed} historical inspection lots (GD 17): ${a.is.lots.concat(a.isNot.lots).join(", ")}`
+  };
+}
+function acceptIsIsNot(id){
+  touchStep(id, STATE.step);
+  const draft = draftIsIsNotText(id);
+  if(!draft) return;
+  const rec = getIsIsNot(id);
+  rec["IS (where/when it happens)"] = draft.is;
+  rec["IS NOT (where/when it doesn't)"] = draft.isNot;
+  rec["Notes"] = draft.citation;
+  STATE.accepted["isisnot-"+id] = true;
+  addAudit(id,"You","Accepted AI-drafted Is/Is-Not comparison");
+  render();
+}
+
+/* ---------- RAG-lite precedent retrieval (same scoring shape as 8d_ai_backend.py) ---------- */
+function materialFamily(matId){ const m=getMaterial(matId); return m? m["Description"].split(" ").slice(0,-1).join(" ") : ""; }
+function retrieveSimilar(id, topN=3){
+  const n=getNotif(id);
+  const candidates = DATA.notifications.filter(c=>c["Notification ID (PK)"]!==id);
+  const scored = candidates.map(c=>{
+    let score=0;
+    if(c["Work Center ID (FK)"]===n["Work Center ID (FK)"]) score+=4;
+    if(c["Defect Code (FK)"]===n["Defect Code (FK)"]) score+=4;
+    if(c["Material ID (FK)"]===n["Material ID (FK)"]) score+=3;
+    else if(materialFamily(c["Material ID (FK)"])===materialFamily(n["Material ID (FK)"]) && materialFamily(n["Material ID (FK)"])!=="") score+=1;
+    return {c, score};
+  }).sort((a,b)=>b.score-a.score);
+  return scored.slice(0,topN);
+}
+
+/* ---------- D1 AI team suggestions (role + named person) ----------
+   Deliberately reuses retrieveSimilar() -- the SAME similarity engine as D4 --
+   rather than inventing a second definition of "similar". A precedent only
+   counts if it clears the same MIN_PRECEDENT_SCORE (3) used everywhere else.
+   Suggestions are aggregated from GD 15 (who actually served on those past
+   cases' teams), so "suggest a role" and "suggest a person" are one
+   mechanism, not two. */
+const MIN_PRECEDENT_SCORE = 3;
+function suggestTeamFromHistory(id, topN=3){
+  const similar = retrieveSimilar(id, topN).filter(s=>s.score>=MIN_PRECEDENT_SCORE);
+  const roleTally = {}, personTally = {};
+  similar.forEach(({c,score})=>{
+    const cid = c["Notification ID (PK)"];
+    getTeamHistory(cid).forEach(row=>{
+      const title = row["Function / Title"], bp = row["Partner ID (FK)"];
+      if(!roleTally[title]) roleTally[title] = {count:0, cases:new Set()};
+      roleTally[title].count++; roleTally[title].cases.add(cid);
+      if(!personTally[bp]) personTally[bp] = {count:0, cases:new Set(), title, name:row["Partner Name"]};
+      personTally[bp].count++; personTally[bp].cases.add(cid);
+    });
+  });
+  const roles = Object.entries(roleTally).sort((a,b)=>b[1].count-a[1].count)
+    .map(([title,v])=>({title, cases:[...v.cases]}));
+  const people = Object.entries(personTally).sort((a,b)=>b[1].count-a[1].count)
+    .map(([bp,v])=>({bp, name:v.name, title:v.title, count:v.count, cases:[...v.cases]}));
+  return {roles, people, basedOn: similar.map(s=>s.c["Notification ID (PK)"])};
+}
+function addSuggestedTeamMember(id, bp){
+  touchStep(id, STATE.step);
+  if(getTeam(id).some(r=>r.bp===bp)) return;
+  const p = bpLookup(bp);
+  const role = getTeam(id).length===0 ? "8D Team Leader" : "8D Team Member";
+  getTeam(id).push({bp, role});
+  addAudit(id,"You",`Added AI-suggested team member ${p?p.name+" ("+p.title+")":bp}`);
+  render();
+}
+function acceptAllSuggested(id){
+  touchStep(id, STATE.step);
+  const sugg = suggestTeamFromHistory(id);
+  let added = 0;
+  sugg.people.forEach(p=>{
+    if(getTeam(id).some(r=>r.bp===p.bp)) return; // already on the team, skip
+    const role = getTeam(id).length===0 ? "8D Team Leader" : "8D Team Member";
+    getTeam(id).push({bp:p.bp, role});
+    added++;
+  });
+  addAudit(id,"You",`Accepted all ${added} AI-suggested team member${added===1?'':'s'} at once — remove any you don't want from the table below`);
+  render();
+}
+
+/* ---------- completeness (8 D-steps) — now driven by explicit Step Status, not just data presence ---------- */
+function completeness(id){
+  let score=0;
+  for(let i=1;i<=8;i++) if(getStepStatus(id,i)==="Complete") score++;
+  return score;
+}
+
+/* ---------- SAP Business Partner directory (fake, for D1 team assignment) ---------- */
+const BP_DIRECTORY = [
+  {id:"BP-100001", name:"Heli Weber",  title:"Quality Engineer",       email:"heli.weber@conaspark-demo.com",  phone:"+49 711 400 1001"},
+  {id:"BP-100002", name:"Brian Cole",  title:"Sales Representative",   email:"brian.cole@conaspark-demo.com",  phone:"+49 711 400 1002"},
+  {id:"BP-100011", name:"Quyen La",    title:"Quality Technician",     email:"quyen.la@conaspark-demo.com",    phone:"+49 711 400 1011"},
+  {id:"BP-100012", name:"Minh Dinh",   title:"Production Engineer",    email:"minh.dinh@conaspark-demo.com",   phone:"+49 711 400 1012"},
+  {id:"BP-100013", name:"Dung Truong", title:"Warehouse Clerk",        email:"dung.truong@conaspark-demo.com", phone:"+49 711 400 1013"},
+  {id:"BP-100014", name:"Thien Tu",    title:"Production Worker",      email:"thien.tu@conaspark-demo.com",    phone:"+49 711 400 1014"},
+  {id:"BP-100015", name:"Phat Luu",    title:"Action Processor",       email:"phat.luu@conaspark-demo.com",    phone:"+49 711 400 1015"},
+];
+const bpLookup = id => BP_DIRECTORY.find(b=>b.id===id);
+
+/* ---------- step status (Not Started / In Process / Complete) — SAP's real per-step workflow ---------- */
+const STEP_STATUS = {};
+function computeDoneMap(id, n){
+  n = n || getNotif(id);
+  return {1: typeof n["Team Size"]==="number", 2: !!n["Symptom / Short Text"], 3: getActions(id,"Containment").length>0,
+    4: getCauses(id).some(x=>x["Is Root Cause?"]==="Y"), 5: getActions(id,"Corrective").length>0,
+    6: getActions(id,"Corrective").some(a=>isTerminal(a["Status"])),
+    7: getActions(id,"Preventive").length>0, 8: ["Completed","Closed"].includes(n["Status"])};
+}
+function seedStepStatus(id){
+  const doneMap = computeDoneMap(id);
+  const s = {};
+  for(let i=1;i<=8;i++) s[i] = doneMap[i] ? "Complete" : "Not Started";
+  return s;
+}
+function getStepStatus(id, stepNum){
+  if(!STEP_STATUS[id]) STEP_STATUS[id] = seedStepStatus(id);
+  return STEP_STATUS[id][stepNum];
+}
+function touchStep(id, stepNum){
+  if(!STEP_STATUS[id]) STEP_STATUS[id] = seedStepStatus(id);
+  if(STEP_STATUS[id][stepNum] === "Not Started") STEP_STATUS[id][stepNum] = "In Process";
+}
+function completeStep(id, stepNum){
+  if(!STEP_STATUS[id]) STEP_STATUS[id] = seedStepStatus(id);
+  STEP_STATUS[id][stepNum] = "Complete";
+  addAudit(id,"You",`Marked D${stepNum} as Complete`);
+  render();
+}
+function reopenStep(id, stepNum){
+  if(!STEP_STATUS[id]) STEP_STATUS[id] = seedStepStatus(id);
+  STEP_STATUS[id][stepNum] = "In Process";
+  addAudit(id,"You",`Reopened D${stepNum}`);
+  render();
+}
+
+/* ---------- D1 team table ---------- */
+const TEAM_ROWS = {};
+const D1_TAB = {};
+const COMMENTS = {};
+function seedTeam(id){
+  const n = getNotif(id), size = typeof n["Team Size"]==="number" ? n["Team Size"] : 2;
+  const pool = isQ1(id) ? ["BP-100001","BP-100002","BP-100011","BP-100015"] : ["BP-100001","BP-100012","BP-100013","BP-100014"];
+  return pool.slice(0, Math.max(2, Math.min(size, pool.length))).map((bp,i)=>({bp, role: i===0?"8D Team Leader":"8D Team Member"}));
+}
+function getTeam(id){ if(!TEAM_ROWS[id]) TEAM_ROWS[id] = seedTeam(id); return TEAM_ROWS[id]; }
+function setD1Tab(id, tab){ D1_TAB[id]=tab; render(); }
+function addTeamRow(id){
+  touchStep(id, STATE.step);
+  getTeam(id).push({bp:"", role:"8D Team Member"});
+  addAudit(id,"You","Added an empty team row — assign a Business Partner");
+  render();
+}
+function setTeamRowBP(id, idx, bp){
+  touchStep(id, STATE.step);
+  getTeam(id)[idx].bp = bp;
+  const p = bpLookup(bp);
+  addAudit(id,"You",`Assigned ${p?p.name+" ("+p.title+")":bp} to the 8D team`);
+  render();
+}
+function setTeamRowRole(id, idx, role){
+  touchStep(id, STATE.step);
+  getTeam(id)[idx].role = role;
+  addAudit(id,"You",`Set partner role to "${role}"`);
+  render();
+}
+function removeTeamRow(id, idx){
+  const p = bpLookup(getTeam(id)[idx].bp);
+  getTeam(id).splice(idx,1);
+  addAudit(id,"You",`Removed ${p?p.name:"team member"} from the team`);
+  render();
+}
+function addComment(id){
+  const text = prompt("Add a comment:"); if(!text) return;
+  touchStep(id, STATE.step);
+  if(!COMMENTS[id]) COMMENTS[id]=[];
+  COMMENTS[id].unshift({who:"You", text, t:new Date().toLocaleString([], {hour:"2-digit",minute:"2-digit"})});
+  addAudit(id,"You","Added a comment");
+  render();
+}
+
+/* ---------- other edit-mode actions (mutate DATA in place + log to audit trail) ---------- */
+const D2_OVERRIDE = {};
+const TERMINAL_STATUSES = ["Done","Verified","Verified in production"];
+const isTerminal = s => TERMINAL_STATUSES.includes(s);
+
+function editD2(id){
+  touchStep(id, STATE.step);
+  const current = D2_OVERRIDE[id] || draftD2(id);
+  const edited = prompt("Edit problem description:", current);
+  if(edited===null) return;
+  D2_OVERRIDE[id] = edited;
+  addAudit(id,"You","Edited D2 problem description");
+  render();
+}
+function editIsIsNot(id){
+  touchStep(id, STATE.step);
+  const cur = getIsIsNot(id);
+  const isVal = prompt("IS (where/when it happens):", cur["IS (where/when it happens)"]);
+  if(isVal===null) return;
+  const isNotVal = prompt("IS NOT (where/when it doesn't):", cur["IS NOT (where/when it doesn't)"]);
+  if(isNotVal===null) return;
+  cur["IS (where/when it happens)"]=isVal;
+  cur["IS NOT (where/when it doesn't)"]=isNotVal;
+  addAudit(id,"You","Updated Is/Is-Not comparison");
+  render();
+}
+function setRootCause(id, category){
+  touchStep(id, STATE.step);
+  getCauses(id).forEach(c=>{ c["Is Root Cause?"] = (c["Category"]===category) ? "Y" : "N"; });
+  addAudit(id,"You",`Set root cause category to ${category} (overriding AI suggestion)`);
+  render();
+}
+function addWhyStep(id){
+  const q = prompt("Why question:"); if(!q) return;
+  const a = prompt("Answer:"); if(!a) return;
+  touchStep(id, STATE.step);
+  const stepNum = getFiveWhy(id).length + 1;
+  DATA.fivewhy.push({"Notification ID (FK)":id, "Step #":stepNum, "Question":q, "Answer":a, "Evidence Citation":""});
+  addAudit(id,"You",`Added 5-Why step ${stepNum}: ${q}`);
+  render();
+}
+function addAction(id, type){
+  const text = prompt(`New ${type.toLowerCase()} action:`);
+  if(!text) return;
+  touchStep(id, STATE.step);
+  DATA.actions.push({"Notification ID (FK)":id, "Action Type":type, "Action Text":text, "Status":"Planned"});
+  addAudit(id,"You",`Added ${type.toLowerCase()} action: ${text}`);
+  render();
+}
+function advanceActionStatus(id, idx, newStatus){
+  touchStep(id, STATE.step);
+  const a = DATA.actions[idx];
+  a["Status"] = newStatus;
+  addAudit(id,"You",`${a["Action Type"]} action marked "${newStatus}": ${a["Action Text"].slice(0,60)}${a["Action Text"].length>60?"…":""}`);
+  render();
+}
+function linkFmea(id){
+  const fmeaId = prompt("FMEA ID to link:"); if(!fmeaId) return;
+  touchStep(id, STATE.step);
+  const f = getFmea(id);
+  f["FMEA ID"] = fmeaId; f["Description"] = "Linked via 8D Copilot";
+  addAudit(id,"You",`Linked FMEA ${fmeaId}`);
+  render();
+}
+function editLessons(id){
+  touchStep(id, STATE.step);
+  const l = getLessons(id);
+  const worked = prompt("What worked?", l["What Worked"]); if(worked===null) return;
+  const didnt = prompt("What didn't?", l["What Didn't"]); if(didnt===null) return;
+  l["What Worked"]=worked; l["What Didn't"]=didnt;
+  addAudit(id,"You","Updated Lessons Learned");
+  render();
+}
+
+/* ---------- state ---------- */
+let STATE = { view:"launcher", caseId:null, step:1, mode:"edit", custView:false, panel:"audit", accepted:{} };
+let AUDIT = {};
+function addAudit(id, who, text){
+  if(!AUDIT[id]) AUDIT[id]=[];
+  AUDIT[id].unshift({t:new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}), who, text});
+}
+function goto_(view, extra){
+  STATE.view=view; if(extra) Object.assign(STATE, extra);
+  render();
+  window.scrollTo({top:0});
+}
+function openCase(id, step){
+  STATE.view="case"; STATE.caseId=id; STATE.step=step||1;
+  render();
+}
+
+const STEPS = [
+  {n:1,label:"D1 · Team"}, {n:2,label:"D2 · Problem"}, {n:3,label:"D3 · Containment"},
+  {n:4,label:"D4 · Root Cause"}, {n:5,label:"D5 · Corrective"}, {n:6,label:"D6 · Implement"},
+  {n:7,label:"D7 · Preventive"}, {n:8,label:"D8 · Closure"}
+];
+
+/* ============================================================ RENDER ============================================================ */
+function render(){
+  document.querySelectorAll("#shell nav button").forEach(b=>b.classList.toggle("active", b.dataset.nav===STATE.view || (STATE.view==="case"&&b.dataset.nav==="worklist") || (["defectApp","complaintApp","defectDetail","complaintDetail"].includes(STATE.view)&&b.dataset.nav==="launcher")));
+  const root = document.getElementById("view-root");
+  if(STATE.view==="launcher") root.innerHTML = renderLauncher();
+  else if(STATE.view==="defectApp") root.innerHTML = renderDefectApp();
+  else if(STATE.view==="defectDetail") root.innerHTML = renderDefectDetail(STATE.caseId);
+  else if(STATE.view==="complaintApp") root.innerHTML = renderComplaintApp();
+  else if(STATE.view==="complaintDetail") root.innerHTML = renderComplaintDetail(STATE.caseId);
+  else if(STATE.view==="worklist") root.innerHTML = renderWorklist();
+  else if(STATE.view==="case") root.innerHTML = renderCase();
+}
+
+function renderLauncher(){
+  return `
+  <div class="eyebrow">Source systems (today)</div>
+  <h1>Where an 8D case starts</h1>
+  <p class="sub">8D Copilot never replaces where problems get logged. It plugs in right after — reading the defect or complaint record and drafting the 8D case from it. Priority 1 build target: the internal defect flow below. Priority 2: customer complaint.</p>
+  <div class="tile-grid">
+    <div class="tile q3">
+      <div class="tile-icon">⚠</div>
+      <div class="priority-badge">PRIORITY 1 · INTERNAL DEFECT</div>
+      <h3>Record Defects (SAP Fiori)</h3>
+      <p class="desc">A production worker logs a defect found during in-process inspection. A quality engineer reviews it and chooses <b>Start Problem-Solving Process</b> to generate the 8D issue.</p>
+      <button class="btn-primary" onclick="goto_('defectApp')">Open Record Defects →</button>
+      <div class="src">Source: SAP Learning — "Processing an Internal Problem Using the 8D Methodology" (Applying SAP S/4HANA Quality Management)</div>
+    </div>
+    <div class="tile q1">
+      <div class="tile-icon">✉</div>
+      <div class="priority-badge">PRIORITY 2 · CUSTOMER COMPLAINT</div>
+      <h3>Customer Complaint intake</h3>
+      <p class="desc">A customer complains by e-mail. A sales rep or quality technician captures it as a quality notification — description, customer, delivery info, attachments — then routes it for investigation.</p>
+      <button class="btn-primary" onclick="goto_('complaintApp')">Open complaint intake →</button>
+      <div class="src">Source: SAP Learning — "Creating a Customer Complaint", UI pattern reference: Galileon SolveR real product site</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:26px;">
+    <div class="card-head"><h3 style="margin:0;">All 8D cases (from the Golden Dataset)</h3><button class="btn-secondary" onclick="goto_('worklist')">Open worklist →</button></div>
+    <div class="card-body" style="padding-top:8px;">
+      <p style="font-size:12.5px;color:var(--muted);margin:0;">4 cases loaded from <code>ConaSpark_CompetitorResearch_v0.6.xlsx</code> — 3 internal-defect (Q3) + 1 customer-complaint (Q1), the latter reused verbatim from Galileon SolveR's own published case walkthrough.</p>
+    </div>
+  </div>`;
+}
+
+function statusBadgeClass(status){
+  if(["Completed","Closed"].includes(status)) return "status-done";
+  if(status==="In Process") return "status-progress";
+  return "status-open";
+}
+
+function renderDefectApp(){
+  const rows = DATA.notifications.filter(n=>!isQ1(n["Notification ID (PK)"])).map(n=>{
+    const mat=getMaterial(n["Material ID (FK)"]), def=getDefect(n["Defect Code (FK)"]);
+    return `<tr class="rowlink" onclick="goto_('defectDetail',{caseId:'${n["Notification ID (PK)"]}'})">
+      <td><b>${n["Notification ID (PK)"]}</b></td>
+      <td>${mat["Description"]}<br><span style="color:var(--muted);font-size:11.5px;">${mat["Material ID (PK)"]}</span></td>
+      <td>${def["Defect Text"]}</td>
+      <td>${getWC(n["Work Center ID (FK)"])["Description"]}</td>
+      <td><span class="badge ${statusBadgeClass(n["Status"])==='status-done'?'q3':''}" style="background:var(--surface-alt);color:var(--body-c);border:1px solid var(--line);">${n["Status"]}</span></td>
+    </tr>`;
+  }).join("");
+  return `
+  <div class="eyebrow">SAP Fiori · Record Defects</div>
+  <h1>Record Defects</h1>
+  <p class="sub">The only screen that actually exists in SAP today for this flow. Click a defect to review it and start the 8D problem-solving process.</p>
+  <div class="card">
+    <table class="list">
+      <thead><tr><th>Notification</th><th>Material</th><th>Defect</th><th>Work center</th><th>Status</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+function renderDefectDetail(id){
+  const n=getNotif(id), mat=getMaterial(n["Material ID (FK)"]), batch=getBatch(n["Batch ID (FK)"]),
+        def=getDefect(n["Defect Code (FK)"]), wc=getWC(n["Work Center ID (FK)"]), insp=getInspections(id)[0];
+  const started = AUDIT[id] && AUDIT[id].some(a=>a.text.includes("Started Problem-Solving Process"));
+  return `
+  <div class="eyebrow">SAP Fiori · Record Defects</div>
+  <h1>${id}</h1>
+  <p class="sub">${def["Defect Text"]} — reviewed by Quality Engineering.</p>
+  <div class="card"><div class="card-body">
+    <div class="kv-grid">
+      <div class="kv"><label>Material</label><div>${mat["Description"]} (${mat["Material ID (PK)"]})</div></div>
+      <div class="kv"><label>Batch</label><div>${batch["Batch ID (PK)"]}</div></div>
+      <div class="kv"><label>Defect code</label><div>${def["Defect Code (PK)"]}</div></div>
+      <div class="kv"><label>Work center</label><div>${wc["Description"]}</div></div>
+      <div class="kv"><label>Inspection characteristic</label><div>${insp?insp["Characteristic"]:"—"}</div></div>
+      <div class="kv"><label>Measured / Spec</label><div>${insp?insp["Measured Value"]+" / "+insp["Spec Value"]:"—"}</div></div>
+      <div class="kv"><label>Found during</label><div>In-process inspection</div></div>
+      <div class="kv"><label>Status</label><div><span class="badge ${statusBadgeClass(n["Status"])}">${n["Status"]}</span></div></div>
+    </div>
+    <div class="attach-row">
+      <div class="attach-chip"><span class="ext img">IMG</span> defect_photo_01.jpg</div>
+      <div class="attach-chip"><span class="ext">DOC</span> production_order_${batch["Batch ID (PK)"]}.pdf</div>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--line);margin:18px 0;">
+    <p style="font-size:13px;">Heli (Quality Engineer) reviews the defect and decides a formally structured 8D process is required.</p>
+    ${started ? `<div class="gate-msg ok">✓ Problem-solving process started — 8D issue ${id} created. <a href="#" onclick="event.preventDefault();openCase('${id}',1);">Open in 8D Copilot →</a></div>`
+      : `<button class="btn-primary" onclick="addAudit('${id}','Heli (QE)','Started Problem-Solving Process from Record Defects'); openCase('${id}',1);">Start Problem-Solving Process →</button>`}
+    <div class="src" style="margin-top:14px;">Action name and flow verified against SAP Learning: "Processing an Internal Problem Using the 8D Methodology" → generates an 8D issue in the <i>Resolve Internal Problems</i> (F4197) app, which 8D Copilot replaces end to end.</div>
+  </div></div>
+  <button class="btn-secondary" onclick="goto_('defectApp')">← Back to Record Defects</button>`;
+}
+
+function renderComplaintApp(){
+  const n = getNotif("8D-2612");
+  const cref = getCustRef("8D-2612");
+  return `
+  <div class="eyebrow">Customer Complaint intake</div>
+  <h1>Inbox</h1>
+  <p class="sub">A complaint arrives by e-mail with attachments. UI/UX pattern reused from Galileon SolveR's real multi-format auto-parsing ("Complaint parsed · 3 attachments read") — the strongest publicly documented feature either competitor showed for this step.</p>
+  <div class="card">
+    <div class="card-head">
+      <div><b>QA · ${cref["Customer Plant / Contact"].replace("QA - ","")}</b><br><span style="color:var(--muted);font-size:12px;">Assembly stoppage: bolt-hole misalignment — ${cref["SLA Response Due"]}</span></div>
+      <button class="btn-primary" onclick="goto_('complaintDetail',{caseId:'8D-2612'})">Open →</button>
+    </div>
+    <div class="card-body">
+      <p style="font-size:13px;">${n["Symptom / Short Text"]}. CMM report and photos attached.</p>
+      <div class="attach-row">
+        <div class="attach-chip"><span class="ext pdf">PDF</span> CMM_report_4471.pdf</div>
+        <div class="attach-chip"><span class="ext zip">ZIP</span> photos_station12.zip</div>
+        <div class="attach-chip"><span class="ext xls">XLS</span> sorting_log.xlsx</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderComplaintDetail(id){
+  const n=getNotif(id), mat=getMaterial(n["Material ID (FK)"]), batch=getBatch(n["Batch ID (FK)"]),
+        def=getDefect(n["Defect Code (FK)"]), wc=getWC(n["Work Center ID (FK)"]), cref=getCustRef(id);
+  const started = AUDIT[id] && AUDIT[id].some(a=>a.text.includes("Created quality notification"));
+  return `
+  <div class="eyebrow">Customer Complaint intake</div>
+  <h1>${id}</h1>
+  <p class="sub">${n["Symptom / Short Text"]}</p>
+  <div class="ai-parsed"><div class="dot"></div><div><b>AI-parsed from 3 attachments —</b> material, batch, defect location and inspection values below were extracted automatically. Review and confirm before creating the notification.</div></div>
+  <div class="card"><div class="card-body">
+    <div class="kv-grid">
+      <div class="kv"><label>Customer / plant</label><div>${cref["Customer Plant / Contact"]}</div></div>
+      <div class="kv"><label>Complaint reference</label><div>${cref["Complaint Reference"]}</div></div>
+      <div class="kv"><label>Response SLA</label><div>${cref["SLA Response Due"]}</div></div>
+      <div class="kv"><label>Material</label><div>${mat["Description"]} (${mat["Material ID (PK)"]})</div></div>
+      <div class="kv"><label>Batch</label><div>${batch["Batch ID (PK)"]}</div></div>
+      <div class="kv"><label>Defect</label><div>${def["Defect Text"]}</div></div>
+      <div class="kv"><label>Work center</label><div>${wc["Description"]}</div></div>
+      <div class="kv"><label>Status</label><div><span class="badge ${statusBadgeClass(n["Status"])}">${n["Status"]}</span></div></div>
+    </div>
+    <div class="attach-row">
+      <div class="attach-chip"><span class="ext pdf">PDF</span> CMM_report_4471.pdf</div>
+      <div class="attach-chip"><span class="ext zip">ZIP</span> photos_station12.zip</div>
+      <div class="attach-chip"><span class="ext xls">XLS</span> sorting_log.xlsx</div>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--line);margin:18px 0;">
+    <p style="font-size:13px;">Per SAP process: the notification creator captures description, customer, purchasing/delivery info and pictures, then routes it to the department responsible for this material.</p>
+    ${started ? `<div class="gate-msg ok">✓ Quality notification created — 8D investigation started for ${id}. <a href="#" onclick="event.preventDefault();openCase('${id}',1);">Open in 8D Copilot →</a></div>`
+      : `<button class="btn-primary" onclick="addAudit('${id}','Call center agent','Created quality notification, routed to Quality dept, started 8D investigation'); openCase('${id}',1);">Create quality notification &amp; start 8D →</button>`}
+    <div class="src" style="margin-top:14px;">Flow verified against SAP Learning: "Creating a Customer Complaint" — "If your customer requires an investigation report, for example, following the 8D methodology, you can create reports using the data from the quality notification."</div>
+  </div></div>
+  <button class="btn-secondary" onclick="goto_('complaintApp')">← Back to inbox</button>`;
+}
+
+function renderWorklist(){
+  const rows = DATA.notifications.map(n=>{
+    const id=n["Notification ID (PK)"], mat=getMaterial(n["Material ID (FK)"]), q1=isQ1(id);
+    const c = completeness(id);
+    return `<tr class="rowlink" onclick="openCase('${id}',1)">
+      <td><b>${id}</b></td>
+      <td><span class="badge ${q1?'q1':'q3'}">${q1?'Customer Complaint':'Internal Defect'}</span></td>
+      <td>${mat["Description"]}</td>
+      <td>${n["Symptom / Short Text"].length>60?n["Symptom / Short Text"].slice(0,60)+"…":n["Symptom / Short Text"]}</td>
+      <td><span class="badge ${statusBadgeClass(n["Status"])}">${n["Status"]}</span></td>
+      <td style="width:140px;"><div class="cbar-wrap"><div class="cbar" style="width:${c/8*100}%;"></div></div><span style="font-size:10.5px;color:var(--muted);">${c}/8 steps</span></td>
+    </tr>`;
+  }).join("");
+  return `
+  <div class="eyebrow">8D Copilot</div>
+  <h1>Worklist</h1>
+  <p class="sub">Every case below — both origins — lives in one worklist. Populated live from the Golden Dataset (GD 1–14) built in the competitor research workbook.</p>
+  <div class="card">
+    <table class="list">
+      <thead><tr><th>Case</th><th>Origin</th><th>Material</th><th>Symptom</th><th>Status</th><th>Completeness</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+/* ---------------- Case workspace ---------------- */
+function statusClass(status){ return status==="Complete"?"complete":(status==="In Process"?"inprocess":"notstarted"); }
+
+function renderCase(){
+  const id=STATE.caseId, n=getNotif(id), q1=isQ1(id), c=completeness(id);
+  const stepperHtml = STEPS.map(s=>{
+    const status = getStepStatus(id, s.n);
+    const cls = statusClass(status);
+    const icon = status==="Complete" ? "✓" : (status==="In Process" ? "»" : s.n);
+    return `<div class="step ${STATE.step===s.n?'active':''} ${cls==='complete'?'done':''}" onclick="STATE.step=${s.n};render();">
+      <div class="dot ${cls}">${icon}</div><div>${s.label}<span class="status-txt">${status}</span></div></div>`;
+  }).join("");
+
+  const curStatus = getStepStatus(id, STATE.step);
+  const curCls = statusClass(curStatus);
+  const doneMap = computeDoneMap(id, n);
+  const aiHint = (doneMap[STATE.step] && curStatus!=="Complete") ? `<span class="ai-hint">✓ AI: this step looks ready to complete</span>` : "";
+  const completeBtn = STATE.mode!=='edit' ? "" :
+    curStatus==="Complete"
+      ? `<button class="btn-secondary" onclick="reopenStep('${id}',${STATE.step})">Reopen</button>`
+      : `<button class="btn-primary" onclick="completeStep('${id}',${STATE.step})">Complete</button>`;
+  const stepHeadBar = `<div class="step-head-bar"><span class="step-status-badge ${curCls}">${curStatus}</span>${aiHint}${completeBtn}</div>`;
+
+  return `
+  <div id="case-shell">
+    <div id="case-top">
+      <div><div class="cid">${id}</div><div class="title">${n["Symptom / Short Text"]}</div></div>
+      <span class="badge ${q1?'q1':'q3'}">${q1?'Customer Complaint (Q1)':'Internal Defect (Q3)'}</span>
+      <span class="badge ${statusBadgeClass(n["Status"])}">${n["Status"]}</span>
+      <div class="spacer"></div>
+      ${q1?`<div class="toggle-group"><button class="${!STATE.custView?'active':''}" onclick="STATE.custView=false;render();">Internal view</button><button class="${STATE.custView?'active':''}" onclick="STATE.custView=true;render();">Customer view</button></div>`:""}
+      <div class="toggle-group"><button class="${STATE.mode==='edit'?'active':''}" onclick="STATE.mode='edit';render();">Edit</button><button class="${STATE.mode==='readonly'?'active':''}" onclick="STATE.mode='readonly';render();">Read-only</button></div>
+      <button class="btn-secondary" onclick="goto_('worklist')">Close</button>
+    </div>
+    <div id="stepper">
+      <div class="completeness">Completeness<div class="cbar-wrap"><div class="cbar" style="width:${c/8*100}%;"></div></div>${c}/8 steps Complete</div>
+      ${stepperHtml}
+    </div>
+    <div id="step-body">${stepHeadBar}${renderStepBody(id, STATE.step)}</div>
+    <div id="side-panel">
+      <div class="panel-toggles">
+        <button class="btn-ghost ${STATE.panel==='audit'?'active':''}" onclick="STATE.panel='audit';render();">Audit trail</button>
+        <button class="btn-ghost ${STATE.panel==='similar'?'active':''}" onclick="STATE.panel='similar';render();">Similar cases</button>
+      </div>
+      ${STATE.panel==='audit'?renderAuditPanel(id):renderSimilarPanel(id)}
+    </div>
+  </div>`;
+}
+
+function renderAuditPanel(id){
+  const log = AUDIT[id]||[];
+  if(log.length===0) return `<p style="color:var(--muted);">No actions logged yet this session.</p>`;
+  return log.map(a=>`<div class="audit-item"><div class="t">${a.t} · ${a.who}</div>${a.text}</div>`).join("");
+}
+function renderSimilarPanel(id){
+  const sims = retrieveSimilar(id);
+  if(sims.every(s=>s.score===0)) return `<p style="color:var(--muted);">No strong precedent found above the confidence threshold — flag for manual investigation.</p>`;
+  return sims.filter(s=>s.score>0).map(s=>{
+    const cid=s.c["Notification ID (PK)"];
+    return `<div class="sim-case"><span class="score">${s.score}/11</span><b>${cid}</b><br><span style="color:var(--muted);">${s.c["Symptom / Short Text"].slice(0,50)}…</span>
+      <div style="margin-top:6px;"><a href="#" onclick="event.preventDefault();openCase('${cid}',4);">View root cause →</a></div></div>`;
+  }).join("");
+}
+
+function renderStepBody(id, step){
+  const n=getNotif(id), q1=isQ1(id);
+  if(step===1) return stepD1(id,n,q1);
+  if(step===2) return stepD2(id,n,q1);
+  if(step===3) return stepD3(id,n,q1);
+  if(step===4) return stepD4(id,n,q1);
+  if(step===5) return stepAction(id,"Corrective","D5 · Propose corrective actions","Actions that eliminate the confirmed root cause. Not all proposed actions are released — for example due to time or cost limits.", {advanceLabel:"Approve & release", advanceStatus:"Released"});
+  if(step===6) return stepD6(id,n,q1);
+  if(step===7) return stepD7(id,n,q1);
+  if(step===8) return stepD8(id,n,q1);
+  return "";
+}
+
+function aiBlock(key, html, accepted, hideGenericAccept){
+  const isAccepted = accepted || STATE.accepted[key];
+  return `<div class="ai-block ${isAccepted?'accepted':''}" id="ai-${key}">
+    <span class="ai-tag">${isAccepted?'AI DRAFT · ACCEPTED':'AI DRAFT'}</span>
+    ${html}
+    ${STATE.mode==='edit' && !isAccepted && !hideGenericAccept ? `<div class="accept-btn"><button class="btn-secondary" onclick="STATE.accepted['${key}']=true; addAudit('${STATE.caseId}','You','Accepted AI-drafted ${key}'); render();">✓ Accept suggestion</button></div>` : ""}
+  </div>`;
+}
+
+function stepD1(id,n,q1){
+  const editable = STATE.mode==='edit';
+  const team = getTeam(id);
+  const tab = D1_TAB[id] || "team";
+  const rows = team.map((row,idx)=>{
+    const p = bpLookup(row.bp);
+    const initials = p ? p.name.split(" ").map(w=>w[0]).join("") : "?";
+    const options = BP_DIRECTORY.map(b=>`<option value="${b.id}" ${row.bp===b.id?"selected":""}>${b.id} — ${b.name} (${b.title})</option>`).join("");
+    return `<tr>
+      <td><div class="avatar-sm">${initials}</div></td>
+      <td>${editable
+          ? `<select onchange="setTeamRowBP('${id}',${idx},this.value)"><option value="">— select partner —</option>${options}</select>`
+          : (p ? `${p.id}<br><span style="color:var(--muted);font-size:11px;">${p.name}</span>` : "—")}</td>
+      <td>${editable
+          ? `<select onchange="setTeamRowRole('${id}',${idx},this.value)"><option ${row.role==="8D Team Leader"?"selected":""}>8D Team Leader</option><option ${row.role==="8D Team Member"?"selected":""}>8D Team Member</option></select>`
+          : row.role}</td>
+      <td>${p ? p.email : "—"}</td>
+      <td>${p ? p.phone : "—"}</td>
+      <td>${editable ? `<button class="btn-ghost" onclick="removeTeamRow('${id}',${idx})" style="color:var(--red);">Remove</button>` : ""}</td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:18px;">No team members assigned yet.</td></tr>`;
+
+  const commentsHtml = (COMMENTS[id]||[]).map(c=>`<div class="audit-item"><div class="t">${c.t} · ${c.who}</div>${c.text}</div>`).join("")
+    || "<p style='color:var(--muted);font-size:12.5px;'>No comments yet.</p>";
+
+  const sugg = suggestTeamFromHistory(id);
+  const suggAllOnTeam = sugg.people.length>0 && sugg.people.every(p=>getTeam(id).some(r=>r.bp===p.bp));
+  const suggBody = sugg.roles.length ? `
+    <p style="margin:0 0 8px;"><b>Suggested roles</b> — based on similar case${sugg.basedOn.length>1?'s':''} ${sugg.basedOn.join(', ')}: ${sugg.roles.map(r=>r.title).join(', ')}</p>
+    <p style="margin:0 0 4px;font-size:12.5px;"><b>Suggested individuals:</b></p>
+    <ul style="margin:0 0 10px 18px;padding:0;">
+      ${sugg.people.map(p=>{
+        const already = getTeam(id).some(r=>r.bp===p.bp);
+        return `<li style="margin-bottom:3px;">${p.name} (${p.title}) — served on ${p.count} similar case${p.count>1?'s':''}
+        ${already ? `<span style="color:var(--success-text);font-size:11px;margin-left:6px;">✓ on team</span>` : ""}</li>`;
+      }).join("")}
+    </ul>
+    ${editable ? (suggAllOnTeam
+      ? `<span style="color:var(--success-text);font-size:12.5px;">✓ All suggested members added — remove any from the table below if not needed</span>`
+      : `<button class="btn-secondary" onclick="acceptAllSuggested('${id}')">✓ Accept all suggested</button>`) : ""}`
+    : `<p style="margin:0;color:var(--muted);">No similar past case clears the confidence threshold for this one — no team suggestion available; assign manually.</p>`;
+
+  return `
+  <h2>D1 · Assemble the 8D team</h2>
+  <p style="color:var(--muted);font-size:12.5px;">Partner and role are assigned manually, matching the Business Partner (BP) assignment in SAP's Resolve Internal Problems app. E-mail and telephone are queried automatically from the BP master record — never typed by hand.</p>
+  ${aiBlock("d1team", suggBody, false, true)}
+  <div class="d1-tabs">
+    <button class="tabbtn ${tab==='team'?'active':''}" onclick="setD1Tab('${id}','team')">Team Members</button>
+    <button class="tabbtn ${tab==='comments'?'active':''}" onclick="setD1Tab('${id}','comments')">Comments</button>
+  </div>
+  ${tab==='team' ? `
+    <div class="team-table-wrap">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">${editable?`<button class="btn-primary" onclick="addTeamRow('${id}')">Add</button>`:""}</div>
+      <table class="team-table">
+        <thead><tr><th></th><th>Partner</th><th>Partner Role</th><th>E-Mail Address</th><th>Telephone number</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`
+  : `
+    <div class="comments-list">${commentsHtml}</div>
+    ${editable?`<button class="btn-secondary" style="margin-top:10px;" onclick="addComment('${id}')">Add comment</button>`:""}`}
+  <div class="footnote">Source: SAP Learning — the 8D team lead assigns employees to "8D team lead" and "8D team member" roles in the Resolve Internal Problems app. Heli and Brian are the two personas SAP itself uses in this course's official use-case scenarios (internal defect and customer complaint). Suggested roles/individuals above are computed from GD 15 (Historical Team Assignments), backfilled from this case's own causal data for demo purposes — for 8D-2612 the historical roster is explicitly marked ASSUMED, since Galileon's published walkthrough doesn't document who was on the team. Production would replace GD 15 with real historical assignment records.</div>`;
+}
+
+function renderIsIsNot(id){
+  const isisnot = getIsIsNot(id);
+  const editable = STATE.mode==='edit';
+  const isPlaceholder = isisnot["IS (where/when it happens)"] === "Not yet analyzed for this case";
+  const analysis = analyzeIsIsNot(id);
+  const acceptedKey = "isisnot-"+id;
+  const alreadyAccepted = !!STATE.accepted[acceptedKey];
+
+  if(!isPlaceholder){
+    // Already has real/recorded content -- either 8D-2612's real Galileon answer, or a
+    // previously-accepted AI draft (which overwrites this same field, so it lands here too).
+    let validation = "";
+    if(analysis.status==="ok" && !alreadyAccepted){
+      validation = `<p style="font-size:11.5px;color:var(--muted);margin-top:8px;">AI cross-check against ${analysis.lotsUsed} historical inspection lots (GD 17) independently points to the same fixture: <b>${analysis.is.equipment}</b> (${Math.round(analysis.is.rate*100)}% nonconforming) vs <b>${analysis.isNot.equipment}</b> (${Math.round(analysis.isNot.rate*100)}%).</p>`;
+    }
+    return `
+    <div class="isisnot-grid">
+      <div class="isisnot-box is"><h4 style="color:var(--success-text);">IS</h4>${isisnot["IS (where/when it happens)"]}</div>
+      <div class="isisnot-box isnot"><h4>IS NOT</h4>${isisnot["IS NOT (where/when it doesn't)"]}</div>
+    </div>
+    ${editable?`<button class="btn-secondary" onclick="editIsIsNot('${id}')">Edit Is / Is-Not</button>`:""}
+    ${isisnot["Notes"] ? `<p style="font-size:11.5px;color:var(--muted);">${isisnot["Notes"]}</p>`:""}
+    ${validation}`;
+  }
+
+  if(analysis.status === "not_applicable"){
+    return `<p style="color:var(--muted);">Is/Is-Not not applicable — no measurable characteristic recorded for this defect (visual defect).</p>`;
+  }
+  if(analysis.status === "no_contrast"){
+    const seen = (analysis.groups||[]).reduce((s,g)=>s+g.total,0);
+    return `<p style="color:var(--muted);">No clear contrast found across the ${seen} available historical lots — insufficient population to draw an Is/Is-Not conclusion yet.</p>
+    ${editable?`<button class="btn-secondary" onclick="editIsIsNot('${id}')">Enter manually</button>`:""}`;
+  }
+  // status === "ok": genuine AI-drafted suggestion, human accepts or edits
+  const draft = draftIsIsNotText(id);
+  const body = `
+    <div class="isisnot-grid">
+      <div class="isisnot-box is"><h4 style="color:var(--success-text);">IS</h4>${draft.is}</div>
+      <div class="isisnot-box isnot"><h4>IS NOT</h4>${draft.isNot}</div>
+    </div>
+    <p style="font-size:11.5px;color:var(--muted);margin-top:6px;">${draft.citation}</p>
+    ${editable ? `<button class="btn-secondary" onclick="acceptIsIsNot('${id}')">✓ Accept suggestion</button> <button class="btn-secondary" onclick="editIsIsNot('${id}')">Edit manually</button>` : ""}
+  `;
+  return aiBlock(acceptedKey, body, alreadyAccepted, true);
+}
+
+function stepD2(id,n,q1){
+  const draft = D2_OVERRIDE[id] || draftD2(id);
+  const cref = q1 ? getCustRef(id) : null;
+  const editable = STATE.mode==='edit';
+  const custBanner = (q1 && STATE.custView) ? `<div class="cf-banner"><b>Customer-facing summary —</b> ${n["Customer-Facing Summary"]}</div>` : "";
+  const intBanner = (q1 && !STATE.custView) ? `<div class="cf-banner" style="background:var(--blue-bg);border-color:#bcd8f5;"><b>Internal-facing summary —</b> ${n["Internal-Facing Summary"]}</div>` : "";
+  return `
+  <h2>D2 · Describe the problem</h2>
+  ${custBanner}${intBanner}
+  ${q1?`<div class="field-row"><label>Complaint reference</label><div>${cref["Complaint Reference"]} · ${cref["Customer Plant / Contact"]} · SLA ${cref["SLA Response Due"]}</div></div>`:""}
+  ${aiBlock("d2", `<p style="margin:0;">${draft}${D2_OVERRIDE[id]?' <i style="color:var(--muted);">(edited by you)</i>':''}</p>`)}
+  ${editable?`<button class="btn-secondary" onclick="editD2('${id}')">Edit description</button>`:""}
+  <h3 style="margin-top:20px;">5W2H — structured view</h3>
+  <p style="color:var(--muted);font-size:12px;margin:0 0 4px;">Same facts as the description above, broken into individual fields — not a second data source.</p>
+  ${render5W2HGrid(id)}
+  <h3 style="margin-top:20px;">Is / Is-Not comparison</h3>
+  <p style="color:var(--muted);font-size:12px;margin:0 0 4px;">AI compares individual historical inspection lots (GD 17) by fixture/equipment — a summary alone can't tell you which one is the problem.</p>
+  ${renderIsIsNot(id)}
+  <div class="footnote">Is/Is-Not pattern: real, confirmed feature from Galileon SolveR's published case walkthrough — doubleSlash does not publish this feature.</div>`;
+}
+
+function stepD3(id,n,q1){
+  const desc = q1? "Stop the problem reaching more customers — sorting, return delivery, or 100% inspection at the customer site." : "Prevent the defect from spreading further inside the plant, e.g. quarantine remaining stock or check similar components in the warehouse.";
+  return stepAction(id,"Containment","D3 · Immediate / containment actions", desc, {advanceLabel:"Mark as done", advanceStatus:"Done"})
+   + `<div class="footnote">Source: SAP Learning — for internal defects, a task is sent to the warehouse to check for similar broken components and move them to blocked stock. For customer complaints, a return delivery can be created to bring the defective item back for analysis.</div>`;
+}
+
+function stepD4(id,n,q1){
+  const causes = getCauses(id);
+  const why = getFiveWhy(id);
+  const draft4 = draftD4(id);
+  const order = ["Man","Machine","Method","Material","Measurement","Environment"];
+  const editable = STATE.mode==='edit';
+  const cards = order.map(cat=>{
+    const c = causes.find(x=>x["Category"]===cat);
+    if(!c) return "";
+    const root = c["Is Root Cause?"]==="Y";
+    const setRootLink = (editable && !root) ? `<div style="margin-top:8px;"><a href="#" onclick="event.preventDefault();setRootCause('${id}','${cat}');">Set as root cause</a></div>` : "";
+    return `<div class="ish-card ${root?'root':''}"><h4>${cat}</h4><div class="desc">${c["Description"]}</div>${c["Metric Value (if applicable)"]?`<span class="metric">${c["Metric Value (if applicable)"]}</span>`:""}${root?'<div class="root-tag">★ ROOT CAUSE</div>':''}${setRootLink}</div>`;
+  }).join("");
+  const whyHtml = why.map((w,i)=>`<div class="why-step ${i===why.length-1?'root':''}"><div class="n">${w["Step #"]}</div><div><div class="q">${w["Question"]}</div><div class="a">${w["Answer"]}</div>${w["Evidence Citation"]?`<div class="cite">Cited: ${w["Evidence Citation"]}</div>`:""}</div></div>`).join("") || "<p style='color:var(--muted);'>No 5-Why chain recorded for this case yet.</p>";
+  return `
+  <h2>D4 · Root cause analysis</h2>
+  ${aiBlock("d4", `<p style="margin:0;"><b>Root cause (AI-drafted, cites evidence):</b> ${draft4.text}${draft4.cite?` <span style="color:var(--muted);">— ${draft4.cite}</span>`:""}</p>`)}
+  <h3 style="margin-top:18px;">Ishikawa ${editable?'<span style="font-size:11px;font-weight:400;color:var(--muted);">— click "Set as root cause" on a category to override the AI</span>':''}</h3>
+  <div class="ishikawa-grid">${cards}</div>
+  <h3>5-Why chain</h3>
+  <div class="why-chain">${whyHtml}</div>
+  ${editable?`<button class="btn-primary" style="margin-top:12px;" onclick="addWhyStep('${id}')">+ Add why-step</button>`:""}
+  <div class="footnote">Ishikawa Measurement uses a Gauge R&R (Repeatability &amp; Reproducibility) statistic where available — confirmed real field from Galileon's published case walkthrough. 5-Why with per-step evidence citation is also a Galileon-confirmed pattern; doubleSlash mentions "5-Why" only generically.</div>`;
+}
+
+function stepAction(id, type, title, desc, opts){
+  opts = opts || {};
+  const actions = getActions(id, type);
+  const editable = STATE.mode==='edit';
+  const rows = actions.map(a=>{
+    const idx = DATA.actions.indexOf(a);
+    const terminal = isTerminal(a["Status"]);
+    const advanceBtn = (editable && !terminal && opts.advanceLabel)
+      ? `<button class="btn-secondary" style="margin-top:6px;" onclick="advanceActionStatus('${id}',${idx},'${opts.advanceStatus}')">${opts.advanceLabel}</button>` : "";
+    return `<div class="action-card"><div><div class="type">${type}</div><div class="txt">${a["Action Text"]}</div>${advanceBtn}</div><span class="badge ${terminal?"status-done":"status-open"}">${a["Status"]}</span></div>`;
+  }).join("") || `<p>No ${type.toLowerCase()} action logged yet.</p>`;
+  const addBtn = editable ? `<button class="btn-primary" style="margin-top:10px;" onclick="addAction('${id}','${type}')">+ Add ${type.toLowerCase()} action</button>` : "";
+  return `<h2>${title}</h2><p style="color:var(--muted);font-size:12.5px;">${desc}</p>${rows}${addBtn}`;
+}
+
+function stepD6(id,n,q1){
+  return stepAction(id,"Corrective","D6 · Implement & validate","Approved actions are executed. Effort and cost of non-conformance are recorded to a repair order for tracking.", {advanceLabel:"Mark as verified", advanceStatus:"Verified"})
+   + `<div class="footnote">Source: SAP Learning — the production operator records repair effort to a repair order created by engineering, so cost of non-conformance can be tracked; this maps to the Cost of Poor Quality field in D8.</div>`;
+}
+function stepD7(id,n,q1){
+  const fmea = getFmea(id);
+  const editable = STATE.mode==='edit';
+  const fmeaLinked = !!fmea["FMEA ID"];
+  return stepAction(id,"Preventive","D7 · Preventive actions", "Longer-term change that stops this failure mode recurring anywhere, not just this case.", {advanceLabel:"Mark as verified", advanceStatus:"Verified"})
+   + `<h3 style="margin-top:18px;">FMEA link</h3>
+      <div class="action-card"><div><div class="type">FMEA</div><div class="txt">${fmea["FMEA ID"]||"Not linked"} — ${fmea["Description"]}</div>${(editable && !fmeaLinked)?`<button class="btn-secondary" style="margin-top:6px;" onclick="linkFmea('${id}')">Link FMEA</button>`:""}</div></div>`;
+}
+function stepD8(id,n,q1){
+  const cost = getCost(id), lessons = getLessons(id);
+  const c = completeness(id);
+  const canClose = [1,2,3,4,5,6,7].every(s=>getStepStatus(id,s)==="Complete");
+  const closed = ["Completed","Closed"].includes(n["Status"]);
+  const editable = STATE.mode==='edit';
+  return `
+  <h2>D8 · Closure — congratulate the team</h2>
+  <div class="field-row"><label>Cost of Poor Quality</label><div>${typeof cost["Cost of Poor Quality (EUR)"]==="number" ? "€"+cost["Cost of Poor Quality (EUR)"].toLocaleString() : cost["Cost of Poor Quality (EUR)"]}</div></div>
+  <div class="field-row"><label>What worked</label><div>${lessons["What Worked"]}</div></div>
+  <div class="field-row"><label>What didn't</label><div>${lessons["What Didn't"]}</div></div>
+  <div class="field-row"><label>Status</label><div><span class="badge ${statusBadgeClass(n["Status"])}">${n["Status"]}</span></div></div>
+  ${editable && !closed ? `<button class="btn-secondary" style="margin-top:10px;" onclick="editLessons('${id}')">Edit lessons learned</button>` : ""}
+  ${closed ? `<div class="gate-msg ok">✓ Case closed — knowledge kept for future precedent matching.</div>`
+    : canClose ? `<button class="btn-primary" style="margin-top:14px;" onclick="getNotif('${id}')['Status']='Completed'; addAudit('${id}','You','Approved and closed case (completeness ${c}/8)'); render();">Approve &amp; close case</button>`
+    : `<div class="gate-msg">Not ready to close — completeness ${c}/8. Complete the remaining D-steps first.</div>`}
+  <div class="footnote">Source: SAP Learning — closure step documents lessons learned and recognizes the team's collective effort ("congratulate your team").</div>`;
+}
+
+/* ---------- nav wiring ---------- */
+document.querySelectorAll("#shell nav button").forEach(b=>b.addEventListener("click",()=>goto_(b.dataset.nav)));
+render();
+</script>
+</body>
+</html>

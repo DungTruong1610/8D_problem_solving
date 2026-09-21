@@ -1,0 +1,55 @@
+{
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Assembly fitters flagged 0.25mm burr ridge at bore mouth on 74 sprocket hubs (B-40112) on 2026-02-14. Chipped finishing tooth on broach cutter B1 caused ridge; cutter B2 produced conforming parts.",
+  "foundDate": "2026-02-14",
+  "defectQuantity": 74,
+  "defectQuantityUom": "PC",
+  "referenceNumber": "INT-2026-4407",
+  "plant": "1000",
+  "entryMode": "during-inspection",
+  "inspectionLotId": "0010000027",
+  "material": {
+    "materialId": "MAT-11500",
+    "description": "Sprocket Hub H22",
+    "materialGroup": "MG-DRIVE"
+  },
+  "batch": {
+    "batchId": "B-40112",
+    "materialId": "MAT-11500"
+  },
+  "workCenter": {
+    "workCenterId": "WC-BROACH-01",
+    "description": "Broaching Line 1"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-SUR",
+    "defectCode": "DEF-1610",
+    "defectText": "Raised metal ridge at bore mouth",
+    "defectClass": "Major"
+  },
+  "inspections": [
+    {
+      "characteristic": "Ridge height at bore mouth",
+      "measuredValue": "0.2500 mm",
+      "specLowerLimit": 0,
+      "specUpperLimit": 0.05,
+      "specUom": "mm",
+      "valuation": "Rejected",
+      "equipment": "OPTICAL-COMP-01"
+    },
+    {
+      "characteristic": "Central Bore Diameter",
+      "measuredValue": "22.0150 mm",
+      "specLowerLimit": 22,
+      "specUpperLimit": 22.03,
+      "specUom": "mm",
+      "valuation": "Accepted",
+      "equipment": "BORE-MICROMETER-01"
+    }
+  ],
+  "responsibility": {
+    "reportedBy": "Thomas Mueller",
+    "coordinator": "Frank Castle",
+    "department": "Process Engineering"
+  }
+}

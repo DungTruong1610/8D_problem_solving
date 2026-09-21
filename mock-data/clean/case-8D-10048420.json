@@ -1,0 +1,167 @@
+{
+  "notificationId": "8D-10048420",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Assembly fitters cut their hands on hub bores",
+  "status": "Closed",
+  "foundDate": "2026-06-28",
+  "completionDate": "2026-07-19",
+  "quantityExtent": "74 units affected",
+  "teamSize": 3,
+  "material": {
+    "materialId": "MAT-11500",
+    "description": "Sprocket Hub H22",
+    "materialGroup": "MG-DRIVE"
+  },
+  "batch": {
+    "batchId": "B-49688",
+    "materialId": "MAT-11500"
+  },
+  "defect": {
+    "defectCode": "DEF-1610",
+    "defectText": "Raised metal ridge at bore mouth"
+  },
+  "workCenter": {
+    "workCenterId": "WC-BROACH-01",
+    "description": "Broaching Line 1"
+  },
+  "inspections": [
+    {
+      "characteristic": "Ridge height at bore mouth",
+      "measuredValue": "0.28mm",
+      "specValue": "max 0.05mm"
+    },
+    {
+      "characteristic": "Bore mouth radius",
+      "measuredValue": "0.02mm",
+      "specValue": "0.20-0.40mm"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-3301, Shift A - ran the standard cycle, no deviation logged",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-BROACH01-002, broach tool ran 41,200 strokes against a 30,000 stroke replacement limit; cutting edges rounded and pushed material instead of shearing it",
+      "metricValue": "41,200 of 30,000 strokes",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-7740 Rev C - broaching instruction current, cycle parameters unchanged",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Forging cert PASS, hardness 198 HB within band",
+      "metricValue": "198 HB",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "PG-0142, last cal 2026-05-22, R&R 6.8%",
+      "metricValue": "6.8%",
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "21.8C at 07:40 (illustrative)",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why is there a raised metal ridge at the bore mouth?",
+      "answer": "Ridge measured 0.28mm against a 0.05mm maximum - the broach pushed material up instead of shearing it off",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did the broach push material instead of shearing it?",
+      "answer": "Its cutting edges were rounded from wear after 41,200 strokes against a 30,000 stroke replacement limit",
+      "evidenceCitation": "Equipment maintenance log EQ-BROACH01-002"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was a worn broach still in the machine? (root cause)",
+      "answer": "Broach life is tracked on a paper tally at the machine and nobody owns it, so the replacement point passed unnoticed",
+      "evidenceCitation": "PM plan EQ-BROACH01-002"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Quarantine batch B-49688 and inspect the bore mouth of all H22 hubs in WIP and finished stock",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "actionText": "Replace the worn broach on EQ-BROACH01-002 and deburr the 74 affected hubs",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "actionText": "Move broach stroke counting into the PM system with an automatic work order at 90% of tool life, so replacement no longer depends on a paper tally",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100014",
+      "partnerName": "Karl Wagner",
+      "functionTitle": "Maintenance Planner",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100012",
+      "partnerName": "Minh Dinh",
+      "functionTitle": "Production Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100061",
+      "partnerName": "Anh Pham",
+      "functionTitle": "Tooling Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-BROACH01-02",
+    "description": "Broach tool wear"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 8600
+  },
+  "lessonsLearned": {
+    "whatWorked": "Stroke count from the PM log pinned the start date within one shift",
+    "whatDidnt": "Tool life was tracked on paper at the machine, so nobody saw the limit go by"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "H22 hub bores - WC-BROACH-01 - parts broached after the tool passed 30,000 strokes on 2026-06-21",
+    "isNotWhereWhenItDoesnt": "H18 hubs on WC-BROACH-02 - same part family, tool replaced on schedule",
+    "notes": "Defect starts at the stroke count overrun, not at a batch or shift change"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - internal defect, no customer reference",
+    "customerPlantContact": "N/A",
+    "slaResponseDue": "N/A"
+  }
+}

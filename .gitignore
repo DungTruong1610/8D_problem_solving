@@ -1,0 +1,62 @@
+# Node.js dependencies
+node_modules/
+**/node_modules/
+
+# CAP & MTA Generated build artifacts
+gen/
+dist/
+**/dist/
+mta_archives/
+ui_resources/
+**/ui_resources/
+.cnma_proresolve_mta_build_tmp/
+Makefile*.mta
+@cds-models/
+
+# Local SQLite databases
+*.db
+*.sqlite
+sqlite.db*
+db.sqlite*
+
+# Environment and credentials
+.env
+.env.local
+.env.*.local
+default-env.json
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Operating System & IDE files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Python bytecode (mock-data generator)
+__pycache__/
+*.pyc
+
+# Ảnh chụp của mock-data/clean/, do scripts/bundle-library.mjs sinh ra lúc build.
+# Gói theo srv để app tự nạp kho lúc khởi động trên CF. Nguồn là mock-data/.
+srv/data/case-library/
+
+# Sự vụ mẫu, do scripts/bundle-library.mjs sinh ra từ mock-data/incoming/.
+app/cnma_proresolve_ui/public/samples/
+
+# added by cds
+.cdsrc-private.json
+
+# Backup của binding, giữ cục bộ để revert profile khi cds deploy ghi đè.
+.cdsrc-private.json*
+
+./venv

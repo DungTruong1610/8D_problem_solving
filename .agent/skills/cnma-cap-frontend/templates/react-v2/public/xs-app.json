@@ -1,0 +1,29 @@
+{
+    "welcomeFile": "/index.html",
+    "authenticationMethod": "route",
+    "sessionTimeout": 60,
+    "logout": {
+        "logoutEndpoint": "/do/logout"
+    },
+    "routes": [
+        {
+            "source": "^/api/(.*)$",
+            "target": "/api/$1",
+            "destination": "{{DESTINATION_NAME}}",
+            "authenticationType": "xsuaa",
+            "csrfProtection": true
+        },
+        {
+            "source": "^(.*)$",
+            "target": "$1",
+            "service": "html5-apps-repo-rt",
+            "authenticationType": "xsuaa"
+        }
+    ],
+    "responseHeaders": [
+        {
+            "name": "X-Frame-Options",
+            "value": "SAMEORIGIN"
+        }
+    ]
+}

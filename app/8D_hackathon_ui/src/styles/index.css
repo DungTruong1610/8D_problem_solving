@@ -1,0 +1,66 @@
+/* ── @cnma/react-ui — all design tokens, Tailwind base, and component styles ──
+ * This single import pulls in:
+ *   tailwind.css  → @import "tailwindcss" (Tailwind v4 base)
+ *   font.css      → 72 font stack
+ *   theme.css     → CSS custom properties + @theme inline tokens
+ * ── */
+@import '@cnma/react-ui/styles.css';
+@import './theme.css';
+@import '@cnma/cap-identity/react/identity.css';
+@import '@cnma/cap-valuehelp/react/valuehelp.css';
+
+@source "../../node_modules/@cnma/cap-identity";
+@source "../../node_modules/@cnma/cap-valuehelp";
+@source "../../node_modules/@cnma/sap-aicore-integrate";
+
+
+/* ═══════════════════════════════════════════════════════════
+   APP-LEVEL OVERRIDES & EXTENSIONS
+   Add tokens here that are specific to this application.
+   The @cnma/react-ui theme.css provides all base tokens.
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+    /* ── Status Colors (entity/domain-specific) ─────────────
+     * These extend the library's status palette.
+     * Add/override here: --status-X: var(--palette-Y);
+     * bg-status-X / text-status-X-text / border-status-X are auto-generated.
+     * ────────────────────────────────────────────────────── */
+}
+
+/* ── Global resets ────────────────────────────────────── */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#root {
+    height: 100%;
+}
+
+/* The shared Table wrapper uses overflow:auto on both axes. Wide identity
+ * tables then gain a few pixels of vertical overflow when the horizontal
+ * scrollbar appears, clipping the last row and action menu. Keep vertical
+ * scrolling at page level while retaining horizontal table scrolling. */
+.organization-page .ci-org-manager [role='tabpanel'] .rounded-lg.border.bg-card {
+    overflow: visible;
+}
+
+.organization-page .ci-org-manager div.relative.w-full.overflow-auto:has(> table) {
+    overflow: visible;
+}
+
+@media (max-width: 1024px) {
+    .organization-page .ci-org-manager div.relative.w-full.overflow-auto:has(> table) {
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 12px;
+    }
+}
+
+/* ── Ẩn mũi tên (arrow) của Tooltip ───────────────────── */
+[data-slot="tooltip-content"] > svg {
+    display: none !important;
+}
+

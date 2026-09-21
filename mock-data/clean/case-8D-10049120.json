@@ -1,0 +1,167 @@
+{
+  "notificationId": "8D-10049120",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "CMM reported bolt circle true position out of spec 0.085mm vs max 0.050mm limit",
+  "status": "Completed",
+  "foundDate": "2026-08-14",
+  "completionDate": "2026-08-28",
+  "quantityExtent": "40 units affected",
+  "teamSize": 3,
+  "material": {
+    "materialId": "MAT-10247",
+    "description": "Bracket Housing X240",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-50755",
+    "materialId": "MAT-10247"
+  },
+  "defect": {
+    "defectCode": "DEF-1250",
+    "defectText": "Coordinate Measuring Machine false rejection on bolt circle true position"
+  },
+  "workCenter": {
+    "workCenterId": "WC-QA-01",
+    "description": "Quality Metrology Laboratory CMM 1"
+  },
+  "inspections": [
+    {
+      "characteristic": "Bolt circle true position",
+      "measuredValue": "0.085mm (CMM)",
+      "specValue": "max 0.050mm"
+    },
+    {
+      "characteristic": "CMM probe stylus ruby ball sphericity",
+      "measuredValue": "chipped 0.035mm flat",
+      "specValue": "max 0.002mm"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-9012, Shift A - CMM technician ran automated measurement routine per inspection plan",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "CMM EQ-CMM01-001 air bearings and linear glass scale optical readouts verified compliant",
+      "metricValue": "air 5.2 bar",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-1108 Rev B - DMIS measurement alignment algorithm (3-2-1 primary datum) verified correct",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Bracket Housing X240 machined features inspected on optical vision machine were 100% within drawing tolerance",
+      "metricValue": "true pos 0.022mm",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "CMM star probe stylus ruby ball GA-0012 had micro-chipped contact flat and loose M2 shank thread, generating 0.035mm directional hysteresis error during vector touch trigger probing",
+      "metricValue": "35um hysteresis vs 2um max",
+      "isRootCause": "Y",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Metrology lab temperature 20.0C +/- 0.3C / 45% RH strictly controlled",
+      "metricValue": "20.0C",
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why were 40 housing brackets quarantined as non-conforming?",
+      "answer": "Automated CMM inspection reported bolt circle true position at 0.085mm exceeding the 0.050mm tolerance",
+      "evidenceCitation": "CMM inspection report CMM-2026-880"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did re-measuring on an optical comparator show the parts were actually within tolerance (0.022mm)?",
+      "answer": "The CMM touch-trigger probe recorded artificial position offsets during touch probing in the -Y vector direction",
+      "evidenceCitation": "Metrology cross-verification report TR-2026-112"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why did the CMM touch-trigger probe record artificial directional offsets? (root cause)",
+      "answer": "The 3mm ruby ball stylus was micro-chipped on its equatorial contact zone and the M2 thread had loosened, creating 0.035mm mechanical hysteresis during touch deflection",
+      "evidenceCitation": "Stylus microscope inspection and qualification sphere error log"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "Release 40 falsely rejected housings following optical coordinate verification"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "status": "Verified",
+      "actionText": "Replace damaged ruby stylus on CMM 1, torque M2 shank to 1.2 Nm, and re-qualify probe on reference sphere"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "status": "Verified in production",
+      "actionText": "Implement mandatory automated reference sphere qualification routine before every shift inspection run in DMIS software"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100147",
+      "partnerName": "Lena Hoffmann",
+      "functionTitle": "Metrology Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-QA-01",
+    "description": "False defect rejection and measurement bias due to chipped CMM probe stylus"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 8200
+  },
+  "lessonsLearned": {
+    "whatWorked": "Cross-measuring on optical comparator prevented unnecessary scrapping of 40 fully conforming housings",
+    "whatDidnt": "Stylus qualification on reference sphere was run weekly instead of daily at shift startup"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "Housing X240 inspected on CMM 1 using probe configuration #3 on 2026-08-14",
+    "isNotWhereWhenItDoesnt": "Parts inspected on CMM 2 with verified stylus qualification run",
+    "notes": "Defect was a measurement system artifact (false rejection) caused by a damaged probe stylus"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

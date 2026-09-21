@@ -1,0 +1,68 @@
+/* ================================================================
+   CDK Brand Design Tokens — CNMA Standard
+   ================================================================
+   Tailwind v4: Use as-is with @tailwindcss/vite plugin.
+   Tailwind v3: Replace the @import and @theme block below with:
+     @tailwind base;
+     @tailwind components;
+     @tailwind utilities;
+   and copy the extend.colors to tailwind.config.js (see Section 8.5)
+   ================================================================ */
+
+@import "tailwindcss";
+
+/* === CDK Brand Design Tokens === */
+:root {
+    --brand-red: #b00000;
+    --accent-color: #b00000;
+    --accent-hover: #8a0000;
+    --bg-color: #f5f7fa;
+    --card-bg: #ffffff;
+    --text-primary: #32363a;
+    --text-secondary: #6a6d70;
+    --border-color: #d9d9d9;
+
+    /* Status Colors */
+    --success-bg: #dcfce7;
+    --success-text: #166534;
+    --warning-bg: #fef9c3;
+    --warning-text: #854d0e;
+    --error-bg: #fee2e2;
+    --error-text: #991b1b;
+    --info-bg: #e0f2fe;
+    --info-text: #0369a1;
+
+    /* Typography — SAP Fiori / 72 Font Family */
+    font-family: "72", "72full", "Inter", "Segoe UI", Arial, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+}
+
+/* Tailwind v4 — Map CSS vars to utility classes (e.g. bg-brand, text-text-secondary) */
+@theme {
+    --color-brand: var(--brand-red);
+    --color-accent: var(--accent-color);
+    --color-accent-hover: var(--accent-hover);
+    --color-background: var(--bg-color);
+    --color-card: var(--card-bg);
+    --color-text-primary: var(--text-primary);
+    --color-text-secondary: var(--text-secondary);
+    --color-border-custom: var(--border-color);
+    --color-success-bg: var(--success-bg);
+    --color-success-text: var(--success-text);
+    --color-warning-bg: var(--warning-bg);
+    --color-warning-text: var(--warning-text);
+    --color-error-bg: var(--error-bg);
+    --color-error-text: var(--error-text);
+    --color-info-bg: var(--info-bg);
+    --color-info-text: var(--info-text);
+}
+
+@layer components {
+    .btn-primary {
+        @apply bg-brand text-white hover:bg-accent-hover transition-colors;
+    }
+}

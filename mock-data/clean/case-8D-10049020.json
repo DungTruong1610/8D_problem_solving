@@ -1,0 +1,167 @@
+{
+  "notificationId": "8D-10049020",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Customer assembly line jam due to OD taper exceeding 0.015mm cylindrical tolerance",
+  "status": "Closed",
+  "foundDate": "2026-07-29",
+  "completionDate": "2026-08-18",
+  "quantityExtent": "120 units affected",
+  "teamSize": 3,
+  "material": {
+    "materialId": "MAT-10510",
+    "description": "Bushing Sleeve B45",
+    "materialGroup": "MG-BUSHING"
+  },
+  "batch": {
+    "batchId": "B-50388",
+    "materialId": "MAT-10510"
+  },
+  "defect": {
+    "defectCode": "DEF-0220",
+    "defectText": "Outer diameter taper out of tolerance on CNC lathe"
+  },
+  "workCenter": {
+    "workCenterId": "WC-LATHE-02",
+    "description": "CNC Twin-Spindle Lathe 2"
+  },
+  "inspections": [
+    {
+      "characteristic": "Outer diameter taper",
+      "measuredValue": "0.028mm",
+      "specValue": "max 0.010mm"
+    },
+    {
+      "characteristic": "Coolant temperature drift",
+      "measuredValue": "38.5C",
+      "specValue": "20.0 - 24.0C"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-3310, Shift A - lathe operator executed tool wear offset per daily log sheet",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-LATHE02-003 chiller unit thermostat stuck closed, allowing coolant temperature to climb from 22C to 38.5C during afternoon continuous run",
+      "metricValue": "38.5C vs 22C setpoint",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-9104 Rev B - CNC in-process touch probing performed without thermal compensation offset algorithm",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Alloy steel 42CrMo4 raw bar batch B-50388 dimensional runout and hardness 280 HBW verified compliant",
+      "metricValue": "280 HBW",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "CNC in-process optical touch probe GA-0450 calibrated at 20C; thermal expansion of stylus shank at 38.5C coolant caused false in-cycle offset calculation of +18um",
+      "metricValue": "Delta +18um thermal error",
+      "isRootCause": "Y",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Shop floor temperature controlled at 23.0C +/- 1.5C",
+      "metricValue": "23.0C",
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the bushing sleeve jam during customer automated press-fit?",
+      "answer": "The sleeve OD carried a taper of 0.028mm over its 60mm length, exceeding the 0.010mm drawing limit",
+      "evidenceCitation": "Customer quality claim CC-2026-0611"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why was the OD turned with a taper on the CNC lathe?",
+      "answer": "The in-process touch probe registered an incorrect baseline dimension and applied a false progressive tool compensation offset",
+      "evidenceCitation": "CNC controller macro offset log"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why did the in-process touch probe measure with an 18um error? (root cause)",
+      "answer": "Coolant temperature rose to 38.5C due to a failed chiller thermostat, thermally expanding the probe stylus while the calibration algorithm assumed constant 20C",
+      "evidenceCitation": "Metrology lab thermal expansion test report TR-2026-91"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "Quarantine 120 sleeves at customer plant and sort finished inventory with air-gage OD micrometer"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "status": "Verified",
+      "actionText": "Replace faulty coolant chiller thermostat on WC-LATHE-02 and integrate thermal probe compensation macro in CNC program"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "status": "Verified in production",
+      "actionText": "Install automated coolant temperature interlock to halt machining if coolant exceeds 25C across all CNC lathe cells"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100147",
+      "partnerName": "Lena Hoffmann",
+      "functionTitle": "Metrology Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100031",
+      "partnerName": "Sara Klein",
+      "functionTitle": "Supplier Quality Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-LATHE-02",
+    "description": "Dimensional drift caused by coolant thermal expansion of measuring probes"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 22400
+  },
+  "lessonsLearned": {
+    "whatWorked": "Air-gage sorting quickly separated 18 bad sleeves from good stock at the customer dock",
+    "whatDidnt": "In-process probe macro lacked a temperature reference input to guard against coolant thermal buildup"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "Bushing Sleeve B45 machined on WC-LATHE-02 during afternoon shifts between 13:00 and 17:00",
+    "isNotWhereWhenItDoesnt": "Morning shift parts on WC-LATHE-02 or parts machined on WC-LATHE-01 with functional chiller",
+    "notes": "Thermal drift correlated directly with coolant sump temperature climb during prolonged run"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0611",
+    "customerPlantContact": "Jean Dupont - Plant Lyon, Assembly Line 4",
+    "slaResponseDue": "2026-08-05"
+  }
+}

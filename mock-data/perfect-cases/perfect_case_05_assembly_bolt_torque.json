@@ -1,0 +1,55 @@
+{
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Line audit found loose M8 bolts on 63 gearboxes (B-91611) at WC-ASSY-08 on 2026-07-28. Fastener torque was only 18 Nm (spec 34-38 Nm) on nutrunner SPINDLE1 (SPINDLE2 at 36 Nm); worn planetary reduction gears slipped under tightening load.",
+  "foundDate": "2026-07-28",
+  "defectQuantity": 63,
+  "defectQuantityUom": "PC",
+  "referenceNumber": "INT-2026-8805",
+  "plant": "1000",
+  "entryMode": "during-inspection",
+  "inspectionLotId": "0010000061",
+  "material": {
+    "materialId": "MAT-10611",
+    "description": "Transmission Gear TG-12",
+    "materialGroup": "MG-GEARBOX"
+  },
+  "batch": {
+    "batchId": "B-91611",
+    "materialId": "MAT-10611"
+  },
+  "workCenter": {
+    "workCenterId": "WC-ASSY-08",
+    "description": "Gearbox Assembly Line 8"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-ASM",
+    "defectCode": "DEF-0723",
+    "defectText": "Bolt torque below specification",
+    "defectClass": "Major"
+  },
+  "inspections": [
+    {
+      "characteristic": "Bolt seating torque",
+      "measuredValue": "18.0000 Nm",
+      "specLowerLimit": "34.0000",
+      "specUpperLimit": "38.0000",
+      "specUom": "Nm",
+      "valuation": "Rejected",
+      "equipment": "WC-ASSY-08-SPINDLE1"
+    },
+    {
+      "characteristic": "Bolt seating torque",
+      "measuredValue": "36.0000 Nm",
+      "specLowerLimit": "34.0000",
+      "specUpperLimit": "38.0000",
+      "specUom": "Nm",
+      "valuation": "Accepted",
+      "equipment": "WC-ASSY-08-SPINDLE2"
+    }
+  ],
+  "responsibility": {
+    "reportedBy": "Marcus Wright",
+    "coordinator": "Marcus Wright",
+    "department": "Production Shop Floor"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Assembly fitters reported raised metal ridge at bore mouth on 74 sprocket hubs (B-40112) at WC-BROACH-01 on 2026-08-08. Ridge height measured 0.25mm (spec max 0.05mm) on broach B1 (B2 conforming at 0.02mm); worn broach teeth produced burrs.",
+  "foundDate": "2026-08-08",
+  "defectQuantity": 74,
+  "defectQuantityUom": "PC",
+  "referenceNumber": "INT-2026-8806",
+  "plant": "1000",
+  "entryMode": "during-inspection",
+  "inspectionLotId": "0010000019",
+  "material": {
+    "materialId": "MAT-11500",
+    "description": "Sprocket Hub H22",
+    "materialGroup": "MG-DRIVE"
+  },
+  "batch": {
+    "batchId": "B-40112",
+    "materialId": "MAT-11500"
+  },
+  "workCenter": {
+    "workCenterId": "WC-BROACH-01",
+    "description": "Broaching Line 1"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-SUR",
+    "defectCode": "DEF-1610",
+    "defectText": "Raised metal ridge at bore mouth",
+    "defectClass": "Major"
+  },
+  "inspections": [
+    {
+      "characteristic": "Ridge height at bore mouth",
+      "measuredValue": "0.25 mm",
+      "specLowerLimit": "0.0",
+      "specUpperLimit": "0.05",
+      "specUom": "mm",
+      "valuation": "Rejected",
+      "equipment": "WC-BROACH-01-B1"
+    },
+    {
+      "characteristic": "Ridge height at bore mouth",
+      "measuredValue": "0.02 mm",
+      "specLowerLimit": "0.0",
+      "specUpperLimit": "0.05",
+      "specUom": "mm",
+      "valuation": "Accepted",
+      "equipment": "WC-BROACH-01-B2"
+    }
+  ],
+  "responsibility": {
+    "reportedBy": "Dave Miller",
+    "coordinator": "Dave Miller",
+    "department": "Maintenance & Tooling"
+  }
+}

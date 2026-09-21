@@ -1,0 +1,29 @@
+[
+  {
+    "file": "issue-A-internal-milling.json",
+    "notificationId": "8D-10049001",
+    "origin": "Q3 - Internal Defect",
+    "symptom": "Operator stopped the line - rough edge felt on bracket flange after milling",
+    "workCenter": "WC-MILL-07",
+    "material": "MAT-10247",
+    "investigated": false
+  },
+  {
+    "file": "issue-B-customer-leak.json",
+    "notificationId": "8D-10049002",
+    "origin": "Q1 - Customer Complaint",
+    "symptom": "Customer reports coolant weeping from pump housing joint after 200 operating hours",
+    "workCenter": "WC-CAST-03",
+    "material": "MAT-10318",
+    "investigated": false
+  },
+  {
+    "file": "issue-C-new-welding.json",
+    "notificationId": "8D-10049003",
+    "origin": "Q3 - Internal Defect",
+    "symptom": "Weld seam cracked during frame straightening at the fixture",
+    "workCenter": "WC-WELD-11",
+    "material": "MAT-12800",
+    "investigated": false
+  }
+]

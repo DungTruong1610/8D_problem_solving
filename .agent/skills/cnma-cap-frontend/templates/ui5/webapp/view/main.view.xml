@@ -1,0 +1,10 @@
+<mvc:View
+    controllerName="cnma.template.ui5.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <Page id="page" title="{i18n>title}">
+        <content>
+            <Text text="Hello World" />
+        </content>
+    </Page>
+</mvc:View>

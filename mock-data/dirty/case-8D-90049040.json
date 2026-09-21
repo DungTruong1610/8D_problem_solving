@@ -1,0 +1,124 @@
+{
+  "notificationId": "8D-90049040",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Visible sink mark 0.35mm depth on top cosmetic cover rejected by customer inspection",
+  "status": "Closed",
+  "foundDate": "04.08.2026",
+  "completionDate": "20-AUG-26",
+  "quantityExtent": "210 St",
+  "teamSize": "k.A.",
+  "material": {
+    "materialId": "  MAT-10730 ",
+    "description": "Electronic Enclosure EE-50",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-50455",
+    "materialId": "  MAT-10730 "
+  },
+  "defect": {
+    "defectCode": "DEF-0440",
+    "defectText": "Sink mark and internal void on cosmetic injection molded surface"
+  },
+  "workCenter": {
+    "workCenterId": "WC-MOLD-01",
+    "description": "150T Injection Molding Machine 1"
+  },
+  "inspections": [
+    {
+      "characteristic": "Sink mark depth",
+      "measuredValue": "Messung Sink mark depth ergab 0,35mm; lt. Zeichnung max 0,05mm",
+      "specValue": "k.A."
+    },
+    {
+      "characteristic": "Holding pressure duration",
+      "measuredValue": "2,5s",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Method",
+      "description": "Molding recipe REC-EE50-02 had holding pressure time set to 2.5s instead of validated 5.5s, switching to cooling before the 3.2mm boss gate solidified",
+      "metricValue": "2,5s vs 5,5s validated",
+      "isRootCause": "Y",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Depth dial indicator GA-0190 calibrated and repeatability confirmed",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Mold chiller water temperature 45C +/- 2C on both core and cavity sides",
+      "metricValue": "45C",
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "",
+      "status": "Done",
+      "actionText": "Sort 210 units at customer facility and hold 450 finished enclosures in warehouse for visual audit"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Korrekturmassnahme",
+      "status": "Verified",
+      "actionText": "Restore validated holding pressure duration (5.5s @ 650 bar) and lock controller recipe with password"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "VM",
+      "status": "Verified in production",
+      "actionText": "Connect injection molding machines to central MES recipe server with checksum validation to block unapproved USB parameter loading"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng.",
+      "partnerRole": "k.A.",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100067",
+      "partnerName": "Marek Nowak",
+      "functionTitle": "Plastics Process Eng.",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 19600
+  },
+  "lessonsLearned": {
+    "whatWorked": "n.a.",
+    "whatDidnt": ""
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "Electronic Enclosure EE-50 molded on WC-MOLD-01 on 2026-08-04 after mold setup",
+    "isNotWhereWhenItDoesnt": "Batches produced prior to 2026-08-04 or running on WC-MOLD-02 with locked recipe card",
+    "notes": "Sink mark strictly restricted to the thick boss region due to premature hold pressure release"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0719",
+    "customerPlantContact": "Marcus Lindqvist, Plant Gothenburg",
+    "slaResponseDue": "11.08.2026"
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "notificationId": "8D-10049080",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Effective induction case depth 1.1mm below minimum 1.8mm drawing specification",
+  "status": "Completed",
+  "foundDate": "2026-08-10",
+  "completionDate": "2026-08-26",
+  "quantityExtent": "54 units affected",
+  "teamSize": 3,
+  "material": {
+    "materialId": "MAT-10402",
+    "description": "Drive Shaft S150",
+    "materialGroup": "MG-SHAFT"
+  },
+  "batch": {
+    "batchId": "B-50604",
+    "materialId": "MAT-10402"
+  },
+  "defect": {
+    "defectCode": "DEF-0822",
+    "defectText": "Insufficient case depth after induction hardening"
+  },
+  "workCenter": {
+    "workCenterId": "WC-HEAT-03",
+    "description": "Induction Hardening Cell 3"
+  },
+  "inspections": [
+    {
+      "characteristic": "Effective case depth (50 HRC)",
+      "measuredValue": "1.15mm",
+      "specValue": "1.80 - 2.40mm"
+    },
+    {
+      "characteristic": "Induction coil cooling flow",
+      "measuredValue": "14 l/min",
+      "specValue": "28 - 32 l/min"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-1904, Shift C - heat treat operator verified coil alignment and scan speed per setup sheet",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "High-frequency induction coil EQ-HEAT03-001 internal cooling passage choked with calcium mineral scale, reducing flow to 14 l/min and causing thermal derating of generator power output by 16%",
+      "metricValue": "14 l/min vs 30 l/min nominal",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-3390 Rev C - induction scanning speed 4.2 mm/s and quench polymer concentration 12% verified compliant",
+      "metricValue": "4.2 mm/s",
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Forged alloy steel 42CrMo4 chemistry (C 0.41%, Cr 1.05%, Mo 0.22%) and grain size 7 compliant",
+      "metricValue": "C 0.41%",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Microhardness tester GA-0512 optical indentation and calibration verified",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Quench polymer tank temperature maintained at 28C +/- 2C",
+      "metricValue": "28C",
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the drive shaft batch fail destructive metallurgical inspection?",
+      "answer": "Effective case depth to 50 HRC reached only 1.15mm against the 1.80mm minimum requirement",
+      "evidenceCitation": "Metallurgy lab cross-section hardness report ML-2026-104"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why was the heat-affected austenitizing zone too shallow?",
+      "answer": "RF induction power delivered to the shaft surface dropped from 85 kW to 71 kW during the scanning stroke",
+      "evidenceCitation": "Induction generator power telemetry log"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why did generator power drop during scanning? (root cause)",
+      "answer": "Severe calcium scale inside the induction copper coil reduced cooling flow by 50%, triggering automatic thermal power throttling in the generator inverter",
+      "evidenceCitation": "Maintenance coil descaling and water circuit inspection report"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "Quarantine 54 drive shafts from batch B-50604 and perform 100% eddy current non-destructive case depth testing"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "status": "Verified",
+      "actionText": "Acid flush and descale induction coil on WC-HEAT-03; restore cooling water flow to 31 l/min"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "status": "Verified in production",
+      "actionText": "Convert induction cell cooling to closed-loop deionized water chiller circuit across all heat treat lines"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100088",
+      "partnerName": "Klaus Richter",
+      "functionTitle": "Heat Treat Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-HEAT-04",
+    "description": "Shallow hardening depth due to induction coil cooling restriction and power throttling"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 18200
+  },
+  "lessonsLearned": {
+    "whatWorked": "Eddy current non-destructive testing sorted good parts without scrapping the full batch",
+    "whatDidnt": "Cooling water quality in heat treatment was connected to open tower with high mineral hardness"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "Drive Shaft S150 induction hardened on WC-HEAT-03 on 2026-08-10",
+    "isNotWhereWhenItDoesnt": "Shafts hardened on WC-HEAT-01 with demineralized closed-loop cooling system",
+    "notes": "Defect caused exclusively by coil cooling passage scaling on open-tower circuit"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

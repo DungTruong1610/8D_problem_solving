@@ -1,0 +1,124 @@
+{
+  "notificationId": "8D-90049110",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Nital etch inspection revealed thermal grinding burn on rail running raceway",
+  "status": "Completed",
+  "foundDate": "13.08.2026",
+  "completionDate": "28-AUG-26",
+  "quantityExtent": "ca. 26 Stk.",
+  "teamSize": "k.A.",
+  "material": {
+    "materialId": "  MAT-11280 ",
+    "description": "Guide Rail GR-200",
+    "materialGroup": "MG-LINEAR"
+  },
+  "batch": {
+    "batchId": "B-50710",
+    "materialId": "  MAT-11280 "
+  },
+  "defect": {
+    "defectCode": "DEF-1140",
+    "defectText": "Grinding burn and micro-cracks on precision linear guideway"
+  },
+  "workCenter": {
+    "workCenterId": "WC-GRIND-01",
+    "description": "CNC Precision Surface Grinder 1"
+  },
+  "inspections": [
+    {
+      "characteristic": "Barkhausen noise peak",
+      "measuredValue": "Barkhausen noise peak: gemessen 85 mp, Sollwert max 35 mp",
+      "specValue": "  "
+    },
+    {
+      "characteristic": "Wheel dressing interval count",
+      "measuredValue": "55 parts",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Method",
+      "description": "CNC grinding program dressing macro interval was modified from 20 parts to 55 parts, causing corundum grinding wheel loading and excessive frictional thermal spike >750C during finishing pass",
+      "metricValue": "55 parts vs 20 standard",
+      "isRootCause": "Y",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-GRIND01-002 spindle runout <1.5um, table hydraulic traverse speed consistent",
+      "metricValue": "runout <1,5um",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Man",
+      "description": "EMP-3882, Shift A - grinder operator extended dressing interval to reduce diamond dresser wear",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    }
+  ],
+  "fiveWhyChain": [],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "SM",
+      "status": "Done",
+      "actionText": "Perform 100% Barkhausen noise non-destructive inspection on all 26 quarantined guide rails"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Korrekturmassnahme",
+      "status": "Verified",
+      "actionText": "Restore automated diamond dressing frequency to every 18 parts in CNC macro and dress wheel"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "",
+      "status": "Verified in production",
+      "actionText": "Lock dressing macro parameters in CNC controller under supervisor authorization key"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng.",
+      "partnerRole": "  ",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100088",
+      "partnerName": "Klaus Richter",
+      "functionTitle": "Grinding Process Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 16700
+  },
+  "lessonsLearned": {
+    "whatWorked": "-",
+    "whatDidnt": "n.a."
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "Guide Rail GR-200 ground on WC-GRIND-01 after part count #22 in grinding batch",
+    "isNotWhereWhenItDoesnt": "Parts #1 to #20 in the batch immediately following fresh diamond dressing",
+    "notes": "Thermal burn strictly initiated after part 20 when abrasive wheel grains became glazed"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

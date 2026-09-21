@@ -1,0 +1,167 @@
+{
+  "notificationId": "8D-10049110",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Nital etch inspection revealed thermal grinding burn on rail running raceway",
+  "status": "Completed",
+  "foundDate": "2026-08-13",
+  "completionDate": "2026-08-28",
+  "quantityExtent": "26 units affected",
+  "teamSize": 3,
+  "material": {
+    "materialId": "MAT-11280",
+    "description": "Guide Rail GR-200",
+    "materialGroup": "MG-LINEAR"
+  },
+  "batch": {
+    "batchId": "B-50710",
+    "materialId": "MAT-11280"
+  },
+  "defect": {
+    "defectCode": "DEF-1140",
+    "defectText": "Grinding burn and micro-cracks on precision linear guideway"
+  },
+  "workCenter": {
+    "workCenterId": "WC-GRIND-01",
+    "description": "CNC Precision Surface Grinder 1"
+  },
+  "inspections": [
+    {
+      "characteristic": "Barkhausen noise peak",
+      "measuredValue": "85 mp",
+      "specValue": "max 35 mp"
+    },
+    {
+      "characteristic": "Wheel dressing interval count",
+      "measuredValue": "55 parts",
+      "specValue": "max 20 parts"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-3882, Shift A - grinder operator extended dressing interval to reduce diamond dresser wear",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-GRIND01-002 spindle runout <1.5um, table hydraulic traverse speed consistent",
+      "metricValue": "runout <1.5um",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "CNC grinding program dressing macro interval was modified from 20 parts to 55 parts, causing corundum grinding wheel loading and excessive frictional thermal spike >750C during finishing pass",
+      "metricValue": "55 parts vs 20 standard",
+      "isRootCause": "Y",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Case-hardened alloy steel 58-62 HRC core structure and carbide distribution compliant",
+      "metricValue": "60 HRC",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Barkhausen noise grinding burn analyzer GA-0419 calibrated on master burn calibration blocks",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "High-pressure coolant flushing nozzle flow 85 l/min aligned to grinding contact zone",
+      "metricValue": "85 l/min",
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did linear guide rails fail Nital chemical etching inspection?",
+      "answer": "Dark re-tempered martensite thermal burn bands appeared along the precision raceway",
+      "evidenceCitation": "Nital etch inspection lot report QALS"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did excessive frictional heat develop during grinding pass?",
+      "answer": "The vitrified grinding wheel pores were loaded with steel swarf, causing rubbing instead of clean abrasive cutting",
+      "evidenceCitation": "Grinding wheel surface microscopic examination"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was the grinding wheel glazed and loaded with swarf? (root cause)",
+      "answer": "The diamond dressing cycle parameter was improperly raised from every 20 parts to every 55 parts in an unverified cycle-time change",
+      "evidenceCitation": "CNC program modification audit record PRG-GR200-01"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "Perform 100% Barkhausen noise non-destructive inspection on all 26 quarantined guide rails"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "status": "Verified",
+      "actionText": "Restore automated diamond dressing frequency to every 18 parts in CNC macro and dress wheel"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "status": "Verified in production",
+      "actionText": "Lock dressing macro parameters in CNC controller under supervisor authorization key"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100088",
+      "partnerName": "Klaus Richter",
+      "functionTitle": "Grinding Process Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-GRIND-02",
+    "description": "Thermal grinding burn and surface re-tempering due to wheel glazing and extended dressing"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 16700
+  },
+  "lessonsLearned": {
+    "whatWorked": "Barkhausen noise testing non-destructively identified the exact part #21 threshold where burn started",
+    "whatDidnt": "Operator adjusted wheel dressing frequency to save dressing diamond cost without consulting quality engineering"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "Guide Rail GR-200 ground on WC-GRIND-01 after part count #22 in grinding batch",
+    "isNotWhereWhenItDoesnt": "Parts #1 to #20 in the batch immediately following fresh diamond dressing",
+    "notes": "Thermal burn strictly initiated after part 20 when abrasive wheel grains became glazed"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

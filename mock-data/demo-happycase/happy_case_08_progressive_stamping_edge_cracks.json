@@ -1,0 +1,55 @@
+{
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Crack detector alerted to 0.22mm burr and edge cracks on 340 stamped brackets (B-50412) on 2026-02-16. Die station 4 punch guide bushing seized, collapsing clearance to 4% and tearing sheet.",
+  "foundDate": "2026-02-16",
+  "defectQuantity": 340,
+  "defectQuantityUom": "PC",
+  "referenceNumber": "INT-2026-4408",
+  "plant": "1000",
+  "entryMode": "during-inspection",
+  "inspectionLotId": "0010000028",
+  "material": {
+    "materialId": "MAT-10620",
+    "description": "Stamping Bracket SB-12",
+    "materialGroup": "MG-BRACKET"
+  },
+  "batch": {
+    "batchId": "B-50412",
+    "materialId": "MAT-10620"
+  },
+  "workCenter": {
+    "workCenterId": "WC-PRESS-04",
+    "description": "250T Progressive Stamping Press 4"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-MAT",
+    "defectCode": "DEF-0318",
+    "defectText": "Excessive burr and edge micro-cracks on stamped sheet",
+    "defectClass": "Major"
+  },
+  "inspections": [
+    {
+      "characteristic": "Burr height at sheared edge",
+      "measuredValue": "0.2200 mm",
+      "specLowerLimit": 0,
+      "specUpperLimit": 0.08,
+      "specUom": "mm",
+      "valuation": "Rejected",
+      "equipment": "OPTICAL-MICROSCOPE"
+    },
+    {
+      "characteristic": "Material Sheet Thickness",
+      "measuredValue": "2.0200 mm",
+      "specLowerLimit": 1.95,
+      "specUpperLimit": 2.05,
+      "specUom": "mm",
+      "valuation": "Accepted",
+      "equipment": "MICROMETER-DIGITAL-01"
+    }
+  ],
+  "responsibility": {
+    "reportedBy": "Elena Rostova",
+    "coordinator": "Dave Miller",
+    "department": "Maintenance & Tooling"
+  }
+}

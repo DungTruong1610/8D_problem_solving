@@ -1,0 +1,124 @@
+{
+  "notificationId": "8D-90049120",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "CMM reported bolt circle true position out of spec 0.085mm vs max 0.050mm limit",
+  "status": "Completed",
+  "foundDate": "14.08.2026",
+  "completionDate": "28-AUG-26",
+  "quantityExtent": "~40 Teile",
+  "teamSize": "  ",
+  "material": {
+    "materialId": "  MAT-10247 ",
+    "description": "Bracket Housing X240",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-50755",
+    "materialId": "  MAT-10247 "
+  },
+  "defect": {
+    "defectCode": "DEF-1250",
+    "defectText": "Coordinate Measuring Machine false rejection on bolt circle true position"
+  },
+  "workCenter": {
+    "workCenterId": "WC-QA-01",
+    "description": "Quality Metrology Laboratory CMM 1"
+  },
+  "inspections": [
+    {
+      "characteristic": "Bolt circle true position",
+      "measuredValue": "Bolt circle true position = 0,085mm (CMM) (Vorgabe max 0,050mm) - iO/niO: niO",
+      "specValue": "-"
+    },
+    {
+      "characteristic": "CMM probe stylus ruby ball sphericity",
+      "measuredValue": "chipped 0,035mm flat",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Measurement",
+      "description": "CMM star probe stylus ruby ball GA-0012 had micro-chipped contact flat and loose M2 shank thread, generating 0.035mm directional hysteresis error during vector touch trigger probing",
+      "metricValue": "35um hysteresis vs 2um max",
+      "isRootCause": "Y",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Machine",
+      "description": "CMM EQ-CMM01-001 air bearings and linear glass scale optical readouts verified compliant",
+      "metricValue": "air 5,2 bar",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-1108 Rev B - DMIS measurement alignment algorithm (3-2-1 primary datum) verified correct",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    }
+  ],
+  "fiveWhyChain": [],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Sofortmassnahme",
+      "status": "Done",
+      "actionText": "Release 40 falsely rejected housings following optical coordinate verification"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Korrekturmassnahme",
+      "status": "Verified",
+      "actionText": "Replace damaged ruby stylus on CMM 1, torque M2 shank to 1.2 Nm, and re-qualify probe on reference sphere"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "vorbeugend",
+      "status": "Verified in production",
+      "actionText": "Implement mandatory automated reference sphere qualification routine before every shift inspection run in DMIS software"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng.",
+      "partnerRole": "-",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100147",
+      "partnerName": "Lena Hoffmann",
+      "functionTitle": "Metrology Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 8200
+  },
+  "lessonsLearned": {
+    "whatWorked": "-",
+    "whatDidnt": "k.A."
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "Housing X240 inspected on CMM 1 using probe configuration #3 on 2026-08-14",
+    "isNotWhereWhenItDoesnt": "Parts inspected on CMM 2 with verified stylus qualification run",
+    "notes": "Defect was a measurement system artifact (false rejection) caused by a damaged probe stylus"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

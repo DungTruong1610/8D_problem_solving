@@ -1,0 +1,164 @@
+{
+  "notificationId": "8D-10048857",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Bore misalignment reported at customer assembly",
+  "status": "In Process",
+  "foundDate": "2026-08-08",
+  "completionDate": null,
+  "quantityExtent": "156 units affected",
+  "teamSize": 3,
+  "material": {
+    "materialId": "MAT-11130",
+    "description": "Bearing Cap BC14",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-54012",
+    "materialId": "MAT-11130"
+  },
+  "defect": {
+    "defectCode": "DEF-1233",
+    "defectText": "Bore position out of true position"
+  },
+  "workCenter": {
+    "workCenterId": "WC-MILL-11",
+    "description": "CNC Milling Line 11"
+  },
+  "inspections": [
+    {
+      "characteristic": "Bore true position",
+      "measuredValue": "0.19mm",
+      "specValue": "max 0.08mm"
+    },
+    {
+      "characteristic": "Bore diameter",
+      "measuredValue": "42.012mm",
+      "specValue": "42.000-42.025mm"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-9022, Shift B - loaded parts per the fixture instruction",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-MILL11-002 ballbar test 0.012mm circularity, within the 0.02mm limit",
+      "metricValue": "0.012mm",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-11260 Rev B - machining sequence and fixture unchanged",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Casting lot CST-7701 dimensional and hardness cert PASS",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "CMM program CMM-BC14-03 was rebuilt on 2026-07-15 and references datum B on the as-cast face instead of the machined face called out on the drawing; every part since then measured in-tolerance against the wrong datum",
+      "metricValue": "datum offset 0.11mm",
+      "isRootCause": "Y",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "20.4C in the metrology room, within the 20 +/-1C requirement",
+      "metricValue": "20.4C",
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why is the bore out of true position at the customer?",
+      "answer": "True position measured 0.19mm against a 0.08mm maximum when checked against the drawing datum",
+      "evidenceCitation": "Customer incoming inspection report"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did these parts pass our own inspection?",
+      "answer": "CMM program CMM-BC14-03 measures from the as-cast face rather than the machined datum B, understating true position by roughly 0.11mm",
+      "evidenceCitation": "CMM program revision log 2026-07-15"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was a CMM program with the wrong datum released? (root cause)",
+      "answer": "The program was rebuilt and put into service without a first-article correlation against the drawing datum scheme or a second-person review",
+      "evidenceCitation": "Metrology change record CMM-BC14-03"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "Freeze CMM-BC14-03 and re-measure all BC14 stock against the drawing datum on a manual setup"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Containment",
+      "status": "Planned",
+      "actionText": "Sort the 156 units at the customer and replace any part outside true position"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Corrective",
+      "status": "Planned",
+      "actionText": "Rebuild CMM-BC14-03 against datum B and correlate against a first article before release"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100014",
+      "partnerName": "Thien Tu",
+      "functionTitle": "Quality Engineer",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100147",
+      "partnerName": "Lena Hoffmann",
+      "functionTitle": "Metrology Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100045",
+      "partnerName": "Ingo Braun",
+      "functionTitle": "Manufacturing Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 18700
+  },
+  "lessonsLearned": {
+    "whatWorked": "The customer report and our own records disagreeing pointed straight at the measurement system rather than the process",
+    "whatDidnt": "A measurement program could be rebuilt and released with nobody checking it against the drawing"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "BC14 measured with CMM program CMM-BC14-03 after its 2026-07-15 rebuild",
+    "isNotWhereWhenItDoesnt": "BC14 measured before 07-15, and BC12 measured with its own unmodified program on the same CMM",
+    "notes": "Defect follows the measurement program, not the machine or the casting lot"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0521",
+    "customerPlantContact": "Hugo Martins - Plant 9, Porto",
+    "slaResponseDue": "2026-08-15"
+  }
+}

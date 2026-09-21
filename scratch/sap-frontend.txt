@@ -1,0 +1,59 @@
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\components\ui\ValueHelpInput.tsx:25: *     SAP GUI: bấm vào là thấy hết, không phải thấy mỗi thứ mình đã có.
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\components\ui\ValueHelpInput.tsx:220: // cách người quen SAP GUI mở F4 mà không cần chuột.
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\contexts\fiori-theme-context.tsx:41: // Apply SAP theme to document element whenever theme changes
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\contexts\fiori-theme-context.tsx:61: // Read SAP locale and theme on initial mount
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\contexts\fiori-theme-context.tsx:157: } else if (text.includes('SAP Dark')) {
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\hooks\use-flpsync.ts:102: // ── SAP params ────────────────────────────────────────────────────────────────
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\hooks\use-flpsync.ts:110: * Returns SAP locale and theme from the parent FLP URL.
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\hooks\use-user-info.ts:41: * and real XSUAA user info & strict roles on SAP BTP production.
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\lib\case-workload.ts:216: * Tên trong code vẫn là `defectClass` vì đó là tên cột và tên trường của SAP;
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\lib\step-progress.ts:96: // `sapStatus` la trang thai ben SAP, khac `status` cua pipeline phan tich.
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\create-defect\index.tsx:86: * `srv/src/domain/numberRange.ts`). Ô vẫn gõ được: dữ liệu từ SAP mang số của
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\create-defect\index.tsx:87: * chính nó, và SAP cũng cho phép cả hai kiểu.
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\create-defect\index.tsx:105: * KHÔNG đi vào payload SAP — mục `inspections` ở `builtPayloadObject` liệt kê
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\create-defect\index.tsx:106: * tường minh từng trường, và khoá này là của ProResolve chứ không phải của SAP.
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\create-defect\index.tsx:205: // SAP). Một nhãn cho người dùng, một tên trong schema — cố ý, không phải sót.
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\create-defect\index.tsx:216: * SAP: phán quyết Accepted / Rejected của người kiểm, thứ trước nay không có
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\create-defect\index.tsx:401: // Catalog type 9 của SAP là hai tầng: nhóm quyết định mã nào chọn được. Chưa
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\create-defect\index.tsx:1079: * nhận nếu case này được mở 8D, và người dùng đang mô phỏng SAP muốn thấy
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\create-defect\index.tsx:1094: vì nhét `ID` vào payload: payload là hình dạng SAP, và khoá này là của
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\create-defect\index.tsx:1407: {/* SAP QM Defect Form */}
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\create-defect\index.tsx:1498: so được, không quy ra tiền được. SAP tách RKMNG/MGEIN chính
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\create-defect\index.tsx:1805: {/* Severity — dẫn xuất từ mã, y như SAP suy nó ra từ
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\create-defect\index.tsx:1922: Bước ③ của SAP. Mặc định là RỖNG chứ không
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\action-table.tsx:265: * danh mục SAP (catalog type 2) y như danh mục lỗi (type 9) — ngày nối S/4, cả
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\analyze-dialog.tsx:29: * Đường CHÍNH là mở 8D từ một lỗi đã ghi nhận: đó là chuỗi nghiệp vụ thật của SAP
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\analyze-dialog.tsx:64: * Bóc lớp bọc của OData (`value: [ … ]`). Export SAP thật luôn có lớp này; file
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\analyze-dialog.tsx:148: /** Phân loại nguồn gốc lỗi QM SAP: Q1 (khách hàng), Q2 (nhà cung cấp), Q3 (nội bộ). */
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\analyze-dialog.tsx:157: /** Huy hiệu hiển thị loại defect chuẩn SAP QM với màu sắc phân biệt trực quan. */
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\case-stepper.tsx:20: // "Team Recognition", không phải "Closure": SAP và trang /workflow đều gọi
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\comparative-diagnosis-badge.tsx:73: // Active divergence: Either explicit SAP recorded cause disagree, or human suspicion in symptom overturned by AI
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\evidence-source.ts:13: * Dataset đã ghi sẵn hệ thống gốc cho từng dòng: `'SAP: EQUI/AFIH (PM)'`,
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\evidence-source.ts:16: * `source` — và khi phải suy, ta chỉ nói được tới mức "phần nào của SAP QM".
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\evidence-source.ts:18: * ── Vì sao `ASSUMED:` phải hiện khác `SAP:` ──
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\evidence-source.ts:19: * `SAP:` nghĩa là có một bản ghi trong hệ thống chống lưng. `ASSUMED:` nghĩa là
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\evidence-source.ts:20: * KHÔNG có — dòng đó được giả định từ MES/IoT/HR, những hệ nằm ngoài SAP và
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\evidence-source.ts:28: /** Nhãn hiện trên màn hình, ví dụ `SAP EQUI/AFIH (PM)`. */
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\evidence-source.ts:49: /** Tên đối tượng SAP xuất hiện trong một câu trích dẫn viết tự do. */
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\evidence-source.ts:55: if (/GW_8D/i.test(trimmed) || /SAP HANA.*GW_8D/i.test(trimmed)) {
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\evidence-source.ts:73: if (/^SAP\s*:/i.test(trimmed)) {
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\evidence-source.ts:74: const module = trimmed.replace(/^SAP\s*:\s*/i, '');
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\evidence-source.ts:80: * không mang tiền tố `SAP:`. Bỏ qua nhánh này thì một bằng chứng CÓ bản ghi
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\index.tsx:171: // thuoc bang ma phan loai thong bao cua SAP.
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\index.tsx:230: * Mức nghiêm trọng (SAP FECLAS).
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\eight-d\schema-discipline-card.tsx:368: // `complaint-reference` doc thang CaseContext (du lieu SAP da xac thuc), nen
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\master-data\CodeCataloguesTab.tsx:11: * Cả hai danh mục là dữ liệu chủ của SAP: mã lỗi là catalog type 9, mã nhiệm vụ
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\master-data\CodeCataloguesTab.tsx:14: * và tệ hơn, là tạo ra một bản danh mục thứ hai lệch với bản của SAP. Đường sửa
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\master-data\HistoricalDefectsTab.tsx:377: // Section 1: SAP Notification & Header
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\master-data\HistoricalDefectsTab.tsx:1069: // `notificationId` tuỳ chọn: file xuất từ SAP mang số của nó, file dựng
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\master-data\HistoricalDefectsTab.tsx:1091: * một payload SAP lồng nhau đầy đủ vào kho nguyên vẹn thay vì bị dẹp
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\master-data\index.tsx:19: * của SAP — một header với N kết quả; bảng đằng sau nó là một lô một đặc tính, và
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\master-data\InspectionLotsTab.tsx:60: * số của chính nó, và SAP hỗ trợ cả hai kiểu.
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\object-schema\SourceFieldsPanel.tsx:11: * Panel 1 — All available SAP source fields scanned from historical cases.
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\pages\object-schema\StepObjectSchemaEditor.tsx:24: *   left    every SAP field, scanned from real case payloads
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\services\eightd-service.ts:277: /** SAP FECLAS. Hiện trên giao diện dưới nhãn "Severity". */
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\services\retrieval-service.ts:330: * Một field SAP gửi lên, đã đo trên kho thật.
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\services\value-help-service.ts:33: /** Quản lý lô hàng (SAP MCHA/MCH1). Con của Material. */
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\services\value-help-service.ts:35: /** Danh mục phòng ban chịu trách nhiệm (SAP QMEL-ABTEI). */
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\services\value-help-service.ts:37: /** Điều phối viên thông báo lỗi (SAP QMEL-PARNR). */
+d:\Download\VNG-MLAI\project\refractor-migrate\app\8D_hackathon_ui\src\services\value-help-service.ts:39: /** Đặc tính đo kiểm chuẩn (SAP QPMK Master Inspection Characteristics). */

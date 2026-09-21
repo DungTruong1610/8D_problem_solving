@@ -1,0 +1,68 @@
+{
+    "name": "cap-project-template",
+    "version": "1.0.0",
+    "description": "SAP CAP Project with TypeScript type sharing",
+    "dependencies": {
+        "@cap-js/hana": "^2",
+        "@sap/cds": "^9",
+        "@sap/xssec": "^4",
+        "express": "^4"
+    },
+    "devDependencies": {
+        "@cap-js/cds-typer": "^0.38.0",
+        "@cap-js/cds-types": "^0.15.0",
+        "@cap-js/sqlite": "^2",
+        "@sap/cds-dk": "^9",
+        "@types/jest": "^30.0.0",
+        "@types/node": "^25.0.3",
+        "eslint": "^9",
+        "eslint-config-prettier": "^10",
+        "husky": "^9",
+        "jest": "^30",
+        "lint-staged": "^16",
+        "prettier": "^3",
+        "ts-jest": "^29",
+        "ts-node": "^10",
+        "tsx": "^4",
+        "typescript": "^5",
+        "concurrently": "^9"
+    },
+    "scripts": {
+        "start": "cds-serve",
+        "build:types": "cds-typer \"*\" --outputDirectory @cds-models",
+        "watch:types": "cds-typer \"*\" --outputDirectory @cds-models --watch",
+        "types": "npm run build:types",
+        "dev": "concurrently \"npm run watch:types\" \"cds watch\"",
+        "test": "jest",
+        "prepare": "husky"
+    },
+    "private": true,
+    "cds": {
+        "requires": {
+            "db": {
+                "kind": "sqlite",
+                "credentials": {
+                    "url": "db.sqlite"
+                }
+            },
+            "[production]": {
+                "auth": "xsuaa"
+            },
+            "auth": {
+                "kind": "mocked",
+                "users": {
+                    "alice": {
+                        "password": "alice",
+                        "roles": [
+                            "admin",
+                            "authenticated-user"
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "imports": {
+        "#cds-models/*": "./@cds-models/*/index.js"
+    }
+}

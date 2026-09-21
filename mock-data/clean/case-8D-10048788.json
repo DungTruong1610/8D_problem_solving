@@ -1,0 +1,151 @@
+{
+  "notificationId": "8D-10048788",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Chatter marks on rotor shaft ground diameter",
+  "status": "In Process",
+  "foundDate": "2026-08-06",
+  "completionDate": null,
+  "quantityExtent": "88 units affected",
+  "teamSize": 2,
+  "material": {
+    "materialId": "MAT-10820",
+    "description": "Rotor Shaft R60",
+    "materialGroup": "MG-SHAFT"
+  },
+  "batch": {
+    "batchId": "B-53001",
+    "materialId": "MAT-10820"
+  },
+  "defect": {
+    "defectCode": "DEF-0902",
+    "defectText": "Chatter marks on ground surface"
+  },
+  "workCenter": {
+    "workCenterId": "WC-GRIND-04",
+    "description": "Cylindrical Grinding Cell 4"
+  },
+  "inspections": [
+    {
+      "characteristic": "Surface roughness Ra",
+      "measuredValue": "2.8um",
+      "specValue": "max 0.8um"
+    },
+    {
+      "characteristic": "Roundness",
+      "measuredValue": "0.014mm",
+      "specValue": "max 0.006mm"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-6033, Shift A - dressing cycle run at the released interval",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-GRIND04-001 spindle bearing vibration 7.9 mm/s RMS against a 2.8 mm/s alarm limit; trend rising since 2026-07-20",
+      "metricValue": "7.9 mm/s vs 2.8 limit",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-9120 Rev C - grinding parameters and dressing interval unchanged",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Bar stock hardness 58 HRC within the 56-60 HRC band",
+      "metricValue": "58 HRC",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Roughness tester GA-0402, last cal 2026-07-11, R&R 4.8%",
+      "metricValue": "4.8%",
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "22.1C, coolant temperature 19.6C, both nominal",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why are there chatter marks on the ground diameter?",
+      "answer": "Surface roughness measured 2.8um against a 0.8um maximum and roundness 0.014mm against 0.006mm, the signature of vibration during grinding",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why was there vibration during grinding? (root cause)",
+      "answer": "Spindle bearing vibration reached 7.9 mm/s RMS against a 2.8 mm/s alarm limit, indicating bearing degradation",
+      "evidenceCitation": "Condition monitoring trend EQ-GRIND04-001"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why did a rising vibration trend since 2026-07-20 not trigger intervention?",
+      "answer": "Condition monitoring data is reviewed monthly rather than on threshold breach, so the alarm limit was crossed without anyone acting",
+      "evidenceCitation": "PM review schedule WC-GRIND-04"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "Stop WC-GRIND-04, quarantine batch B-53001 and route R60 grinding to WC-GRIND-01"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "status": "Planned",
+      "actionText": "Replace the WC-GRIND-04 spindle bearing set and re-qualify the machine with a capability run"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100012",
+      "partnerName": "Minh Dinh",
+      "functionTitle": "Production Engineer",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100091",
+      "partnerName": "Karl Wagner",
+      "functionTitle": "Maintenance Planner",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 15600
+  },
+  "lessonsLearned": {
+    "whatWorked": "Comparing two grinding cells running the same job isolated the machine within one shift",
+    "whatDidnt": "Vibration data was trending toward the limit for two weeks with nobody watching it"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "R60 shafts ground on WC-GRIND-04 from 2026-08-01 onward",
+    "isNotWhereWhenItDoesnt": "R60 ground on WC-GRIND-01 - same wheel spec, same bar stock lot",
+    "notes": "Defect follows the machine, not the material or the wheel"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - internal defect, no customer reference",
+    "customerPlantContact": "N/A",
+    "slaResponseDue": "N/A"
+  }
+}

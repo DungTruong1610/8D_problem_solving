@@ -1,0 +1,167 @@
+{
+  "notificationId": "8D-10048834",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Cracks at retainer flange radius after forming",
+  "status": "Completed",
+  "foundDate": "2026-07-01",
+  "completionDate": "2026-07-18",
+  "quantityExtent": "1,240 units affected",
+  "teamSize": 3,
+  "material": {
+    "materialId": "MAT-11002",
+    "description": "Spring Retainer SR8",
+    "materialGroup": "MG-SPRING"
+  },
+  "batch": {
+    "batchId": "B-53700",
+    "materialId": "MAT-11002"
+  },
+  "defect": {
+    "defectCode": "DEF-1120",
+    "defectText": "Retainer cracking during forming"
+  },
+  "workCenter": {
+    "workCenterId": "WC-PRESS-09",
+    "description": "Progressive Press Line 9"
+  },
+  "inspections": [
+    {
+      "characteristic": "Material hardness",
+      "measuredValue": "214 HV",
+      "specValue": "max 160 HV"
+    },
+    {
+      "characteristic": "Elongation at break",
+      "measuredValue": "11%",
+      "specValue": "min 22%"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-8140, Shift A - press setup verified against the setup sheet",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-PRESS09-001 tonnage and shut height logged within tolerance",
+      "metricValue": "within band",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-10450 Rev A - forming sequence and radii unchanged since qualification",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Coil lot COIL-6612 delivered as DC04 but hardness 214 HV and elongation 11% match DC01 full-hard; supplier shipped the wrong grade against the same part number",
+      "metricValue": "214 HV vs 160 HV max",
+      "isRootCause": "Y",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Hardness tester GA-0620, last cal 2026-06-09, R&R 3.9%",
+      "metricValue": "3.9%",
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "22.7C / 41% RH, nominal",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why do the retainers crack at the flange radius?",
+      "answer": "Elongation measured 11% against a 22% minimum, so the material cannot survive the forming strain",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why is elongation half of specification?",
+      "answer": "Coil lot COIL-6612 has hardness 214 HV against a 160 HV maximum, consistent with a full-hard grade rather than the specified DC04",
+      "evidenceCitation": "Incoming certificate COIL-6612"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why did a wrong-grade coil enter production? (root cause)",
+      "answer": "Incoming inspection for this part number checks dimensions and surface only; there is no mechanical property check to catch a grade substitution",
+      "evidenceCitation": "Incoming inspection plan MAT-11002"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "Quarantine all SR8 from COIL-6612 and hardness-test every remaining coil in the store"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "status": "Verified",
+      "actionText": "Return coil lot COIL-6612 to the supplier and raise a supplier corrective action request"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "status": "Verified in production",
+      "actionText": "Add hardness and elongation checks to the incoming inspection plan for all formed-steel part numbers"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100031",
+      "partnerName": "Sara Klein",
+      "functionTitle": "Supplier Quality Engineer",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100014",
+      "partnerName": "Thien Tu",
+      "functionTitle": "Quality Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100133",
+      "partnerName": "Ola Nyberg",
+      "functionTitle": "Press Shop Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-PRESS09-03",
+    "description": "Cracking from incorrect material grade"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 22300
+  },
+  "lessonsLearned": {
+    "whatWorked": "Coil-level traceability tied all 1,240 cracked parts to a single delivery within a day",
+    "whatDidnt": "Incoming inspection could not distinguish two grades that look identical and share a part number"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "SR8 retainers formed from coil lot COIL-6612",
+    "isNotWhereWhenItDoesnt": "SR8 from coil lots COIL-6588 and COIL-6640 - same press, same die, same operators",
+    "notes": "Defect tracks the coil lot exclusively"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - internal defect, no customer reference",
+    "customerPlantContact": "N/A",
+    "slaResponseDue": "N/A"
+  }
+}

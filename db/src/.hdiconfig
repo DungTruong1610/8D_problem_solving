@@ -1,0 +1,10 @@
+{
+  "file_suffixes": {
+    "hdbview": {
+      "plugin_name": "com.sap.hana.di.view"
+    },
+    "hdbgraphworkspace": {
+      "plugin_name": "com.sap.hana.di.graphworkspace"
+    }
+  }
+}

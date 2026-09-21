@@ -1,0 +1,7 @@
+ID;code;name;isEnabled;description;icon;sortOrder
+82b9c513-410e-4059-8692-06b23dcaae01;USER;Individual User;true;A specific individual user;person;1
+82b9c513-410e-4059-8692-06b23dcaae02;GROUP;User Group;true;A collection of users;group;2
+82b9c513-410e-4059-8692-06b23dcaae03;TEAM;Team;true;A working team;team;3
+82b9c513-410e-4059-8692-06b23dcaae04;DEPARTMENT;Department;true;An organizational unit;building;4
+82b9c513-410e-4059-8692-06b23dcaae05;ROLE;Functional Role;true;A functional role;tag;5
+82b9c513-410e-4059-8692-06b23dcaae06;POSITION;Org Position;false;Organizational hierarchy position (Phase 2);sitemap;6

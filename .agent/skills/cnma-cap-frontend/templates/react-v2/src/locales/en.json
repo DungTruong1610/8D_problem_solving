@@ -1,0 +1,51 @@
+{
+    "app": {
+        "title": "{{APP_TITLE}}",
+        "description": "{{APP_DESCRIPTION}}"
+    },
+    "nav": {
+        "home": "Home",
+        "settings": "Settings",
+        "admin": "Administrator",
+        "user": "User",
+        "logOut": "Log Out"
+    },
+    "common": {
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "retry": "Retry",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "create": "Create",
+        "search": "Search",
+        "filter": "Filter",
+        "reset": "Reset",
+        "confirm": "Confirm",
+        "yes": "Yes",
+        "no": "No",
+        "close": "Close",
+        "back": "Back",
+        "next": "Next",
+        "submit": "Submit",
+        "noData": "No data available"
+    },
+    "home": {
+        "title": "Welcome to {{APP_TITLE}}",
+        "subtitle": "Your SAP CAP application is ready.",
+        "gettingStarted": "Getting Started",
+        "gettingStartedDesc": "Add your pages and routes in App.tsx. Use the @cnma/react-ui package for UI components."
+    },
+    "errors": {
+        "boundary": {
+            "title": "Something went wrong",
+            "description": "An unexpected error occurred. Please try refreshing the page.",
+            "retry": "Refresh Page"
+        }
+    },
+    "auth": {
+        "accessDenied": "Access Denied",
+        "accessDeniedMessage": "You do not have permission to view this page. Please contact your administrator."
+    }
+}

@@ -1,0 +1,124 @@
+{
+  "notificationId": "8D-90049010",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Surface roughness Ra 2.8um exceeding max 0.8um spec on flange face due to chatter",
+  "status": "Completed",
+  "foundDate": "01.08.2026",
+  "completionDate": "12-AUG-26",
+  "quantityExtent": "~85 Teile",
+  "teamSize": "k.A.",
+  "material": {
+    "materialId": "  MAT-10247 ",
+    "description": "Bracket Housing X240",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-50341",
+    "materialId": "  MAT-10247 "
+  },
+  "defect": {
+    "defectCode": "DEF-0104",
+    "defectText": "Chatter marks and surface waviness on milled flange"
+  },
+  "workCenter": {
+    "workCenterId": "WC-MILL-07",
+    "description": "CNC 5-Axis Milling Center 7"
+  },
+  "inspections": [
+    {
+      "characteristic": "Surface roughness Ra",
+      "measuredValue": "Messung Surface roughness Ra ergab 2,8um; lt. Zeichnung max 0,8um",
+      "specValue": "k.A."
+    },
+    {
+      "characteristic": "Drawbar retention force",
+      "measuredValue": "6,2 kN",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Machine",
+      "description": "EQ-MILL07-001 spindle drawbar disc spring stack had 4 broken Belleville washers, reducing clamping force from 11.2 kN to 6.2 kN and causing tool micro-slippage under milling load",
+      "metricValue": "6,2 kN vs 11,0 kN nominal",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Profilometer GA-0219 calibrated on 2026-07-15, stylus radius 2um verified",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Man",
+      "description": "EMP-4421, Shift B - operator performed tool change per SOP; toolholder cleaned before loading",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    }
+  ],
+  "fiveWhyChain": [],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "SM",
+      "status": "Done",
+      "actionText": "100% surface roughness inspection on all 85 quarantined housings and sort out-of-spec units"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Korrekturmassnahme",
+      "status": "Verified",
+      "actionText": "Replace complete Belleville disc spring pack and gripper fingers on WC-MILL-07 spindle; re-test retention force to 11.5 kN"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "vorbeugend",
+      "status": "Verified in production",
+      "actionText": "Introduce preventive drawbar force gauge check into 500-hour PM schedule across all CNC milling centers"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng.",
+      "partnerRole": "-",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100088",
+      "partnerName": "Klaus Richter",
+      "functionTitle": "CNC Maintenance Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 14200
+  },
+  "lessonsLearned": {
+    "whatWorked": "-",
+    "whatDidnt": "-"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "Bracket Housing X240 flange face on WC-MILL-07 using 63mm face mill on 2026-08-01",
+    "isNotWhereWhenItDoesnt": "Other parts machined on WC-MILL-05 and WC-MILL-06 with healthy drawbar force >11 kN",
+    "notes": "Defect tracks machine spindle clamping force degradation, not part geometry or cutting tool batch"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

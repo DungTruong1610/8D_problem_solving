@@ -1,0 +1,43 @@
+{
+    "_version": "1.21.0",
+    "sap.app": {
+        "id": "{{NAMESPACE_DOT}}",
+        "type": "application",
+        "applicationVersion": {
+            "version": "1.0.0"
+        },
+        "title": "{{APP_TITLE}}",
+        "description": "{{APP_DESCRIPTION}}",
+        "crossNavigation": {
+            "inbounds": {
+                "{{INBOUND_ID}}": {
+                    "signature": {
+                        "parameters": {},
+                        "additionalParameters": "allowed"
+                    },
+                    "semanticObject": "{{SEMANTIC_OBJECT}}",
+                    "action": "{{SEMANTIC_ACTION}}",
+                    "title": "{{APP_TITLE}}",
+                    "subTitle": "{{APP_SUBTITLE}}",
+                    "icon": "{{APP_ICON}}"
+                }
+            }
+        }
+    },
+    "sap.cloud": {
+        "public": true,
+        "service": "{{NAMESPACE_DOT}}"
+    },
+    "sap.ui": {
+        "technology": "UI5",
+        "fullWidth": true,
+        "icons": {
+            "icon": "{{APP_ICON}}"
+        },
+        "deviceTypes": {
+            "desktop": true,
+            "tablet": true,
+            "phone": true
+        }
+    }
+}
