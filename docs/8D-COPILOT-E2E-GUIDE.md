@@ -8,7 +8,7 @@ Tài liệu này cung cấp chi tiết toàn bộ kiến thức nghiệp vụ, k
 
 1. [Tổng Quan Nghiệp Vụ 8D Copilot](#1-tổng-quan-nghiệp-vụ-8d-copilot)
 2. [Cấu Trúc Dữ Liệu Đầu Vào (Deep Structure JSON)](#2-cấu-trúc-dữ-liệu-đầu-vào-deep-structure-json)
-3. [Giải Thích Các Trang Cấu Hình AI](#3-giải-thích-các-trang-cấu-hình-ai)
+3. [Hệ Thống Quản Trị AI (AI Settings / Governance)](#3-hệ-thống-quản-trị-ai-ai-settings--governance)
    - [Model Registry & General Settings](#31-model-registry--general-settings)
    - [Trang Similarity (Tìm Kiếm Tiền Lệ)](#32-trang-similarity-tìm-kiếm-tiền-lệ)
    - [Trang Step Prompts (Quản Lý Prompt D1-D8)](#33-trang-step-prompts-quản-lý-prompt-d1-d8)
@@ -20,10 +20,10 @@ Tài liệu này cung cấp chi tiết toàn bộ kiến thức nghiệp vụ, k
 
 ## 1. Tổng Quan Nghiệp Vụ 8D Copilot
 
-Trong quản lý chất lượng sản xuất (SAP QM), khi phát sinh sự cố/lỗi sản phẩm (Defect Case), các kỹ sư chất lượng (Quality Engineers) phải tiến hành điều tra và lập báo cáo **8D (8 Disciplines)** để tìm nguyên nhân gốc rễ và đưa ra giải pháp khắc phục triệt để.
+Trong quản lý chất lượng sản xuất (Quality Management - QM), khi phát sinh sự cố/lỗi sản phẩm (Defect Case), các kỹ sư chất lượng (Quality Engineers) phải tiến hành điều tra và lập báo cáo **8D (8 Disciplines)** để tìm nguyên nhân gốc rễ và đưa ra giải pháp khắc phục triệt để.
 
 ### 🎯 8D Copilot giải quyết vấn đề gì?
-- **Tự động bóc tách & phân tích**: Nhận dữ liệu case sự cố từ SAP QM, phân tích dữ liệu đo đạc, thiết bị, quy trình.
+- **Tự động bóc tách & phân tích**: Nhận dữ liệu case sự cố từ hệ thống QM, phân tích dữ liệu đo đạc, thiết bị, quy trình.
 - **Chẩn đoán mù độc lập (Independent/Blind Diagnosis)**: AI tự tìm nguyên nhân gốc khi **CẮT TOÀN BỘ ĐÁP ÁN** của kỹ sư (chuỗi 5-Why, Ishikawa, FMEA), sau đó so sánh kết luận của AI và Kỹ sư (Same conclusion / Different conclusion).
 - **Tra cứu tiền lệ tương đồng (Precedent Search)**: Tra cứu các case quá khứ có đặc điểm lỗi/thiết bị tương tự để học hỏi giải pháp thật, chống bịa đặt (hallucination).
 - **Dự thảo 8D Disciplines (D1 ➔ D8)** và viết 2 bản tóm tắt riêng biệt:
@@ -34,7 +34,7 @@ Trong quản lý chất lượng sản xuất (SAP QM), khi phát sinh sự cố
 
 ## 2. Cấu Trúc Dữ Liệu Đầu Vào (Deep Structure JSON)
 
-Đầu vào cho 8D Copilot là **1 Case Notification** (Hồ sơ sự cố chất lượng SAP QM - bảng `QMEL`), chứa các thành phần lồng nhau (Deep Structure):
+Đầu vào cho 8D Copilot là **1 Case Notification** (Hồ sơ sự cố chất lượng QM - bảng `QMEL`), chứa các thành phần lồng nhau (Deep Structure):
 
 ```json
 {
@@ -74,7 +74,7 @@ Trong quản lý chất lượng sản xuất (SAP QM), khi phát sinh sự cố
       "description": "Gauge GA-0117 calibration expired 2026-05-30",
       "metricValue": "-22um drift",
       "isRootCause": "Y",
-      "source": "SAP: Test Equipment Mgmt"
+      "source": "Test Equipment Mgmt"
     }
   ],
   "fiveWhyChain": [
@@ -134,7 +134,7 @@ Hệ thống cung cấp trang quản trị **AI Settings** (đường dẫn: `/#
 ```
 
 ### 3.1 Model Registry & General Settings
-- **Model Registry**: Cho phép đồng bộ (Sync) các Foundation Model từ SAP AI Core / Generative AI Hub và bật/tắt từng model.
+- **Model Registry**: Quản lý danh mục các Foundation Model được hỗ trợ và bật/tắt từng model.
 - **General Settings**: Cho phép gán model riêng cho từng Activity:
   - `parseData`: Chọn model cho bước đọc & cấu trúc hóa dữ liệu (ví dụ: `gemini-2.5-flash`).
   - `analyzeDefect`: Chọn model cho bước suy luận 8D & viết báo cáo (ví dụ: `gemini-2.5-pro`).

@@ -7,7 +7,7 @@
 * **Mục tiêu chiến lược:**
   1. **Loại bỏ 100% rủi ro bản quyền / nghi vấn gian lận** liên quan đến các giải pháp 8D đã công bố của Conarum.
   2. **Tái cấu trúc bài toán** để đáp ứng hoàn hảo tiêu chí chấm điểm khắt khe của Đề bài Hackathon (Tính tự chủ, Tính minh bạch & Giải trình, Đánh giá tác động thực tế).
-  3. **Tái sử dụng 85% – 90% toàn bộ khung sườn backend SAP CAP hiện có** (`db/schema/*.cds`, `srv/*.cds`, SQLite, pipeline suy luận AI).
+  3. **Tái sử dụng 85% – 90% toàn bộ khung sườn backend CAP hiện có** (`db/schema/*.cds`, `srv/*.cds`, SQLite, pipeline suy luận AI).
 
 ---
 
@@ -17,37 +17,37 @@
 
 * **Lĩnh vực nghiệp vụ:** Quản lý sự cố chất lượng sản xuất rời (Discrete Manufacturing Quality Management) theo chuẩn công nghiệp ô tô/cơ khí (ISO/IATF 16949, VDA 6.3).
 * **Quy trình vận hành hiện thời:**
-  1. Ghi nhận lỗi chất lượng chuẩn SAP QM (`QMEL` Notification) thuộc 3 phân loại: Khiếu nại khách hàng (`Q1`), Lỗi nhà cung cấp (`Q2`), Sự cố nội bộ nhà máy (`Q3`).
-  2. Bóc tách kết quả đo kiểm vượt dung sai kỹ thuật (`DefectCharacteristics` tương đương bảng SAP `QAMR`), liên kết lô kiểm tra (`InspectionLots`).
+  1. Ghi nhận lỗi chất lượng chuẩn QM (`QMEL` Notification) thuộc 3 phân loại: Khiếu nại khách hàng (`Q1`), Lỗi nhà cung cấp (`Q2`), Sự cố nội bộ nhà máy (`Q3`).
+  2. Bóc tách kết quả đo kiểm vượt dung sai kỹ thuật (`DefectCharacteristics` tương đương bảng đo kiểm `QAMR`), liên kết lô kiểm tra (`InspectionLots`).
   3. Mở chu trình **8D Problem Solving (D1 $\rightarrow$ D8)**: Phân tích hiện tượng đối sánh (Is/Is-Not), tìm nguyên nhân gốc rễ (5 Whys, Ishikawa), lập biện pháp ngăn chặn tạm thời (D3 - ICA) và khắc phục vĩnh viễn (D5 - PCA), phòng ngừa tái diễn (D7 - FMEA link).
-  4. Tích hợp AI hỗ trợ: Chẩn đoán mù độc lập (*Blind Diagnosis* — lược bỏ nhận định của kỹ sư để AI tự suy luận nhằm chống thiên kiến xác nhận), tra cứu tiền lệ bằng điểm số & SAP HANA Graph Cypher query, và tự động soạn thảo dự thảo báo cáo D1–D8.
+  4. Tích hợp AI hỗ trợ: Chẩn đoán mù độc lập (*Blind Diagnosis* — lược bỏ nhận định của kỹ sư để AI tự suy luận nhằm chống thiên kiến xác nhận), tra cứu tiền lệ bằng điểm số & Graph Cypher query, và tự động soạn thảo dự thảo báo cáo D1–D8.
 
 ### 1.2. Khảo sát tài sản dữ liệu & kiến trúc (Core Assets)
 
-* **`db/schema/defects.cds`**: Mô hình hóa chuẩn SAP QM với các trường `defectId`, `origin` (Q1/Q2/Q3), mã lỗi (`defectCode`, `defectCodeGroup`), mức nghiêm trọng (`defectClass` - FECLAS), thông số nhà xưởng (`plant`, `workCenterId`), và quan hệ 1-nhiều với `DefectCharacteristics` (chứa `measuredValue`, `specLowerLimit`, `specUpperLimit`, `valuation`).
+* **`db/schema/defects.cds`**: Mô hình hóa chuẩn Quản lý Chất lượng (QM) với các trường `defectId`, `origin` (Q1/Q2/Q3), mã lỗi (`defectCode`, `defectCodeGroup`), mức nghiêm trọng (`defectClass` - FECLAS), thông số nhà xưởng (`plant`, `workCenterId`), và quan hệ 1-nhiều với `DefectCharacteristics` (chứa `measuredValue`, `specLowerLimit`, `specUpperLimit`, `valuation`).
 * **`db/schema/eight-d.cds`**: Thực thể `Reports` và thành phần con `Disciplines` (D1 đến D8). Quản lý chi phí tổn thất chất lượng (`copqEur`), liên kết rủi ro FMEA (`fmeaId`), phân tách tóm tắt nội bộ vs gửi khách hàng (`internalSummary`, `customerSummary`), lưu vết suy luận AI (`aiFinding`, `aiConfidence`, `aiAgreesWithRecord`).
 * **`db/schema/case-library.cds` & `graph-config.cds`**: Kho sự cố lịch sử đã đóng (`HistoricalCases`, `HistoricalActions`), chuẩn hóa từ khóa tìm kiếm (`searchKeywords`), cấu hình trọng số theo từng bước D (`GraphStepParams`) để truy hồi bằng Graph Cypher / Scoring Engine.
 * **`srv/EightDService.cds`**: Cung cấp API OData nghiệp vụ chuẩn, các action điều khiển luồng: `analyzeFromJson`, `startEightD`, `saveDisciplineField`, `reviewDiscipline` (ghi nhận quyết định `approve`, `request-change`, `reopen`), và chốt chặn an toàn `ReviewEvents`.
 
 ### 1.3. "Dấu vân tay IP" Dễ Gây Rủi Ro Bản Quyền / Trùng Lặp
 
-1. **Trùng lặp với thông điệp truyền thông của Conarum:** Conarum đã công bố nhiều năng lực về SAP BTP và AI trong quản trị chất lượng. Khi Ban Giám khảo tra cứu từ khóa `Conarum 8D SAP`, việc bài thi mang dáng dấp một "8D Copilot" thông thường sẽ dễ dẫn đến nghi vấn: *Bài thi lấy lại sản phẩm của công ty đem đi thi hay là sản phẩm mới phát triển?*
+1. **Trùng lặp với thông điệp truyền thông của Conarum:** Conarum đã công bố nhiều năng lực về AI trong quản trị chất lượng. Khi Ban Giám khảo tra cứu từ khóa `Conarum 8D`, việc bài thi mang dáng dấp một "8D Copilot" thông thường sẽ dễ dẫn đến nghi vấn: *Bài thi lấy lại sản phẩm của công ty đem đi thi hay là sản phẩm mới phát triển?*
 2. **Dấu vết thương hiệu nội bộ trong repo:** Các định danh `cnma.*`, `@cnma/react-ui`, namespace `cnma.proresolve` trong các tệp schema và cấu hình package.
 3. **Mô thức "Form-filling Copilot" đã bão hòa:** Một công cụ chỉ dùng LLM để hỗ trợ điền biểu mẫu báo cáo D1–D8 thụ động không còn tạo được sự đột phá công nghệ cho mùa giải Hackathon 2026 và không làm nổi bật được tiêu chí "Agentic Workflow" mà ban tổ chức tìm kiếm.
 
 ---
 
-## 2. NGHIÊN CỨU THỊ TRƯỜNG & HỆ SINH THÁI SAP ("8D Defect Solution in SAP")
+## 2. NGHIÊN CỨU THỊ TRƯỜNG & CÁC GIẢI PHÁP HIỆN CÓ ("8D Defect Solutions")
 
-### 2.1. Chuẩn mực SAP Standard đã có những gì?
+### 2.1. Chuẩn mực ERP/QM hiện tại đã có những gì?
 
-* **SAP S/4HANA QM Nonconformance Management:** Cung cấp ứng dụng Fiori chuẩn (như `F1813`, `F2309` - *Process Defects*, *Resolve Internal Problems*) cho phép kích hoạt quy trình 8D trực tiếp từ lỗi ghi nhận.
-* **SAP Quality Issue Resolution (QIR) trên SAP BTP:** Giải pháp SaaS chính thức của SAP (trước đây là *SAP Supplier Problem-Solving*) hỗ trợ toàn diện luồng D1–D8 giữa OEM và nhà cung ứng, tích hợp Ishikawa, 5 Whys, deadline cam kết (SLA) và xuất báo cáo PDF tiêu chuẩn `QM_QN8D_REP_AUTO`.
+* **Hệ thống ERP QM Nonconformance Management:** Cung cấp ứng dụng chuẩn (như *Process Defects*, *Resolve Internal Problems*) cho phép kích hoạt quy trình 8D trực tiếp từ lỗi ghi nhận.
+* **Hệ thống Quản lý Vấn đề Chất lượng (Quality Issue Resolution):** Giải pháp SaaS hỗ trợ toàn diện luồng D1–D8 giữa OEM và nhà cung ứng, tích hợp Ishikawa, 5 Whys, deadline cam kết (SLA) và xuất báo cáo PDF tiêu chuẩn.
 
 ### 2.2. Điểm mù và giới hạn của các giải pháp hiện tại
 
 1. **Bản chất hồi tố, bị động (Purely Reactive Post-Mortem):** Quy trình 8D truyền thống chỉ bắt đầu sau khi phế phẩm đã phát sinh, dây chuyền đã ngưng trệ hoặc khách hàng khiếu nại. Thiếu hoàn toàn khả năng **can thiệp sớm và tự động khoanh vùng cách ly** ngay khi thông số đo kiểm vừa xuất hiện độ lệch (drift).
-2. **Quá tải hành chính vì thiếu phân cấp tự chủ (Administrative Fatigue):** Trong SAP QIR, con người phải nhập liệu và điều phối thủ công từng bước. Doanh nghiệp ngập tràn các lỗi nhỏ thường quy, dẫn đến việc các kỹ sư chất lượng bị kiệt sức và dễ bỏ lọt sự cố nghiêm trọng mang tính hệ thống.
+2. **Quá tải hành chính vì thiếu phân cấp tự chủ (Administrative Fatigue):** Trong các giải pháp ERP truyền thống, con người phải nhập liệu và điều phối thủ công từng bước. Doanh nghiệp ngập tràn các lỗi nhỏ thường quy, dẫn đến việc các kỹ sư chất lượng bị kiệt sức và dễ bỏ lọt sự cố nghiêm trọng mang tính hệ thống.
 3. **Sự bế tắc trong tranh chấp chuỗi cung ứng (Cross-Tier Blame Game):** Khi xảy ra lỗi giữa OEM và nhà cung cấp, quy trình 8D hiện tại chỉ là nơi trao đổi biểu mẫu qua lại. Thiếu hẳn cơ chế phân giải khách quan để phân biệt giữa bất đồng kỹ thuật thực chất và sự khác biệt về cách dùng thuật ngữ quy chuẩn.
 
 ---

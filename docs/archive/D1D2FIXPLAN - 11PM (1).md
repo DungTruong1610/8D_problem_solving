@@ -1,13 +1,13 @@
 # D1 + D2 — Why D2 Looks Broken, and How We Fix Both
 
-**Prepared by:** Quyen (BA) · **For:** AI Team (Dung, Thien, Minh)
+**Prepared by:** Duy (Lead).
 **Status:** Ready to implement · **Version:** v2 — see *Revision note* below if you read the earlier copy
 **Scope:** D1 (Team) and D2 (Describe the Problem), plus the Record Defect popup
 **Related:** `docs/AI-RULES-8D-STEPS.md` — R2.1 is normative for D1, R2.2 for D2
 
 > **Summary of the two steps.** D2 is genuinely broken: it cannot produce Is/Is-Not for any demo case, and when it correctly reports why, the screen has nowhere to show it. **D1 is not broken** — it has correct grounding, a working "Accept all suggested", and complete team data. D1 needs only two small schema additions to satisfy R2.1 fully. Most of the work below is D2.
 
-> **New to SAP QM terms?** Read **Appendix A** first — it explains *characteristic*, how "out of spec" is decided, and walks the two lookups through real data. Roughly ten minutes, and the rest of the document reads much faster afterwards.
+> **New to QM terms?** Read **Appendix A** first — it explains *characteristic*, how "out of spec" is decided, and walks the two lookups through real data. Roughly ten minutes, and the rest of the document reads much faster afterwards.
 
 ---
 
@@ -68,7 +68,7 @@ If `seed-library.ts` is not run, **the popup's dropdowns are empty** and every p
 
 ### 3. The architectural principle this establishes
 
-Removing JSON upload moves the system from *"the payload carries everything"* to *"the database is the source of truth."* That is also how the real SAP integration will work, so the demo architecture stops being a fiction.
+Removing JSON upload moves the system from *"the payload carries everything"* to *"the database is the source of truth."* That is also how real enterprise integration works, so the demo architecture stops being a fiction.
 
 It also means: **anything the AI needs that the popup does not send must now come from the database.** Auditing the popup payload against `CaseContext` gives two categories.
 
@@ -207,7 +207,7 @@ Add the missing box to the screen. Nothing else changes. Immediately, instead of
 Delete the old sentence, keep the new one, push the update. This is an AI Settings change — no code deployment.
 
 **Step 3 — Build the history table. ← the real fix**
-Create a place in the database to store past inspection measurements. When the AI analyses a case it looks up: *"show me all past measurements for this same part and same characteristic."* That is exactly what a real SAP system does.
+Create a place in the database to store past inspection measurements. When the AI analyses a case it looks up: *"show me all past measurements for this same part and same characteristic."* That is exactly what a real enterprise QM system does.
 
 This is the step that actually makes D2 work — for **every** case, including ones created from the popup.
 
@@ -247,7 +247,7 @@ Note: we do **not** need to edit the 22 existing test files. Once Step 3 is in p
 - **Measurements are logged inside the defect.** Characteristic, measured value, unit, operator (max/min/nominal/between), limit, upper limit — as repeatable rows. It sends both the text form *and* the real numbers, which stops the system mis-reading values like `≤0.10` and losing the evidence.
 - **It does not pre-fill the 8D team.** The "Coordinator" field deliberately does not flow into the team list. Correct — choosing the team is D1's job, and pre-filling would corrupt D1's suggestions.
 - **It leaves causes, actions and 5-Why empty.** Correct — those belong to D3–D7.
-- **Section structure matches SAP:** 1. Defect · 2. Reference Object · 3. Impact & Measured Evidence · 4. Responsibility · 5. Customer (Q1 only).
+- **Section structure matches QM standard:** 1. Defect · 2. Reference Object · 3. Impact & Measured Evidence · 4. Responsibility · 5. Customer (Q1 only).
 
 ### What is wrong or missing
 
@@ -255,14 +255,14 @@ Note: we do **not** need to edit the 22 existing test files. Once Step 3 is in p
 |---|---|---|---|
 | **A** | **No fixture / equipment field.** Each measurement says *what* was measured but not *on which machine*. | This is the exact dimension Is/Is-Not compares. Without it the feature cannot exist. | Add **Equipment / Fixture** to each measurement row in Section 3. |
 | **B** | **No path choice.** The form assumes the defect was found outside inspection. | Only one of the two demo paths is expressible. | Add a toggle at the top of Section 1. |
-| **C** | **No inspection lot number.** When a defect *is* found during inspection, SAP has a lot number linking them. | Path A cannot be shown as a real SAP link. | Add an **Inspection Lot** field, visible only in "during inspection" mode. |
+| **C** | **No inspection lot number.** When a defect *is* found during inspection, standard QM has a lot number linking them. | Path A cannot be shown as a real QM link. | Add an **Inspection Lot** field, visible only in "during inspection" mode. |
 | **D** | **Nothing tells the user why measurements matter.** | People skip Section 3, D2 comes out weak, and they blame the AI. | Add helper text: *"Measurements here become the evidence in D2 and the comparison in D4."* |
 
 ### One important thing NOT to change
 
 **Do not make the popup collect the measurement history.**
 
-It is tempting to add a table where the user pastes past measurements. **That would be wrong.** No inspector would type in the last twenty lots while logging one defect. In real SAP that data already exists in the system.
+It is tempting to add a table where the user pastes past measurements. **That would be wrong.** No inspector would type in the last twenty lots while logging one defect. In a real ERP system that data already exists in the system.
 
 The history must come from the database (Step 3), not from the person filling the form. **Keep the popup about this defect only.**
 
@@ -312,7 +312,7 @@ Four changes. That is the whole popup fix.
 
 Understanding this explains why the fix is shaped the way it is.
 
-In SAP, a defect can reach us by two routes:
+In the QM flow, a defect can reach us by two routes:
 
 ```
 PATH A — found during inspection
@@ -707,7 +707,7 @@ Step 3 is the only genuinely hard task. If one person takes it, Steps 1, 2 and 4
 
 *New in v2 — this whole appendix. If you read v1, nothing here replaces anything you already read; it only explains the vocabulary the rest of the document uses.*
 
-For anyone joining this work without the SAP QM background. Every example uses real data from `mock-data/clean/case-8D-10048412.json`.
+For anyone joining this work without the QM background. Every example uses real data from `mock-data/clean/case-8D-10048412.json`.
 
 ## A.1 What is a "characteristic"?
 
@@ -837,9 +837,7 @@ return (inspections.find((row) => row.outOfSpec === true) ?? inspections[0])?.ch
 
 What is already fine: the output names the ruler it used — the IS/IS NOT text ends with `…for Flange burr height`.
 
-What is missing: **nothing says the second failing characteristic was never analysed.** Hence F6, and the `gaps` line added in Step 1. The single-characteristic default stays; only the boundary becomes visible.
-
-## A.5 Quick reference — the SAP tables behind all this
+## A.5 Quick reference — the QM tables behind all this
 
 | Table | Holds | Used for |
 |---|---|---|
@@ -849,4 +847,4 @@ What is missing: **nothing says the second failing characteristic was never anal
 | `QAMV` | characteristic specification per lot | the target and tolerance |
 | `QAMR` | characteristic *result* per lot | the measured value, conforming yes/no |
 
-`QALS.EQUNR` (Equipment) is the field the whole Is/Is-Not feature rests on. Confirmed present in the real SAP export.
+`QALS.EQUNR` (Equipment) is the field the whole Is/Is-Not feature rests on. Confirmed present in the real ERP export.

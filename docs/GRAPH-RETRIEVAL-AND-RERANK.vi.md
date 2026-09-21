@@ -1,7 +1,7 @@
 # Truy hồi bằng Graph, Re-rank và Chain-of-Thought — đã làm gì, áp ở đâu, test thế nào
 
 **Ngày:** 2026-09-03
-**Nhánh:** `feat/graph-retrieval` (cắt từ `dev/Thien`, đã cherry-pick `feature/re-rank`)
+**Nhánh:** `feat/graph-retrieval` 
 **Trạng thái:** đã implement · **tắt mặc định** — nhánh này không đổi hành vi gì cho tới khi có người sửa một giá trị cấu hình
 **Bản tiếng Anh:** `docs/GRAPH-RETRIEVAL-AND-RERANK.md` (hai bản cùng nội dung; sửa một bản thì sửa cả hai)
 **Liên quan:** `docs/RERANK-PRECEDENT-RETRIEVAL.md` (Thanh — tầng 2 cho engine chấm điểm) · `docs/PRECEDENT-RETRIEVAL-REVIEW.md` (phát hiện R2/R3/R4) · `docs/superpowers/specs/2026-09-03-graph-retrieval-design.md` (thiết kế + phần hiệu chỉnh)
@@ -13,7 +13,7 @@
 ## 0. Tóm tắt một đoạn
 
 Truy hồi tiền lệ giờ có **hai cách tìm** và **một cách đọc**. Tầng 1 là engine chấm điểm cũ hoặc
-một tầng đi trên graph của SAP HANA, chọn bằng đúng một công tắc toàn cục. Tầng 2 — một lượt gọi
+một tầng đi trên graph của hệ cơ sở dữ liệu, chọn bằng đúng một công tắc toàn cục. Tầng 2 — một lượt gọi
 model đọc case đang mở **cùng** từng ứng viên — dùng chung cho cả hai, và giờ **lập luận trước khi
 chấm**. Mọi thứ hội tụ về hợp đồng `PerStepPrecedents` không đổi, nên quay về engine cũ tốn một giá
 trị cấu hình chứ không phải một lần revert.
@@ -42,7 +42,7 @@ Hai lỗi đã đo được, ghi trong `PRECEDENT-RETRIEVAL-REVIEW.md`, tái hi�
 
 ### 2.1 Nó là cái gì
 
-Một property graph trên **SAP HANA Cloud Graph**, truy vấn bằng openCypher qua `OPENCYPHER_TABLE`.
+Một property graph trên **Database Graph Engine**, truy vấn bằng openCypher qua `OPENCYPHER_TABLE`.
 **14 loại đỉnh, 18 loại cạnh — tất cả đều là view SQL trên những bảng đã có.** `HistoricalCases`
 vẫn là nguồn sự thật duy nhất; không có bản sao dữ liệu thứ hai và không có gì phải đồng bộ. Cypher
 trả về **khoá**, SQL join ngược lại lấy nội dung.
@@ -52,7 +52,7 @@ trả về **khoá**, SQL join ngược lại lấy nội dung.
 | `Case8D`, `OpenDefect`, `WorkCenter`, `DefectCode`, `Material`, `MaterialFamily`, `Keyword`, `Person`, `JobFunction`, `Action`, `TaskCode`, `RootCause`, `Fmea`, `InspectionLot` | `OCCURRED_AT`, `HAS_DEFECT`, `ON_MATERIAL`, `IN_FAMILY`, `MENTIONS`, `STAFFED_BY`, `ACTS_AS`, `RESOLVED_BY`, `CODED_AS`, `CAUSED_BY`, `REFERENCES_FMEA`, `COVERS_WORKCENTER`, `COVERS_MATERIAL`, `LOT_OF_MATERIAL`, `LOT_AT`, `DEFECT_AT`, `DEFECT_ON_MATERIAL`, `DEFECT_HAS_CODE` |
 
 Nhãn là `Case8D` chứ không phải `Case`: **`CASE` là từ khoá của openCypher** nên `MATCH (c:Case)`
-không parse được, và thông báo lỗi của HANA (*"expecting identifier near Case"*) không hề nhắc tới
+không parse được, và thông báo lỗi của engine (*"expecting identifier near Case"*) không hề nhắc tới
 từ khoá. `Function` đổi thành `JobFunction` để phòng trước. Có một unit test kiểm mọi nhãn với danh
 sách từ khoá dành riêng.
 
@@ -86,15 +86,15 @@ bản sẽ lệch nhau âm thầm ngay lần đầu ai đó thêm một stopword
 | `PARAMETERS ('x' = ?)` — bind thật | |
 
 Nên phân vai là **Cypher khớp mẫu, SQL tổng hợp**. Mọi hình chữ V viết bằng mẫu ngăn dấu phẩy; mọi
-phép đếm nằm ở câu SQL bọc ngoài. Đây cũng chính là cách SAP thiết kế `OPENCYPHER_TABLE` — nó trả
+phép đếm nằm ở câu SQL bọc ngoài. Đây cũng chính là cách thiết kế `OPENCYPHER_TABLE` — nó trả
 về một bảng để SQL dùng tiếp.
 
 Vì `IN [$a, $b]` bị từ chối với ô bind, danh sách từ khoá viết thành chuỗi `OR` của `= $kwN`
 (`anchor.ts`). Xấu hơn một chút và an toàn hoàn toàn: ghép token thẳng vào chuỗi truy vấn là con
-đường **duy nhất** trong module này mà dữ liệu từ payload SAP chạm vào văn bản câu truy vấn.
+đường **duy nhất** trong module này mà dữ liệu từ payload đầu vào chạm vào văn bản câu truy vấn.
 
 **Nói thẳng phần đánh đổi:** với phương ngữ này, Cypher **không thay** được SQL — nó **bổ sung**.
-Thứ SQL ở đây không làm nổi là đường độ dài biến thiên, vì HANA Cloud không hỗ trợ recursive CTE.
+Thứ SQL ở đây không làm nổi là đường độ dài biến thiên, vì hệ CSDL không hỗ trợ recursive CTE.
 Đó, cộng với việc quan hệ được khai báo tường minh một chỗ thay vì nằm rải trong các câu JOIN, là
 thứ graph thật sự mua được.
 
@@ -109,7 +109,7 @@ phân biệt thật trong bộ dữ liệu này là **Keyword, MaterialFamily** 
 **WorkCenter** (21 distinct) và **RootCause** (6).
 
 Đỉnh mã lỗi khoá theo mã đơn lẻ — đúng khi chỉ có một không gian mã. **Phải đổi thành khoá ghép khi
-CHAIN-ALIGNMENT Phase 1.3 nạp nhóm mã**, vì mã lỗi SAP chỉ duy nhất **trong** nhóm của nó.
+CHAIN-ALIGNMENT Phase 1.3 nạp nhóm mã**, vì mã lỗi chỉ duy nhất **trong** nhóm của nó.
 
 ### 2.5 Áp ở đâu
 
@@ -353,7 +353,7 @@ cho người dùng.
 | `db/src/.hdiconfig`, `.hdinamespace` | Bắt buộc: bản CAP sinh nằm ở `db/src/gen` và **không map plugin nào** cho `hdbgraphworkspace` |
 | `scripts/seed-graph-library.mjs` | Nạp 25 case JSON vào container graph |
 | `scripts/shadow-retrieval.mjs` | Chạy một case qua **cả hai** engine rồi in bảng so sánh từng bước |
-| `scripts/run-graph-tests.mjs` | Chạy bộ test chạm HANA với đúng biến môi trường |
+| `scripts/run-graph-tests.mjs` | Chạy bộ test chạm Graph DB với đúng biến môi trường |
 
 ### 6.2 File đã sửa
 
@@ -420,7 +420,7 @@ npm run typecheck
 npm test
 ```
 
-**Kỳ vọng: 1126 pass, 22 skipped, 0 fail** trên 41 suite. 22 test skipped là nhóm chạm HANA; chúng
+**Kỳ vọng: 1126 pass, 22 skipped, 0 fail** trên 41 suite. 22 test skipped là nhóm chạm Graph DB Cloud; chúng
 báo đúng chữ **skipped**, không bao giờ báo *passed*, vì cổng là `describe.skip` khai báo **tĩnh**
 theo `GRAPH_INTEGRATION`. Cách "tự dò, không kết nối được thì lặng lẽ bỏ qua" sẽ cho ra một bộ test
 xanh mà không chạy gì — tệ hơn không có test, vì nó **trông như** đã được phủ.
@@ -435,7 +435,7 @@ Phần offline phủ gì:
 | `rerankWiring.test.ts` | Toàn bộ chuỗi tầng 2 với provider giả: nội dung prompt, **thứ tự trường schema**, temperature 0, parse `analysis`, id bịa bị loại, và màn "cứu case" hai tầng trọn vẹn |
 | `precedent/reranker.test.ts` | Phần chuẩn hoá và `applyRerank` của Thanh, cộng phần parse CoT |
 
-### 8.2 Trên HANA thật
+### 8.2 Trên Cloud Graph Database thật
 
 Điều kiện — container tách hẳn khỏi container dùng chung, nên **không có bước nào ở đây chạm vào**
 `cnma_proresolve_db`:

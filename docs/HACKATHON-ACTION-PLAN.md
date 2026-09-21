@@ -46,7 +46,7 @@ Ban tổ chức cho chọn 1 trong 3 đề bài (A, B, C). Chúng ta chọn **Đ
 
 ### 2.2. Proresolve (8D Copilot) giải quyết thế nào?
 
-Hệ thống tiếp nhận hồ sơ sự cố chất lượng (chuẩn SAP QM `QMEL`) dưới dạng JSON sâu (gồm mã lỗi, vật tư, lô hàng, trạm máy, kết quả đo kiểm, chi phí chất lượng COPQ):
+Hệ thống tiếp nhận hồ sơ sự cố chất lượng (chuẩn QM `QMEL`) dưới dạng JSON sâu (gồm mã lỗi, vật tư, lô hàng, trạm máy, kết quả đo kiểm, chi phí chất lượng COPQ):
 
 1. **Enrich Context:** Tự động bóc tách thông số kỹ thuật, phát hiện lỗ hổng dữ liệu.
 2. **Blind Diagnosis (Chẩn đoán mù độc lập — Điểm nhấn sáng tạo):** Hệ thống **cắt bỏ toàn bộ nhận định của kỹ sư** (chuỗi 5-Why, Ishikawa), yêu cầu AI tự tư duy độc lập để tìm nguyên nhân gốc. Sau đó so sánh xem nhận định của AI và Kỹ sư có đồng thuận hay không $\rightarrow$ Giúp kỹ sư tránh thiên kiến xác nhận (Confirmation Bias).
@@ -59,7 +59,7 @@ Hệ thống tiếp nhận hồ sơ sự cố chất lượng (chuẩn SAP QM `Q
 
 ## 3. CÁC ĐIỂM NGHẼN (PAIN POINTS) TRONG SOURCE CODE HIỆN TẠI
 
-Source code hiện tại được phát triển cho môi trường nội bộ doanh nghiệp trên nền tảng **SAP BTP**, dẫn đến các rào cản nghiêm trọng khi mang ra thi đấu bên ngoài:
+Source code ban đầu được phát triển cho môi trường nội bộ doanh nghiệp trên nền tảng Cloud đóng kín, dẫn đến các rào cản nghiêm trọng khi mang ra thi đấu bên ngoài:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -67,17 +67,17 @@ Source code hiện tại được phát triển cho môi trường nội bộ do
 ├───────────────────────┬─────────────────────────────────────────────────────────┤
 │ Thành phần            │ Vấn đề khi mang ra Hackathon                            │
 ├───────────────────────┼─────────────────────────────────────────────────────────┤
-│ 1. SAP BTP Cockpit    │ Hạ tầng cloud nội bộ, yêu cầu tài khoản doanh nghiệp.   │
-│ 2. SAP HANA Cloud     │ CSDL trả phí đắt đỏ của SAP, không thể cấp quyền ngoài. │
-│ 3. SAP AI Core        │ Tiêu tốn BTP credit công ty, cấu hình binding phức tạp. │
-│ 4. SAP XSUAA Auth     │ Bắt đăng nhập SAP ID ➔ Vi phạm luật "No Login" của BTC.  │
+│ 1. Cloud Cockpit      │ Hạ tầng cloud nội bộ, yêu cầu tài khoản doanh nghiệp.   │
+│ 2. Enterprise DB      │ CSDL trả phí đắt đỏ, không thể cấp quyền ngoài.         │
+│ 3. AI Gateway cũ      │ Tiêu tốn credit công ty, cấu hình binding phức tạp.     │
+│ 4. Enterprise Auth    │ Bắt đăng nhập tài khoản riêng ➔ Vi phạm luật "No Login". │
 │ 5. Gói `@cnma/*`      │ Lưu trên Azure Artifacts riêng ➔ Người ngoài clone repo  │
 │                       │ về sẽ bị lỗi E401/npm install thất bại.                 │
 └───────────────────────┴─────────────────────────────────────────────────────────┘
 ```
 
 👉 **Mục tiêu Rework Backend:**
-Decouple (tách rời) toàn bộ các phụ thuộc vào SAP BTP và tài nguyên công ty. Chuyển đổi thành một hệ thống **độc lập (Standalone), 100% mã nguồn mở/miễn phí**, người ngoài clone về có thể chạy ngay bằng 1 lệnh mà không cần tài khoản nội bộ hay tốn bất kỳ chi phí nào.
+Decouple (tách rời) toàn bộ các phụ thuộc vào hạ tầng cloud nội bộ đóng kín. Chuyển đổi thành một hệ thống **độc lập (Standalone), 100% mã nguồn mở/miễn phí**, người ngoài clone về có thể chạy ngay bằng 1 lệnh mà không cần tài khoản nội bộ hay tốn bất kỳ chi phí nào.
 
 ---
 
@@ -85,23 +85,23 @@ Decouple (tách rời) toàn bộ các phụ thuộc vào SAP BTP và tài nguy�
 
 Chúng ta **tuyệt đối không dùng công nghệ trả phí**. Bảng kiến trúc thay thế tối ưu:
 
-| Thành phần             | Công nghệ cũ (Nội bộ) | Công nghệ mới (Hackathon)                    | Chi phí      | Lý do lựa chọn                                                                                                                                                            |
+| Thành phần             | Công nghệ cũ (Nội bộ)      | Công nghệ mới (Hackathon)                    | Chi phí      | Lý do lựa chọn                                                                                                                                                            |
 | :----------------------- | :------------------------- | :---------------------------------------------- | :------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Frontend Host**  | BTP HTML5 App Repo         | **Vercel** (Hobby Plan)                   | **0đ** | Deploy trong 1 phút từ GitHub, CDN toàn cầu siêu nhanh, uptime 99.9%.                                                                                                   |
-| **Backend Host**   | BTP Cloud Foundry          | **Render.com** hoặc **Railway**    | **0đ** | Chạy Node.js persistent server.**Không dùng Vercel cho Backend** vì Vercel Serverless bị timeout 10–15s (trong khi AI reasoning chạy 20–40s sẽ bị lỗi 504). |
-| **Database**       | SAP HANA Cloud             | **SQLite (`db.sqlite`)**                | **0đ** | Đóng gói sẵn file`db.sqlite` kèm source code. Chạy in-memory, query siêu tốc, 0 cấu hình, không tốn tiền server DB.                                           |
-| **Authentication** | SAP XSUAA (OAuth2)         | **Public Access (Mock Auth)**             | **0đ** | Bỏ cơ chế login, cho phép giám khảo vào thẳng URL theo đúng tiêu chuẩn đề bài (10 điểm vận hành).                                                         |
-| **AI LLM Gateway** | SAP AI Core (GenAI Hub)    | **Google Gemini API** (`@google/genai`) | **0đ** | Gói Free Tier miễn phí 15 RPM, hỗ trợ suy luận Thinking Budget, tốc độ cực nhanh.                                                                                  |
-| **Vector Search**  | HANA Vector Engine         | **In-memory Cosine Similarity**           | **0đ** | Tính khoảng cách vector trực tiếp bằng TypeScript trong RAM của Node.js (tốc độ < 10ms cho vài trăm case).                                                       |
+| **Frontend Host**  | Private App Repo           | **Vercel** (Hobby Plan)                   | **0đ** | Deploy trong 1 phút từ GitHub, CDN toàn cầu siêu nhanh, uptime 99.9%.                                                                                                   |
+| **Backend Host**   | Cloud Foundry              | **Render.com** hoặc **Railway**    | **0đ** | Chạy Node.js persistent server.**Không dùng Vercel cho Backend** vì Vercel Serverless bị timeout 10–15s (trong khi AI reasoning chạy 20–40s sẽ bị lỗi 504). |
+| **Database**       | Enterprise Cloud DB        | **SQLite (`db.sqlite`)**                | **0đ** | Đóng gói sẵn file`db.sqlite` kèm source code. Chạy in-memory, query siêu tốc, 0 cấu hình, không tốn tiền server DB.                                           |
+| **Authentication** | Enterprise Auth (OAuth2)   | **Public Access (Mock Auth)**             | **0đ** | Bỏ cơ chế login, cho phép giám khảo vào thẳng URL theo đúng tiêu chuẩn đề bài (10 điểm vận hành).                                                         |
+| **AI LLM Gateway** | Enterprise AI Gateway      | **Google Gemini API** (`@google/genai`) | **0đ** | Gói Free Tier miễn phí 15 RPM, hỗ trợ suy luận Thinking Budget, tốc độ cực nhanh.                                                                                  |
+| **Vector Search**  | Cloud Vector Engine        | **In-memory Cosine Similarity**           | **0đ** | Tính khoảng cách vector trực tiếp bằng TypeScript trong RAM của Node.js (tốc độ < 10ms cho vài trăm case).                                                       |
 
 ---
 
 ## 5. PHƯƠNG ÁN REWORK PHẦN AI ENGINE & ĐÁNH GIÁ HIỆU QUẢ
 
-### 5.1. Bản chất của SAP AI Core và cơ hội của chúng ta
+### 5.1. Bản chất của các Gateway AI doanh nghiệp và cơ hội của chúng ta
 
-SAP AI Core thực chất **không tự tạo model riêng**; nó chỉ là cổng proxy bọc ngoài các model của Google (Gemini) và OpenAI (GPT-4o).
-Do đó, khi bỏ SAP AI Core để gọi trực tiếp vào Google Gemini API, chúng ta **vẫn dùng chính xác những "bộ não" AI đó**, không hề bị giảm chất lượng!
+Các Gateway AI doanh nghiệp thực chất **không tự tạo model riêng**; nó chỉ là cổng proxy bọc ngoài các model của Google (Gemini) và OpenAI (GPT-4o).
+Do đó, khi gọi trực tiếp vào Google Gemini API, chúng ta **vẫn dùng chính xác những "bộ não" AI đó**, không hề bị giảm chất lượng!
 
 ### 5.2. Rework code phần AI như thế nào?
 
@@ -131,7 +131,7 @@ export function initStandaloneAI() {
 * **Các bước triển khai:**
   1. Thêm gói thư viện chuẩn: `npm install @google/genai dotenv`.
   2. Tạo adapter `standaloneLlmProvider.ts` cắm vào `setLlmProvider` khi khởi động server.
-  3. Gỡ bỏ việc import các package nội bộ `@cnma/sap-aicore-integrate`.
+  3. Gỡ bỏ việc import các package phụ thuộc gateway nội bộ.
   4. Đưa `GEMINI_API_KEY` vào file `.env`.
 
 ### 5.3. Có đạt hiệu quả 100% như bây giờ không?
@@ -160,6 +160,6 @@ Mục tiêu Sprint 1: Hoàn tất 6 hạng mục bắt buộc của BTC (Live UR
 
 ## 7. KẾT LUẬN
 
-Chúng ta đang sở hữu một sản phẩm có **chiều sâu kỹ thuật và giá trị thực tế hàng đầu cuộc thi**. Việc tách rời khỏi hạ tầng SAP BTP nội bộ để chuyển sang kiến trúc Standalone mã nguồn mở + SQLite + Gemini API miễn phí là bước đi bắt buộc và đúng đắn nhất: vừa bảo vệ tuyệt đối dữ liệu doanh nghiệp, vừa tối ưu hóa 100% cho tiêu chí chấm thi của Ban tổ chức.
+Chúng ta đang sở hữu một sản phẩm có **chiều sâu kỹ thuật và giá trị thực tế hàng đầu cuộc thi**. Việc tách rời khỏi hạ tầng cloud nội bộ trước đây để chuyển sang kiến trúc Standalone mã nguồn mở + SQLite + Gemini API miễn phí là bước đi bắt buộc và đúng đắn nhất: vừa bảo vệ tuyệt đối dữ liệu doanh nghiệp, vừa tối ưu hóa 100% cho tiêu chí chấm thi của Ban tổ chức.
 
 Cả team cùng bám sát kế hoạch này để triển khai Sprint 1! 🚀

@@ -598,7 +598,7 @@ Use verified facts only and expose missing facts in problem.gaps.
 Do not hide all 5W2H information inside one narrative field.
 Set problem.how to how the defect surfaced, for example in-process inspection or customer complaint.
 Put the reasoning behind Is / Is-Not into problem.isIsNotBasis, citing the records it rests on.
-Never output problem.complaintReference or problem.statementOverride. Those come from SAP and from the quality engineer.
+Never output problem.complaintReference or problem.statementOverride. Those come from the quality management system and from the quality engineer.
 ```
 
 ### 2. Data Schema → ô `inputSchemaJson`
@@ -610,8 +610,8 @@ Never output problem.complaintReference or problem.statementOverride. Those come
     "problem.complaintReference": {
       "type": "string",
       "title": "Complaint reference",
-      "description": "Read from the SAP QM customer reference on the case. The AI never writes this.",
-      "x-source": "sap_qm"
+      "description": "Read from the customer reference on the case. The AI never writes this.",
+      "x-source": "qm_system"
     },
     "problem.statement": {
       "type": "string",
@@ -769,8 +769,8 @@ Never output problem.complaintReference or problem.statementOverride. Those come
       "dataType": "string",
       "colSpan": 12,
       "constraints": {},
-      "xSource": "sap_qm",
-      "description": "Read from the SAP QM customer reference on the case. The AI never writes this."
+      "xSource": "qm_system",
+      "description": "Read from the customer reference on the case. The AI never writes this."
     },
     {
       "key": "problem.statement",
@@ -1005,7 +1005,7 @@ Assign an owner to every containment action from the D1 team roster (team.roster
 Keep each action text short, direct and concise (e.g. Move to backup server).
 Distinguish recorded actions from precedent-based proposals.
 Do not collapse the action plan into one narrative paragraph.
-Start every action with the imperative verb naming the PRIMARY work; when an action has two halves, put the primary one first. Each action is filed against the SAP quality task catalogue by reading its leading clause, so a sentence that opens on the secondary task lands under the wrong code.
+Start every action with the imperative verb naming the PRIMARY work; when an action has two halves, put the primary one first. Each action is filed against the quality task catalogue by reading its leading clause, so a sentence that opens on the secondary task lands under the wrong code.
 Never output a task code, code group, or planned end date. The code is derived from your action text by rule, and the date is a human commitment.
 ```
 
@@ -1539,7 +1539,7 @@ In corrective.rootCauseCoverage name, per action, which step of the D4 chain it 
 List any part of the root cause with no action against it in corrective.uncoveredCauses.
 Distinguish recorded actions from precedent-based proposals using origin.
 Do not collapse the plan into one narrative paragraph.
-Start every action with the imperative verb naming the PRIMARY work; when an action has two halves, put the primary one first. Each action is filed against the SAP quality task catalogue by reading its leading clause, so a sentence that opens on the secondary task lands under the wrong code.
+Start every action with the imperative verb naming the PRIMARY work; when an action has two halves, put the primary one first. Each action is filed against the quality task catalogue by reading its leading clause, so a sentence that opens on the secondary task lands under the wrong code.
 Never output a task code, code group, or planned end date. The code is derived from your action text by rule, and the date is a human commitment.
 ```
 
@@ -1916,7 +1916,7 @@ Put the FMEA entry into preventive.fmea with fmeaId, description and the change 
 When the case links no FMEA entry, leave preventive.fmea.fmeaId empty and say what a systemic fix would have to cover.
 List where else the failure mode applies in preventive.systemicScope.
 An action that only protects this batch is corrective and belongs in D5.
-Start every action with the imperative verb naming the PRIMARY work; when an action has two halves, put the primary one first. Each action is filed against the SAP quality task catalogue by reading its leading clause, so a sentence that opens on the secondary task lands under the wrong code.
+Start every action with the imperative verb naming the PRIMARY work; when an action has two halves, put the primary one first. Each action is filed against the quality task catalogue by reading its leading clause, so a sentence that opens on the secondary task lands under the wrong code.
 Never output a task code, code group, or planned end date. The code is derived from your action text by rule, and the date is a human commitment.
 ```
 
@@ -2148,7 +2148,7 @@ Never output closure.gate or closure.costOfPoorQuality. The screen computes the 
       "type": "string",
       "title": "Cost of poor quality",
       "description": "Read from the case. The AI never writes this.",
-      "x-source": "sap_qm"
+      "x-source": "qm_system"
     },
     "closure.lessonsWhatWorked": {
       "type": "string",
@@ -2218,7 +2218,7 @@ Never output closure.gate or closure.costOfPoorQuality. The screen computes the 
       "dataType": "string",
       "colSpan": 4,
       "constraints": {},
-      "xSource": "sap_qm",
+      "xSource": "qm_system",
       "description": "Read from the case. The AI never writes this."
     },
     {

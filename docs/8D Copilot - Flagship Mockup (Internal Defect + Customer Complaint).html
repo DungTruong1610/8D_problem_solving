@@ -362,7 +362,7 @@ const DATA = {
       "Description": "EQ-PRESS12-004, last maint 2026-06-15",
       "Metric Value (if applicable)": null,
       "Is Root Cause?": "Y",
-      "Source": "SAP: EQUI/AFIH (PM)"
+      "Source": "ERP: EQUI/AFIH (PM)"
     },
     {
       "Notification ID (FK)": "8D-10048291",
@@ -370,7 +370,7 @@ const DATA = {
       "Description": "DOC-4471 Rev C - Press-fit assembly work instruction",
       "Metric Value (if applicable)": null,
       "Is Root Cause?": "N",
-      "Source": "SAP: DRAW/PLPO (DMS+Routing)"
+      "Source": "ERP: DRAW/PLPO (DMS+Routing)"
     },
     {
       "Notification ID (FK)": "8D-10048291",
@@ -378,7 +378,7 @@ const DATA = {
       "Description": "Batch cert PASS",
       "Metric Value (if applicable)": null,
       "Is Root Cause?": "N",
-      "Source": "SAP: QALS/QAMR (incoming)"
+      "Source": "ERP: QALS/QAMR (incoming)"
     },
     {
       "Notification ID (FK)": "8D-10048291",
@@ -386,7 +386,7 @@ const DATA = {
       "Description": "GA-0012, last cal 2026-05-01",
       "Metric Value (if applicable)": "3.1% (illustrative)",
       "Is Root Cause?": "N",
-      "Source": "SAP: Test Equipment Mgmt"
+      "Source": "ERP: Test Equipment Mgmt"
     },
     {
       "Notification ID (FK)": "8D-10048291",
@@ -410,7 +410,7 @@ const DATA = {
       "Description": "EQ-PRESS12-004, stroke-limit valve worn",
       "Metric Value (if applicable)": null,
       "Is Root Cause?": "Y",
-      "Source": "SAP: EQUI/AFIH (PM)"
+      "Source": "ERP: EQUI/AFIH (PM)"
     },
     {
       "Notification ID (FK)": "8D-10047950",
@@ -418,7 +418,7 @@ const DATA = {
       "Description": "DOC-4471 Rev C - unchanged",
       "Metric Value (if applicable)": null,
       "Is Root Cause?": "N",
-      "Source": "SAP: DRAW/PLPO (DMS+Routing)"
+      "Source": "ERP: DRAW/PLPO (DMS+Routing)"
     },
     {
       "Notification ID (FK)": "8D-10047950",
@@ -426,7 +426,7 @@ const DATA = {
       "Description": "Batch cert PASS",
       "Metric Value (if applicable)": null,
       "Is Root Cause?": "N",
-      "Source": "SAP: QALS/QAMR (incoming)"
+      "Source": "ERP: QALS/QAMR (incoming)"
     },
     {
       "Notification ID (FK)": "8D-10047950",
@@ -434,7 +434,7 @@ const DATA = {
       "Description": "GA-0031, last cal 2026-04-12",
       "Metric Value (if applicable)": "2.8% (illustrative)",
       "Is Root Cause?": "N",
-      "Source": "SAP: Test Equipment Mgmt"
+      "Source": "ERP: Test Equipment Mgmt"
     },
     {
       "Notification ID (FK)": "8D-10047950",
@@ -458,7 +458,7 @@ const DATA = {
       "Description": "EQ-ASSY04-011, guide rail liner missing",
       "Metric Value (if applicable)": null,
       "Is Root Cause?": "Y",
-      "Source": "SAP: EQUI/AFIH (PM)"
+      "Source": "ERP: EQUI/AFIH (PM)"
     },
     {
       "Notification ID (FK)": "8D-10048150",
@@ -466,7 +466,7 @@ const DATA = {
       "Description": "DOC-4502 Rev A - transfer handling instruction",
       "Metric Value (if applicable)": null,
       "Is Root Cause?": "N",
-      "Source": "SAP: DRAW/PLPO (DMS+Routing)"
+      "Source": "ERP: DRAW/PLPO (DMS+Routing)"
     },
     {
       "Notification ID (FK)": "8D-10048150",
@@ -474,7 +474,7 @@ const DATA = {
       "Description": "Batch cert PASS",
       "Metric Value (if applicable)": null,
       "Is Root Cause?": "N",
-      "Source": "SAP: QALS/QAMR (incoming)"
+      "Source": "ERP: QALS/QAMR (incoming)"
     },
     {
       "Notification ID (FK)": "8D-10048150",
@@ -482,7 +482,7 @@ const DATA = {
       "Description": "N/A - visual defect, no gauge used",
       "Metric Value (if applicable)": null,
       "Is Root Cause?": "N",
-      "Source": "SAP: Test Equipment Mgmt"
+      "Source": "ERP: Test Equipment Mgmt"
     },
     {
       "Notification ID (FK)": "8D-10048150",
@@ -1051,7 +1051,7 @@ function completeness(id){
   return score;
 }
 
-/* ---------- SAP Business Partner directory (fake, for D1 team assignment) ---------- */
+/* ---------- Enterprise Business Partner directory (fake, for D1 team assignment) ---------- */
 const BP_DIRECTORY = [
   {id:"BP-100001", name:"Heli Weber",  title:"Quality Engineer",       email:"heli.weber@conaspark-demo.com",  phone:"+49 711 400 1001"},
   {id:"BP-100002", name:"Brian Cole",  title:"Sales Representative",   email:"brian.cole@conaspark-demo.com",  phone:"+49 711 400 1002"},
@@ -1063,7 +1063,7 @@ const BP_DIRECTORY = [
 ];
 const bpLookup = id => BP_DIRECTORY.find(b=>b.id===id);
 
-/* ---------- step status (Not Started / In Process / Complete) — SAP's real per-step workflow ---------- */
+/* ---------- step status (Not Started / In Process / Complete) — Real per-step workflow ---------- */
 const STEP_STATUS = {};
 function computeDoneMap(id, n){
   n = n || getNotif(id);
@@ -1263,10 +1263,10 @@ function renderLauncher(){
     <div class="tile q3">
       <div class="tile-icon">⚠</div>
       <div class="priority-badge">PRIORITY 1 · INTERNAL DEFECT</div>
-      <h3>Record Defects (SAP Fiori)</h3>
+      <h3>Record Defects (Quality Portal)</h3>
       <p class="desc">A production worker logs a defect found during in-process inspection. A quality engineer reviews it and chooses <b>Start Problem-Solving Process</b> to generate the 8D issue.</p>
       <button class="btn-primary" onclick="goto_('defectApp')">Open Record Defects →</button>
-      <div class="src">Source: SAP Learning — "Processing an Internal Problem Using the 8D Methodology" (Applying SAP S/4HANA Quality Management)</div>
+      <div class="src">Source: Industry Standard — "Processing an Internal Problem Using the 8D Methodology" (Enterprise Quality Management)</div>
     </div>
     <div class="tile q1">
       <div class="tile-icon">✉</div>
@@ -1274,7 +1274,7 @@ function renderLauncher(){
       <h3>Customer Complaint intake</h3>
       <p class="desc">A customer complains by e-mail. A sales rep or quality technician captures it as a quality notification — description, customer, delivery info, attachments — then routes it for investigation.</p>
       <button class="btn-primary" onclick="goto_('complaintApp')">Open complaint intake →</button>
-      <div class="src">Source: SAP Learning — "Creating a Customer Complaint", UI pattern reference: Galileon SolveR real product site</div>
+      <div class="src">Source: Standard Practice — "Creating a Customer Complaint", UI pattern reference: Galileon SolveR real product site</div>
     </div>
   </div>
   <div class="card" style="margin-top:26px;">
@@ -1303,9 +1303,9 @@ function renderDefectApp(){
     </tr>`;
   }).join("");
   return `
-  <div class="eyebrow">SAP Fiori · Record Defects</div>
+  <div class="eyebrow">Quality Portal · Record Defects</div>
   <h1>Record Defects</h1>
-  <p class="sub">The only screen that actually exists in SAP today for this flow. Click a defect to review it and start the 8D problem-solving process.</p>
+  <p class="sub">The standard screen for this flow. Click a defect to review it and start the 8D problem-solving process.</p>
   <div class="card">
     <table class="list">
       <thead><tr><th>Notification</th><th>Material</th><th>Defect</th><th>Work center</th><th>Status</th></tr></thead>
@@ -1319,7 +1319,7 @@ function renderDefectDetail(id){
         def=getDefect(n["Defect Code (FK)"]), wc=getWC(n["Work Center ID (FK)"]), insp=getInspections(id)[0];
   const started = AUDIT[id] && AUDIT[id].some(a=>a.text.includes("Started Problem-Solving Process"));
   return `
-  <div class="eyebrow">SAP Fiori · Record Defects</div>
+  <div class="eyebrow">Quality Portal · Record Defects</div>
   <h1>${id}</h1>
   <p class="sub">${def["Defect Text"]} — reviewed by Quality Engineering.</p>
   <div class="card"><div class="card-body">
@@ -1341,7 +1341,7 @@ function renderDefectDetail(id){
     <p style="font-size:13px;">Heli (Quality Engineer) reviews the defect and decides a formally structured 8D process is required.</p>
     ${started ? `<div class="gate-msg ok">✓ Problem-solving process started — 8D issue ${id} created. <a href="#" onclick="event.preventDefault();openCase('${id}',1);">Open in 8D Copilot →</a></div>`
       : `<button class="btn-primary" onclick="addAudit('${id}','Heli (QE)','Started Problem-Solving Process from Record Defects'); openCase('${id}',1);">Start Problem-Solving Process →</button>`}
-    <div class="src" style="margin-top:14px;">Action name and flow verified against SAP Learning: "Processing an Internal Problem Using the 8D Methodology" → generates an 8D issue in the <i>Resolve Internal Problems</i> (F4197) app, which 8D Copilot replaces end to end.</div>
+    <div class="src" style="margin-top:14px;">Action name and flow verified against standard 8D Methodology → generates an 8D issue in the <i>Resolve Internal Problems</i> app, which 8D Copilot replaces end to end.</div>
   </div></div>
   <button class="btn-secondary" onclick="goto_('defectApp')">← Back to Record Defects</button>`;
 }
@@ -1395,10 +1395,10 @@ function renderComplaintDetail(id){
       <div class="attach-chip"><span class="ext xls">XLS</span> sorting_log.xlsx</div>
     </div>
     <hr style="border:none;border-top:1px solid var(--line);margin:18px 0;">
-    <p style="font-size:13px;">Per SAP process: the notification creator captures description, customer, purchasing/delivery info and pictures, then routes it to the department responsible for this material.</p>
+    <p style="font-size:13px;">Standard QM process: the notification creator captures description, customer, purchasing/delivery info and pictures, then routes it to the department responsible for this material.</p>
     ${started ? `<div class="gate-msg ok">✓ Quality notification created — 8D investigation started for ${id}. <a href="#" onclick="event.preventDefault();openCase('${id}',1);">Open in 8D Copilot →</a></div>`
       : `<button class="btn-primary" onclick="addAudit('${id}','Call center agent','Created quality notification, routed to Quality dept, started 8D investigation'); openCase('${id}',1);">Create quality notification &amp; start 8D →</button>`}
-    <div class="src" style="margin-top:14px;">Flow verified against SAP Learning: "Creating a Customer Complaint" — "If your customer requires an investigation report, for example, following the 8D methodology, you can create reports using the data from the quality notification."</div>
+    <div class="src" style="margin-top:14px;">Flow verified against Standard Quality Practice: "Creating a Customer Complaint" — "If your customer requires an investigation report, for example, following the 8D methodology, you can create reports using the data from the quality notification."</div>
   </div></div>
   <button class="btn-secondary" onclick="goto_('complaintApp')">← Back to inbox</button>`;
 }
@@ -1558,7 +1558,7 @@ function stepD1(id,n,q1){
 
   return `
   <h2>D1 · Assemble the 8D team</h2>
-  <p style="color:var(--muted);font-size:12.5px;">Partner and role are assigned manually, matching the Business Partner (BP) assignment in SAP's Resolve Internal Problems app. E-mail and telephone are queried automatically from the BP master record — never typed by hand.</p>
+  <p style="color:var(--muted);font-size:12.5px;">Partner and role are assigned manually, matching the Business Partner (BP) assignment in the Resolve Internal Problems system. E-mail and telephone are queried automatically from the BP master record — never typed by hand.</p>
   ${aiBlock("d1team", suggBody, false, true)}
   <div class="d1-tabs">
     <button class="tabbtn ${tab==='team'?'active':''}" onclick="setD1Tab('${id}','team')">Team Members</button>
@@ -1575,7 +1575,7 @@ function stepD1(id,n,q1){
   : `
     <div class="comments-list">${commentsHtml}</div>
     ${editable?`<button class="btn-secondary" style="margin-top:10px;" onclick="addComment('${id}')">Add comment</button>`:""}`}
-  <div class="footnote">Source: SAP Learning — the 8D team lead assigns employees to "8D team lead" and "8D team member" roles in the Resolve Internal Problems app. Heli and Brian are the two personas SAP itself uses in this course's official use-case scenarios (internal defect and customer complaint). Suggested roles/individuals above are computed from GD 15 (Historical Team Assignments), backfilled from this case's own causal data for demo purposes — for 8D-2612 the historical roster is explicitly marked ASSUMED, since Galileon's published walkthrough doesn't document who was on the team. Production would replace GD 15 with real historical assignment records.</div>`;
+  <div class="footnote">Source: Standard Reference — the 8D team lead assigns employees to "8D team lead" and "8D team member" roles in the Resolve Internal Problems app. Heli and Brian are the two standard personas used in official use-case scenarios (internal defect and customer complaint). Suggested roles/individuals above are computed from GD 15 (Historical Team Assignments), backfilled from this case's own causal data for demo purposes — for 8D-2612 the historical roster is explicitly marked ASSUMED, since Galileon's published walkthrough doesn't document who was on the team. Production would replace GD 15 with real historical assignment records.</div>`;
 }
 
 function renderIsIsNot(id){
@@ -1648,7 +1648,7 @@ function stepD2(id,n,q1){
 function stepD3(id,n,q1){
   const desc = q1? "Stop the problem reaching more customers — sorting, return delivery, or 100% inspection at the customer site." : "Prevent the defect from spreading further inside the plant, e.g. quarantine remaining stock or check similar components in the warehouse.";
   return stepAction(id,"Containment","D3 · Immediate / containment actions", desc, {advanceLabel:"Mark as done", advanceStatus:"Done"})
-   + `<div class="footnote">Source: SAP Learning — for internal defects, a task is sent to the warehouse to check for similar broken components and move them to blocked stock. For customer complaints, a return delivery can be created to bring the defective item back for analysis.</div>`;
+   + `<div class="footnote">Source: Standard Practice — for internal defects, a task is sent to the warehouse to check for similar broken components and move them to blocked stock. For customer complaints, a return delivery can be created to bring the defective item back for analysis.</div>`;
 }
 
 function stepD4(id,n,q1){
@@ -1693,7 +1693,7 @@ function stepAction(id, type, title, desc, opts){
 
 function stepD6(id,n,q1){
   return stepAction(id,"Corrective","D6 · Implement & validate","Approved actions are executed. Effort and cost of non-conformance are recorded to a repair order for tracking.", {advanceLabel:"Mark as verified", advanceStatus:"Verified"})
-   + `<div class="footnote">Source: SAP Learning — the production operator records repair effort to a repair order created by engineering, so cost of non-conformance can be tracked; this maps to the Cost of Poor Quality field in D8.</div>`;
+   + `<div class="footnote">Source: Standard Practice — the production operator records repair effort to a repair order created by engineering, so cost of non-conformance can be tracked; this maps to the Cost of Poor Quality field in D8.</div>`;
 }
 function stepD7(id,n,q1){
   const fmea = getFmea(id);
@@ -1719,7 +1719,7 @@ function stepD8(id,n,q1){
   ${closed ? `<div class="gate-msg ok">✓ Case closed — knowledge kept for future precedent matching.</div>`
     : canClose ? `<button class="btn-primary" style="margin-top:14px;" onclick="getNotif('${id}')['Status']='Completed'; addAudit('${id}','You','Approved and closed case (completeness ${c}/8)'); render();">Approve &amp; close case</button>`
     : `<div class="gate-msg">Not ready to close — completeness ${c}/8. Complete the remaining D-steps first.</div>`}
-  <div class="footnote">Source: SAP Learning — closure step documents lessons learned and recognizes the team's collective effort ("congratulate your team").</div>`;
+  <div class="footnote">Source: Standard Practice — closure step documents lessons learned and recognizes the team's collective effort ("congratulate your team").</div>`;
 }
 
 /* ---------- nav wiring ---------- */

@@ -1,6 +1,6 @@
 # Did the team actually build what the D1/D2 fix plan asked for?
 
-**Checked on:** 2026-08-30 · **Branch:** `dev/Thien` · **Latest commit:** `75fc36e`
+**Checked on:** 2026-08-30 ·
 **Plan being checked:** `docs/D1D2FIXPLAN - 11PM (1).md`
 
 **How I checked.** I read the code and the seed data and compared them, line by line, against every task in the plan. I also ran the automated test suite, the type checker, and the database model compiler. What I could **not** do is start the system and click through it — so anything that depends on how the AI actually behaves on a live case is marked *"needs a real run"* rather than *"passed"*.

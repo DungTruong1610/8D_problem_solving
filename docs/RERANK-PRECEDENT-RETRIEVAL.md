@@ -174,8 +174,8 @@ Suggested A/B protocol:
 
 - **No DB migration, no HDI artifact**: `matchType` is a free `String(20)`; the instruction
   reuses the criterion's `description` column; the floor reuses `minSimilarity`. Deploying
-  to HANA requires nothing beyond the normal build.
-- **Runs identically on SQLite and HANA** — the re-rank layer is pure TypeScript plus one
+  requires nothing beyond the normal build.
+- **Runs identically on SQLite and Cloud DB** — the re-rank layer is pure TypeScript plus one
   LLM call; nothing engine-specific.
 - **Cost**: one extra `reviewQuality` model call per search per enabled profile
   (≤ 20 candidates × ~700 chars each + the query text; output capped at 4 000 tokens).

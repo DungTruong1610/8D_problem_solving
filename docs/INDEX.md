@@ -1,7 +1,7 @@
 # Documentation Index & Working Conventions
 
 **Status:** Proposal — not yet executed
-**Owner:** Quyen (BA)
+**Owner:** Tran Khanh Duy (Lead)
 **Audience:** Anyone opening this folder; dev team; process owner
 **Authoritative for:** what each document is for, which one wins when two disagree, and where a new finding belongs
 
@@ -17,7 +17,7 @@
 |---|---|---|---|
 | `AI Requirements - 8D Copilot POC.md` | Requirements | **Normative** | What the AI must do, on what data, and the acceptance criteria. Retrieval weights §2 are the seeded defaults. |
 | `AI-RULES-8D-STEPS.md` | Requirements | 🔴 **MISSING on this branch** | R2.1 (D1), R2.2 (D2), §R4 acceptance tests 8–10. Cited as normative by the D1/D2 fix plan. See Part 3. |
-| `GRAPH-RETRIEVAL-AND-RERANK.vi.md` | Architecture / Superpower | Living | Core flagship: SAP HANA Cloud Graph + openCypher & 2-stage LLM Re-ranking. |
+| `GRAPH-RETRIEVAL-AND-RERANK.vi.md` | Architecture / Superpower | Living | Core flagship: Knowledge Graph + openCypher & 2-stage LLM Re-ranking. |
 | `RERANK-PRECEDENT-RETRIEVAL.md` | Architecture / Superpower | Living | Stage-2 LLM Re-rank pass spec (D4 Root Cause & D5 Corrective Actions). |
 | `8D-COPILOT-E2E-GUIDE.md` | Guide | Living | Business context, AI architecture, E2E test walkthrough (VN). |
 | `8D-DISCIPLINE-PIPELINE-AND-CREATE-DEFECT-GUIDE.md` | Guide | Living | The 5-tab step config pipeline and the Create Defect module (VN). |
@@ -74,9 +74,6 @@ The numbers show the flow: **requirements → findings → plan → verification
 |---|---|---|
 | `AI Requirements - 8D Copilot POC.md` | `00-requirements/AI-REQUIREMENTS-POC.md` | rename only |
 | `AI-RULES-8D-STEPS.md` | `00-requirements/` | **recover first** |
-| `REFACTOR-PLAN.md` | `20-plans/` or `archive/` | recover, then decide |
-| `SAP-QM-CHAIN-ALIGNMENT-VERIFICATION.md` | `10-findings/SAP-QM-CHAIN-ALIGNMENT.md` | drop "VERIFICATION" — it is a findings doc and the name misleads |
-| `PRECEDENT-RETRIEVAL-REVIEW.md` | `10-findings/` | as is |
 | `CHAIN-ALIGNMENT-IMPLEMENTATION-PLAN.md` | `20-plans/` | Frozen — dev started 2026-09-01 |
 | `CHAIN-ALIGNMENT-VERIFICATION.md` | `30-verification/` | as is |
 | `D1D2FIXPLAN - 11PM (1).md` | `20-plans/D1D2-FIXPLAN.md` | rename; keep frozen |
@@ -96,7 +93,7 @@ Every finding gets a stable ID. Other documents **cite the ID and never restate 
 
 | Prefix | Document |
 |---|---|
-| `SAP-nn` | SAP QM chain alignment |
+| `QM-nn` | Quality Management (QM) chain alignment |
 | `RET-nn` | Precedent retrieval review |
 | `LIVE-nn` | Live-run verification (currently L1–L6) |
 
@@ -140,7 +137,7 @@ A document nobody can `git pull` does not exist. Five of the current documents �
 Is it about something already in build?
   YES → the verification log for that plan (30-verification/)
   NO  ↓
-Does it contradict the requirements or the SAP model?
+Does it contradict the requirements or the core model?
   YES → 10-findings/, and add it to "Known disagreements" above
   NO  ↓
 Is it about how the system behaves rather than what it should do?
@@ -174,7 +171,7 @@ Then check whether the `origin/BA/Quyen` copy of `AI Requirements - 8D Copilot P
 git diff origin/BA/Quyen -- "docs/AI Requirements - 8D Copilot POC.md"
 ```
 
-## 2. Commit the five untracked documents
+## 2. Commit the untracked documents
 
 ```bash
 git status --short docs/
@@ -185,7 +182,6 @@ Currently untracked — visible to nobody but this machine:
 - `AI Requirements - 8D Copilot POC.md` ← **normative**
 - `D1D2FIXPLAN - 11PM (1).md` ← **the plan being built right now**
 - `D1D2-FIXPLAN-VERIFICATION.md`
-- `SAP-QM-CHAIN-ALIGNMENT-VERIFICATION.md`
 - `PRECEDENT-RETRIEVAL-REVIEW.md`
 
 ## 3. Delete the junk file

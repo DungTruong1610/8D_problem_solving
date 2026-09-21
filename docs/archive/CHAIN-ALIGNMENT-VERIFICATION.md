@@ -1,10 +1,10 @@
-# Was the SAP chain-alignment plan actually built?
+# Was the QM chain-alignment plan actually built?
 
 **Status:** Living log — append-only
-**Owner:** Quyen (BA)
+**Owner:** Duy (Lead)
 **Audience:** Dev team / Process owner / Reviewers
 **Authoritative for:** what got built against `CHAIN-ALIGNMENT-IMPLEMENTATION-PLAN.md`, what deviated, and what is still owed
-**Related:** `CHAIN-ALIGNMENT-IMPLEMENTATION-PLAN.md` (the frozen plan) · `SAP-QM-CHAIN-ALIGNMENT-VERIFICATION.md` (findings SAP-nn) · `PRECEDENT-RETRIEVAL-REVIEW.md` (RET-nn, AI track)
+**Related:** `CHAIN-ALIGNMENT-IMPLEMENTATION-PLAN.md` (the frozen plan) · `QM-CHAIN-ALIGNMENT-VERIFICATION.md` (findings QM-nn) · `PRECEDENT-RETRIEVAL-REVIEW.md` (RET-nn, AI track)
 
 **Why this file exists.** INDEX Rule 2: a plan freezes the moment dev starts, and everything learned afterwards goes here instead. The plan says what we agreed to build. This says what exists.
 
@@ -77,13 +77,13 @@ The plan named two browser-side ID generators. There was a **third**, unnamed, a
 
 ### 1.3 — Capture the full defect classification ✅ Done
 
-*The plan's point: SAP classifies a defect by group, code and severity. We stored the code and threw the rest away.*
+*The plan's point: QM classifies a defect by group, code and severity. We stored the code and threw the rest away.*
 
 | What was asked | Done? | What it means in practice |
 |---|---|---|
 | `defectCodeGroup` + `defectClass` on the payload and on `Reports` | ✅ | The classification survives the save instead of living only in the picker |
-| Severity on the popup, read-only, filled by the picker | ✅ | The user sees "Severity"; the schema says `defectClass` (SAP FECLAS). One label, one column name |
-| Carry code group into D2 | ✅ | D2 now shows what SAP's D2 shows |
+| Severity on the popup, read-only, filled by the picker | ✅ | The user sees "Severity"; the schema says `defectClass` (QM FECLAS). One label, one column name |
+| Carry code group into D2 | ✅ | D2 now shows what standard D2 shows |
 | Reference Number on the popup | ✅ | Nullable — blank stays blank |
 
 **Handoff to the AI track is live.** `defectCodeGroup` is stored and carries no weight, exactly as the plan agreed. RET-07 is unblocked on data; what it is worth is still their decision.
@@ -99,7 +99,7 @@ The plan named two browser-side ID generators. There was a **third**, unnamed, a
 | What was asked | Done? | What it means in practice |
 |---|---|---|
 | Split spec into lower limit / upper limit / UoM | ✅ | `outOfSpec` is computed from numbers, not parsed out of prose |
-| Add a valuation column (Accepted / Rejected) | ✅ | SAP's step ③ exists in our chain for the first time |
+| Add a valuation column (Accepted / Rejected) | ✅ | step ③ exists in our chain for the first time |
 | Numeric quantity + UoM instead of free-text "Quantity / Extent" | ✅ | The seeded `UOM` list is finally used; the server composes the display string so the halves can't disagree |
 | Inspection Lot F4 with return mapping | ✅ | Selecting a lot pulls material, plant, work centre, equipment and the characteristic row into the grid |
 
@@ -273,7 +273,7 @@ So `writeHistoricalCase()` was **extracted out of** the seeder (`srv/src/domain/
 
 ### Where the lesson actually lives
 
-`Reports.caseContext` is the snapshot taken at **analysis** time — what SAP handed over, before anyone concluded anything. The thing worth keeping as a precedent is in `Disciplines.resultJson`: the approved root cause, the confirmed team, the assigned actions, the lessons written at closure. Writing `caseContext` straight into the library would store the question and discard the answer.
+`Reports.caseContext` is the snapshot taken at **analysis** time — what the ERP system handed over, before anyone concluded anything. The thing worth keeping as a precedent is in `Disciplines.resultJson`: the approved root cause, the confirmed team, the assigned actions, the lessons written at closure. Writing `caseContext` straight into the library would store the question and discard the answer.
 
 `buildClosedCaseContext(base, disciplines)` in `srv/src/domain/eightd/precedent/closedCaseWriteBack.ts` therefore takes the analysis context as a **base** and overlays each D-step's approved result on top. It is a pure function with no database access, because it is the most error-prone part of the whole flow: it reads free-form JSON that a model produced and a human edited, with two key variants on nearly every field — `actions` / `assignedActions`, `statement` / `statementOverride`, `team.roster` / `team.assignedRoster`.
 
@@ -359,7 +359,7 @@ The same helper also mis-read the English thousands separator — "18,500 EUR" c
 **Checked on:** 2026-09-02 · **Branch:** `dev/Quyen-Test` · **Base commit:** `e9dae40` (Phase 1 + 5 + 2 work is uncommitted on top)
 **Covers:** items 2.1 – 2.4
 
-**How I checked.** Same standing as Entries 1 and 2: I built it, so read this as a build record rather than an independent audit. New this time — **the screens were actually clicked through in a browser**, which is what caught two of the four bugs below. Everything marked ✅ was verified by the test suite, both type checkers, a read through the migrated SQLite service views, or a live click.
+**How I checked.** Same standing as Entries 1 and 2: I built it, so read this as a build record, not an independent audit. New this time — **the screens were actually clicked through in a browser**, which is what caught two of the four bugs below. Everything marked ✅ was verified by the test suite, both type checkers, a read through the migrated SQLite service views, or a live click.
 
 ### The short answer
 
@@ -391,14 +391,14 @@ The same helper also mis-read the English thousands separator — "18,500 EUR" c
 **Payload is rebuilt server-side, never posted.** The client sends only a defect number. `buildDefectPayload(defect, characteristics)` reconstructs what the analyzer sees, so there is no route by which a browser can edit case facts on the way into an 8D. That boundary is where 25 of the 25 new tests live (`srv/src/domain/__tests__/defectPayload.test.ts`) — every failure there would be silent, producing a plausible-looking case built on the wrong numbers.
 
 > **⚠ Deviation — the `DEFECT` number range is shared between `Defects.defectId` and `Reports.notificationId`, on purpose.**
-> The plan reads as though the defect gets a number from the 1.7 range and the report keeps its own. In SAP the notification **is** the defect, and `Reports.notificationId` is still the case key for every imported and seeded row (the plan says so itself, under D-1). Giving the two objects independent numbers would mean an 8D and the defect it came from carry two different numbers that must then be reconciled by hand in every conversation about the case.
+> The plan reads as though the defect gets a number from the 1.7 range and the report keeps its own. In standard QM the notification **is** the defect, and `Reports.notificationId` is still the case key for every imported and seeded row (the plan says so itself, under D-1). Giving the two objects independent numbers would mean an 8D and the defect it came from carry two different numbers that must then be reconciled by hand in every conversation about the case.
 > *Consequence:* `assignBusinessKey` had to grow an `alsoCheck` parameter — allocating from a range that feeds two tables and probing only one of them misses exactly half the range. One code path, both tables checked.
 
 ---
 
 ### 2.2 — Start an 8D from an existing open defect ✅ Done
 
-*The plan's point: this is the normal path in SAP and the only one the app lacked. It is also the fix for double entry — today the same defect gets recorded twice.*
+*The plan's point: this is the normal path in QM and the only one the app lacked. It is also the fix for double entry — today the same defect gets recorded twice.*
 
 | What was asked | Done? | What it means in practice |
 |---|---|---|
@@ -464,7 +464,7 @@ Completed 20 / In Process 5
 ```
 
 > **⚠ Deviation — back-filled defects reuse the report's `notificationId` rather than drawing a fresh number.**
-> The agreed answer was "backfill one Defect per report, numbered from the 1.7 range". Taken literally that mints 25 brand-new numbers for defects that, in SAP's terms, already had one — and it cuts the case-library link, which keys on `notificationId`. So the backfill reuses the existing number, allocates from the range only where a report has none, and then raises the range counter past every reused value so the next real allocation cannot collide. The counter finished unchanged at 10049120, which is correct: every existing number was already below it.
+> The agreed answer was "backfill one Defect per report, numbered from the 1.7 range". Taken literally that mints 25 brand-new numbers for defects that, in QM terms, already had one — and it cuts the case-library link, which keys on `notificationId`. So the backfill reuses the existing number, allocates from the range only where a report has none, and then raises the range counter past every reused value so the next real allocation cannot collide. The counter finished unchanged at 10049120, which is correct: every existing number was already below it.
 
 **What the backfill would not guess.** Legacy payloads store spec values as prose — `'max 0.10mm'`, `'0.05 – 0.15'`. All 50 characteristic rows are like this. Parsing them into `specUpperLimit` would put a **guessed number** into precisely the field D2 reads to decide whether a measurement is out of spec. The limits are therefore left null and the count is printed. A wrong limit there produces a confident, wrong verdict; a null produces no verdict, which is the honest outcome.
 
@@ -768,7 +768,7 @@ Both are appended to the D3, D5 and D7 mechanics. The `action` item descriptions
 
 *The plan asked for "a task code catalogue in Master Data alongside the defect one".* Delivered as **one read-only tab showing both**, because the defect catalogue had no UI at all — it lived in `ValueHelpList` and surfaced only through an F4 dropdown, which meant the hard-block's advice to "add it in Master Data first" pointed at a screen that did not exist.
 
-Read-only is the point, not a shortcut: both are SAP master data (type 9 defects, type 2 tasks). A write path here would promise something that has to be withdrawn when S/4 is connected, and in the meantime would create a second catalogue drifting from SAP's.
+Read-only is the point, not a shortcut: both are ERP master data (type 9 defects, type 2 tasks). A write path here would promise something that has to be withdrawn when the ERP is connected, and in the meantime would create a second catalogue drifting from the ERP's.
 
 **The "Used in closed cases" column is the visible proof that Phase 4 works.** It counts by fetching the column and tallying client-side rather than using `$apply=groupby` — a group-by returns empty rather than erroring on some adapters, and a column of zeroes looks exactly like "nobody has used any code". Zero renders as a literal `0`, not `—`: a code that exists and has never been used is a fact, not a missing cell.
 
@@ -872,7 +872,7 @@ Three routes were possible. **Two were rejected after reading the code, not afte
 | A new column, e.g. `Reports.committedDue` | CAP's SQLite service views enumerate columns explicitly. A new column means dropping and recreating 35 views — a migration for a field that already exists |
 | Through the payload — `buildDefectPayload` → `customer_reference.sla_response_due` | Cleanest on paper: single source of truth, visible to the AI. **But `datasetValidator.ts:217-224` raises `Q1-ONLY-CUSTOMER-FIELDS` for any non-`N/A` value there on a non-customer case, and `defectPayload.ts:104-109` hard-codes the `N/A` sentinel for non-Q1 origins.** Every internal case with a committed date would have been flagged invalid by the app's own validator |
 
-**Chosen: `Reports.slaResponseDue`, one column with two write paths** — derived from the customer SLA on a Q1 case, typed by a human on any case. The commitment is a ProResolve workflow field and never enters the SAP-shaped payload, so the validator stays right about what it is checking.
+**Chosen: `Reports.slaResponseDue`, one column with two write paths** — derived from the customer SLA on a Q1 case, typed by a human on any case. The commitment is a ProResolve workflow field and never enters the standard-shaped payload, so the validator stays right about what it is checking.
 
 > **This is the entry's one load-bearing claim, so it is the one I verified against the database rather than by reading.** See "The bug this uncovered" below.
 
@@ -967,7 +967,7 @@ The term was retired in favour of **Severity** in Entry 3. Two section headings 
 
 Both sections hold the code group, the code, the severity and the measurements — naming them after their contents avoids the vocabulary question entirely. Verified in the live DOM: the Create Defect dialog now contains no occurrence of "Classification".
 
-**`defectClass` remains the column name.** One label for the user, one name in the schema mirroring SAP's `FECLAS` — deliberate, and commented as such at `create-defect/index.tsx:185`.
+**`defectClass` remains the column name.** One label for the user, one name in the schema mirroring standard `FECLAS` — deliberate, and commented as such at `create-defect/index.tsx:185`.
 
 ---
 
@@ -1013,7 +1013,7 @@ The database said so plainly. Defect `8D-10049122` was created at `08:41:02.126Z
 | hydration | keeps `c.ID` when filling the grid from `getWithCharacteristics` |
 | `defectRecord` | re-attaches keys positionally: `...(keptRows[idx]?.ID ? { ID: keptRows[idx].ID } : {})` |
 
-The key is attached **outside** `builtPayloadObject`. That object is the SAP-shaped payload and its `inspections` mapping is an explicit field whitelist; a ProResolve row key does not belong in it. The two are aligned by re-running the same filter (`filter(i => cleanInput(i.characteristic))`), which preserves order — so row *n* of one array is row *n* of the other. Commented in place as a pair that must be changed together.
+The key is attached **outside** `builtPayloadObject`. That object is the standard-shaped payload and its `inspections` mapping is an explicit field whitelist; a ProResolve row key does not belong in it. The two are aligned by re-running the same filter (`filter(i => cleanInput(i.characteristic))`), which preserves order — so row *n* of one array is row *n* of the other. Commented in place as a pair that must be changed together.
 
 **Verified against the running server**, all four shapes, on `8D-10049122`:
 

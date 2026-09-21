@@ -1,19 +1,17 @@
 # Precedent Retrieval — Review of the Matching Engine
 
 **Date:** 2026-08-31 · **Revised 2026-09-01** — prerequisite scheduled, ownership restated
-**Branch:** `dev/Thien`
 **Status:** review — **owned by the AI / retrieval workstream**, not the chain-alignment plan
-**Owner:** AI track (separate from Quyen's chain-alignment plan)
 **Audience:** whoever tunes **AI Settings → Similarity**; process owner for R1
 **Authoritative for:** the similarity engine — criteria, weights, thresholds. Feeds D1, D3, D4, D5, D8.
-**Related:** `CHAIN-ALIGNMENT-IMPLEMENTATION-PLAN.md` (captures `defectCodeGroup` in Phase 1.3; takes **no position** on weights) · `SAP-QM-CHAIN-ALIGNMENT-VERIFICATION.md` · `AI Requirements - 8D Copilot POC.md` §2
+**Related:** `CHAIN-ALIGNMENT-IMPLEMENTATION-PLAN.md` (captures `defectCodeGroup` in Phase 1.3; takes **no position** on weights) · `AI Requirements - 8D Copilot POC.md` §2
 
 **Scope:** the one engine that answers *"which closed cases are like this one"*. It feeds D1 (team), D3, D4, D5 and D8, so a change here changes five steps at once.
 
 **Why this is a separate document.**
 
 - `D1D2FIXPLAN - 11PM (1).md` is being implemented and tested right now. Nothing here should be added to it.
-- `CHAIN-ALIGNMENT-IMPLEMENTATION-PLAN.md` (accepted 2026-09-01) covers the SAP QM chain — flow, screens, fields, integration. Retrieval is a different subject with a different owner. The chain plan **explicitly does not decide** R1 / R4 (semantic weight).
+- `CHAIN-ALIGNMENT-IMPLEMENTATION-PLAN.md` (accepted 2026-09-01) covers the QM chain — flow, screens, fields, integration. Retrieval is a different subject with a different owner. The chain plan **explicitly does not decide** R1 / R4 (semantic weight).
 - The findings below propose changing **seeded defaults that the requirements document fixed**, so they need sign-off from whoever owns `AI Requirements - 8D Copilot POC.md` §2.
 
 The two documents meet at one point: once defect **code groups** exist, the group becomes the natural fallback when codes differ. That is finding R7. **Prerequisite now scheduled:** `CHAIN-ALIGNMENT-IMPLEMENTATION-PLAN.md` Phase 1.3 stores `defectCodeGroup`. This workstream decides what it is worth; the chain plan only captures the field.
@@ -142,7 +140,7 @@ Full detail and the fix are in `D1D2-FIXPLAN-VERIFICATION.md` (finding L1). Note
 
 **This is the structural answer to "every defect gets a different code, so how will we ever match?"** — and it depends on the code-group work now scheduled in `CHAIN-ALIGNMENT-IMPLEMENTATION-PLAN.md` Phase 1.3.
 
-Codes differ between plants, lines and catalogues. **Groups do not.** SAP groups codes into families deliberately, by a human decision about the nature of the failure.
+Codes differ between plants, lines and catalogues. **Groups do not.** The QM standard groups codes into families deliberately, by a human decision about the nature of the failure.
 
 Replace the binary defect criterion with a graded one:
 

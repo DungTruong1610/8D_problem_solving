@@ -1,11 +1,11 @@
-# SAP Chain Alignment — End-to-End Implementation Plan
+# QM Chain Alignment — End-to-End Implementation Plan
 
 **Date:** 2026-09-01 (rev 2 — decisions recorded)
 **Status:** Accepted — Phase 0 answered, handed to dev. **Frozen (INDEX Rule 2) — do not edit.** What actually got built, and where the build deviated, is logged in `CHAIN-ALIGNMENT-VERIFICATION.md`.
-**Owner:** Quyen (BA)
+**Owner:** Duy (Lead)
 **Audience:** Dev team (execution)
-**Authoritative for:** what gets built to align the app with the SAP QM chain — flow, screens, fields, integration — and in what order
-**Related:** `SAP-QM-CHAIN-ALIGNMENT-VERIFICATION.md` (findings SAP-nn) · `PRECEDENT-RETRIEVAL-REVIEW.md` (findings RET-nn, **owned by the AI track, not this plan**) · `AI Requirements - 8D Copilot POC.md` (normative)
+**Authoritative for:** what gets built to align the app with the QM chain — flow, screens, fields, integration — and in what order
+**Related:** `QM-CHAIN-ALIGNMENT-VERIFICATION.md` (findings QM-nn) · `PRECEDENT-RETRIEVAL-REVIEW.md` (findings RET-nn, **owned by the AI track, not this plan**) · `AI Requirements - 8D Copilot POC.md` (normative)
 
 ---
 
@@ -105,7 +105,7 @@ The end-to-end view. `—` means the page is untouched in that phase.
 
 ## Phase 1 — Fix the coding model
 
-**Goal:** capture defect classification the way SAP does, and wire the integrations that make Path A mean something.
+**Goal:** capture defect classification the way standard QM does, and wire the integrations that make Path A mean something.
 **Est.** 6–9 days.
 
 ### 1.1 Reconcile the catalogue with the case library — **do this first**
@@ -145,8 +145,8 @@ Also both Master Data tab forms.
 ### 1.3 Capture the full defect classification
 
 - Add `defectCodeGroup` and `defectClass` to the payload and to `Reports`.
-- Show **Severity** on the popup, read-only, filled by the picker. UI term is Severity; the column is `defectClass` (SAP FECLAS). One label for the user, one name in the schema.
-- Carry code group into D2 — SAP's D2 displays *"the defect 'Code Group' and 'Defect code'"*.
+- Show **Severity** on the popup, read-only, filled by the picker. UI term is Severity; the column is `defectClass` (QM FECLAS). One label for the user, one name in the schema.
+- Carry code group into D2 — Standard D2 displays *"the defect 'Code Group' and 'Defect code'"*.
 - Add **Reference Number** to the popup.
 
 > **Handoff to the AI track:** `defectCodeGroup` stored here is the prerequisite for the code-group criterion (RET-07). This plan captures it and assigns it no weight.
@@ -158,7 +158,7 @@ Also both Master Data tab forms.
 Two changes that belong together — the lot's return mapping is what populates the rows this fixes.
 
 - Split **spec** into lower limit / upper limit / UoM instead of one string. Today `outOfSpec` is parsed out of free text (`caseMapper.ts:174`) and returns `null` when parsing fails — and `postProcess.ts:339` picks the Is/Is-Not characteristic from `outOfSpec`, so a parse failure silently changes which characteristic D2 compares.
-- Add a **valuation** column (Accepted / Rejected) to the inspection rows. This is SAP's step ③, currently missing from the chain entirely.
+- Add a **valuation** column (Accepted / Rejected) to the inspection rows. This is standard step ③, currently missing from the chain entirely.
 - Replace free-text "Quantity / Extent" with **numeric quantity + UoM** (`UOM` value help is seeded and unused).
 - **Inspection Lot F4 with return mapping** (Q4): selecting a lot pulls back material, plant, work centre, equipment and the lot's characteristic row into the grid. That mapping *is* Path A — without it, "found during inspection" is a dropdown value with nothing behind it, and the operator retypes data the system already holds.
 - Known limitation, accepted for this round: the lot object holds **one** characteristic (Q8), so a lot that failed several cannot be pulled across in one pick. The defect grid supports N rows; the lot behind it does not. Recorded in S2.
@@ -189,7 +189,7 @@ Both Master Data tabs generate the next ID **in the browser** — `generateNextN
 - New `NumberRanges` entity: `{ object, prefix, currentValue, width }` — e.g. `DEFECT / 8D- / 10049201 / 8`, `INSPLOT / 001 / 0000012 / 10`.
 - Allocate **server-side, on save**, in the same transaction as the insert.
 - The form shows *"Assigned on save"*, not a number.
-- External assignment stays possible — SAP supports both, and imported data needs it.
+- External assignment stays possible — Standard QM supports both, and imported data needs it.
 
 This is also what `Defects` will use in Phase 2.1, so the range object is built once.
 
@@ -211,7 +211,7 @@ This is also what `Defects` will use in Phase 2.1, so the range object is built 
 ### 2.1 Separate the defect from the 8D
 
 - New `Defects` entity: own number (allocated from the 1.7 range), status (`Open` / `In Process` / `Completed`), material, batch, **plant**, work centre, classification, characteristics, reference number.
-- `Reports` gains `sourceDefectId`, and a defect may have **at most one** 8D — SAP: *"only possible to create one Problem Solution Process per Defect."*
+- `Reports` gains `sourceDefectId`, and a defect may have **at most one** 8D — Standard: *"only possible to create one Problem Solution Process per Defect."*
 - The popup records a **defect**. Starting an 8D becomes a separate, explicit action.
 
 ### 2.2 "Start an 8D from an existing open defect" — gap 8
@@ -222,7 +222,7 @@ In the Create 8D Report dialog, alongside paste / upload / sample:
 - **Exclude defects that already have an 8D.**
 - On selection, carry material, work centre, batch, classification and characteristics straight in — no retyping. Reuse the 1.4 return-mapping pattern.
 
-**Why this ranks high:** in SAP this is the *normal* path, and it is the only one the app lacks. It is also the fix for the double-entry problem — today the same defect gets recorded twice.
+**Why this ranks high:** in QM this is the *normal* path, and it is the only one the app lacks. It is also the fix for the double-entry problem — today the same defect gets recorded twice.
 
 ### 2.3 New Master Data → Defects tab
 
@@ -286,7 +286,7 @@ Reading it as a coordinator with thirty open cases, three questions go unanswere
 
 **Independent of everything above. Not demo-blocking. Est.** 4–6 days.
 
-SAP models every 8D action as a Quality Task with **Task Code, Task Code Group, Task Processor, Time Effort, Planned End Date** and its own status lifecycle. The app has free-typed sentences with an owner and a status.
+Standard QM models every 8D action as a Quality Task with **Task Code, Task Code Group, Task Processor, Time Effort, Planned End Date** and its own status lifecycle. The app has free-typed sentences with an owner and a status.
 
 The payoff is retrieval, not field parity: coded tasks make *"what did we do last time this happened"* a lookup instead of an AI re-reading old prose. It also unlocks a future criterion — *cases that were fixed the same way* — which is impossible today. That criterion is the AI track's to weigh; the coding is ours to supply.
 
@@ -326,7 +326,7 @@ Each answers: **can we reuse the screen, and what is missing?** The right-hand c
 
 ### S1 · Record Defect
 
-**Reuse: yes, and it stops meaning "start an 8D".** The layout, the SAP field labelling and roughly 60% of the fields are a sound defect-recording form. What is missing is the classification chain (code group → code → Severity), the plant, the lot link, and any guarantee that what was typed exists.
+**Reuse: yes, and it stops meaning "start an 8D".** The layout, the standard QM field labelling and roughly 60% of the fields are a sound defect-recording form. What is missing is the classification chain (code group → code → Severity), the plant, the lot link, and any guarantee that what was typed exists.
 
 Fields absent from the form today, all now scheduled: **Defect Code Group** (the code is only unique within a group — without it the key is wrong), **Severity**, **Plant**, **Reference Number**, **defect quantity + UoM as numbers**, **valuation per characteristic**, and the **inspection lot as a real link** rather than free text.
 
@@ -357,7 +357,7 @@ The existing "Historical Defects" form is **two forms fused together**, and the 
 | Part | Fields | Belongs to |
 |---|---|---|
 | **A — defect record** | Notification ID (QMNUM), Origin (QMART), Found Date (QMDAT), Quantity on hold (RKMNG), Reported By (PARNR), Coordinator, Symptom (QMTXT), Material (MATNR) + description + group (MATKL), Batch (CHARG), Work Centre (ARBPL) + description, Defect Code (FECOD) + description (FETXT), Characteristic, Measured value, Spec limit, Equipment (EQUNR) | **Recording a defect** → new `Defects` tab |
-| **B — 8D outcome** | SAP Status (QSTAT), Completion Date (QMDAB), Ishikawa 6M category (URCOD), FMEA reference, COPQ, Root Cause / 5-Why conclusion (URTXT), Proven Corrective Action (D5) | **A closed case, after the 8D** → stays in `HistoricalCases` |
+| **B — 8D outcome** | QM Status (QSTAT), Completion Date (QMDAB), Ishikawa 6M category (URCOD), FMEA reference, COPQ, Root Cause / 5-Why conclusion (URTXT), Proven Corrective Action (D5) | **A closed case, after the 8D** → stays in `HistoricalCases` |
 
 **Reuse Part A, do not reuse the entity.** The table behind today's tab is `HistoricalCases` — the precedent store, which retrieval reads with `closedOnly: true`. Logging a live defect into it means writing an open, outcome-less row into the store the AI learns from.
 
@@ -383,7 +383,7 @@ Each row shows its provenance (`closed-in-app` · `imported`), the 8D it came fr
 
 ### S5 · The Create 8D Report popup
 
-**Today:** paste JSON · upload a file · pick from a hardcoded list of three "incoming issues". None of these is how an 8D starts in SAP.
+**Today:** paste JSON · upload a file · pick from a hardcoded list of three "incoming issues". None of these is how an 8D starts in standard QM.
 
 **Add as the primary path: select an ongoing defect.**
 
@@ -397,7 +397,7 @@ Each row shows its provenance (`closed-in-app` · `imported`), the 8D it came fr
 
 **Deliberately not on this popup:** team, problem statement, containment. D1 proposes the team, D2 drafts the problem — asking for them here duplicates the Copilot's entire purpose.
 
-**On submit:** allocate the problem-solving number from the 1.7 range, link it to the defect, set the defect to *In Process*, run the analysis, navigate to `/8d/:id`. Exactly SAP's "Start Problem-Solving Process".
+**On submit:** allocate the problem-solving number from the 1.7 range, link it to the defect, set the defect to *In Process*, run the analysis, navigate to `/8d/:id`. Exactly the standard "Start Problem-Solving Process".
 
 **Keep paste/upload**, demoted to a secondary "Import from JSON" section — it is how demo data and migrated cases get in, and the test flow depends on it.
 
@@ -428,7 +428,7 @@ Designed in Phase 3. Screen-level note: **Current step** and **Days Open** are d
 
 #### Defect Code vs Severity — why both exist
 
-They answer different questions, and SAP keeps them apart deliberately:
+They answer different questions, and the QM standard keeps them apart deliberately:
 
 - **Defect Code** = the diagnosis. *Flange edge burr above limit.*
 - **Severity** = the triage level. *Major.*
@@ -446,9 +446,9 @@ Today `notificationId` is both: the defect's identity *and* the case key. Under 
 | Item | Why |
 |---|---|
 | **Similarity engine** — weights, keyword thresholds, semantic criterion, the scoring paragraph in the prompt | Owned by a separate workstream. Tracked in `PRECEDENT-RETRIEVAL-REVIEW.md`. This plan supplies the data it needs (1.3) and takes no position on the numbers |
-| Multiple defects per 8D | SAP is 1:1. An earlier draft of this analysis suggested otherwise; it was wrong |
-| Live S/4 connection | Value helps are built to switch `sourceType: 'reference' → 'external'`. The two-level defect key must exist first |
-| Renaming D8 | The detail page says "Closure"; SAP and `/workflow` say "Team Recognition". Cosmetic; decide separately |
+| Multiple defects per 8D | QM is 1:1. An earlier draft of this analysis suggested otherwise; it was wrong |
+| Live ERP connection | Value helps are built to switch `sourceType: 'reference' → 'external'`. The two-level defect key must exist first |
+| Renaming D8 | The detail page says "Closure"; standard and `/workflow` say "Team Recognition". Cosmetic; decide separately |
 | Restructuring inspection lots into header + N results | Deferred by Q8 — see S2 for what that costs |
 | Q2/Q3 due-date policy | Needs a business decision on target cycle times — see 3.3 |
 

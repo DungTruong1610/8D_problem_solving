@@ -14,7 +14,7 @@ Hệ thống đã được nâng cấp toàn diện nhằm chuyển đổi từ 
 
    - Trước đây, cấu hình tìm kiếm tương đồng (Similarity Search) nằm phân tán ở một trang bên ngoài, khiến người dùng khó hình dung bước D hiện tại đang lấy dữ liệu lịch sử như thế nào.
    - Hiện tại, mỗi bước D (D1 $\rightarrow$ D8) sở hữu trực tiếp tab `Object Schema` với **3 bảng điều khiển (3-panel workbench)**:
-     - **Panel trái**: Toàn bộ từ điển trường dữ liệu SAP được quét từ các case thực tế.
+     - **Panel trái**: Toàn bộ từ điển trường dữ liệu hệ thống được quét từ các case thực tế.
      - **Panel giữa**: Các trường dữ liệu bước D dùng để so sánh, phương thức so khớp (`exact`, `keyword`, `family`, `cosine`), trọng số (Weight) và sàn ngưỡng điểm (`minScore`, `minSimilarity`).
      - **Panel phải (`StepScorePanel`)**: Thử nghiệm và chấm điểm trực tiếp 2 case thực tế từ kho dữ liệu lịch sử để kiểm chứng ngay lập tức: *"Bước D này có nhìn thấy case đó hay không?"*.
 2. **Chuẩn hóa Pipeline Cấu hình 5 Bước Tuần Tự Cho Từng Bước D**:
@@ -47,8 +47,8 @@ Mỗi bước D trong quy trình 8D đều có 5 tab cấu hình tương ứng. 
 
 | Tab Cấu Hình             | User Thiết Lập Điều Gì?                                                                                                                                                                                                                                          | Tác Động Lên Output Khi Thực Thi Process                                                                                                                                                                                |
 | :------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1. Object Schema** | Kéo thả trường dữ liệu SAP (Work Center, Defect Code, Material Group, Ishikawa...); chọn kiểu so khớp (`exact`, `keyword`, `family`, `cosine`); gán trọng số điểm; đặt ngưỡng lọc `minScore`.                                            | Quyết định**3 case tiền lệ lịch sử (`precedents#N`) nào** được nạp vào bộ nhớ AI cho bước này. Nếu đặt trọng số sai, AI sẽ tham khảo các sự cố không liên quan.                        |
-| **2. Data Schema**   | Định nghĩa cấu trúc JSON đầu vào (`inputSchemaJson`): Các trường thông tin bắt buộc/tùy chọn mà bước này cần đọc từ sự cố hiện tại (`x-source: sap_qm`, `ai_enrichment`, `vector_search`).                                        | Đảm bảo AI**nhận đủ dữ liệu đầu vào sạch** để phân tích. Giúp LLM biết chính xác dữ liệu nào có sẵn và dữ liệu nào bị thiếu để tránh bịa đặt.                                     |
+| **1. Object Schema** | Kéo thả trường dữ liệu (Work Center, Defect Code, Material Group, Ishikawa...); chọn kiểu so khớp (`exact`, `keyword`, `family`, `cosine`); gán trọng số điểm; đặt ngưỡng lọc `minScore`.                                            | Quyết định**3 case tiền lệ lịch sử (`precedents#N`) nào** được nạp vào bộ nhớ AI cho bước này. Nếu đặt trọng số sai, AI sẽ tham khảo các sự cố không liên quan.                        |
+| **2. Data Schema**   | Định nghĩa cấu trúc JSON đầu vào (`inputSchemaJson`): Các trường thông tin bắt buộc/tùy chọn mà bước này cần đọc từ sự cố hiện tại (`x-source: qm_system`, `ai_enrichment`, `vector_search`).                                        | Đảm bảo AI**nhận đủ dữ liệu đầu vào sạch** để phân tích. Giúp LLM biết chính xác dữ liệu nào có sẵn và dữ liệu nào bị thiếu để tránh bịa đặt.                                     |
 | **3. Prompt Guide**  | Soạn thảo`systemPrompt` (vai trò, nguyên tắc làm việc) và `userTemplate` / `combinedPrompt` (hướng dẫn phương pháp luận, tích hợp các biến động `{{caseContext}}`, `{{precedents}}`).                                                  | Quyết định**phong cách hành văn, lập luận kỹ thuật, phương pháp suy luận** (ví dụ: áp dụng 5W2H, Ishikawa 6M, cách ly 24h, phân bổ vai trò nhân sự).                                           |
 | **4. Form Editor**   | Kéo thả nhóm trường (`groups`), căn chỉnh độ rộng cột (33%, 50%, 100%), chọn widget hiển thị (`textarea`, `input`, `tag-selector`, `checkbox`, `multiSelect`).                                                                              | Quyết định**kết quả AI trả về sẽ hiển thị thành giao diện Form như thế nào** trên trang chi tiết Báo cáo 8D để người dùng đọc và chỉnh sửa trực tiếp.                                   |
 | **5. Constraints**   | Thiết lập các quy tắc hậu kiểm duyệt (`rules`): Bắt buộc trích dẫn nguồn (`citationRequired`), khớp mẫu dẫn chứng (`sourcePattern`), cờ dữ liệu thực tế (`dataBackedWhenInputPresent`), công bố đối chiếu (`requiredDisclosure`). | Đóng vai trò là**lưới an toàn chống ảo giác (Anti-hallucination)**. Nếu kết luận của AI không có dẫn chứng hoặc vi phạm luật, hệ thống sẽ cảnh báo Warning hoặc chặn Error ngay lập tức. |
@@ -65,7 +65,7 @@ Mỗi bước D trong quy trình 8D đều có 5 tab cấu hình tương ứng. 
 
 * **Mục đích**: Thành lập nhóm chuyên trách liên phòng ban (Cross-functional Team) gồm Trưởng nhóm (Team Leader), Điều phối viên (Champion/Sponsor), và các thành viên kỹ thuật/chất lượng phù hợp nhất với loại sự cố.
 * **AI Copilot**:
-  * Nếu dữ liệu sự cố đã có danh sách nhân sự chính thức từ SAP QM $\rightarrow$ AI trích xuất và giải thích tính phù hợp của cơ cấu này.
+  * Nếu dữ liệu sự cố đã có danh sách nhân sự chính thức từ hệ thống QM $\rightarrow$ AI trích xuất và giải thích tính phù hợp của cơ cấu này.
   * Nếu chưa có nhân sự $\rightarrow$ AI đối chiếu với các case tiền lệ (`precedents#N`) có cùng *Work Center* hoặc *Họ vật tư* để **đề xuất đích danh các kỹ sư từng xử lý thành công sự cố tương tự**.
 
 #### 2. Chi tiết 5 Tab Cấu Hình D1
@@ -74,7 +74,7 @@ Mỗi bước D trong quy trình 8D đều có 5 tab cấu hình tương ứng. 
   * *Trọng số chính*: `workCenter` (+4 điểm, `exact`), `materialFamily` (+3 điểm, `family` hoặc `keyword`).
   * *Nguyên do*: Tìm người đã quen thuộc với dây chuyền/máy móc đó và am hiểu chủng loại vật tư đó.
 * **2. Data Schema (`inputSchemaJson`)**:
-  * `teamMembers`: Danh sách nhân sự chính thức từ SAP QM (`x-source: sap_qm`).
+  * `teamMembers`: Danh sách nhân sự chính thức từ hệ thống QM (`x-source: qm_system`).
   * `teamSize`: Số lượng nhân sự hiện tại (`x-source: ai_enrichment`).
   * `precedentTeams`: Danh sách đội ngũ từ các case tiền lệ tương tự (`x-source: vector_search`).
 * **3. Prompt Guide (`combinedPrompt`)**:
@@ -91,8 +91,8 @@ Mỗi bước D trong quy trình 8D đều có 5 tab cấu hình tương ứng. 
     * `confidence` (Độ tin cậy - `input`, 50% width).
     * `dataBacked` (Dữ liệu thực chứng minh - `checkbox`, 50% width).
 * **5. Constraints (`constraintsJson`)**:
-  * `D1_GROUNDING`: `type: sourcePattern`, pattern `^(team\.|precedents#)`, mức độ `error`. Bắt buộc tên nhân sự phải xuất phát từ dữ liệu SAP hoặc case tiền lệ được trích dẫn.
-  * `D1_DATA_BACKED`: `type: dataBackedWhenInputPresent`, mức độ `warning`. Nếu cả dữ liệu SAP lẫn case tiền lệ đều không có nhân sự, cờ `dataBacked` bắt buộc phải chuyển sang `false`.
+  * `D1_GROUNDING`: `type: sourcePattern`, pattern `^(team\.|precedents#)`, mức độ `error`. Bắt buộc tên nhân sự phải xuất phát từ dữ liệu hệ thống hoặc case tiền lệ được trích dẫn.
+  * `D1_DATA_BACKED`: `type: dataBackedWhenInputPresent`, mức độ `warning`. Nếu cả dữ liệu hệ thống lẫn case tiền lệ đều không có nhân sự, cờ `dataBacked` bắt buộc phải chuyển sang `false`.
 
 #### 3. Thay đổi trong Output khi thực thi
 
@@ -117,7 +117,7 @@ Mỗi bước D trong quy trình 8D đều có 5 tab cấu hình tương ứng. 
   * *Trọng số chính*: `defectCode` (+4 điểm, `exact`), `material` (+3 điểm, `exact`), `semantic` (Cosine $\ge 0.70$).
   * *Nguyên do*: Cần tìm đúng các case mô tả cùng hiện tượng hư hỏng và cùng mã sản phẩm.
 * **2. Data Schema (`inputSchemaJson`)**:
-  * `header`: Thông tin thông báo sự cố SAP (`notificationId`, `origin`, `foundDate`).
+  * `header`: Thông tin thông báo sự cố hệ thống (`notificationId`, `origin`, `foundDate`).
   * `product`: Thông tin sản phẩm, mã vật tư, số lô (`batchId`).
   * `defect`: Mã lỗi và diễn giải mô tả hiện trường (`defectCode`, `defectText`).
   * `inspections`: Mảng kết quả đo lường (Thông số, giá trị thực đo, giá trị tiêu chuẩn).
@@ -152,7 +152,7 @@ Mỗi bước D trong quy trình 8D đều có 5 tab cấu hình tương ứng. 
 
 * **Mục đích**: Đưa ra các biện pháp khẩn cấp (trong vòng 24h) để cô lập sự cố, bảo vệ khách hàng và chặn không cho sản phẩm lỗi tiếp tục lọt ra thị trường.
 * **AI Copilot**:
-  * Rà soát các hành động tạm thời đã được ghi nhận trong SAP QM.
+  * Rà soát các hành động tạm thời đã được ghi nhận trong hệ thống QM.
   * Nếu chưa có hành động nào được ghi nhận $\rightarrow$ tự động trích xuất các hành động khoanh vùng hiệu quả nhất từ các case tiền lệ (`precedents#N`) để đề xuất (ví dụ: Dừng chuyền, phong tỏa tồn kho 100%, bổ sung kiểm tra Sorting 100%).
 
 #### 2. Chi tiết 5 Tab Cấu Hình D3
@@ -160,7 +160,7 @@ Mỗi bước D trong quy trình 8D đều có 5 tab cấu hình tương ứng. 
 * **1. Object Schema**:
   * *Trọng số chính*: `defectCode` (+4, `exact`), `keyword` (+2, trùng từ khóa mô tả), `workCenter` (+3).
 * **2. Data Schema (`inputSchemaJson`)**:
-  * `actions`: Các hành động tức thời đang có trong SAP QM (`actions.containment`).
+  * `actions`: Các hành động tức thời đang có trong hệ thống QM (`actions.containment`).
   * `customer`: Tác động tới khách hàng & hàng đang trên đường vận chuyển.
   * `precedents`: Các hành động khoanh vùng thành công trong quá khứ.
 * **3. Prompt Guide (`combinedPrompt`)**:
@@ -181,38 +181,6 @@ Mỗi bước D trong quy trình 8D đều có 5 tab cấu hình tương ứng. 
 
 ---
 
-### 🔬 D4: Root Cause Analysis (Phân tích Nguyên nhân Gốc)
-
-#### 1. Mục đích nghiệp vụ & Trách nhiệm AI ⭐ (Bước Quan Trọng Nhất)
-
-* **Mục đích**: Tìm ra nguyên nhân cốt lõi gây ra lỗi (Occurrence Root Cause) và nguyên nhân hệ thống không phát hiện được lỗi (Escape/Detection Root Cause) bằng chuỗi **5-Why** và biểu đồ xương cá **Ishikawa 6M** (Man, Machine, Material, Method, Measurement, Milieu).
-* **AI Copilot**:
-  * Thực hiện **Chẩn đoán Mù (Blind Diagnosis)**: AI tự phân tích facts thô mà không nhìn thấy kết luận có sẵn để đảm bảo tính khách quan.
-  * So sánh đối chiếu chuỗi 5-Why với kết quả Chẩn đoán mù để xác nhận tính logic.
-  * Chỉ định danh mục Ishikawa được xác nhận và lý giải vì sao loại trừ 5 danh mục còn lại.
-
-#### 2. Chi tiết 5 Tab Cấu Hình D4
-
-* **1. Object Schema**:
-  * *Trọng số chính*: `semantic` (Cosine Vector Similarity $\ge 0.72$, trọng số cao nhất), `defectCode` (+3), `ishikawaCategory` (+3).
-  * *Nguyên do*: Hai lỗi khác nhau về mã nhưng có thể chung một cơ chế vật lý/hóa học hỏng hóc $\rightarrow$ Tìm kiếm ngữ nghĩa (Semantic) là yếu tố quyết định.
-* **2. Data Schema (`inputSchemaJson`)**:
-  * `fiveWhy`: Chuỗi 5 câu hỏi Tại sao.
-  * `ishikawa`: Danh sách các yếu tố Ishikawa 6M đã điều tra.
-  * `rootCause`: Nguyên nhân gốc ghi nhận trên hệ thống.
-  * `independent`: Kết quả Chẩn đoán độc lập (Blind Diagnosis từ AI Enrichment).
-  * `precedents`: Nguyên nhân gốc từ các case tương đồng trong quá khứ.
-* **3. Prompt Guide (`combinedPrompt`)**:
-  ```text
-  Walk the recorded 5-Why chain and evaluate Ishikawa 6M evidence.
-  State the confirmed root cause only when supported by evidence.
-  Include an Independent verification section that reports agreement or disagreement with the blind diagnosis.
-  Treat precedent root causes as hypotheses, never as facts for this case.
-  ```
-* **4. Form Editor (`formSchemaJson`)**:
-  * Group `root-cause`: `summary`, `content` (5-Why, Ishikawa & Independent verification, max 2500 ký tự), `sources`, `confidence`, `dataBacked`.
-* **5. Constraints (`constraintsJson`)**:
-  * `D4_DISCLOSURE`: `type: requiredDisclosure`, pattern `independent verification`, mức độ `error`. Bắt buộc D4 phải có mục đối chiếu xác nhận đồng thuận hay bất đồng thuận với kết quả chẩn đoán mù độc lập.
   * `D4_SOURCES`: `type: sourcePattern`, pattern `^(fiveWhy|ishikawa|rootCause|independent|precedents#)`.
 
 #### 3. Thay đổi trong Output khi thực thi
@@ -230,7 +198,7 @@ Mỗi bước D trong quy trình 8D đều có 5 tab cấu hình tương ứng. 
 
 #### 2. Cấu hình & Tác động Output
 
-* **Data Schema**: Đọc mảng `actions` (`x-source: sap_qm`) và kết quả nguyên nhân từ D4.
+* **Data Schema**: Đọc mảng `actions` (`x-source: qm_system`) và kết quả nguyên nhân từ D4.
 * **Prompt Guide**: Yêu cầu AI chỉ rõ hành động nào khắc phục nguyên nhân phát sinh (Occurrence) và hành động nào khắc phục nguyên nhân thoát lỗi (Escape).
 * **Output**: Bảng danh mục hành động khắc phục dài hạn kèm đánh giá khả năng loại trừ nguyên nhân gốc.
 
@@ -260,7 +228,7 @@ Mỗi bước D trong quy trình 8D đều có 5 tab cấu hình tương ứng. 
 
 #### 2. Cấu hình & Tác động Output
 
-* **Data Schema**: Liên kết FMEA (`fmea`, `x-source: sap_qm`).
+* **Data Schema**: Liên kết FMEA (`fmea`, `x-source: qm_system`).
 * **Prompt Guide**: Đề xuất cải tiến hệ thống ở mức quản trị (Systemic prevention) chứ không chỉ dừng lại ở thao tác công nhân.
 * **Output**: Danh sách mã tài liệu SOP/FMEA cần sửa đổi và đề xuất hành động phòng ngừa trên diện rộng.
 

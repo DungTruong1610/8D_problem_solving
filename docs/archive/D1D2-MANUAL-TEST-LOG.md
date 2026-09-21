@@ -1,10 +1,10 @@
 # D1 → D2 Manual Test & Audit Log
 
 **Status:** Living — one section per run
-**Owner:** Quyen (BA) — manual execution, human judgement
+**Owner:** Duy
 **Audience:** BA (executing), dev team (receiving findings)
 **Authoritative for:** what was clicked, what appeared, and whether it was correct
-**Related:** plan `D1D2FIXPLAN - 11PM (1).md` (frozen) · audit `D1D2-FIXPLAN-VERIFICATION.md` · findings `PRECEDENT-RETRIEVAL-REVIEW.md`, `SAP-QM-CHAIN-ALIGNMENT-VERIFICATION.md`
+**Related:** plan `D1D2FIXPLAN - 11PM (1).md` (frozen) · audit `D1D2-FIXPLAN-VERIFICATION.md` · findings `PRECEDENT-RETRIEVAL-REVIEW.md`, `CHAIN-ALIGNMENT-IMPLEMENTATION-PLAN.md`
 
 ---
 
@@ -212,7 +212,7 @@ Is it wrong data rather than wrong code?
         e.g. LIVE-03 duplicate cases, LIVE-04 partner ID collision
   NO  ↓
 Is it about the design being wrong rather than the build being wrong?
-  YES → one line here, detail to SAP-QM-CHAIN-ALIGNMENT or PRECEDENT-RETRIEVAL-REVIEW.
+  YES → one line here, detail to CHAIN-ALIGNMENT or PRECEDENT-RETRIEVAL-REVIEW.
         These are Thread B and are not this plan's problem to fix.
 ```
 

@@ -22,9 +22,9 @@
 
 ### 1.1. Mục Tiêu Cốt Lõi
 
-* **Tính Đúng đắn (Correctness)**: Đảm bảo dữ liệu đầu vào (SAP facts, thông số kiểm tra, tiền lệ lịch sử) được ánh xạ chính xác $100\%$ vào ngữ cảnh của AI, không bị méo mó.
+* **Tính Đúng đắn (Correctness)**: Đảm bảo dữ liệu đầu vào (facts hệ thống, thông số kiểm tra, tiền lệ lịch sử) được ánh xạ chính xác $100\%$ vào ngữ cảnh của AI, không bị méo mó.
 * **Tính Toàn vẹn (Integrity & Non-Hallucination)**: Đảm bảo AI không bao giờ bịa đặt nhân sự, số đo, hoặc nguyên nhân gốc khi không có căn cứ chứng minh.
-* **Độ Ổn định Xử lý Dữ liệu Thực tế (Robustness on Dirty Data)**: Xử lý mượt mà dữ liệu SAP bẩn (ngày định dạng Đức `DD.MM.YYYY`, dấu phẩy thập phân `0,26`, số đo nằm trong câu văn thô).
+* **Độ Ổn định Xử lý Dữ liệu Thực tế (Robustness on Dirty Data)**: Xử lý mượt mà dữ liệu đầu vào bị bẩn (ngày định dạng Đức `DD.MM.YYYY`, dấu phẩy thập phân `0,26`, số đo nằm trong câu văn thô).
 * **Kiểm chứng Cấu hình Linh hoạt (Configurability Verification)**: Mọi thay đổi tại 5 Tab (`Object Schema`, `Data Schema`, `Prompt Guide`, `Form Editor`, `Constraints`) phải phản ánh trực tiếp và tức thì lên Output khi thực thi.
 
 ---
@@ -108,7 +108,7 @@ Trang kiểm thử: [`/ai-settings/step-prompts`](file:///d:/GitHub/8d-copilot/a
 
 ### 🔬 D4: Root Cause Analysis (Trọng Tâm)
 
-* **Object Schema Test**: Thiết lập Profile D4 với trọng số Vector Cosine $\ge 0.72$ (trọng số 5 điểm). Kiểm chứng AI tìm ra đúng case có cùng cơ chế nứt/bavia dù mã lỗi SAP khác nhau.
+* **Object Schema Test**: Thiết lập Profile D4 với trọng số Vector Cosine $\ge 0.72$ (trọng số 5 điểm). Kiểm chứng AI tìm ra đúng case có cùng cơ chế nứt/bavia dù mã lỗi khác nhau.
 * **Blind Diagnosis Verification**: Đảm bảo AI thực hiện chẩn đoán độc lập (Blind Diagnosis) trước khi nhìn vào kết luận cũ.
 * **Constraints Test (`D4_DISCLOSURE`)**: Rule `requiredDisclosure` bắt buộc phải có cụm từ `independent verification`.
   * *Expected Output*: D4 xuất bản mục đối chiếu: *"Chẩn đoán độc lập đồng thuận với kết quả 5-Why ở nhánh Method/Tool Wear"*.
@@ -131,7 +131,7 @@ Trang kiểm thử: [`/ai-settings/step-prompts`](file:///d:/GitHub/8d-copilot/a
 ### 🟢 KỊCH BẢN 1: Clean Golden Dataset (Tiêu Chuẩn Chuẩn Mực)
 
 * **File nguồn**: [`mock-data/clean/case-8D-10048412.json`](file:///d:/GitHub/8d-copilot/mock-data/clean/case-8D-10048412.json)
-* **Đặc điểm Input**: Dữ liệu SAP hoàn hảo, ngày chuẩn ISO `2026-08-20`, số đo tách cột `0.26` / `0.10`, đầy đủ 6 nhánh Ishikawa, chuỗi 5-Why hoàn chỉnh 5 bước.
+* **Đặc điểm Input**: Dữ liệu đầu vào hoàn hảo, ngày chuẩn ISO `2026-08-20`, số đo tách cột `0.26` / `0.10`, đầy đủ 6 nhánh Ishikawa, chuỗi 5-Why hoàn chỉnh 5 bước.
 * **Quy trình thử nghiệm**:
   1. Vào `/create-defect`, chọn preset `Q3 Internal Defect - Flange Burr`.
   2. Bấm `Start 8D Analysis`.
@@ -145,7 +145,7 @@ Trang kiểm thử: [`/ai-settings/step-prompts`](file:///d:/GitHub/8d-copilot/a
 
 ---
 
-### 🔴 KỊCH BẢN 2: Dirty SAP QM Real-world Data (Dữ Liệu SAP Bẩn Thực Tế)
+### 🔴 KỊCH BẢN 2: Dirty Real-world Data (Dữ Liệu Bẩn Thực Tế)
 
 * **File nguồn**: [`mock-data/dirty/case-8D-90048412.json`](file:///d:/GitHub/8d-copilot/mock-data/dirty/case-8D-90048412.json)
 * **Đặc điểm Input (Edge Cases)**:
@@ -207,7 +207,7 @@ Trang kiểm thử: [`/ai-settings/step-prompts`](file:///d:/GitHub/8d-copilot/a
   3. Lưu cấu hình. Chạy phân tích 1 sự cố mới.
 * **Kết quả kỳ vọng (Expected Output)**:
   * AI sinh ra tên *"John Wick"* và *"Peter Parker"*.
-  * Tầng Hậu kiểm duyệt (`postProcess.ts`) kiểm tra đối chiếu danh sách nhân sự SAP và tiền lệ $\rightarrow$ Không thấy 2 tên này.
+  * Tầng Hậu kiểm duyệt (`postProcess.ts`) kiểm tra đối chiếu danh sách nhân sự hệ thống và tiền lệ $\rightarrow$ Không thấy 2 tên này.
   * Hệ thống kích hoạt Rule Violation: Đánh dấu `Error` vi phạm bảo mật dữ liệu, từ chối công nhận đề xuất và hiển thị cảnh báo đỏ trên UI Báo cáo 8D.
 
 ---

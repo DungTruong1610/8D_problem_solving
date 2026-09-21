@@ -1,4 +1,4 @@
-# 🚀 8D Copilot — UIT 4Love
+# 🚀 8D Copilot — UIT_4Lovpe
 
 Hệ thống quản lý sự cố chất lượng và tự động hóa quy trình **8D (Eight Disciplines of Problem Solving)** kết hợp trợ lý AI thông minh:
 - 🔍 **Tự động phân tích nguyên nhân gốc rễ**: Dựng sơ đồ 6M Ishikawa & chuỗi 5-Why từ dữ liệu đo kiểm thực tế.

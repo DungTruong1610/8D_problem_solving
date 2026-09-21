@@ -1,7 +1,7 @@
 # TÀI LIỆU TOÀN DIỆN VỀ NGHIỆP VỤ 8D VÀ HẠ TẦNG AI
 
 **Dự án:** 8D Copilot (CNMA Proresolve)
-**Môi trường:** SAP Business Technology Platform (SAP BTP)
+**Môi trường:** Enterprise Cloud Platform
 **Đối tượng phục vụ:** Thành viên đội ngũ Hackathon (Software Engineers & Business Analysts)
 **Nguyên tắc cốt lõi:** Mã nguồn thực tế là sự thật duy nhất (Code is Ground Truth)
 
@@ -21,7 +21,7 @@
   - [D8: Team Recognition &amp; Case Closure (Ghi Nhận Đội Ngũ &amp; Đóng Hồ Sơ 8D)](#d8-team-recognition--case-closure-ghi-nhận-đội-ngũ--đóng-hồ-sơ-8d)
 - [PHẦN 2: HẠ TẦNG AI &amp; CÔNG NGHỆ CHUYÊN SÂU (AI &amp; DATA ARCHITECTURE)](#phần-2-hạ-tầng-ai--công-nghệ-chuyên-sâu-ai--data-architecture)
   - [1. Tổng Quan Nền Tảng &amp; Cấu Hình Đa Môi Trường](#1-tổng-quan-nền-tảng--cấu-hình-đa-môi-trường)
-  - [2. Chiến Lược Phân Tầng Mô Hình (SAP AI Core Orchestration)](#2-chiến-lược-phân-tầng-mô-hình-sap-ai-core-orchestration)
+  - [2. Chiến Lược Phân Tầng Mô Hình (AI Core Orchestration)](#2-chiến-lược-phân-tầng-mô-hình-ai-core-orchestration)
   - [3. Kiến Trúc Truy Hồi Tiền Lệ 2 Tầng (Precedent Retrieval Architecture)](#3-kiến-trúc-truy-hồi-tiền-lệ-2-tầng-precedent-retrieval-architecture)
   - [4. Bản Đồ Mã Nguồn Hệ Thống (Code Architecture Map)](#4-bản-đồ-mã-nguồn-hệ-thống-code-architecture-map)
 
@@ -29,15 +29,15 @@
 
 ## TỔNG QUAN HỆ THỐNG VÀ CHUỖI GIÁ TRỊ DOANH NGHIỆP
 
-Trong sản xuất ô tô (VDA 6.3 / IATF 16949) và quản lý chất lượng doanh nghiệp (SAP QM), phương pháp **8D (Eight Disciplines)** là chuẩn mực giải quyết vấn đề có tính kỷ luật cao. Điểm phân biệt cốt lõi giữa hệ thống này với các hệ thống AI thông thường là: **AI không thay thế con người đưa ra quyết định mà đóng vai trò Copilot có căn cứ dữ liệu (Grounded AI)**, tôn trọng tuyệt đối dữ liệu thực tế từ SAP ERP/QM.
+Trong sản xuất ô tô (VDA 6.3 / IATF 16949) và quản lý chất lượng doanh nghiệp (Quality Management - QM), phương pháp **8D (Eight Disciplines)** là chuẩn mực giải quyết vấn đề có tính kỷ luật cao. Điểm phân biệt cốt lõi giữa hệ thống này với các hệ thống AI thông thường là: **AI không thay thế con người đưa ra quyết định mà đóng vai trò Copilot có căn cứ dữ liệu (Grounded AI)**, tôn trọng tuyệt đối dữ liệu thực tế từ hệ thống ERP/QM doanh nghiệp.
 
 Chuỗi giá trị nghiệp vụ được thiết kế nghiêm ngặt:
 
 ```mermaid
 flowchart LR
-    A["① Inspection Result<br/>(Lô kiểm tra SAP QALS)"] --> B["② Defect Recorded<br/>(Ghi nhận mã lỗi QM)"]
+    A["① Inspection Result<br/>(Lô kiểm tra QALS)"] --> B["② Defect Recorded<br/>(Ghi nhận mã lỗi QM)"]
     B --> C["③ 8D Opened<br/>(Quyết định mở 8D)"]
-    C --> D["④ Precedents Retrieved<br/>(HANA Graph / Rerank)"]
+    C --> D["④ Precedents Retrieved<br/>(Knowledge Graph / Rerank)"]
     D --> E["⑤ D1 - D8 Drafted<br/>(AI Copilot đề xuất)"]
     E --> F["⑥ Human Review & Governance<br/>(State Machine / Evidence)"]
     F --> G["⑦ Case Closed<br/>(Nạp vào Thư viện Tiền lệ)"]
@@ -69,7 +69,7 @@ flowchart LR
 * Hệ thống phân biệt rạch ròi giữa 2 cấu trúc:
   * `team.roster`: Danh sách đội ngũ do AI đề xuất.
   * `team.assignedRoster`: Danh sách đội ngũ chính thức do kỹ sư/quản lý chất lượng phê duyệt (`Save Team Assignment`).
-* Đội ngũ phải có cơ cấu chuẩn SAP QM:
+* Đội ngũ phải có cơ cấu chuẩn Quản lý Chất lượng (QM):
   * **Team Leader (Trưởng nhóm):** Người chịu trách nhiệm điều phối chính.
   * **Champion / Sponsor:** Đại diện quản lý bảo trợ nguồn lực.
   * **Members (Thành viên):** Kỹ sư quy trình, kỹ thuật viên vận hành, đại diện QA/QC.
@@ -79,10 +79,10 @@ flowchart LR
 
 * **Truy hồi tiền lệ (Precedent Retrieval):** Thuật toán Graph trích xuất các hồ sơ lỗi lịch sử có cùng `workCenter` và `materialFamily`.
 * **Cơ chế Prompt & Suy luận:**
-  * Nếu hồ sơ hiện tại đã có chỉ định nhân sự từ SAP: AI giữ nguyên dữ liệu gốc làm cơ sở thực tế (`x-source: sap_qm`).
+  * Nếu hồ sơ hiện tại đã có chỉ định nhân sự từ hệ thống: AI giữ nguyên dữ liệu gốc làm cơ sở thực tế (`x-source: qm_system`).
   * Nếu hồ sơ chưa có nhân sự: AI quét danh sách đội ngũ từ các case tiền lệ (`precedents#N`), nhận diện các vai trò thực tế (Leader, Member, Specialist) và đề xuất người thật đã từng xử lý thành công lỗi tương tự.
   * **Cấm tuyệt đối (Negative Constraint):** Không được tự bịa ra các chức danh hoặc tên người không có trong cơ sở dữ liệu. Phải trích dẫn nguồn `sources: ["team.leader", "precedents#1.team"]`.
-* **Hậu xử lý (`postProcess.ts`):** Rà soát danh sách trích dẫn, gán cờ `dataBacked = false` nếu không tìm thấy dữ liệu đối chiếu trong SAP QM hoặc case tiền lệ.
+* **Hậu xử lý (`postProcess.ts`):** Rà soát danh sách trích dẫn, gán cờ `dataBacked = false` nếu không tìm thấy dữ liệu đối chiếu trong hệ thống QM hoặc case tiền lệ.
 
 #### 4. Code Tham Chiếu
 
@@ -97,7 +97,7 @@ flowchart LR
 #### 1. Ý nghĩa Nghiệp vụ & Tiêu chuẩn Chất lượng
 
 * Phương pháp Kepner-Tregoe đòi hỏi mô tả vấn đề không chỉ bằng văn bản cảm tính mà bằng sự đối lập: **Cái gì bị lỗi (IS) và Cái gì lẽ ra bị nhưng thực tế KHÔNG BỊ (IS-NOT)**.
-* **Dữ liệu đầu vào:** Thông tin lỗi 5W2H (What, When, Where, Who, Why, How, How Many) và tập dữ liệu các lô kiểm tra lịch sử (SAP QM `QALS`/`QAMR`).
+* **Dữ liệu đầu vào:** Thông tin lỗi 5W2H (What, When, Where, Who, Why, How, How Many) và tập dữ liệu các lô kiểm tra lịch sử (`QALS`/`QAMR`).
 
 #### 2. Nghiệp vụ trong Hệ thống & Vòng đời Dữ liệu
 
@@ -145,7 +145,7 @@ stateDiagram-v2
 ```
 
 * **Quy tắc chuyển trạng thái bất biến:**
-  1. **Planned $\rightarrow$ Open:** Người dùng không thể chọn trực tiếp trạng thái trong dropdown. Task chỉ chuyển sang `Open` khi kỹ sư bấm nút **Publish**. Điều kiện tiên quyết: Task phải có người phụ trách (`assignee`), thời lượng (`durationDays`), và mã nhiệm vụ SAP (`taskCode`).
+  1. **Planned $\rightarrow$ Open:** Người dùng không thể chọn trực tiếp trạng thái trong dropdown. Task chỉ chuyển sang `Open` khi kỹ sư bấm nút **Publish**. Điều kiện tiên quyết: Task phải có người phụ trách (`assignee`), thời lượng (`durationDays`), và mã nhiệm vụ (`taskCode`).
   2. **Open $\rightarrow$ Done:** Task chỉ chuyển sang `Done` khi:
      * **Trường hợp bắt buộc minh chứng (`evidenceRequired = true`):** Kỹ sư phải upload ít nhất một tài liệu đính kèm (PDF biên bản kiểm tra, ảnh cách ly kho) qua `TaskEvidenceSection`.
      * **Trường hợp không bắt buộc minh chứng (`evidenceRequired = false`):** Kỹ sư nhập và lưu ghi chú hoàn thành (`Execution Notes & Remarks`).
@@ -153,7 +153,7 @@ stateDiagram-v2
 #### 3. Cơ chế AI Xử lý & Ràng buộc Dữ liệu
 
 * AI tra cứu các hành động loại `Containment` trong các case tiền lệ có cùng triệu chứng hoặc mã lỗi tương đương.
-* Đề xuất các hành động cụ thể, thời gian ước tính và tự động liên kết với bộ mã danh mục hành động SAP QM (`taskCodeGroup: 'ACT-CONT'`).
+* Đề xuất các hành động cụ thể, thời gian ước tính và tự động liên kết với bộ mã danh mục hành động QM (`taskCodeGroup: 'ACT-CONT'`).
 
 #### 4. Code Tham Chiếu
 
@@ -182,7 +182,7 @@ stateDiagram-v2
 
 * **2-Stage Retrieval & Re-ranking:** D4 là bước duy nhất kích hoạt mô hình Re-ranking bằng LLM (Chain-of-Thought). Mô hình đọc sâu mô tả lỗi và từng case tiền lệ để đánh giá sự trùng khớp về mặt cơ chế vật lý hỏng hóc.
 * **Phát sinh biểu đồ xương cá & 5-Why:** AI sinh chuỗi 5 câu hỏi liên hoàn. Câu hỏi cuối cùng phải chỉ thẳng vào nguyên nhân gốc rễ và được đánh dấu `(root cause)`.
-* **Cơ chế Backfill bảo toàn:** Nếu model sinh thiếu trường hoặc JSON không chuẩn, hàm `backfillD4FromContext` trong [postProcess.ts](file:///d:/GitHub/8D_Hackathon/srv/src/domain/eightd/postProcess.ts) tự động khôi phục cấu trúc từ dữ kiện SAP ERP.
+* **Cơ chế Backfill bảo toàn:** Nếu model sinh thiếu trường hoặc JSON không chuẩn, hàm `backfillD4FromContext` trong [postProcess.ts](file:///d:/GitHub/8D_Hackathon/srv/src/domain/eightd/postProcess.ts) tự động khôi phục cấu trúc từ dữ kiện hệ thống ERP.
 
 #### 4. Code Tham Chiếu
 
@@ -249,7 +249,7 @@ stateDiagram-v2
 
 #### 2. Nghiệp vụ trong Hệ thống & Vòng đời Dữ liệu
 
-* **Liên kết trực tiếp SAP FMEA (`cnma.proresolve.FmeaRegister`):**
+* **Liên kết trực tiếp Hồ sơ FMEA (`cnma.proresolve.FmeaRegister`):**
   * Hệ thống yêu cầu liên kết hồ sơ 8D với mã FMEA tương ứng.
   * Tái đánh giá chỉ số rủi ro RPN (Risk Priority Number) hoặc Action Priority (AP) sau khi có giải pháp phòng ngừa.
 * **Máy trạng thái nhiệm vụ phòng ngừa:** Tuân thủ chu trình `Planned` $\rightarrow$ `Open` $\rightarrow$ `Done` có kiểm soát bằng chứng cập nhật tài liệu ISO/IATF.
@@ -282,7 +282,7 @@ stateDiagram-v2
 * **Cơ chế nạp tự động vào Thư viện Tiền lệ (`closedCaseWriteBack.ts`):**
   * Khi case đóng, hệ thống tự động trích xuất toàn bộ dữ kiện thực tế: Mã lỗi, trạm làm việc, vật tư, các giải pháp thành công, tên thành viên đội ngũ.
   * Tự động vector hóa và tạo token từ khóa (`searchKeywords`) nạp vào bảng `HistoricalCases`.
-  * Đồ thị SAP HANA Graph Workspace tự động kết nạp các node và cạnh mới qua các SQL View phản chiếu mà không cần migrate hay đồng bộ thủ công.
+  * Đồ thị Graph Workspace tự động kết nạp các node và cạnh mới qua các SQL View phản chiếu mà không cần migrate hay đồng bộ thủ công.
 
 #### 3. Cơ chế AI Xử lý
 
@@ -301,40 +301,40 @@ stateDiagram-v2
 
 ### 1. Tổng Quan Nền Tảng & Cấu Hình Đa Môi Trường
 
-Hệ thống được phát triển trên kiến trúc **SAP Cloud Application Programming Model (CAP)**, được thiết kế để chạy linh hoạt trên cả đám mây doanh nghiệp lẫn môi trường máy phát triển cục bộ:
+Hệ thống được phát triển trên kiến trúc **Cloud Application Programming Model (CAP)**, được thiết kế để chạy linh hoạt trên cả đám mây doanh nghiệp lẫn môi trường máy phát triển cục bộ:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                        SAP BTP Cloud Foundry                           │
+│                        Cloud Application Platform                      │
 │                                                                        │
 │  ┌────────────────────┐   ┌────────────────────┐   ┌────────────────┐  │
-│  │   React Frontend   │──▶│  CAP Node.js srv   │──▶│  SAP AI Core  │  │
+│  │   React Frontend   │──▶│  CAP Node.js srv   │──▶│    AI Core     │  │
 │  │ (Tailwind + Lucide)│   │   (TypeScript)     │   │ Orchestration  │  │
 │  └────────────────────┘   └─────────┬──────────┘   └────────────────┘  │
 │                                     │                                  │
 │                                     ▼                                  │
 │                    ┌─────────────────────────────────┐                 │
-│                    │         SAP HANA Cloud          │                 │
-│                    │  - Relational Schema (HDI)      │                 │
+│                    │    Enterprise Cloud Database    │                 │
+│                    │  - Relational Schema (HDI/SQL)  │                 │
 │                    │  - Vector Engine (cds.Vector)   │                 │
 │                    │  - Graph Engine (GW_8D)         │                 │
 │                    └─────────────────────────────────┘                 │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
-* **Môi trường Production / Cloud Foundry (và Hybrid Mode):**
-  * **Hệ quản trị cơ sở dữ liệu:** **SAP HANA Cloud** (sử dụng container HDI `cnma_proresolve_db` khai báo qua [mta.yaml](file:///d:/GitHub/8D_Hackathon/mta.yaml) với service plan `hdi-shared`).
-  * **Bảo mật & Ủy quyền:** SAP XSUAA (`@sap/xssec` v4.2.8) tích hợp phân quyền vai trò người dùng doanh nghiệp.
-  * **Hạ tầng AI:** Kết nối tới **SAP AI Core** thông qua BTP Destination `AICORE`.
+* **Môi trường Production / Cloud Deployment (và Hybrid Mode):**
+  * **Hệ quản trị cơ sở dữ liệu:** **Enterprise Cloud Database** (sử dụng schema/HDI container `cnma_proresolve_db` khai báo qua [mta.yaml](file:///d:/GitHub/8D_Hackathon/mta.yaml) hoặc PostgreSQL/pgvector).
+  * **Bảo mật & Ủy quyền:** Cơ chế bảo mật và phân quyền vai trò người dùng doanh nghiệp (Enterprise Auth & JWT Security).
+  * **Hạ tầng AI:** Kết nối tới **AI Core Engine** thông qua Service Destination `AICORE` hoặc API Gateway.
 * **Môi trường Cục bộ (Local Development):**
   * Chạy trên **SQLite** (`db.sqlite` thông qua package `sqlite3`), cho phép lập trình viên phát triển và kiểm thử giao diện mà không phụ thuộc hạ tầng đám mây.
-  * **Cơ chế Fallback thông minh:** Khi phát hiện database là SQLite (không có engine Graph của HANA), hệ thống tự động kích hoạt chế độ Fallback sang engine tính điểm truyền thống mà không phát sinh lỗi crash.
+  * **Cơ chế Fallback thông minh:** Khi phát hiện database là SQLite (không có engine Graph đám mây), hệ thống tự động kích hoạt chế độ Fallback sang engine tính điểm truyền thống mà không phát sinh lỗi crash.
 
 ---
 
-### 2. Chiến Lược Phân Tầng Mô Hình (SAP AI Core Orchestration)
+### 2. Chiến Lược Phân Tầng Mô Hình (AI Core Orchestration)
 
-Toàn bộ các tác vụ gọi AI được điều phối qua cổng kết nối tập trung `@cnma/sap-aicore-integrate` và bộ SDK chính thức `@sap-ai-sdk/orchestration`. Để tối ưu hóa triệt để giữa **chi phí token, tốc độ phản hồi** và **độ tin cậy của suy luận**, hệ thống triển khai chiến lược phân tầng mô hình rõ ràng tại [srv/src/config/ai.ts](file:///d:/GitHub/8D_Hackathon/srv/src/config/ai.ts):
+Toàn bộ các tác vụ gọi AI được điều phối qua cổng kết nối tập trung `@cnma/ai-core-integrate` và bộ SDK điều phối AI Orchestration. Để tối ưu hóa triệt để giữa **chi phí token, tốc độ phản hồi** và **độ tin cậy của suy luận**, hệ thống triển khai chiến lược phân tầng mô hình rõ ràng tại [srv/src/config/ai.ts](file:///d:/GitHub/8D_Hackathon/srv/src/config/ai.ts):
 
 | Tầng Mô Hình                      | Model Áp Dụng                            | Hoạt Động / Nhiệm Vụ Được Giao                                                                                                                    | Lý Do Thiết Kế Nghiệp Vụ                                                                                                                                                                                                                                          |
 | :----------------------------------- | :----------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -342,7 +342,7 @@ Toàn bộ các tác vụ gọi AI được điều phối qua cổng kết nố
 | **Escalation / Fallback Tier** | `anthropic--claude-4.5-sonnet`           | • Cứu hộ bước sinh báo cáo khi Haiku vi phạm schema sau các lượt retry có chỉ dẫn                                                           | Chỉ kích hoạt khi đường đi nhanh thất bại. Đảm bảo quy trình không bao giờ bị đứt gãy giữa chừng.                                                                                                                                                 |
 | **Reasoning Tier**             | `gemini-2.5-pro`                         | • Model chat và suy luận tổng quát mặc định của hệ thống                                                                                       | Khả năng lập luận logic và xử lý ngữ cảnh sâu sắc cho các phân tích mở.                                                                                                                                                                                 |
 | **Quality Judge Tier**         | Admin chỉ định (Claude Sonnet / GPT-4o) | • Thẩm định chất lượng chẩn đoán mù (`reviewQuality`)• LLM-as-a-Judge đánh giá toàn bộ báo cáo                                       | Cần mô hình mạnh nhất để chấm điểm độc lập, không bị ảnh hưởng bởi mô hình đã sinh ra văn bản.                                                                                                                                                |
-| **Embedding Tier**             | `text-embedding-3-small`                 | • Nhúng vector tìm kiếm ngữ nghĩa (1536 chiều)                                                                                                     | Khớp chính xác với kiểu cột`cds.Vector(1536)` trong SAP HANA Cloud.                                                                                                                                                                                            |
+| **Embedding Tier**             | `text-embedding-3-small`                 | • Nhúng vector tìm kiếm ngữ nghĩa (1536 chiều)                                                                                                     | Khớp chính xác với kiểu cột`cds.Vector(1536)` trong Database.                                                                                                                                                                                            |
 
 ---
 
@@ -354,10 +354,10 @@ Khác với các ứng dụng RAG thông thường chỉ so sánh văn bản đ�
 flowchart TD
     Start["Hồ sơ Defect đang mở"] --> CheckSwitch{"Công tắc Engine?<br/>(Global Settings)"}
   
-    CheckSwitch -->|engine = 'graph'| Stage1Graph["TẦNG 1: SAP HANA Graph Traversal<br/>(openCypher via OPENCYPHER_TABLE)"]
+    CheckSwitch -->|engine = 'graph'| Stage1Graph["TẦNG 1: Graph Traversal Engine<br/>(openCypher via OPENCYPHER_TABLE)"]
     CheckSwitch -->|engine = 'scoring'| Stage1Scoring["TẦNG 1: Vector Search + Heuristic Scoring<br/>(Cosine Similarity + Attribute Match)"]
   
-    Stage1Graph -.->|HANA Graph lỗi hoặc SQLite| Stage1Scoring
+    Stage1Graph -.->|Graph Engine lỗi hoặc SQLite| Stage1Scoring
   
     Stage1Graph --> Pool["Tập hợp ứng viên đạt ngưỡng Reachability<br/>(Pool Size: Top N x 4)"]
     Stage1Scoring --> Pool
@@ -370,12 +370,12 @@ flowchart TD
     FinalCut --> Unified["Danh sách Precedents hợp nhất (precedents#1, #2, ...)<br/>Nạp vào Prompt Context cho AI"]
 ```
 
-#### A. Tầng 1: Đồ Thị Tri Thức SAP HANA Graph Engine (Native Graph Workspace)
+#### A. Tầng 1: Đồ Thị Tri Thức Graph Engine (Native Graph Workspace)
 
-* **Không cần cài đặt DB đồ thị ngoài:** Tận dụng trực tiếp khả năng xử lý đồ thị trong nhân của **SAP HANA Cloud**.
+* **Không cần cài đặt DB đồ thị ngoài:** Tận dụng trực tiếp khả năng xử lý đồ thị trong nhân của hệ quản trị cơ sở dữ liệu.
 * **Định nghĩa Workspace:** Khai báo qua file [GW_8D.hdbgraphworkspace](file:///d:/GitHub/8D_Hackathon/db/src/GW_8D.hdbgraphworkspace) gồm **14 loại đỉnh (Vertices)** và **18 loại cạnh (Edges)**.
-* **Không nhân bản dữ liệu (Zero Data Duplication):** Tất cả các đỉnh và cạnh đều là **SQL View** được chiếu trực tiếp từ các bảng nghiệp vụ SAP QM (`HistoricalCases`, `OpenDefect`, `WorkCenter`, `Material`, `MaterialFamily`, `Keyword`, `Person`, `Action`, `RootCause`, `Fmea`, `InspectionLot`). Dữ liệu nghiệp vụ cập nhật thì đồ thị tự động cập nhật ngay lập tức.
-* **Thực thi openCypher an toàn:** Thông qua hàm `OPENCYPHER_TABLE` trong SQL của HANA ([graphClient.ts](file:///d:/GitHub/8D_Hackathon/srv/src/domain/eightd/graph/graphClient.ts)):
+* **Không nhân bản dữ liệu (Zero Data Duplication):** Tất cả các đỉnh và cạnh đều là **SQL View** được chiếu trực tiếp từ các bảng nghiệp vụ QM (`HistoricalCases`, `OpenDefect`, `WorkCenter`, `Material`, `MaterialFamily`, `Keyword`, `Person`, `Action`, `RootCause`, `Fmea`, `InspectionLot`). Dữ liệu nghiệp vụ cập nhật thì đồ thị tự động cập nhật ngay lập tức.
+* **Thực thi openCypher an toàn:** Thông qua hàm `OPENCYPHER_TABLE` trong SQL của Database Engine ([graphClient.ts](file:///d:/GitHub/8D_Hackathon/srv/src/domain/eightd/graph/graphClient.ts)):
   * **Cypher khớp mẫu (Pattern Matching):** Tìm kiếm các đường liên kết phức tạp đa chặng.
   * **SQL tổng hợp và gom nhóm:** Tính toán trọng số và lọc kết quả.
   * **Bảo mật tuyệt đối:** Giá trị của người dùng không bao giờ nối chuỗi trực tiếp mà truyền qua bind parameter `PARAMETERS ('x' = ?)`.
@@ -402,16 +402,16 @@ Mỗi bước D đặt một câu hỏi đồ thị khác nhau, do đó trọng 
 
 | Hạng Mục Kiến Trúc              | Đường Dẫn File Mã Nguồn                                                                                                                        | Chức Năng & Trách Nhiệm Kỹ Thuật                                                                          |
 | :---------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------- |
-| **Graph Workspace**           | [db/src/GW_8D.hdbgraphworkspace](file:///d:/GitHub/8D_Hackathon/db/src/GW_8D.hdbgraphworkspace)                                                       | Định nghĩa cấu trúc đồ thị 14 đỉnh, 18 cạnh trên SAP HANA Cloud.                                    |
+| **Graph Workspace**           | [db/src/GW_8D.hdbgraphworkspace](file:///d:/GitHub/8D_Hackathon/db/src/GW_8D.hdbgraphworkspace)                                                       | Định nghĩa cấu trúc đồ thị 14 đỉnh, 18 cạnh trên Enterprise Database.                                    |
 | **Graph Client**              | [srv/src/domain/eightd/graph/graphClient.ts](file:///d:/GitHub/8D_Hackathon/srv/src/domain/eightd/graph/graphClient.ts)                               | Thực thi câu lệnh openCypher qua`OPENCYPHER_TABLE` với bind params.                                       |
 | **Graph Engine Core**         | [srv/src/domain/eightd/graph/engine.ts](file:///d:/GitHub/8D_Hackathon/srv/src/domain/eightd/graph/engine.ts)                                         | Điều phối toàn cục 2 engine, thu thập bằng chứng, quản lý fallback.                                   |
 | **Step Weights & Profiles**   | [srv/src/domain/eightd/graph/stepProfiles.ts](file:///d:/GitHub/8D_Hackathon/srv/src/domain/eightd/graph/stepProfiles.ts)                             | Cấu hình trọng số cạnh đồ thị D1–D8 và khung re-ranking cho D4, D5.                                   |
 | **LLM Re-ranking**            | [srv/src/domain/eightd/precedent/reranker.ts](file:///d:/GitHub/8D_Hackathon/srv/src/domain/eightd/precedent/reranker.ts)                             | Tái chấm điểm chuyên sâu bằng LLM với suy luận chuỗi (Chain-of-Thought).                              |
-| **Is / Is-Not Matrix**        | [srv/src/domain/eightd/isIsNot.ts](file:///d:/GitHub/8D_Hackathon/srv/src/domain/eightd/isIsNot.ts)                                                   | Thuật toán phân tích thống kê đối chuẩn từ dữ liệu lô kiểm tra SAP QM.                            |
+| **Is / Is-Not Matrix**        | [srv/src/domain/eightd/isIsNot.ts](file:///d:/GitHub/8D_Hackathon/srv/src/domain/eightd/isIsNot.ts)                                                   | Thuật toán phân tích thống kê đối chuẩn từ dữ liệu lô kiểm tra QM.                            |
 | **8D Analyzer Pipeline**      | [srv/src/domain/eightd/eightDAnalyzer.ts](file:///d:/GitHub/8D_Hackathon/srv/src/domain/eightd/eightDAnalyzer.ts)                                     | Pipeline chính điều phối toàn bộ lượt phân tích và sinh báo cáo 8D.                                |
 | **Prompt Engineering**        | [srv/src/domain/eightd/prompts.ts](file:///d:/GitHub/8D_Hackathon/srv/src/domain/eightd/prompts.ts)                                                   | Hệ thống System Prompt, luật sinh báo cáo và hướng dẫn từng bước D.                                 |
 | **Safety Net & Post-Process** | [srv/src/domain/eightd/postProcess.ts](file:///d:/GitHub/8D_Hackathon/srv/src/domain/eightd/postProcess.ts)                                           | Lưới an toàn hậu xử lý, kiểm soát trích dẫn, backfill dữ liệu tất định.                          |
-| **AI Core Client**            | [srv/src/core/ai/llmClient.ts](file:///d:/GitHub/8D_Hackathon/srv/src/core/ai/llmClient.ts)                                                           | Cổng gọi mô hình qua SAP AI Core Orchestration, quản lý timeout, retry.                                   |
+| **AI Core Client**            | [srv/src/core/ai/llmClient.ts](file:///d:/GitHub/8D_Hackathon/srv/src/core/ai/llmClient.ts)                                                           | Cổng gọi mô hình qua AI Core Orchestration, quản lý timeout, retry.                                   |
 | **AI Configuration**          | [srv/src/config/ai.ts](file:///d:/GitHub/8D_Hackathon/srv/src/config/ai.ts)                                                                           | Phân bổ model theo hoạt động (Haiku, Sonnet, Gemini Pro, Embeddings).                                      |
 | **Task State Machine (UI)**   | [app/cnma_proresolve_ui/src/pages/eight-d/action-table.tsx](file:///d:/GitHub/8D_Hackathon/app/cnma_proresolve_ui/src/pages/eight-d/action-table.tsx) | Quản trị vòng đời nhiệm vụ`Planned` $\rightarrow$ `Open` $\rightarrow$ `Done` tại D3, D5, D7. |
 | **AI Settings Workbench**     | [app/cnma_proresolve_ui/src/pages/workflow/](file:///d:/GitHub/8D_Hackathon/app/cnma_proresolve_ui/src/pages/workflow/)                               | Giao diện quản trị cấu hình AI, chỉnh sửa Prompt, Schema và Graph Weights.                              |
