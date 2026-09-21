@@ -1,6 +1,5 @@
 services:
   - type: web
-    name: cnma-proresolve-backend
     name: 8d-hackathon-backend
     runtime: node
     plan: free
