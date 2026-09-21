@@ -26,15 +26,12 @@ Trước khi bắt đầu, hãy đảm bảo máy tính của bạn đã cài đ
 Mở terminal (PowerShell, Command Prompt hoặc Git Bash) và chạy lệnh:
 
 ```bash
-# Clone repository nhánh dev-egative
-git clone -b dev-egative https://github.com/DungTruong1610/8D_Hackathon.git
-# Clone repository
-git clone <REPO_URL>
+# Clone repository (nhánh main)
+git clone https://github.com/DungTruong1610/8D_problem_solving.git
 
 # Di chuyển vào thư mục dự án
-cd 8D_Hackathon
+cd 8D_problem_solving
 ```
-*(Nếu thư mục code nằm trong `refractor-migrate`, hãy chạy thêm `cd refractor-migrate`).*
 
 ---
 
