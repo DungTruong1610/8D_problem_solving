@@ -137,6 +137,8 @@ export async function hydratePrecedents(scored: readonly ScoredCase[]): Promise<
             maxScore: s.score,
             breakdown: toBreakdown(s),
             explanation: explainEvidence(s),
+            rerankAnalysis: s.rerankAnalysis ?? null,
+            rerankReason: s.rerankReason ?? null,
 
             symptomShortText: row.SYMPTOMSHORTTEXT,
             sapStatus: row.SAPSTATUS,

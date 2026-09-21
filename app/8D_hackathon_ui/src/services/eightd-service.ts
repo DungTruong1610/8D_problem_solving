@@ -184,6 +184,8 @@ export interface Precedent {
     maxScore: number;
     breakdown: PrecedentBreakdown[];
     explanation: string;
+    rerankAnalysis?: string | null;
+    rerankReason?: string | null;
     symptomShortText: string | null;
     sapStatus: string | null;
     completionDate: string | null;

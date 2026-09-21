@@ -56,6 +56,8 @@ export interface Precedent {
     breakdown: CriterionHit[];
     /** Một dòng người đọc hiểu: `"7/11 — Work center WC-MILL-07, Material MAT-10247"`. */
     explanation: string;
+    rerankAnalysis?: string | null;
+    rerankReason?: string | null;
 
     symptomShortText: string | null;
     sapStatus: string | null;
@@ -228,7 +230,7 @@ async function scoreWithProfile(
     );
     if (rerankCriterion) {
         const rerankWeight = Number(rerankCriterion.weight) || 0;
-        const poolSize = Math.min(20, Math.max(settings.topN * 4, 12));
+        const poolSize = Math.min(6, Math.max(settings.topN * 2, 4));
         const pool = ranked
             .filter((x) => x.result.score + rerankWeight >= settings.minScore)
             .sort(byRank)
@@ -302,6 +304,8 @@ async function scoreWithProfile(
         maxScore: result.maxScore,
         breakdown: result.breakdown,
         explanation: explainScore(result),
+        rerankAnalysis: result.rerankAnalysis ?? null,
+        rerankReason: result.rerankReason ?? null,
 
         symptomShortText: row.symptomShortText,
         sapStatus: row.sapStatus,

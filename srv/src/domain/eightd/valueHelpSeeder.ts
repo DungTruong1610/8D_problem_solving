@@ -20,6 +20,7 @@
 import cds from '@sap/cds';
 
 import { TASK_CODES, TASK_CODE_GROUPS } from '../../../../shared/task-catalogue';
+import { ADDITIONAL_Q_DEFECTS } from './sampleDefects';
 
 const LOG = cds.log('valuehelp-seed');
 
@@ -559,6 +560,7 @@ export async function seedValueHelps(): Promise<void> {
             await upgradeDefectCodeToStatic(db);
             await reconcileStaticCatalogues(db);
             await seedStandardTeamDirectory(db);
+            await seedSampleDefects(db);
             return;
         }
 
@@ -585,6 +587,7 @@ export async function seedValueHelps(): Promise<void> {
         await upgradeDefectCodeToStatic(db);
         await reconcileStaticCatalogues(db);
         await seedStandardTeamDirectory(db);
+        await seedSampleDefects(db);
         return;
     } catch (e: any) {
         LOG.error(`Seed value help thất bại (form sẽ phải gõ tay): ${e.message}`);
@@ -893,6 +896,81 @@ export async function seedStandardTeamDirectory(db: any): Promise<void> {
         LOG.info(`Đã seed/cập nhật danh mục nhân sự chuẩn (${STANDARD_TEAM_DIRECTORY.length} hồ sơ chuyên môn)`);
     } catch (e: any) {
         LOG.warn(`Không seed được danh mục nhân sự chuẩn: ${e.message}`);
+    }
+}
+
+/**
+ * Tự động đảm bảo danh sách lỗi mẫu Q1, Q2, Q3 luôn sẵn sàng trong hệ thống
+ * để kiểm thử tính năng tạo và phân tích 8D Report (Analyze Dialog).
+ */
+export async function seedSampleDefects(db: any): Promise<void> {
+    try {
+        const existing = await db.run(
+            SELECT.from('cnma.proresolve.Defects').columns('defectId'),
+        );
+        const have = new Set((existing as any[]).map((r) => r.defectId));
+
+        let addedCount = 0;
+        for (const item of ADDITIONAL_Q_DEFECTS) {
+            if (!have.has(item.defectId)) {
+                await db.run(
+                    INSERT.into('cnma.proresolve.Defects').entries({
+                        ID: item.id,
+                        defectId: item.defectId,
+                        origin: item.origin,
+                        status: item.status,
+                        symptomShortText: item.symptomShortText,
+                        foundDate: item.foundDate,
+                        defectQuantity: item.defectQuantity,
+                        defectQuantityUom: item.defectQuantityUom,
+                        referenceNumber: item.referenceNumber,
+                        plant: item.plant,
+                        materialId: item.materialId,
+                        materialDesc: item.materialDesc,
+                        materialGroup: item.materialGroup,
+                        batchId: item.batchId,
+                        workCenterId: item.workCenterId,
+                        workCenterDesc: item.workCenterDesc,
+                        defectCodeGroup: item.defectCodeGroup,
+                        defectCode: item.defectCode,
+                        defectText: item.defectText,
+                        defectClass: item.defectClass,
+                        entryMode: item.entryMode,
+                        inspectionLotId: item.inspectionLotId,
+                        reportedBy: item.reportedBy,
+                        coordinator: item.coordinator,
+                        department: item.department,
+                        complaintReference: item.complaintReference,
+                        customerPlantContact: item.customerPlantContact,
+                        slaResponseDue: item.slaResponseDue,
+                    }),
+                );
+
+                for (const char of item.characteristics) {
+                    await db.run(
+                        INSERT.into('cnma.proresolve.DefectCharacteristics').entries({
+                            ID: cds.utils.uuid(),
+                            defect_ID: item.id,
+                            lineNo: char.lineNo,
+                            characteristic: char.characteristic,
+                            measuredValue: char.measuredValue,
+                            specLowerLimit: char.specLowerLimit ?? null,
+                            specUpperLimit: char.specUpperLimit ?? null,
+                            specUom: char.specUom ?? null,
+                            valuation: char.valuation,
+                            equipment: char.equipment ?? null,
+                        }),
+                    );
+                }
+                have.add(item.defectId);
+                addedCount++;
+            }
+        }
+        if (addedCount > 0) {
+            LOG.info(`Đã seed ${addedCount} lỗi kiểm thử mẫu mới vào cnma.proresolve.Defects`);
+        }
+    } catch (e: any) {
+        LOG.warn(`Không seed được danh mục lỗi kiểm thử mẫu: ${e.message}`);
     }
 }
 

@@ -373,6 +373,8 @@ export function applyRerank(
             row.points = points;
             row.matchedOn = `rerank ${verdict.score}/100 — ${verdict.reason}`;
             result.score = round1(result.score + points);
+            result.rerankAnalysis = verdict.analysis || null;
+            result.rerankReason = verdict.reason || null;
         } else {
             row.matchedOn = `rerank ${verdict.score}/100 < floor ${floor * 100}`;
         }

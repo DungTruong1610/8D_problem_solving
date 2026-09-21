@@ -256,7 +256,7 @@ export function normalizeFinding(raw: any): IndependentFinding {
     const fiveWhy = fiveWhyRaw
         .slice(0, 5)
         .map((s: any, i: number) => ({
-            stepNo: s.stepNo ?? i + 1,
+            stepNo: i + 1,
             question: s.question ?? s.why ?? `Why step ${i + 1}?`,
             answer: s.answer ?? s.why ?? '',
             evidence: s.evidence ?? '',

@@ -83,6 +83,16 @@ function installMockProvider(reason: string): void {
 export function ensureLlmProvider(): void {
   if (providerInitialized) return;
 
+  try {
+    const existing = getLlmProvider();
+    if (existing && existing.name && existing.name.startsWith('test')) {
+      providerInitialized = true;
+      return;
+    }
+  } catch {
+    // ignore
+  }
+
   if (process.env.MOCK_LLM === 'true') {
     installMockProvider('MOCK_LLM=true trong .env');
     providerInitialized = true;

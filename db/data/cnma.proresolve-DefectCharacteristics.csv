@@ -49,3 +49,23 @@ ID;createdAt;createdBy;modifiedAt;modifiedBy;defect_ID;lineNo;characteristic;mea
 00000000-0000-0000-0000-000000010048;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;00000000-0000-0000-0000-000000000024;2;Wheel dressing interval count;55 parts;;20;parts;Rejected;WC-GRIND-01
 00000000-0000-0000-0000-000000010049;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;00000000-0000-0000-0000-000000000025;1;Bolt circle true position;0.085mm (CMM);;0.050;mm;Rejected;WC-QA-01
 00000000-0000-0000-0000-000000010050;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;00000000-0000-0000-0000-000000000025;2;CMM probe stylus ruby ball sphericity;chipped 0.035mm flat;;0.002;mm;Rejected;WC-QA-01
+char-8D-10049201-1;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000201;1;Flange burr height;0.28mm;;0.1;mm;Rejected;WC-MILL-07
+char-8D-10049201-2;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000201;2;Flange flatness;0.08mm;;0.05;mm;Rejected;WC-MILL-07
+char-8D-10049202-1;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000202;1;Coating layer thickness;34um;60;90;um;Rejected;WC-COAT-05
+char-8D-10049202-2;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000202;2;Cross-cut adhesion test;Class 4B;;1;Class;Rejected;WC-COAT-05
+char-8D-10049203-1;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000203;1;Pressure test leak rate;18.5 mbar*l/s;;5;mbar*l/s;Rejected;WC-CAST-03
+char-8D-10049203-2;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000203;2;Porosity pore size;0.85mm;;0.2;mm;Rejected;WC-CAST-03
+char-8D-10049210-1;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000210;1;Porosity area ratio;4.8%;;1;%;Rejected;WC-INSP-01
+char-8D-10049210-2;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000210;2;Material tensile strength;182 MPa;240;;MPa;Rejected;WC-INSP-01
+char-8D-10049211-1;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000211;1;Sheet thickness deviation;1.68mm;1.45;1.55;mm;Rejected;WC-INSP-01
+char-8D-10049211-2;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000211;2;Material Vickers hardness;205 HV;;160;HV;Rejected;WC-INSP-01
+char-8D-10049212-1;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000212;1;Total radial runout;0.16mm;;0.04;mm;Rejected;WC-INSP-01
+char-8D-10049212-2;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000212;2;Surface inclusion level;Level 3.5;;1;Level;Rejected;WC-INSP-01
+char-8D-10049220-1;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000220;1;Surface roughness Ra;3.4um;;0.8;um;Rejected;WC-MILL-07
+char-8D-10049220-2;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000220;2;Spindle vibration amplitude;5.2mm/s;;1.5;mm/s;Rejected;WC-MILL-07
+char-8D-10049221-1;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000221;1;Shaft diameter D1;24.932mm;24.95;25;mm;Rejected;WC-TURN-02
+char-8D-10049221-2;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000221;2;Taper deviation along length;0.024mm;;0.01;mm;Rejected;WC-TURN-02
+char-8D-10049222-1;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000222;1;Fastener rundown torque;0.75 Nm;1.8;2.2;Nm;Rejected;WC-ASSY-05
+char-8D-10049222-2;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000222;2;Screw angle rotation;750 deg;360;480;deg;Rejected;WC-ASSY-05
+char-8D-10049223-1;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000223;1;Surface residual tensile stress;+480 MPa;;0;MPa;Rejected;WC-GRIND-01
+char-8D-10049223-2;2026-03-01T00:00:00Z;seed-script;2026-03-01T00:00:00Z;seed-script;10000000-0000-0000-0000-000000000223;2;Nital etch indication;Level 4 Dark temper burn;;0;Level;Rejected;WC-GRIND-01

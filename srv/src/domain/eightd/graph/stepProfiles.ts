@@ -282,6 +282,8 @@ export interface ScoredCase {
     score: number;
     /** Chỉ những bằng chứng THẬT SỰ ăn điểm ở bước này. */
     evidence: Array<{ kind: EvidenceKind; detail: string; count: number; points: number }>;
+    rerankAnalysis?: string | null;
+    rerankReason?: string | null;
 }
 
 /**
@@ -381,7 +383,7 @@ export function finalizeScores(
 export function applyRerankToScored(
     scored: readonly ScoredCase[],
     rerank: NonNullable<GraphStepProfile['rerank']>,
-    verdicts: ReadonlyMap<string, { score: number; reason: string }> | null,
+    verdicts: ReadonlyMap<string, { score: number; reason: string; analysis?: string }> | null,
 ): ScoredCase[] {
     if (!verdicts) return [...scored];
 
@@ -397,6 +399,8 @@ export function applyRerankToScored(
         return sortEvidence({
             ...c,
             score: Math.round((c.score + points) * 10) / 10,
+            rerankAnalysis: verdict.analysis || null,
+            rerankReason: verdict.reason || null,
             evidence: [...c.evidence, {
                 kind: 'rerank' as const,
                 detail: `${verdict.score}/100 — ${verdict.reason}`,

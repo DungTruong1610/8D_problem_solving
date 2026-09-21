@@ -145,7 +145,7 @@ function reasonFor(
  * Đủ rộng để tầng 2 có cái mà đảo, đủ hẹp để một lượt gọi model không phình.
  */
 function poolSize(topN: number): number {
-    return Math.min(20, Math.max(topN * 4, 12));
+    return Math.min(6, Math.max(topN * 2, 4));
 }
 
 /**

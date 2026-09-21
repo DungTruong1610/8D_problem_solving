@@ -225,6 +225,8 @@ export interface ScoreResult {
     /** Tổng trọng số của các tiêu chí ĐANG BẬT. Tắt bớt tiêu chí thì trần hạ theo. */
     maxScore: number;
     breakdown: CriterionHit[];
+    rerankAnalysis?: string | null;
+    rerankReason?: string | null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

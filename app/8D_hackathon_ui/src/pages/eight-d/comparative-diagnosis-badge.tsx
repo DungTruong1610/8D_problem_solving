@@ -212,6 +212,12 @@ export function ComparativeDiagnosisBadge({
                         <p className="text-sm leading-relaxed text-muted-foreground">
                             Case had no pre-existing 6M assessment. AI blind diagnosis deduced <strong className="text-foreground">[{aiCategory}]</strong> from first principles, consistent with benchmark historical case <strong className="font-mono text-foreground">{topPrecedent.notificationId}</strong>.
                         </p>
+                        {topPrecedent.rerankReason && (
+                            <div className="text-xs text-sky-700 dark:text-sky-300 font-medium pt-1 border-t border-border/50">
+                                <span className="font-semibold">AI Match Rationale: </span>
+                                {topPrecedent.rerankReason}
+                            </div>
+                        )}
                         <div className="text-xs text-muted-foreground pt-1 border-t border-border/50">
                             Precedent symptom: "{topPrecedent.defectText || topPrecedent.symptomShortText || 'Similar machining defect'}"
                         </div>
