@@ -4,6 +4,13 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
+    { "source": "/odata/:path*", "destination": "https://8d-hackathon-backend.onrender.com/odata/:path*" },
+    { "source": "/api/cnma/:path*", "destination": "https://8d-hackathon-backend.onrender.com/api/cnma/:path*" },
+    { "source": "/identity/:path*", "destination": "https://8d-hackathon-backend.onrender.com/identity/:path*" },
+    { "source": "/identity-admin/:path*", "destination": "https://8d-hackathon-backend.onrender.com/identity-admin/:path*" },
+    { "source": "/workflow/:path*", "destination": "https://8d-hackathon-backend.onrender.com/workflow/:path*" },
+    { "source": "/workflow-admin/:path*", "destination": "https://8d-hackathon-backend.onrender.com/workflow-admin/:path*" },
+    { "source": "/health", "destination": "https://8d-hackathon-backend.onrender.com/health" },
     {
       "source": "/((?!api/|odata/|workflow/|workflow-admin/|identity/|identity-admin/).*)",
       "destination": "/index.html"

@@ -4,7 +4,7 @@ services:
     runtime: node
     plan: free
     region: singapore
-    buildCommand: npm install && npx cds build --production && node scripts/bundle-library.mjs
+    buildCommand: npm install && npx cds deploy --to sqlite:db.sqlite && npx cds build --production && node scripts/bundle-library.mjs
     startCommand: node node_modules/@sap/cds/bin/cds.js serve all --profile production --port $PORT
     envVars:
       - key: NODE_ENV
