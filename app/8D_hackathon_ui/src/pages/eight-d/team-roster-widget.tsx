@@ -136,11 +136,14 @@ export function resolveRosterPartnerId(
     context: Record<string, unknown> | null,
     directory: PartnerDirectoryEntry[],
 ): string | null {
+    if (!directory || !directory.length) return null;
+
     if (row.sourcePath && context) {
         const resolved = asRecord(resolvePath(context, row.sourcePath));
         const partnerId = resolved?.partnerId;
         if (typeof partnerId === 'string' && partnerId) return partnerId.replace(/^BP-/i, '');
     }
+
     const name = (row.name ?? '').trim().toLowerCase();
     if (name && name !== 'unassigned') {
         const found = directory.find((entry) => entry.partnerName.trim().toLowerCase() === name)?.partnerId;
@@ -150,6 +153,7 @@ export function resolveRosterPartnerId(
     // Role-based matching fallback
     const role = (row.organizationalRole || row.assigned8DRole || '').trim().toLowerCase();
     if (role && role !== 'unassigned') {
+        // 1. Direct or partial substring match
         const matchRole = directory.find((entry) => {
             const title = (entry.functionTitle || '').toLowerCase();
             const pName = (entry.partnerName || '').toLowerCase();
@@ -157,10 +161,40 @@ export function resolveRosterPartnerId(
                    (pName && pName.includes(role));
         });
         if (matchRole) return matchRole.partnerId.replace(/^BP-/i, '');
+
+        // 2. Keyword/domain-based intelligent matching
+        const words = role.split(/[\s\-_/,]+/).filter((w) => w.length >= 3 && !['and', 'for', 'the', 'with', 'line', 'unit'].includes(w));
+        let bestCandidate: PartnerDirectoryEntry | null = null;
+        let bestScore = 0;
+
+        for (const entry of directory) {
+            const title = (entry.functionTitle || '').toLowerCase();
+            let score = 0;
+            for (const w of words) {
+                if (title.includes(w)) score += 3;
+            }
+            if (role.includes('coating') && (title.includes('coating') || title.includes('surface') || title.includes('paint'))) score += 5;
+            if (role.includes('maintenance') && (title.includes('maintenance') || title.includes('mechanic') || title.includes('repair'))) score += 5;
+            if (role.includes('technician') && (title.includes('technician') || title.includes('planner') || title.includes('specialist'))) score += 3;
+            if (role.includes('quality') && (title.includes('quality') || title.includes('qa') || title.includes('inspection'))) score += 5;
+            if (role.includes('machin') && (title.includes('machin') || title.includes('milling') || title.includes('cnc'))) score += 5;
+            if (role.includes('process') && (title.includes('process') || title.includes('production'))) score += 3;
+            if (role.includes('tool') && (title.includes('tool') || title.includes('fixture'))) score += 5;
+            if (role.includes('metrology') && (title.includes('metrology') || title.includes('inspection') || title.includes('cmm'))) score += 5;
+
+            if (score > bestScore) {
+                bestScore = score;
+                bestCandidate = entry;
+            }
+        }
+
+        if (bestCandidate && bestScore >= 2) {
+            return bestCandidate.partnerId.replace(/^BP-/i, '');
+        }
     }
 
     // Leader matching fallback if AI suggested a leader
-    if (/leader|lead/i.test(row.assigned8DRole || '')) {
+    if (/leader|lead/i.test(row.assigned8DRole || '') || /leader|lead/i.test(row.organizationalRole || '')) {
         const leaderMatch = directory.find((entry) => /lead|head|manager|quality/i.test(entry.functionTitle || ''));
         if (leaderMatch) return leaderMatch.partnerId.replace(/^BP-/i, '');
     }
@@ -442,13 +476,26 @@ export function AiSuggestWidget({
         : buildFallbackRoster(ctx.caseContext);
     if (!activeRoster.length) return null;
 
-    const suggestions = activeRoster.map((row) => ({
-        row,
-        partnerId: resolveRosterPartnerId(row, ctx.caseContext, ctx.directory),
-    }));
+    const suggestions = activeRoster.map((row) => {
+        const partnerId = resolveRosterPartnerId(row, ctx.caseContext, ctx.directory);
+        const resolvedPartner = partnerId ? ctx.lookup(partnerId) : null;
+        const isUnassigned = !row.name || row.name.trim().toLowerCase() === 'unassigned';
+        const effectiveRow = isUnassigned && resolvedPartner
+            ? {
+                ...row,
+                name: resolvedPartner.partnerName,
+                organizationalRole: row.organizationalRole || resolvedPartner.functionTitle,
+            }
+            : row;
+
+        return {
+            row: effectiveRow,
+            partnerId,
+        };
+    });
     const pending = suggestions.filter((item) => item.partnerId && !ctx.onTeam(item.partnerId));
-    const suggestedRoles = [...new Set(activeRoster
-        .map((row) => (row.organizationalRole ?? '').trim()).filter(Boolean))];
+    const suggestedRoles = [...new Set(suggestions
+        .map((item) => (item.row.organizationalRole ?? '').trim()).filter(Boolean))];
 
     const isLocked = readOnly || ctx.readOnly;
 

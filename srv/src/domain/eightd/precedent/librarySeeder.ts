@@ -283,44 +283,62 @@ export async function seedLibrary(payloads: readonly unknown[]): Promise<SeedRep
     return report;
 }
 
-async function ensureReportRecord(db: any, notificationId: string, ctx: any, raw: any) {
+async function ensureReportRecord(db: any, notificationId: string, ctx: any, raw: any, index: number = 0) {
     const existing = await db.run(
         SELECT.one.from('cnma.proresolve.Reports').columns('ID').where({ notificationId }),
     );
     if (existing) return;
 
     const reportID = cds.utils.uuid();
+    const isClosed = ctx.header?.status === 'Completed' || ctx.header?.status === 'Closed' || index % 5 === 0;
+    const isChangeReq = !isClosed && index % 5 === 1;
+    const isMyCase = index % 3 === 1 || index === 0;
+
+    const leaderName = isMyCase
+        ? 'Local Developer'
+        : (ctx.team?.leader?.partnerName || ctx.team?.members?.[0]?.partnerName || 'Helena Weber');
+    const coordinatorName = ctx.header?.coordinator || ctx.team?.members?.[1]?.partnerName || 'Quality Lead';
+
+    let foundDate = ctx.header?.foundDate;
+    if (!isClosed && index % 5 === 3) {
+        const d = new Date();
+        d.setDate(d.getDate() - 45);
+        foundDate = d.toISOString().slice(0, 10);
+    }
+
     await db.run(
         INSERT.into('cnma.proresolve.Reports').entries({
             ID: reportID,
-            status: 'Analyzed',
+            status: isClosed ? 'Closed' : 'Analyzed',
             notificationId,
             origin: emptyToNull(ctx.origin),
-            symptomShortText: emptyToNull(ctx.header.symptomShortText),
-            sapStatus: emptyToNull(ctx.header.status),
-            foundDate: ctx.header.foundDate,
-            completionDate: ctx.header.completionDate,
-            quantityExtent: emptyToNull(ctx.header.quantityExtent),
-            defectQuantity: ctx.header.defectQuantity,
-            defectQuantityUom: emptyToNull(ctx.header.defectQuantityUom ?? ''),
-            teamSize: ctx.header.teamSize,
-            plant: emptyToNull(ctx.product.plant),
-            materialId: emptyToNull(ctx.product.materialId),
-            materialDesc: emptyToNull(ctx.product.materialDesc),
-            batchId: emptyToNull(ctx.product.batchId),
-            defectCodeGroup: emptyToNull(ctx.product.defectCodeGroup),
-            defectCode: emptyToNull(ctx.product.defectCode),
-            defectText: emptyToNull(ctx.product.defectText),
-            defectClass: emptyToNull(ctx.product.defectClass),
-            workCenterId: emptyToNull(ctx.product.workCenterId),
-            workCenterDesc: emptyToNull(ctx.product.workCenterDesc),
+            symptomShortText: emptyToNull(ctx.header?.symptomShortText),
+            sapStatus: isClosed ? 'Completed' : 'In Process',
+            foundDate,
+            completionDate: isClosed ? (ctx.header?.completionDate || new Date().toISOString().slice(0, 10)) : null,
+            quantityExtent: emptyToNull(ctx.header?.quantityExtent),
+            defectQuantity: ctx.header?.defectQuantity,
+            defectQuantityUom: emptyToNull(ctx.header?.defectQuantityUom ?? ''),
+            teamSize: ctx.header?.teamSize || (ctx.team?.members?.length ?? 4),
+            teamLeader: leaderName,
+            coordinator: coordinatorName,
+            plant: emptyToNull(ctx.product?.plant),
+            materialId: emptyToNull(ctx.product?.materialId),
+            materialDesc: emptyToNull(ctx.product?.materialDesc),
+            batchId: emptyToNull(ctx.product?.batchId),
+            defectCodeGroup: emptyToNull(ctx.product?.defectCodeGroup),
+            defectCode: emptyToNull(ctx.product?.defectCode),
+            defectText: emptyToNull(ctx.product?.defectText),
+            defectClass: emptyToNull(ctx.product?.defectClass),
+            workCenterId: emptyToNull(ctx.product?.workCenterId),
+            workCenterDesc: emptyToNull(ctx.product?.workCenterDesc),
             copqEur: numberOrNull(ctx.copqEur),
             rootCauseCategory: ctx.rootCause?.category ?? null,
             fmeaId: ctx.fmea?.fmeaId ?? null,
             sourcePayload: JSON.stringify(raw),
             caseContext: JSON.stringify(ctx),
-            internalSummary: `${ctx.header.symptomShortText} — Root cause: ${ctx.rootCause?.category ?? 'Investigated'}. Work center: ${ctx.product.workCenterDesc}.`,
-            customerSummary: `Defect on ${ctx.product.materialDesc} resolved under 8D methodology.`,
+            internalSummary: `${ctx.header?.symptomShortText} — Root cause: ${ctx.rootCause?.category ?? 'Investigated'}. Work center: ${ctx.product?.workCenterDesc}.`,
+            customerSummary: `Defect on ${ctx.product?.materialDesc} resolved under 8D methodology.`,
             analyzedAt: new Date().toISOString(),
         }),
     );
@@ -331,23 +349,23 @@ async function ensureReportRecord(db: any, notificationId: string, ctx: any, raw
             summary: 'Formed cross-functional 8D team.',
             resultJson: JSON.stringify({
                 team: {
-                    roster: (ctx.team.members || []).map((m: any) => ({
+                    roster: (ctx.team?.members || []).map((m: any) => ({
                         name: m.partnerName, organizationalRole: m.functionTitle,
                         assigned8DRole: m.partnerRole, caseResponsibility: m.functionTitle,
                     })),
                     assignedRoster: [
-                        ...(ctx.team.leader ? [{ partnerId: ctx.team.leader.partnerId, partnerRole: '8D Team Leader' }] : []),
-                        ...(ctx.team.members || []).map((m: any) => ({ partnerId: m.partnerId, partnerRole: m.partnerRole || '8D Team Member' })),
+                        ...(ctx.team?.leader ? [{ partnerId: ctx.team.leader.partnerId, partnerRole: '8D Team Leader' }] : []),
+                        ...(ctx.team?.members || []).map((m: any) => ({ partnerId: m.partnerId, partnerRole: m.partnerRole || '8D Team Member' })),
                     ],
                 },
             }),
         },
         {
             code: 'D2', sequence: 2, title: 'D2 — Problem Description',
-            summary: ctx.header.symptomShortText,
+            summary: ctx.header?.symptomShortText,
             resultJson: JSON.stringify({
                 problem: {
-                    statement: ctx.header.symptomShortText,
+                    statement: ctx.header?.symptomShortText,
                     isIsNot: ctx.isIsNot || {},
                     w2h: ctx.w2h || {},
                 },
@@ -396,7 +414,7 @@ async function ensureReportRecord(db: any, notificationId: string, ctx: any, raw
             code: 'D8', sequence: 8, title: 'D8 — Closure & Team Recognition',
             summary: '8D report closed.',
             resultJson: JSON.stringify({
-                closure: { gate: { status: 'Closed', readyForClosure: true } },
+                closure: { gate: { status: isClosed ? 'Closed' : 'Open', readyForClosure: isClosed } },
             }),
         },
     ];
@@ -405,18 +423,29 @@ async function ensureReportRecord(db: any, notificationId: string, ctx: any, raw
 
     await db.run(
         INSERT.into('cnma.proresolve.Disciplines').entries(
-            disciplines.map((d) => ({
-                ID: cds.utils.uuid(),
-                report_ID: reportID,
-                code: d.code,
-                sequence: d.sequence,
-                title: d.title,
-                summary: d.summary,
-                content: d.summary,
-                aiGenerated: true,
-                resultJson: d.resultJson,
-                formSchemaJson: schemaByCode.get(d.code) ?? null,
-            })),
+            disciplines.map((d, dIdx) => {
+                let reviewStatus = 'Draft';
+                if (isClosed) {
+                    reviewStatus = 'Approved';
+                } else if (isChangeReq && d.code === 'D4') {
+                    reviewStatus = 'ChangeRequested';
+                } else if (dIdx < 3) {
+                    reviewStatus = 'Approved';
+                }
+                return {
+                    ID: cds.utils.uuid(),
+                    report_ID: reportID,
+                    code: d.code,
+                    sequence: d.sequence,
+                    title: d.title,
+                    summary: d.summary,
+                    content: d.summary,
+                    aiGenerated: true,
+                    reviewStatus,
+                    resultJson: d.resultJson,
+                    formSchemaJson: schemaByCode.get(d.code) ?? null,
+                };
+            }),
         ),
     );
 }
@@ -446,13 +475,33 @@ const BUNDLE_DIR = path.resolve(__dirname, '../../../../data/case-library');
 export async function seedLibraryFromBundle(): Promise<SeedReport | null> {
     const db = await cds.connect.to('db');
 
-    if (!fs.existsSync(BUNDLE_DIR)) {
+    let bundleDir = BUNDLE_DIR;
+    if (!fs.existsSync(bundleDir)) {
+        const fallback = path.resolve(__dirname, '../../../../../../mock-data/clean');
+        if (fs.existsSync(fallback)) bundleDir = fallback;
+    }
+
+    if (!fs.existsSync(bundleDir)) {
         LOG.info('Không có dữ liệu đóng gói — bỏ qua. Nạp bằng action seedCaseLibrary.');
         return null;
     }
 
-    const files = fs.readdirSync(BUNDLE_DIR).filter((f) => f.endsWith('.json')).sort();
+    const files = fs.readdirSync(bundleDir).filter((f) => f.endsWith('.json')).sort();
     if (!files.length) return null;
+
+    // 1. Luôn đảm bảo toàn bộ case trong bundle có trong bảng Reports và Disciplines
+    for (let i = 0; i < files.length; i++) {
+        const f = files[i];
+        try {
+            const raw = JSON.parse(fs.readFileSync(path.join(bundleDir, f), 'utf8'));
+            const nid = extractDeepCase(raw)?.notifications?.[0]?.notification_id;
+            if (!nid) continue;
+            const ctx = mapCase(raw);
+            await ensureReportRecord(db, String(nid), ctx, raw, i);
+        } catch (e: any) {
+            LOG.warn(`Không thể nạp 8D report cho ${f}: ${e.message}`);
+        }
+    }
 
     const existing = await db.run(
         SELECT.from(HISTORICAL_CASES).columns(
@@ -487,7 +536,7 @@ export async function seedLibraryFromBundle(): Promise<SeedReport | null> {
 
     const payloads: unknown[] = [];
     for (const f of files) {
-        const raw = JSON.parse(fs.readFileSync(path.join(BUNDLE_DIR, f), 'utf8'));
+        const raw = JSON.parse(fs.readFileSync(path.join(bundleDir, f), 'utf8'));
         const nid = extractDeepCase(raw)?.notifications?.[0]?.notification_id;
         if (nid && complete.has(String(nid))) continue;
         payloads.push(raw);

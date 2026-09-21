@@ -127,29 +127,20 @@ const GUIDE_SOURCE: Record<DisciplineCode, string> = {
     D1: `Produce TWO separate lists, not one blended list.
 
       1. Suggested roles - the functions this work actually needs (Quality
-         Engineer, Production Engineer, and so on), taken from the teams of the
-         precedent cases that cleared the similarity threshold.
-      2. Suggested individuals - the specific people who served on those teams,
-         ranked by how many of the precedent cases each one worked. State that
-         count for every name.
+         Engineer, Production Engineer, Maintenance Technician, and so on), based on
+         the defect mode and process requirements.
+      2. Suggested individuals - the specific qualified people who can fulfill those roles,
+         such as Heli Weber (Quality Engineer), Marek Nowak (Process Engineer - Coating),
+         Karl Wagner (Maintenance Technician), Minh Dinh (CNC Machining Engineer),
+         Lena Hoffmann (Metrology Specialist), or candidates from precedent teams.
+         Assign specific qualified individuals based on their domain and title.
+         Do not leave individuals as "Unassigned" when qualified personnel are available.
 
-    Cite the precedent behind every role and every name with precedents#N.
-
-    Precedents are scored: work centre +4, defect code +4 (or +2 when only the
-    defect text overlaps), material +3 (or +1 for the same material family), out
-    of 11. Below 3 is not a precedent. When no case clears 3, write that no team
-    suggestion is available and the team must be assigned manually. That is the
-    correct answer - a plausible list of invented roles is not.
+    Cite the precedent or personnel record behind every role and every name.
 
     Where this case already records a team, name the leader and members with
     their functions and say in one or two sentences why that skill mix fits THIS
-    defect. Bring in a precedent person only to cover a capability the current
-    team lacks.
-
-    Never name a person who is not in the current team or a precedent team.
-    Never output team.assignedRoster: the quality engineer fills that table in on
-    the report screen, and email and telephone auto-fill from the business
-    partner record without your help.`,
+    defect. Bring in recommended specialist personnel to cover every required capability.`,
 
     D2: `Write the problem twice from the SAME facts - one short paragraph, then
     the 5W2H grid. They must agree; the grid is not a second analysis.
