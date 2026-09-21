@@ -5,6 +5,8 @@ import { mapCase } from '../domain/eightd/caseMapper';
 import { getStepPromptRuntimeConfig } from '../domain/eightd/precedent/configRepository';
 import { ENTITIES } from '../config/ai';
 import { getGlobalAiConfigRaw, saveGlobalAiConfig } from '../core/ai/globalModelConfig';
+import { resolveEmbeddingProvider } from '../core/ai/providerFactory';
+import { OpenAiEmbeddingLlmProvider } from '../core/ai/openAiEmbeddingProvider';
 import {
   clearRetrievalConfigCache,
   seedRetrievalConfig,
@@ -131,6 +133,111 @@ function toAvailableModel(model: Record<string, any>): Record<string, unknown> {
   };
 }
 
+/**
+ * Danh mục model khi chat chạy DeepSeek.
+ *
+ * Hai cổng đặt tên model khác nhau, nên danh mục phải khớp cổng đang gọi: chọn
+ * `deepseek-flash` trong khi endpoint là OpenCode Go sẽ ăn 404 model-not-found.
+ * Cổng suy ra từ `DEEPSEEK_BASE_URL`, và model đang cấu hình (`DEEPSEEK_MODEL`)
+ * luôn được xếp đầu để ô chọn không bao giờ thiếu lựa chọn đang chạy thật.
+ */
+const DEEPSEEK_MODELS_OPENCODE: DiscoveredModel[] = [
+  {
+    model: 'deepseek-v4.1-flash',
+    contextWindow: 1_048_576,
+    capabilities: ['chat', 'vision', 'tools', 'structured_output', 'thinking'],
+    streamingSupported: true,
+  },
+  {
+    model: 'deepseek-v4-pro',
+    contextWindow: 1_048_576,
+    capabilities: ['chat', 'tools', 'structured_output', 'thinking'],
+    streamingSupported: true,
+  },
+  {
+    model: 'deepseek-v4-flash',
+    contextWindow: 1_048_576,
+    capabilities: ['chat', 'vision', 'tools', 'structured_output', 'thinking'],
+    streamingSupported: true,
+  },
+];
+
+const DEEPSEEK_MODELS_PLATFORM: DiscoveredModel[] = [
+  {
+    model: 'deepseek-flash',
+    contextWindow: 1_048_576,
+    capabilities: ['chat', 'vision', 'tools', 'structured_output', 'thinking'],
+    streamingSupported: true,
+  },
+  {
+    model: 'deepseek-v4-pro',
+    contextWindow: 1_048_576,
+    capabilities: ['chat', 'tools', 'structured_output', 'thinking'],
+    streamingSupported: true,
+  },
+];
+
+/** Model DeepSeek theo đúng cổng đang cấu hình, cộng model đang chạy nếu lạ. */
+function deepseekCatalog(): DiscoveredModel[] {
+  const baseUrl = (process.env.DEEPSEEK_BASE_URL || '').toLowerCase();
+  const list = baseUrl.includes('opencode.ai')
+    ? [...DEEPSEEK_MODELS_OPENCODE]
+    : [...DEEPSEEK_MODELS_PLATFORM];
+
+  const configured = (process.env.DEEPSEEK_MODEL || '').trim();
+  if (configured && !list.some((m) => m.model === configured)) {
+    list.unshift({
+      model: configured,
+      contextWindow: 1_048_576,
+      capabilities: ['chat', 'tools', 'structured_output'],
+      streamingSupported: true,
+    });
+  }
+  return list;
+}
+
+/**
+ * Model embedding đang cấu hình, đưa vào danh mục để trang AI Settings hiển thị
+ * nó như một model có thật thay vì một cái tên không tra được ở đâu.
+ *
+ * Gemini không cần mục này: `text-embedding-004` đã nằm sẵn trong GEMINI_MODELS.
+ */
+function embeddingCatalogEntries(): DiscoveredModel[] {
+  const resolved = resolveEmbeddingProvider();
+  if (!(resolved.provider instanceof OpenAiEmbeddingLlmProvider)) return [];
+
+  const model = resolved.provider.getEmbeddingModelName();
+  return [
+    {
+      model,
+      contextWindow: 32_768,
+      capabilities: ['embedding'],
+      streamingSupported: false,
+    },
+  ];
+}
+
+function deepseekDisplayName(modelId: string): string {
+  const clean = modelId.toLowerCase();
+  if (clean.includes('4.1')) return 'DeepSeek V4.1 Flash';
+  if (clean.includes('v4-pro') || clean.includes('4-pro')) return 'DeepSeek V4 Pro';
+  if (clean.includes('v4-flash') || clean.includes('4-flash')) return 'DeepSeek V4 Flash';
+  if (clean.includes('flash')) return 'DeepSeek V4.1 Flash';
+  return modelId;
+}
+
+function classifyDeepSeekModel(modelId: string) {
+  const clean = modelId.toLowerCase();
+  if (clean.includes('embedding')) {
+    const provider = clean.includes('jina') ? 'Jina' : 'Embedding';
+    return { provider, displayName: modelId, sortOrder: 50 };
+  }
+  if (clean.includes('pro')) {
+    return { provider: 'DeepSeek', displayName: deepseekDisplayName(modelId), sortOrder: 2 };
+  }
+  return { provider: 'DeepSeek', displayName: deepseekDisplayName(modelId), sortOrder: 1 };
+}
+
 const GEMINI_MODELS: DiscoveredModel[] = [
   {
     model: 'gemini-3.7-flash',
@@ -178,7 +285,10 @@ const GEMINI_MODELS: DiscoveredModel[] = [
 
 function classifyGeminiModel(modelId: string) {
   const clean = modelId.toLowerCase();
-  if (clean.includes('embedding')) {
+  if (clean.includes('embedding') || clean.includes('jina')) {
+    if (clean.includes('jina')) {
+      return { provider: 'Jina', displayName: modelId, sortOrder: 50 };
+    }
     return { provider: 'Google', displayName: 'Text Embedding 004', sortOrder: 50 };
   }
   if (clean.includes('3.7-flash')) {
@@ -197,15 +307,27 @@ function classifyGeminiModel(modelId: string) {
 }
 
 /**
- * Nạp lại danh mục model, ưu tiên Gemini nếu có cấu hình hoặc fallback AI Core.
+ * Nạp lại danh mục model, theo đúng nhà cung cấp chat đang chạy.
+ *
+ * Thứ tự nhánh phản ánh thứ tự ưu tiên của `resolveChatProvider`:
+ * DeepSeek → Gemini → discovery của AI Core. Danh mục phải khớp cổng đang gọi,
+ * nếu không ô chọn model trên UI sẽ mời admin chọn những cái tên không tồn tại.
  */
 async function syncModels(): Promise<string> {
   const db = await cds.connect.to('db');
-  let discovered: DiscoveredModel[] = [];
-  let isGemini = Boolean(process.env.GEMINI_API_KEY) || !process.env.AICORE_AUTH_URL;
+  const deepseekKey = process.env.DEEPSEEK_API_KEY;
+  const isDeepSeek = Boolean(deepseekKey && deepseekKey.trim().length > 0);
+  let mode: 'deepseek' | 'gemini' | 'aicore' = isDeepSeek
+    ? 'deepseek'
+    : Boolean(process.env.GEMINI_API_KEY) || !process.env.AICORE_AUTH_URL
+      ? 'gemini'
+      : 'aicore';
 
-  if (isGemini) {
-    discovered = GEMINI_MODELS;
+  let discovered: DiscoveredModel[] = [];
+  if (mode === 'deepseek') {
+    discovered = [...deepseekCatalog(), ...embeddingCatalogEntries()];
+  } else if (mode === 'gemini') {
+    discovered = [...GEMINI_MODELS, ...embeddingCatalogEntries()];
   } else {
     try {
       const discovery = await getDiscovery();
@@ -213,12 +335,12 @@ async function syncModels(): Promise<string> {
     } catch (e: any) {
       LOG.warn('Đồng bộ model AI Core thất bại, chuyển sang danh mục Google Gemini:', e.message);
       discovered = GEMINI_MODELS;
-      isGemini = true;
+      mode = 'gemini';
     }
   }
 
   let discoveryClassifier: any = null;
-  if (!isGemini) {
+  if (mode === 'aicore') {
     try {
       discoveryClassifier = await getDiscovery();
     } catch {
@@ -236,9 +358,11 @@ async function syncModels(): Promise<string> {
     const modelId = item.model;
     if (!modelId) continue;
 
-    const classification = isGemini || !discoveryClassifier
-      ? classifyGeminiModel(modelId)
-      : discoveryClassifier.classifyModel(modelId);
+    const classification = mode === 'deepseek'
+      ? classifyDeepSeekModel(modelId)
+      : mode === 'gemini' || !discoveryClassifier
+        ? classifyGeminiModel(modelId)
+        : discoveryClassifier.classifyModel(modelId);
 
     const patch = buildDiscoveryPatch(item, classification);
     if (existingSet.has(modelId)) {
@@ -262,12 +386,13 @@ async function syncModels(): Promise<string> {
   }
 
   const added = newEntries.length;
-  LOG.info(`Đã đồng bộ ${discovered.length} model (${added} mới)`);
+  LOG.info(`Đã đồng bộ ${discovered.length} model từ nguồn "${mode}" (${added} mới)`);
   return JSON.stringify({
     synced: discovered.length,
     new: added,
     updated: discovered.length - added,
     total: discovered.length,
+    source: mode,
   });
 }
 
@@ -601,7 +726,7 @@ export async function seedDefaultModelsIfEmpty(): Promise<void> {
     const count = await db.run(SELECT.from(ENTITIES.AI_MODELS).columns('count(*) as cnt'));
     const total = Number(count[0]?.cnt ?? count[0]?.CNT ?? 0);
     if (total === 0) {
-      LOG.info('Bảng AIModels đang rỗng. Tự động nạp danh mục model Gemini mặc định...');
+      LOG.info('Bảng AIModels đang rỗng. Tự động nạp danh mục model theo nhà cung cấp đang cấu hình...');
       await syncModels();
     }
   } catch (err: any) {

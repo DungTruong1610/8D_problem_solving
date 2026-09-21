@@ -1,5 +1,10 @@
 /**
- * Smoke test AI Core — chạy TRƯỚC khi build domain layer.
+ * Smoke test tầng AI — chạy TRƯỚC khi build domain layer.
+ *
+ * Gọi qua đúng provider mà app dùng lúc chạy thật (`llmClient` → providerFactory),
+ * nên kết quả ở đây là kết quả của bản deploy: DeepSeek V4.1 Flash, Gemini, LLM
+ * local, hay AI Core. Nhúng thử cả embedding để bắt lỗi key/model trước khi lên
+ * Render — thiếu embedding là tiêu chí ngữ nghĩa im lặng cho 0 điểm.
  *
  * ── Vì sao script này là một ma trận chứ không phải một lời gọi ──
  * Lần probe đầu đặt `max_tokens: 50` và kết luận sai rằng `responseSchema`
@@ -19,7 +24,15 @@
 import 'dotenv/config';
 import { registerAppActivities } from '../srv/src/core/ai/activities';
 import { registerAppEmbeddingCorpora } from '../srv/src/core/ai/embeddingCorpora';
-import { initEmbeddings, complete } from '../srv/src/core/ai/llmClient';
+import {
+    initEmbeddings,
+    complete,
+    batchEmbed,
+    currentEmbeddingModel,
+} from '../srv/src/core/ai/llmClient';
+import { resolveChatProvider, resolveEmbeddingProvider } from '../srv/src/core/ai/providerFactory';
+import { isDegenerateVector } from '../srv/src/core/ai/vectorQuality';
+import { cosineSimilarity } from '../srv/src/domain/eightd/precedent/scoring';
 import { AICORE_DEFAULT_MODEL } from '../srv/src/config/ai';
 import type { AIResponse } from '@cnma/sap-aicore-integrate/types';
 
@@ -184,21 +197,57 @@ async function run(t: TestCase) {
     }
 }
 
+/** Nhúng thử hai câu cùng chủ đề — bắt lỗi key/model embedding trước khi deploy. */
+async function probeEmbeddings() {
+    process.stdout.write('\nE1 · embedding · 2 câu cùng chủ đề (kỳ vọng cosine > 0.5)\n');
+    const started = Date.now();
+    try {
+        const vectors = await batchEmbed([
+            'Milling tool exceeded its 8,000-cycle limit and produced a 0.32 mm burr.',
+            'The milling cutter ran past its cycle limit, leaving a burr above the spec.',
+        ]);
+        const ms = Date.now() - started;
+        const [a, b] = vectors;
+
+        if (isDegenerateVector(a) || isDegenerateVector(b)) {
+            console.log('   ⚠️  Không có vector — chưa cấu hình nhà cung cấp embedding.');
+            console.log('       Cắm JINA_API_KEY (hoặc EMBEDDING_API_KEY + EMBEDDING_BASE_URL) rồi chạy lại.');
+            console.log('       Thiếu embedding thì tiêu chí "Similar description" cho 0 điểm mọi case.');
+            return { name: 'E1', ok: false, ms };
+        }
+
+        const cos = cosineSimilarity(a, b, 'probe', 'probe');
+        console.log(
+            `   ✓ ${a.length} chiều · model "${currentEmbeddingModel()}" · ` +
+                `cosine = ${cos === null ? 'null' : cos.toFixed(3)} (${ms}ms)`,
+        );
+        return { name: 'E1', ok: true, ms };
+    } catch (e: any) {
+        console.log(`   ✗ NÉM LỖI: ${e.message}`);
+        return { name: 'E1', ok: false, error: e.message, ms: Date.now() - started };
+    }
+}
+
 async function main() {
     if (process.env.MOCK_LLM === 'true') {
-        console.warn('⚠️  MOCK_LLM=true — script này sẽ KHÔNG gọi AI Core thật.');
+        console.warn('⚠️  MOCK_LLM=true — script này sẽ KHÔNG gọi model thật.');
     }
 
     registerAppActivities();
     registerAppEmbeddingCorpora();
     initEmbeddings();
 
-    console.log(`\nModel mặc định: ${AICORE_DEFAULT_MODEL}`);
+    const chat = resolveChatProvider();
+    const embeddings = resolveEmbeddingProvider();
+    console.log(`\nChat     : ${chat.label} ${chat.detail}`);
+    console.log(`Embedding: ${embeddings.label} ${embeddings.detail}`);
+    console.log(`Model mặc định: ${AICORE_DEFAULT_MODEL}`);
     console.log('Chạy ma trận probe — mất vài phút vì reasoning model chậm.');
     console.log('═'.repeat(72));
 
     const results = [];
     for (const t of TESTS) results.push(await run(t));
+    results.push(await probeEmbeddings());
 
     console.log('\n' + '═'.repeat(72));
     console.log('KẾT LUẬN\n');
@@ -235,9 +284,9 @@ async function main() {
 main().catch((e) => {
     console.error('\n✗ Probe thất bại:', e?.message ?? e);
     console.error('\nKiểm tra theo thứ tự:');
-    console.error('  1. .env có AICORE_SERVICE_KEY hoặc đủ bộ AICORE_AUTH_URL/CLIENT_ID/CLIENT_SECRET/BASE_URL');
-    console.error('  2. AICORE_RESOURCE_GROUP khớp resource group thật');
-    console.error('  3. Đã bấm Sync Models ở trang AI Settings → tab Model Registry');
-    console.error('  4. Model được định tuyến có tồn tại trong resource group đó');
+    console.error('  1. .env có DEEPSEEK_API_KEY (khuyến nghị), hoặc GEMINI_API_KEY, hoặc bộ AICORE_*');
+    console.error('  2. DEEPSEEK_BASE_URL / DEEPSEEK_MODEL khớp cổng đang dùng (OpenCode Go/Zen hay DeepSeek gốc)');
+    console.error('  3. JINA_API_KEY (hoặc EMBEDDING_*) đã có nếu muốn tiêu chí ngữ nghĩa chạy');
+    console.error('  4. Nếu dùng AI Core: resource group khớp và model có thật trong resource group đó');
     process.exit(1);
 });

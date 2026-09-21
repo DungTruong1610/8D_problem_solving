@@ -21,6 +21,8 @@ import { tokenizeDefectText } from './scoring';
 import { flattenPayload } from './sourceFields';
 import { buildSearchText } from './searchText';
 import { batchEmbed, currentEmbeddingModel } from '../../../core/ai/llmClient';
+import { hasEmbeddingBackend } from '../../../core/ai/providerFactory';
+import { isDegenerateVector } from '../../../core/ai/vectorQuality';
 import {
     HISTORICAL_ACTIONS,
     HISTORICAL_CASES,
@@ -615,6 +617,18 @@ export async function embedLibrary(force = false): Promise<EmbedReport> {
 
     const report: EmbedReport = { model, embedded: 0, skipped: 0, failed: 0, total: rows.length };
 
+    // Chưa cắm nhà cung cấp embedding thì đừng đi qua từng case chỉ để nhận về
+    // mảng rỗng. Nói thẳng lý do, để dòng log không bị hiểu thành "kho lỗi".
+    if (!hasEmbeddingBackend()) {
+        report.error = 'Chưa cấu hình nhà cung cấp embedding (JINA_API_KEY / EMBEDDING_API_KEY).';
+        report.failed = rows.filter((r) => r.searchText).length;
+        LOG.warn(
+            `Bỏ qua nhúng vector: ${report.error} `
+            + 'Tiêu chí ngữ nghĩa sẽ không có dữ liệu để so.',
+        );
+        return report;
+    }
+
     const todo = rows.filter((r) => {
         if (!r.searchText) { report.skipped++; return false; }
         // Vector nhúng bằng model khác PHẢI làm lại, không được dùng lẫn.
@@ -635,7 +649,9 @@ export async function embedLibrary(force = false): Promise<EmbedReport> {
             const vectors = await batchEmbed(batch.map((r) => String(r.searchText)));
             for (let k = 0; k < batch.length; k++) {
                 const v = vectors[k];
-                if (!Array.isArray(v) || !v.length) { report.failed++; continue; }
+                // Vector 0/NaN là nhúng thất bại trá hình — ghi vào kho là nhiễm
+                // độc vĩnh viễn (xem `vectorQuality.ts`).
+                if (isDegenerateVector(v)) { report.failed++; continue; }
                 await db.run(
                     UPDATE(HISTORICAL_CASES).set({
                         embedding: JSON.stringify(v),

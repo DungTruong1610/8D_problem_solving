@@ -61,21 +61,36 @@ copy .env.example .env
 cp .env.example .env
 ```
 
-Mở file `.env` vừa tạo và cấu hình API Key AI (chọn 1 trong 2 cách):
+Mở file `.env` vừa tạo và cấu hình AI:
 
-#### 👉 Cách A: Dùng Google Gemini (Khuyên dùng - Nhanh, Thông minh, Miễn phí)
-1. Lấy API Key miễn phí tại: [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. Điền vào file `.env`:
+#### 👉 Cách A: DeepSeek V4.1 Flash (khuyên dùng)
+1. Lấy API Key: [OpenCode](https://opencode.ai/auth) (gói Go/Zen) hoặc [DeepSeek Platform](https://platform.deepseek.com).
+2. Lấy thêm key embedding miễn phí tại [Jina AI](https://jina.ai/embeddings/) — DeepSeek không có API embedding, thiếu key này thì tìm kiếm ngữ nghĩa sẽ bị bỏ qua (không báo lỗi).
+3. Điền vào file `.env`:
    ```env
-   GEMINI_API_KEY=AIzaSyYourActualApiKeyHere
-   GEMINI_MODEL=gemini-2.5-flash
+   DEEPSEEK_API_KEY=sk-your-key
+   DEEPSEEK_BASE_URL=https://opencode.ai/zen/go/v1
+   DEEPSEEK_MODEL=deepseek-v4.1-flash
+   JINA_API_KEY=jina-your-key
    ```
 
-#### 👉 Cách B: Chế độ chạy thử không cần mạng (Mock AI)
+#### 👉 Cách B: Google Gemini (vẫn dùng được)
+```env
+GEMINI_API_KEY=AIzaSyYourActualApiKeyHere
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+#### 👉 Cách C: Chế độ chạy thử không cần mạng (Mock AI)
 Nếu bạn chưa có API Key ngay hoặc chỉ muốn kiểm tra giao diện:
 ```env
 MOCK_LLM=true
 ```
+
+Kiểm tra nhanh cấu hình AI trước khi chạy app:
+```bash
+npx tsx scripts/probe-ai.ts
+```
+Script sẽ in ra provider đang dùng, chạy thử JSON/tool/thinking, và nhúng thử 2 câu để xác nhận key embedding hoạt động.
 
 ---
 
@@ -179,7 +194,8 @@ Sau khi mở web [http://localhost:5544](http://localhost:5544), bạn sẽ th�
 |---|---|---|
 | Báo lỗi `Cannot find table ...` | Chưa tạo database SQLite | Chạy lệnh: `npm run deploy:sqlite && npm run seed:sqlite` |
 | Cổng 4008 hoặc 5544 bị báo đang được sử dụng | Còn tiến trình cũ đang chạy ngầm | Đóng terminal cũ, hoặc khởi động lại bằng lệnh `npm run dev:all` |
-| Bấm "Analyze with AI" báo lỗi API | Chưa cấu hình hoặc sai API Key | Kiểm tra lại `GEMINI_API_KEY` trong file `.env` hoặc bật `MOCK_LLM=true` để test thử |
+| Bấm "Analyze with AI" báo lỗi API | Chưa cấu hình hoặc sai API Key | Kiểm tra `DEEPSEEK_API_KEY` trong `.env` (hoặc `GEMINI_API_KEY`), chạy `npx tsx scripts/probe-ai.ts` để xem provider nào đang chạy, hoặc bật `MOCK_LLM=true` để test thử |
+| Tìm tiền lệ không bao giờ khớp theo ngữ nghĩa | Chưa có nhà cung cấp embedding | Thêm `JINA_API_KEY` vào `.env` (DeepSeek không có API embedding). Log khởi động sẽ báo `Embedding: KHÔNG CÓ` nếu thiếu |
 | `npm install` báo lỗi peer dependencies | Thiếu cờ bỏ qua xung đột phiên bản | Chạy `npm install --legacy-peer-deps` |
 
 ---
@@ -192,7 +208,7 @@ Sau khi mở web [http://localhost:5544](http://localhost:5544), bạn sẽ th�
 ├── srv/                       # Mã nguồn Backend CAP (Express, AI Services, OData Handlers)
 │   ├── server.ts              # Custom Bootstrap Server
 │   └── src/
-│       ├── core/ai/           # Logic kết nối các nhà cung cấp AI (Gemini, Claude, Mock)
+│       ├── core/ai/           # Logic kết nối các nhà cung cấp AI (DeepSeek, Gemini, LLM local, Mock)
 │       └── domain/eightd/     # Logic nghiệp vụ 8D, AI Prompts, Precedent Search
 ├── packages/                  # Các thư viện nội bộ (.tgz)
 ├── scripts/                   # Các script seed database, test AI và migration

@@ -23,7 +23,7 @@ interface AiConfigForm {
 }
 
 /** Cấu hình rỗng: chỉ đặt model mặc định, chưa ghi đè activity nào. */
-const EMPTY_CONFIG = JSON.stringify({ model: 'gemini-2.5-pro' }, null, 2);
+const EMPTY_CONFIG = JSON.stringify({ model: 'deepseek-v4.1-flash' }, null, 2);
 
 export function GeneralSettingsTab() {
     const [loading, setLoading] = useState(true);
@@ -87,7 +87,7 @@ export function GeneralSettingsTab() {
                         <CardDescription className="text-sm">
                             Each step can run on a different model. Leave a step empty to inherit
                             the default on the first row. With nothing configured, everything runs
-                            on <span className="font-mono">gemini-2.5-pro</span>.
+                            on <span className="font-mono">deepseek-v4.1-flash</span>.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="pt-0">

@@ -44,6 +44,7 @@ import {
 } from './precedentRepository';
 import { buildQueryText } from './searchText';
 import { embed, currentEmbeddingModel } from '../../../core/ai/llmClient';
+import { isDegenerateVector } from '../../../core/ai/vectorQuality';
 import { applyRerank, frameFromInstruction, rerankCandidates } from './reranker';
 import type { CaseContext } from '../types';
 
@@ -146,7 +147,9 @@ async function embedQuery(
 ): Promise<{ embedding: number[]; embeddingModel: string } | null> {
     try {
         const embedding = await embed(buildQueryText(context));
-        if (!Array.isArray(embedding) || !embedding.length) return null;
+        // Mảng rỗng = chưa cấu hình nhà cung cấp embedding; vector 0 = provider
+        // trả về "thành công" nhưng không có nội dung. Cả hai đều không so được.
+        if (isDegenerateVector(embedding)) return null;
         return { embedding, embeddingModel: currentEmbeddingModel() };
     } catch (e: any) {
         LOG.warn(

@@ -18,16 +18,15 @@ import {
   EMBEDDING_DIM,
   DEFAULT_EMBEDDING_MODEL,
 } from '../../config/ai';
-import { APP_EMBEDDING_CORPORA } from './embeddingCorpora';
 import { getGlobalModelConfig } from './globalModelConfig';
 
 /**
- * Lớp bọc mỏng quanh OrchestrationProvider của CDK.
+ * Lớp bọc mỏng quanh provider AI đang hoạt động.
  *
  * Chỉ thêm ba thứ:
  *   1. Chọn model theo activity: cấu hình theo tenant → mặc định của app
  *   2. Truyền thinking budget từ aiAgentConfig
- *   3. Đường mock `MOCK_LLM=true` cho unit test
+ *   3. Chọn và cắm provider lúc bootstrap (DeepSeek / Gemini / LLM local / AI Core / Mock)
  *
  * **KHÔNG thêm retry, cache hay timeout** — CDK đã lo hết qua llmSemaphore và
  * withRetries. Thêm ở đây là nhân đôi số lần gọi thật.
@@ -41,45 +40,35 @@ export interface LlmCallOptions extends AIConfig {
   aiAgentConfig?: Record<string, unknown> | string | null;
 }
 
-/** Vector 0 đúng số chiều đã đăng ký — không random, để phân biệt được lần chạy mock. */
-function zeroVector(): number[] {
-  return new Array(APP_EMBEDDING_CORPORA[0].dim).fill(0);
-}
-
-import { GeminiLlmProvider } from './geminiProvider';
-import { OpenAICompatibleLlmProvider } from './openAiCompatibleProvider';
+import { CompositeLlmProvider } from './compositeLlmProvider';
+import { OpenAiEmbeddingLlmProvider } from './openAiEmbeddingProvider';
+import {
+  createAiCoreProvider,
+  createMockChatProvider,
+  hasAiCoreCredentials,
+  resolveChatProvider,
+  resolveEmbeddingProvider,
+} from './providerFactory';
 
 let providerInitialized = false;
 
 function installMockProvider(reason: string): void {
-  setLlmProvider({
-    name: 'mock',
-    async complete(messages: CanonicalMessage[], config?: AIConfig): Promise<AIResponse> {
-      return {
-        content: JSON.stringify({ mock: true, model: config?.model, messageCount: messages.length }),
-        finishReason: 'stop',
-      };
-    },
-    async completeWithTools(
-      _messages: CanonicalMessage[],
-      tools: ToolSchema[],
-      config?: AIConfig,
-    ): Promise<AIToolResponse> {
-      return {
-        content: JSON.stringify({ mock: true, tools: tools.length, model: config?.model }),
-        finishReason: 'stop',
-      };
-    },
-    async embed(_text: string): Promise<number[]> {
-      return zeroVector();
-    },
-    async batchEmbed(texts: string[]): Promise<number[][]> {
-      return texts.map(() => zeroVector());
-    },
-  });
+  setLlmProvider(createMockChatProvider());
   console.log(`[ai/llmClient] Chế độ Mock LLM đang hoạt động: ${reason}.`);
 }
 
+/**
+ * Cắm provider cho tiến trình, đúng MỘT lần.
+ *
+ * Chat và embedding là hai quyết định độc lập: DeepSeek không có API embedding,
+ * nên cấu hình hay dùng nhất là chat DeepSeek + vector Jina. Khi hai nửa khác
+ * họ, `CompositeLlmProvider` chia việc; khi cùng một provider (Gemini lo cả
+ * hai) thì cắm thẳng, không bọc thừa một tầng.
+ *
+ * Không có gì được cấu hình mà vẫn có credential AI Core thì KHÔNG cắm gì cả —
+ * `getLlmProvider()` rơi về `OrchestrationProvider` mặc định của CDK, đúng như
+ * hành vi cũ trên BTP.
+ */
 export function ensureLlmProvider(): void {
   if (providerInitialized) return;
 
@@ -99,45 +88,64 @@ export function ensureLlmProvider(): void {
     return;
   }
 
-  // 1. Kiểm tra Local LLM (Ollama, LM Studio, vLLM với Qwen)
-  const localLlmUrl = process.env.LOCAL_LLM_URL || process.env.OPENAI_BASE_URL;
-  if (localLlmUrl && localLlmUrl.trim().length > 0) {
-    const provider = new OpenAICompatibleLlmProvider();
-    setLlmProvider(provider);
-    console.log(
-      `[ai/llmClient] Local LLM Provider (Qwen/OpenAI-compatible) đã kích hoạt! URL: "${localLlmUrl}", Model: "${provider.getModelName()}".`,
+  const chat = resolveChatProvider();
+  const embeddings = resolveEmbeddingProvider();
+  const embeddingProvider =
+    embeddings.provider && chat.provider?.name !== embeddings.provider.name
+      ? embeddings.provider
+      : null;
+
+  if (chat.provider) {
+    setLlmProvider(
+      embeddingProvider
+        ? new CompositeLlmProvider(chat.provider, embeddingProvider)
+        : chat.provider,
     );
+    logActiveProviders(chat.provider.name, embeddingProvider?.name ?? null);
     providerInitialized = true;
     return;
   }
 
-  // 2. Kiểm tra Google Gemini API
-  const geminiKey = process.env.GEMINI_API_KEY;
-  if (geminiKey && geminiKey.trim().length > 0) {
-    const provider = new GeminiLlmProvider();
-    setLlmProvider(provider);
-    console.log(
-      `[ai/llmClient] Google Gemini API Provider đã kích hoạt (Model: "${provider.getModelName()}").`,
-    );
+  if (embeddingProvider) {
+    // Chỉ có embedding: phần chat để AI Core lo nếu có credential, không thì mock.
+    const chatHalf = hasAiCoreCredentials() ? createAiCoreProvider() : createMockChatProvider();
+    setLlmProvider(new CompositeLlmProvider(chatHalf, embeddingProvider));
+    logActiveProviders(chatHalf.name, embeddingProvider.name);
+    if (chatHalf.name !== 'orchestration') {
+      console.warn(
+        '[ai/llmClient] Chưa cấu hình model chat (DEEPSEEK_API_KEY / GEMINI_API_KEY / LOCAL_LLM_URL) '
+          + '— phần chat chạy Mock, chỉ có embedding là thật.',
+      );
+    }
     providerInitialized = true;
     return;
   }
 
-  const hasAiCore = Boolean(
-    process.env.AICORE_SERVICE_KEY ||
-    (process.env.AICORE_AUTH_URL && process.env.AICORE_CLIENT_ID)
-  );
-
-  if (!hasAiCore) {
-    installMockProvider('Chưa cấu hình GEMINI_API_KEY hoặc LOCAL_LLM_URL trong .env');
+  if (!hasAiCoreCredentials()) {
+    installMockProvider('Chưa cấu hình DEEPSEEK_API_KEY, GEMINI_API_KEY hay LOCAL_LLM_URL trong .env');
     console.warn(
-      '[ai/llmClient] Chưa cấu hình GEMINI_API_KEY hoặc LOCAL_LLM_URL trong .env — hệ thống tự động chạy Mock Mode để web vẫn hoạt động trơn tru mà không lỗi.',
+      '[ai/llmClient] Chưa cấu hình nhà cung cấp AI nào trong .env — hệ thống tự động chạy Mock Mode '
+        + 'để web vẫn hoạt động trơn tru mà không lỗi.',
     );
-    providerInitialized = true;
-    return;
+  } else {
+    console.log(
+      '[ai/llmClient] Không có provider standalone nào — dùng SAP AI Core mặc định của CDK.',
+    );
   }
-
   providerInitialized = true;
+}
+
+/** Một dòng log nói rõ ai đang lo việc gì — thứ đầu tiên cần khi AI trả lời sai. */
+function logActiveProviders(chatName: string, embeddingName: string | null): void {
+  const embedding = embeddingName ?? 'KHÔNG CÓ (tiêu chí ngữ nghĩa sẽ bị bỏ qua)';
+  console.log(`[ai/llmClient] Chat: ${chatName} — Embedding: ${embedding}`);
+  if (!embeddingName) {
+    console.warn(
+      '[ai/llmClient] Không có nhà cung cấp embedding. Tiêu chí "Similar description" '
+        + 'sẽ cho 0 điểm cho mọi case thay vì so ngữ nghĩa. '
+        + 'Cắm JINA_API_KEY (hoặc EMBEDDING_API_KEY + EMBEDDING_BASE_URL) để bật lại.',
+    );
+  }
 }
 
 
@@ -295,12 +303,46 @@ export async function batchEmbed(texts: string[], batchSize?: number): Promise<n
  * Gọi một lần lúc bootstrap. Khi nào cho admin chọn model trong UI thì gọi lại
  * mỗi lần cài đặt đổi — và nhớ nhúng lại toàn bộ kho, vì vector cũ không còn so
  * sánh được với vector mới.
+ *
+ * Tên model ở đây là NHÃN ghi kèm mỗi vector (`embeddingModel`). Nó phải khớp
+ * nhà cung cấp đang thật sự sinh vector, nếu không phép so "khác model thì
+ * không so" sẽ chặn nhầm — hoặc tệ hơn, cho so hai không gian vector khác nhau.
  */
 export function initEmbeddings(): void {
   ensureLlmProvider();
-  configureEmbeddings({ model: DEFAULT_EMBEDDING_MODEL, dim: EMBEDDING_DIM });
-  const active = getEmbeddingSettings();
-  console.log(`[ai/llmClient] Embedding: "${active.model}" (${active.dim} chiều)`);
+  const settings = resolveEmbeddingSettings();
+  configureEmbeddings({ model: settings.model, dim: EMBEDDING_DIM });
+  console.log(
+    `[ai/llmClient] Embedding: "${settings.model}" (${EMBEDDING_DIM} chiều, nguồn: ${settings.source})`,
+  );
+}
+
+/**
+ * Nhãn model embedding theo đúng nhà cung cấp đang chạy.
+ *
+ * ── Vì sao thứ tự này quan trọng ──
+ * Nhãn được ghi kèm mỗi vector và là cơ chế duy nhất chặn so sánh hai không gian
+ * vector khác nhau. Nếu nhãn nói "text-embedding-3-small" trong khi vector thật
+ * do Jina sinh, phép so sẽ lặng lẽ cho ra một con số vô nghĩa — không lỗi, chỉ
+ * là kết quả truy hồi sai. Nên nhãn phải bám theo provider ĐANG chạy, và
+ * `AICORE_MODEL_EMBEDDING` chỉ được dùng khi đường AI Core thật sự được chọn.
+ */
+function resolveEmbeddingSettings(): { model: string; source: string } {
+  const resolved = resolveEmbeddingProvider();
+  if (resolved.provider instanceof OpenAiEmbeddingLlmProvider) {
+    // Tên model đã đọc `EMBEDDING_MODEL` với mặc định là Jina.
+    return { model: resolved.provider.getEmbeddingModelName(), source: 'EMBEDDING_MODEL' };
+  }
+  if (resolved.provider) {
+    return {
+      model: process.env.GEMINI_EMBEDDING_MODEL || 'text-embedding-004',
+      source: 'GEMINI_EMBEDDING_MODEL',
+    };
+  }
+  return {
+    model: process.env.AICORE_MODEL_EMBEDDING || DEFAULT_EMBEDDING_MODEL,
+    source: process.env.AICORE_MODEL_EMBEDDING ? 'AICORE_MODEL_EMBEDDING' : 'mặc định',
+  };
 }
 
 /**

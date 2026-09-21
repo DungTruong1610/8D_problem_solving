@@ -4,13 +4,62 @@ services:
     runtime: node
     plan: free
     region: singapore
-    buildCommand: npm install && npx cds deploy --to sqlite:db.sqlite && npx cds build --production && node scripts/bundle-library.mjs
-    startCommand: node node_modules/@sap/cds/bin/cds.js serve all --profile production --port $PORT
+    healthCheckPath: /health
+    # ── Build ──
+    # `npm run build` = bundle:library → cds build --production → compile:srv.
+    # KHÔNG được bỏ `compile:srv`: CAP không đọc được TypeScript, nên nếu srv/
+    # còn nguyên .ts thì `server.ts` bị bỏ qua TRONG IM LẶNG — app khởi động,
+    # entity phục vụ bình thường, nhưng không handler nào chạy và không seed gì.
+    # `--include=dev` vì NODE_ENV=production (đặt bên dưới) khiến npm bỏ qua
+    # devDependencies — mà @sap/cds-dk và typescript là devDependency.
+    #
+    # `cds deploy` chạy SAU build và ghi thẳng vào artifact (gen/srv/db.sqlite)
+    # vì `cds build` dựng lại gen/srv từ đầu. File này mang schema + dữ liệu
+    # catalogue (Defects, InspectionLots…) và 0 case; kho case được nạp lúc
+    # runtime từ `srv/data/case-library/` — xem seedLibraryFromBundle.
+    buildCommand: npm install --include=dev && npm run build && npx cds deploy --to sqlite:gen/srv/db.sqlite
+    # ── Start ──
+    # Chạy từ GEN/SRV, không phải thư mục gốc: đó là artifact đã build
+    # (server.js đã biên dịch + csn.json + data/case-library). Chạy ở gốc thì CAP
+    # chỉ thấy srv/server.ts — file nó không đọc được — và bỏ qua toàn bộ bootstrap.
+    # `../../node_modules/...` vì @sap/cds là dependency thật (devDeps đã bị bỏ).
+    startCommand: cd gen/srv && node ../../node_modules/@sap/cds/bin/serve.js --port $PORT
     envVars:
       - key: NODE_ENV
         value: production
       - key: CDS_CONFIG
         value: '{"requires":{"db":{"kind":"sqlite","credentials":{"url":"db.sqlite"}},"auth":{"kind":"mocked"}}}'
-      - key: GEMINI_API_KEY
-        sync: false
 
+      # ── Chat: DeepSeek V4.1 Flash qua OpenCode Go ──
+      # DEEPSEEK_API_KEY điền tay trong Render Dashboard (sync: false).
+      # Đổi cổng API:
+      #   OpenCode Zen (trả theo token) : https://opencode.ai/zen/v1
+      #   DeepSeek Platform             : https://api.deepseek.com + model deepseek-flash
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: DEEPSEEK_BASE_URL
+        value: https://opencode.ai/zen/go/v1
+      - key: DEEPSEEK_MODEL
+        value: deepseek-v4.1-flash
+
+      # ── Model mặc định cho từng loại bước (đọc trong srv/src/config/ai.ts) ──
+      # Không đặt thì các bước này rơi về tên model Claude của AI Core và được
+      # provider DeepSeek ánh xạ lại — chạy được, nhưng log và UI sẽ hiển thị
+      # một cái tên không tồn tại. Đặt thẳng tên DeepSeek cho rõ ràng.
+      - key: AICORE_DEFAULT_MODEL
+        value: deepseek-v4.1-flash
+      - key: AICORE_MODEL_PARSE
+        value: deepseek-v4.1-flash
+      - key: AICORE_MODEL_STRUCTURE
+        value: deepseek-v4.1-flash
+      - key: AICORE_MODEL_ANALYZE
+        value: deepseek-v4.1-flash
+      # Lượt leo thang khi bước viết báo cáo trả JSON thiếu trường — model mạnh hơn.
+      - key: AICORE_MODEL_ANALYZE_FALLBACK
+        value: deepseek-v4-pro
+
+      # ── Embedding: DeepSeek không có API embedding ──
+      # Jina AI free tier, endpoint chuẩn OpenAI. Thiếu key này thì tiêu chí
+      # "Similar description" cho 0 điểm cho mọi case (không lỗi, chỉ im lặng).
+      - key: JINA_API_KEY
+        sync: false

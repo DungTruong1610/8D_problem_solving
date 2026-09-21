@@ -71,14 +71,15 @@ curl -u admin:123 http://localhost:4004/api/cnma/AI_SRV/AIModels
 
 ---
 
-## 4. Phần AI — ba chế độ
+## 4. Phần AI — bốn chế độ
 
 ### Chế độ A — chưa cấu hình gì (mặc định sau khi clone)
 
 Chạy được ngay. Lúc khởi động sẽ thấy dòng này, **đây không phải lỗi**:
 
 ```
-[ai-startup] AI Core CHƯA cấu hình. Mọi lời gọi model sẽ hỏng cho tới khi sửa...
+[ai/llmClient] Chưa cấu hình nhà cung cấp AI nào trong .env — hệ thống tự động chạy Mock Mode...
+[ai/llmClient] Chat: mock-chat — Embedding: KHÔNG CÓ (tiêu chí ngữ nghĩa sẽ bị bỏ qua)
 ```
 
 Trang cấu hình AI vẫn mở được, danh sách model rỗng. Bấm **Sync** sẽ hiện thông báo lỗi ngay trên màn hình chứ không làm sập gì.
@@ -96,18 +97,38 @@ MOCK_LLM=true
 Mọi lời gọi model trả kết quả giả, **không hề gọi mạng**:
 
 ```
-complete   → {"mock":true,"model":"gemini-2.5-pro","messageCount":1}
-embed      → vector 1536 chiều, toàn số 0
-batchEmbed → đúng số lượng đầu vào
+complete   → {"mock":true,"model":"deepseek-v4.1-flash","messageCount":1}
+embed      → mảng rỗng (không có vector — tầng trên tự bỏ tiêu chí ngữ nghĩa)
+batchEmbed → mảng rỗng theo đúng số lượng đầu vào
 ```
-
-Vector là **số 0**, không phải số ngẫu nhiên — để nhìn dữ liệu là biết ngay đây là lần chạy giả hay thật.
 
 Chế độ này bị **chặn cứng khi `NODE_ENV=production`**, không sợ lỡ tay mang lên server.
 
 Dùng khi viết logic gọi AI và muốn chạy nhanh, không tốn tiền, không cần mạng.
 
-### Chế độ C — AI Core thật
+### Chế độ C — DeepSeek V4.1 Flash + Jina (khuyến nghị)
+
+Điền vào `.env`:
+
+```
+DEEPSEEK_API_KEY=sk-...
+DEEPSEEK_BASE_URL=https://opencode.ai/zen/go/v1
+DEEPSEEK_MODEL=deepseek-v4.1-flash
+JINA_API_KEY=jina-...
+```
+
+Khởi động lại, log phải hiện đúng hai dòng:
+
+```
+[ai/llmClient] Chat: deepseek — Embedding: openai-compatible-embedding
+[ai/llmClient] Embedding: "jina-embeddings-v5-text-small" (1536 chiều, nguồn: EMBEDDING_MODEL)
+```
+
+Muốn chắc chắn trước khi mở app, chạy `npx tsx scripts/probe-ai.ts` — script kiểm tra JSON mode, tool calls, thinking và nhúng thử 2 câu.
+
+> DeepSeek không có API embedding. Bỏ `JINA_API_KEY` thì app vẫn chạy, nhưng tiêu chí "Similar description" cho 0 điểm mọi case mà không báo lỗi — log lúc boot sẽ có dòng `[AI] Không có nhà cung cấp embedding`.
+
+### Chế độ D — AI Core thật (đường cũ, vẫn dùng được)
 
 Điền vào `.env`. Cách nhanh nhất là dán nguyên service key AI Core dạng JSON một dòng:
 
@@ -128,11 +149,7 @@ AICORE_RESOURCE_GROUP=default
 
 > ⚠️ Tên biến là **`AICORE_AUTH_URL`**, không phải `AICORE_TOKEN_URL`. Project procure ghi tên sau — đó là tên sai, CDK không đọc.
 
-Khởi động lại. Dòng log đổi thành:
-
-```
-[ai-startup] AI Core đang chạy bằng credential trong biến môi trường AICORE_* (resource group 'default')
-```
+AI Core chỉ được chọn khi KHÔNG có `DEEPSEEK_API_KEY`, `GEMINI_API_KEY` hay `LOCAL_LLM_URL`. Khởi động lại và kiểm tra dòng `[ai-startup]`.
 
 Vào trang cấu hình AI bấm **Sync** → danh mục model nạp về từ AI Core.
 

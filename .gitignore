@@ -60,3 +60,7 @@ app/cnma_proresolve_ui/public/samples/
 .cdsrc-private.json*
 
 ./venv
+
+# Kế hoạch nội bộ — giữ ở máy, không đưa lên GitHub.
+# (Lưu ý: `./docs` không phải cú pháp gitignore hợp lệ, phải là `docs/`.)
+docs/
