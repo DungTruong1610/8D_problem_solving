@@ -15,7 +15,35 @@
  * SystemConfiguration row (see srv/lib/ai/EmbeddingModelConfig.ts). Changing one
  * requires re-embedding that corpus, which is why it lives on its own tab.
  */
-import type { AiActivity } from '@cnma/sap-aicore-integrate/react/shared';
+/**
+ * Định nghĩa activity — KHAI BÁO TẠI CHỖ, cố ý KHÔNG import từ CDK.
+ *
+ * ── Vì sao ──
+ * File này được import từ CẢ HAI bundle, nhưng phía frontend nằm trong
+ * `app/8D_hackathon_ui` — một Root Directory riêng trên Vercel, nơi
+ * `node_modules` của repo gốc KHÔNG được cài. Mọi bare import trong file này sẽ
+ * không giải được ở đó:
+ *
+ *     ../../shared/ai-activities/index.ts(18,10): error TS2307:
+ *     Cannot find module '@cnma/sap-aicore-integrate/react/shared'
+ *
+ * Kiểu dưới đây khớp CẤU TRÚC với `AiActivity` của
+ * `@cnma/sap-aicore-integrate/react/shared`, nên `registerActivities()` ở cả hai
+ * phía vẫn nhận (TypeScript so cấu trúc, không so tên). Chính CDK cũng dặn
+ * "keep this module dependency-free (no server/DOM imports) so both bundles can
+ * import it" — đây là hệ quả của lời dặn đó.
+ *
+ * Thêm activity mới thì khai đúng các trường ở đây; KHÔNG thêm import.
+ */
+export interface AiActivity {
+    key: string;
+    label: string;
+    description: string;
+    /** Capabilities model nên có cho activity này (chỉ để hiển thị ở UI admin). */
+    requiredCapabilities?: string[];
+    /** Khoá `aiAgentConfig` giữ thinking/reasoning budget của activity này. */
+    budgetKey?: string;
+}
 
 export const EIGHTD_ACTIVITIES: AiActivity[] = [
     {

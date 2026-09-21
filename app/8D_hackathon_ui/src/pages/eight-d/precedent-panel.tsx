@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Badge, Card, Spinner } from '@cnma/react-ui';
+import { Card, Spinner } from '@cnma/react-ui';
 import { GitBranch, Info, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import { eightDService, parseStoredPrecedents, type PrecedentResult, type Report8D } from '@/services/eightd-service';
 
