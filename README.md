@@ -79,15 +79,37 @@ MOCK_LLM=true
 
 ---
 
-### 4. Khởi tạo Database & Nạp dữ liệu mẫu (Chỉ cần chạy 1 lần)
+### 4. Khởi tạo Database & Sử dụng Dữ liệu mẫu (Sample Database)
 
-Hệ thống sử dụng cơ sở dữ liệu SQLite cục bộ (lưu trong file `db.sqlite`, **không cần cài database server**):
+Hệ thống sử dụng cơ sở dữ liệu SQLite cục bộ (lưu trong file `db.sqlite` ngay tại thư mục gốc, **hoàn toàn không cần cài đặt thêm MySQL, PostgreSQL hay Docker**).
+
+Bạn có thể lựa chọn 1 trong 2 cách sau:
+
+#### 👉 Cách 1: Tự động khởi tạo và nạp toàn bộ dữ liệu mẫu từ mã nguồn (Khuyên dùng)
+Nếu bạn vừa mới clone dự án về, chỉ cần chạy 1 dòng lệnh duy nhất để tạo database và nạp sẵn toàn bộ kho dữ liệu:
 
 ```bash
-# Tạo bảng và nạp toàn bộ danh mục mã lỗi, vật tư và kho ca bệnh lịch sử
-npm run deploy:sqlite
-npm run seed:sqlite
+npm run deploy:sqlite && npm run seed:sqlite
 ```
+
+> **Lệnh trên sẽ tự động nạp sẵn vào `db.sqlite`:**
+> - 📚 **25 ca bệnh sự cố 8D hoàn chỉnh** từ `mock-data/clean/` (bao gồm đầy đủ dữ liệu từ D1 → D8, sơ đồ 6M Ishikawa, chuỗi 5-Why, hành động khoanh vùng D3, hành động khắc phục D5 và phòng ngừa D7).
+> - ⚠️ **15 ca lỗi kiểm thử mẫu** được phân loại rõ ràng theo 3 nhóm chuẩn công nghiệp:
+>   - **Q1 — Customer Complaint**: Lỗi từ khiếu nại khách hàng.
+>   - **Q2 — Supplier Defect**: Lỗi linh kiện/phôi nhập từ nhà cung cấp.
+>   - **Q3 — Internal Defect**: Lỗi phát hiện tại các công đoạn nội bộ nhà máy (phay, tiện, mài, lắp ráp).
+> - 👥 **Danh bạ 21 nhân sự chuyên gia mẫu** (chức danh, email, số điện thoại) phục vụ phân công đội ngũ D1.
+> - 📊 **Bộ đặc tính đo kiểm, dung sai kỹ thuật, mã lỗi và danh mục vật tư chuẩn**.
+
+#### 👉 Cách 2: Sử dụng trực tiếp file `db.sqlite` có sẵn
+Nếu bạn được đồng đội gửi sẵn file `db.sqlite` hoặc tải về từ bản sao lưu:
+1. Copy file `db.sqlite` đặt trực tiếp vào thư mục gốc của dự án (`8D_problem_solving/db.sqlite`).
+2. **Không cần chạy lệnh deploy hay seed nào nữa**, chuyển thẳng sang **Bước 5** bên dưới để khởi động app!
+
+> 💡 **Mẹo: Muốn Reset hoặc khôi phục lại dữ liệu mẫu ban đầu?**  
+> Bất kỳ lúc nào trong quá trình test mà dữ liệu bị thay đổi, bạn chỉ cần chạy lại lệnh:  
+> `npm run deploy:sqlite && npm run seed:sqlite`  
+> Database sẽ tự động được làm mới và đưa về trạng thái dữ liệu mẫu chuẩn ban đầu.
 
 ---
 
@@ -121,23 +143,33 @@ Mở trình duyệt web và truy cập địa chỉ:
 
 ---
 
-## 💡 Hướng dẫn kiểm tra tính năng phân tích 8D AI
+## 💡 Hướng dẫn kiểm tra tính năng trên giao diện
 
-Sau khi mở web [http://localhost:5544](http://localhost:5544):
+Sau khi mở web [http://localhost:5544](http://localhost:5544), bạn sẽ thấy bảng danh sách **8D Reports** với 27+ hồ sơ mẫu sẵn có:
 
-1. **Bước 1**: Nhấn vào menu **"Defects"** (Danh sách sự cố).
-2. **Bước 2**: Bấm vào một ca lỗi bất kỳ (ví dụ: `DEF-10048651`) ➔ Nhấn nút **"Start 8D"** để khởi tạo quy trình 8 bước.
-3. **Bước 3**: Nhấn nút **"Analyze with AI"**:
-   - AI sẽ tự động đọc dữ liệu đo kiểm thực tế, truy xuất tiền lệ tương đồng từ kho dữ liệu.
-   - Tự động điền và phân tích toàn diện 8 bước:
-     - **D1**: Đề xuất đội ngũ xử lý sự cố.
-     - **D2**: Mô tả vấn đề, ma trận Is / Is-Not.
-     - **D3**: Hành động ngăn chặn tạm thời (Containment Actions).
-     - **D4**: Phân tích nguyên nhân gốc rễ (Root Cause), cây 6M Ishikawa và 5-Why.
-     - **D5**: Hành động khắc phục vĩnh viễn (Corrective Actions).
-     - **D6**: Xác thực hiệu quả biện pháp khắc phục.
-     - **D7**: Biện pháp ngăn ngừa tái diễn (FMEA & Preventive Actions).
-     - **D8**: Đóng hồ sơ, đúc kết bài học kinh nghiệm (Lessons Learned).
+### 👉 Cách 1: Tạo và phân tích một hồ sơ 8D mới từ danh mục lỗi kiểm thử
+1. **Bước 1**: Nhấn nút **"Create 8D Report"** màu vàng ở góc trên bên phải bảng báo cáo.
+2. **Bước 2**: Hộp thoại sẽ hiển thị danh mục các lỗi kiểm thử có sẵn, được lọc theo các tab:
+   - **All**: Tất cả các lỗi sẵn sàng xử lý.
+   - **Q1 Customer**: Khiếu nại từ khách hàng (ví dụ: bavia, bong tróc sơn, rò rỉ đúc...).
+   - **Q2 Supplier**: Lỗi từ nhà cung cấp linh kiện (ví dụ: phôi rỗ khí, phôi thép nứt mép, trục rèn bị đảo...).
+   - **Q3 Internal**: Lỗi phát hiện nội bộ chuyền sản xuất (ví dụ: cháy mài, tuôn ren siết ốc, sai lệch kích thước tiện/phay...).
+3. **Bước 3**: Nhấp chọn một lỗi bất kỳ để xem trước chi tiết thông số đo kiểm thực tế ở panel bên phải.
+4. **Bước 4**: Nhấn **"Create & Analyze"**:
+   - Hệ thống tự động tạo hồ sơ 8D và kích hoạt AI phân tích toàn diện.
+   - AI sẽ tự động đọc dữ liệu đo kiểm thực tế, tìm kiếm ca bệnh tương đồng từ kho tiền lệ và điền tự động 8 bước (D1 → D8), dựng cây nguyên nhân gốc rễ 6M Ishikawa và chuỗi 5-Why.
+
+### 👉 Cách 2: Trải nghiệm các hồ sơ 8D mẫu đã có sẵn
+1. Bấm trực tiếp vào bất kỳ dòng nào trong bảng danh sách **8D Reports** (ví dụ các ca có trạng thái *Signed off*, *In process*, hoặc *Awaiting approval*).
+2. Xem chi tiết từng bước quy trình chất lượng:
+   - **D1 Team**: Đội ngũ xử lý với các nhân sự chuyên môn được gợi ý.
+   - **D2 Problem**: Mô tả sự cố chi tiết và ma trận phân định *Is / Is-Not*.
+   - **D3 Containment**: Các biện pháp khoanh vùng và cách ly lô hàng lỗi.
+   - **D4 Root Cause**: Sơ đồ xương cá 6M Ishikawa tương tác trực quan, chuỗi 5-Why tìm nguyên nhân gốc, và panel **Precedent Cases** đối chuẩn các ca tương đồng trong lịch sử.
+   - **D5 Corrective Actions**: Hành động khắc phục triệt để.
+   - **D6 Verification**: Bằng chứng nghiệm thu hiệu quả.
+   - **D7 Prevention**: Cập nhật FMEA và biện pháp ngăn ngừa tái diễn.
+   - **D8 Closure**: Đóng hồ sơ và ghi nhận bài học kinh nghiệm.
 
 ---
 
