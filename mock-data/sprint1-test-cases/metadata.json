@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "suite": "MLAI Hackathon 2026 - Sprint 1 Verify Suite",
+  "track": "Track 1: OrganizationAI",
+  "challenge": "Challenge B: The Whole Workflow (8D Copilot)",
+  "criteriaCompliance": {
+    "section3b_verifyHarness": "Single command/button execution under 90s with pass/fail table and timestamp",
+    "section3b_refusalMandate": "At least one case where the correct behavior is refusal or escalation (TC-04)",
+    "section4_criterion2": "Automated verify harness execution (12 points)",
+    "section4_criterion3": "Handling of 2 new unseen Judge inputs (8 points)"
+  },
+  "testCases": [
+    {
+      "id": "TC-01",
+      "file": "tc-01-happy-path.json",
+      "title": "Milling Burr Defect (Happy Path — Strong Precedent)",
+      "category": "Quadrant 1 — Perfect End-to-End Workflow",
+      "validationCheck": "Must find precedent 8D-10048412 with >=85% score, complete D1-D8 drafting, and generate internal + customer summaries."
+    },
+    {
+      "id": "TC-02",
+      "file": "tc-02-dirty-sap.json",
+      "title": "Dirty SAP QM Flange Defect (Messy Real-World Normalization)",
+      "category": "Quadrant 2 — Messy / Real-world Fault Tolerance",
+      "validationCheck": "Must parse German abbreviations, extract comma decimal 0.32mm, trim whitespace in MAT-10247, and complete pipeline without crashing."
+    },
+    {
+      "id": "TC-03",
+      "file": "tc-03-bias-hunter.json",
+      "title": "Pocket Depth Deviation (Confirmation Bias Hunter)",
+      "category": "Quadrant 3 — Decision Support & Blind Diagnosis",
+      "validationCheck": "Independent Blind Diagnosis must override human bias blaming operator (Man) and prove mechanical tool changer drift (Machine) using empirical metrics."
+    },
+    {
+      "id": "TC-04",
+      "file": "tc-04-graceful-refusal.json",
+      "title": "New Chassis Frame Welding Defect (Safe Escalation & Precedent Refusal)",
+      "category": "Quadrant 4 — Safe Refusal & Escalation",
+      "validationCheck": "Must detect out-of-domain technology with score < 0.60, refuse to invent precedents, and generate technical escalation questions for the Welding SME."
+    }
+  ]
+}

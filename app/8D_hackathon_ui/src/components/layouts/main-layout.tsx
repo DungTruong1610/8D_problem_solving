@@ -9,6 +9,7 @@ import {
     ChevronRight,
     X,
     LogOut,
+    CheckCircle2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, cn } from '@cnma/react-ui';
@@ -43,6 +44,7 @@ function useNavTree(): NavEntry[] {
         { type: 'leaf', to: '/8d', icon: ClipboardList, label: '8D Reports' },
         { type: 'leaf', to: '/master-data', icon: Database, label: 'Master Data' },
         { type: 'leaf', to: '/workflow', icon: Workflow, label: t('nav.workflow') },
+        { type: 'leaf', to: '/verify', icon: CheckCircle2, label: 'Verify (Sprint 1)' },
     ];
 }
 

@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$testCaseId": "TC-03",
+  "$title": "Pocket Depth Deviation (Confirmation Bias Hunter — Human-in-the-loop)",
+  "$category": "Quadrant 3 — Decision Support & Blind Diagnosis",
+  "$expectedOutcome": {
+    "status": "PASS",
+    "biasDetected": true,
+    "engineerClaim": "Man",
+    "aiDetermination": "Machine",
+    "contestedReason": "Zero metrics on Man claim + mechanical drift 0.9mm vs 0.2mm on tool changer + multi-shift occurrence",
+    "humanOverrideRequired": true
+  },
+  "notificationId": "8D-10048880",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Bracket housing pocket depth varying unit to unit",
+  "status": "Completed",
+  "foundDate": "2026-07-19",
+  "completionDate": "2026-08-02",
+  "quantityExtent": "97 units affected across all shifts (A, B, C)",
+  "teamSize": 3,
+  "material": {
+    "materialId": "MAT-10247",
+    "description": "Bracket Housing X240",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-54390",
+    "materialId": "MAT-10247"
+  },
+  "defect": {
+    "defectCode": "DEF-1340",
+    "defectText": "Pocket depth inconsistent across units"
+  },
+  "workCenter": {
+    "workCenterId": "WC-MILL-07",
+    "description": "CNC Milling Line 7"
+  },
+  "inspections": [
+    {
+      "characteristic": "Pocket depth",
+      "measuredValue": "12.84mm",
+      "specValue": "12.95-13.05mm"
+    },
+    {
+      "characteristic": "Pocket depth spread",
+      "measuredValue": "0.62mm",
+      "specValue": "max 0.10mm"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "EMP-9310, Shift C - suspected of loading the previous revision of the NC program at shift start; no MES record of a program change was found",
+      "metricValue": null,
+      "isRootCause": "Y",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "EQ-MILL14-001 automatic tool changer repeatability measured 0.9mm against a 0.2mm specification; drift confirmed on three separate test cycles",
+      "metricValue": "0.9mm vs 0.2mm max",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "DOC-11890 Rev C - milling sequence unchanged, single released revision in the system",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did pocket depth vary across units?",
+      "answer": "Tool positioning height drifted dynamically between tool change cycles",
+      "evidenceCitation": "Tool changer repeatability gauge GA-0081"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did tool height drift?",
+      "answer": "Tool changer arm clamp piston seal worn, losing pressure under high-speed indexing",
+      "evidenceCitation": "PM maintenance report EQ-MILL14-001"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "status": "Done",
+      "actionText": "100% manual depth gauge check on all parts exiting Line 7"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "status": "Verified",
+      "actionText": "Rebuild tool changer pneumatic arm and replace pressure seal kit"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100024",
+      "partnerName": "Felix Huber",
+      "functionTitle": "CNC Setup Lead",
+      "partnerRole": "8D Team Leader",
+      "source": "Case record"
+    }
+  ],
+  "isIsNot": {
+    "isWhereWhenItHappens": "Line 7 - Shifts A, B, and C all exhibit drift after >50 parts",
+    "isNotWhereWhenItDoesnt": "Line 8 running identical part MAT-10247 with zero depth deviation",
+    "notes": "Rules out individual operator error since issue occurs across all three shifts"
+  },
+  "fmeaLink": {
+    "fmeaId": "FMEA-MILL07-02",
+    "description": "Tool positioning repeatability loss during tool exchange"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 14200
+  },
+  "lessonsLearned": {
+    "whatWorked": "Independent physical inspection of tool changer mechanism revealed mechanical drift",
+    "whatDidnt": "Initial assumption blaming operator delayed root cause detection by 4 days"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - internal defect",
+    "customerPlantContact": "N/A",
+    "slaResponseDue": "N/A"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$testCaseId": "TC-04",
+  "$title": "New Chassis Frame Welding Defect (Safe Escalation & Precedent Refusal)",
+  "$category": "Quadrant 4 — Safe Refusal & Escalation",
+  "$expectedOutcome": {
+    "status": "PASS",
+    "precedentFound": false,
+    "maxSimilarityScore": 0.31,
+    "refusalDecision": "No matching precedents in current library (Score < 0.60)",
+    "escalated": true,
+    "escalationTarget": "Welding SME / Quality Director",
+    "specificInquiryGenerated": "Specific technical questions regarding welding arc current, shielding gas flow, and pre-heat temperatures"
+  },
+  "notificationId": "8D-10049003",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Weld seam cracked during frame straightening at the fixture",
+  "status": "In Process",
+  "foundDate": "2026-08-12",
+  "completionDate": null,
+  "quantityExtent": "4 frames scrapped",
+  "teamSize": null,
+  "material": {
+    "materialId": "MAT-12800",
+    "description": "Chassis Frame Weldment F70",
+    "materialGroup": "MG-WELDMENT"
+  },
+  "batch": {
+    "batchId": "B-56010",
+    "materialId": "MAT-12800"
+  },
+  "defect": {
+    "defectCode": "DEF-2210",
+    "defectText": "Weld seam cracked under straightening load"
+  },
+  "workCenter": {
+    "workCenterId": "WC-WELD-11",
+    "description": "Robot Welding Cell 11"
+  },
+  "inspections": [
+    {
+      "characteristic": "Weld penetration depth",
+      "measuredValue": "2.1mm",
+      "specValue": "min 3.5mm"
+    }
+  ],
+  "causesIshikawa": [],
+  "fiveWhyChain": [],
+  "actions": [],
+  "teamAssignments": [],
+  "isIsNot": null,
+  "fmeaLink": null,
+  "costCopq": null,
+  "lessonsLearned": null,
+  "customerReference": {
+    "complaintReference": "N/A - internal defect, no customer reference",
+    "customerPlantContact": "N/A",
+    "slaResponseDue": "N/A"
+  }
+}

@@ -12,6 +12,7 @@
     "deploy:pg": "cds deploy --profile postgres",
     "seed:pg": "tsx scripts/seed-postgres.ts",
     "verify:pg": "tsx scripts/verify-postgres-pgvector.ts",
+    "verify:sprint1": "tsx scripts/verify-sprint1-harness.ts",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "deploy:graph": "cds deploy --to hana --profile graph --for graph",
