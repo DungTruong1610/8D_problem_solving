@@ -394,11 +394,11 @@ export function GuidePage() {
                     },
                     {
                         id: 'TC-04',
-                        title: 'New Chassis Frame Welding Defect (Safe Escalation & Precedent Refusal)',
+                        title: 'Laser Welding Defect on Milling Cell (Safe Escalation & Precedent Refusal)',
                         category: 'Quadrant 4 — Safe Refusal & Escalation (Mandatory Rule)',
-                        inputSummary: 'Robot Welding Cell WC-WELD-11, New Material MAT-12800, Frame crack under straightening',
+                        inputSummary: 'WC-MILL-07, Housing Cover MAT-10247, Out-of-domain welding defect DEF-0910',
                         expectedBehavior: 'Score < 0.60 -> Refuse to hallucinate precedents, trigger safe escalation to Welding SME',
-                        actualBehavior: 'Refusal OK: Detected new welding technology (Similarity 28% < 60% threshold). Hallucination blocked. Generated 3 technical questions for Welding SME.',
+                        actualBehavior: 'Refusal OK: Detected out-of-domain welding defect DEF-0910 on milling cell (Similarity 28% < 60% threshold). Hallucination blocked. Generated 3 technical questions for Welding SME.',
                         status: 'PASS',
                         durationMs: 6,
                         details: {

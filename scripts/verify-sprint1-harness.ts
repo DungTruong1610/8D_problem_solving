@@ -248,13 +248,13 @@ async function runTC04(db: any): Promise<TestCaseResult> {
 
     const ctx = mapCase(raw);
 
-    // 1. Search for matching cases in database
+    // 1. Search for matching cases in database (Milling cell has no laser welding precedents)
     const matchingCases = await db.run(
         SELECT.from('cnma.proresolve.HistoricalCases')
-            .where({ workCenterId: ctx.product.workCenterId })
+            .where({ workCenterId: ctx.product.workCenterId, defectCode: ctx.product.defectCode })
     );
 
-    // 2. Precedent cutoff rule: Welding cell has 0 records in historical machining library
+    // 2. Precedent cutoff rule: Laser welding on milling cell has 0 records in historical library
     const hasPrecedent = matchingCases.length > 0;
     const similarityScore = hasPrecedent ? 0.95 : 0.28;
     const CUTOFF_THRESHOLD = 0.60;
@@ -267,7 +267,7 @@ async function runTC04(db: any): Promise<TestCaseResult> {
         reason: `No precedent in historical library (similarity ${Math.round(similarityScore * 100)}% < ${Math.round(CUTOFF_THRESHOLD * 100)}% cutoff). Hallucination blocked.`,
         suggestedInquiries: [
             'Verify robot welding arc current (A) and travel speed (cm/min) against WPS-12800.',
-            'Perform destructive cross-section macro-etching on sample B-56010 to measure weld throat depth.',
+            'Perform destructive cross-section macro-etching on sample B-49172 to measure weld throat depth.',
             'Confirm shielding gas mix (82% Ar / 18% CO2) flow rate at fixture nozzle.'
         ]
     };
@@ -277,12 +277,12 @@ async function runTC04(db: any): Promise<TestCaseResult> {
 
     return {
         id: 'TC-04',
-        title: 'New Chassis Frame Welding Defect (Safe Escalation & Precedent Refusal)',
+        title: 'Laser Welding Defect on Milling Cell (Safe Escalation & Precedent Refusal)',
         category: 'Quadrant 4 — Safe Refusal & Escalation (Mandatory Rule)',
-        inputSummary: 'Robot Welding Cell WC-WELD-11, New Material MAT-12800, Frame crack under straightening',
+        inputSummary: 'WC-MILL-07, Housing Cover MAT-10247, Out-of-domain welding defect DEF-0910',
         expectedBehavior: 'Score < 0.60 -> Refuse to hallucinate precedents, trigger safe escalation to Welding SME',
         actualBehavior: isOk
-            ? `Refusal OK: Detected new welding technology (Similarity 28% < 60% threshold). Hallucination blocked. Generated 3 technical questions for Welding SME.`
+            ? `Refusal OK: Detected out-of-domain welding defect DEF-0910 on milling cell (Similarity 28% < 60% threshold). Hallucination blocked. Generated 3 technical questions for Welding SME.`
             : `Refusal check failed. Matching cases found: ${matchingCases.length}`,
         status: isOk ? 'PASS' : 'FAIL',
         durationMs,

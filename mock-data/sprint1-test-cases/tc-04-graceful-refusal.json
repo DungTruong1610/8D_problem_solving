@@ -14,20 +14,20 @@
   },
   "notificationId": "8D-10049003",
   "origin": "Q3 - Internal Defect",
-  "symptomShortText": "Weld seam cracked during frame straightening at the fixture",
+  "symptomShortText": "Laser welding porosity on machined housing cover flange",
   "status": "In Process",
   "foundDate": "2026-08-12",
   "completionDate": null,
-  "quantityExtent": "4 frames scrapped",
+  "quantityExtent": "4 units scrapped",
   "teamSize": null,
   "material": {
-    "materialId": "MAT-12800",
-    "description": "Chassis Frame Weldment F70",
-    "materialGroup": "MG-WELDMENT"
+    "materialId": "MAT-10247",
+    "description": "Housing Cover Machined",
+    "materialGroup": "MG-CASTING"
   },
   "batch": {
-    "batchId": "B-56010",
-    "materialId": "MAT-12800"
+    "batchId": "B-49172",
+    "materialId": "MAT-10247"
   },
   "defect": {
     "defectCode": "DEF-0910",
@@ -35,8 +35,8 @@
     "defectText": "Internal porosity in robotic fiber laser welded lap joint"
   },
   "workCenter": {
-    "workCenterId": "WC-WELD-11",
-    "description": "Robot Welding Cell 11"
+    "workCenterId": "WC-MILL-07",
+    "description": "CNC 5-Axis Milling Cell 07"
   },
   "inspections": [
     {
