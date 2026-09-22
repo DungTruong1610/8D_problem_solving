@@ -500,9 +500,6 @@ export function GuidePage() {
                     <div>
                         <div className="flex items-center gap-2">
                             <h1 className="text-2xl font-bold tracking-tight">User &amp; Judge Guide</h1>
-                            <span className="text-[11px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20">
-                                MLAI Hackathon 2026 • Track 1
-                            </span>
                         </div>
                         <p className="text-sm text-muted-foreground mt-0.5">
                             Standard operating procedures for Quality Engineers and automated evaluation suite for Judges.
