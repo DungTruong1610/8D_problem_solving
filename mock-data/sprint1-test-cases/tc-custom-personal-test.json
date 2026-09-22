@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$testCaseId": "TC-PERSONAL-VALID-01",
-  "$title": "Gearbox Flange Surface Roughness & Oil Weeping (Valid Personal Test Case)",
+  "$title": "Gearbox Flange Surface Roughness & Oil Weeping (Unseen Raw Defect Input)",
   "$category": "Customer Complaint — Manufacturing Precision Defect",
   "notificationId": "8D-10049099",
   "origin": "Q1 - Customer Complaint",
@@ -10,7 +10,7 @@
   "foundDate": "2026-09-20",
   "completionDate": null,
   "quantityExtent": "14 units inspected at customer assembly line",
-  "teamSize": 4,
+  "teamSize": null,
   "material": {
     "materialId": "MAT-10247",
     "description": "Bracket Housing X240",
@@ -49,108 +49,14 @@
       "equipment": "WC-MILL-07-F1"
     }
   ],
-  "teamAssignments": [
-    {
-      "partnerId": "100088",
-      "partnerName": "Rita Fischer",
-      "partnerRole": "8D Team Leader",
-      "email": "rita.fischer@proresolve.com"
-    },
-    {
-      "partnerId": "100012",
-      "partnerName": "Minh Dinh",
-      "partnerRole": "Production Engineer",
-      "email": "minh.dinh@proresolve.com"
-    },
-    {
-      "partnerId": "100091",
-      "partnerName": "Karl Wagner",
-      "partnerRole": "Maintenance Planner",
-      "email": "karl.wagner@proresolve.com"
-    },
-    {
-      "partnerId": "100034",
-      "partnerName": "Helena Weber",
-      "partnerRole": "Quality Manager",
-      "email": "helena.weber@proresolve.com"
-    }
-  ],
-  "causesIshikawa": [
-    {
-      "category": "Machine",
-      "causeDescription": "Spindle front bearing radial runout exceeded tolerance (0.04mm measured vs max 0.01mm spec)",
-      "isRootCause": "Y",
-      "metricValue": "0.04mm radial runout"
-    },
-    {
-      "category": "Material",
-      "causeDescription": "Aluminium casting batch hardness within nominal spec (85 HB)",
-      "isRootCause": "N",
-      "metricValue": "85 HB"
-    },
-    {
-      "category": "Method",
-      "causeDescription": "Milling feed rate and tool path programmed per standard SOP-MIL-04",
-      "isRootCause": "N",
-      "metricValue": "F=650mm/min"
-    },
-    {
-      "category": "Man",
-      "causeDescription": "Line operator verified clamping torque correctly according to work instruction",
-      "isRootCause": "N",
-      "metricValue": "45 Nm"
-    }
-  ],
-  "fiveWhyChain": [
-    {
-      "stepNo": 1,
-      "question": "Why is there oil weeping at the gearbox joint face?",
-      "answer": "Mating flange cannot form a leak-tight seal due to excessive surface waviness and micro-chatter grooves"
-    },
-    {
-      "stepNo": 2,
-      "question": "Why is there surface waviness and micro-chatter?",
-      "answer": "The face mill cutter vibrates intermittently during the final finishing pass"
-    },
-    {
-      "stepNo": 3,
-      "question": "Why does the face mill cutter vibrate?",
-      "answer": "The milling machine spindle exhibits excessive radial play under cutting load"
-    },
-    {
-      "stepNo": 4,
-      "question": "Why does the spindle exhibit excessive radial play?",
-      "answer": "Pre-load Belleville springs in the front duplex angular bearing set suffered mechanical fatigue"
-    },
-    {
-      "stepNo": 5,
-      "question": "Why did the bearing springs suffer fatigue before scheduled overhaul?",
-      "answer": "Preventive maintenance interval was based on calendar months rather than actual spindle cutting hours under heavy machining cycles"
-    }
-  ],
-  "actions": [
-    {
-      "lineNo": 1,
-      "actionType": "Immediate",
-      "actionText": "Quarantine 14 affected gearbox housings; 100% optical leak check on customer buffer stock",
-      "responsible": "Rita Fischer",
-      "status": "Done"
-    },
-    {
-      "lineNo": 2,
-      "actionType": "Corrective",
-      "actionText": "Overhaul Milling Line 7 spindle: install new matched duplex bearing set and verify radial runout < 0.005mm",
-      "responsible": "Karl Wagner",
-      "status": "Done"
-    },
-    {
-      "lineNo": 3,
-      "actionType": "Preventive",
-      "actionText": "Update SAP PM maintenance strategy: install IoT spindle vibration monitoring and schedule bearing rebuilds at 2,000 runtime hours",
-      "responsible": "Minh Dinh",
-      "status": "Open"
-    }
-  ],
+  "causesIshikawa": [],
+  "fiveWhyChain": [],
+  "actions": [],
+  "teamAssignments": [],
+  "isIsNot": null,
+  "fmeaLink": null,
+  "costCopq": null,
+  "lessonsLearned": null,
   "customerReference": {
     "complaintReference": "CC-2026-0881",
     "customerPlantContact": "BMW Steyr Engine Plant - Quality Inbound",
