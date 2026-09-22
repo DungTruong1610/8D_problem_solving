@@ -18,8 +18,9 @@
     "materialId": "MAT-12800"
   },
   "defect": {
-    "defectCode": "DEF-2210",
-    "defectText": "Weld seam cracked under straightening load"
+    "defectCode": "DEF-0910",
+    "defectCodeGroup": "QM-MAT",
+    "defectText": "Internal porosity in robotic fiber laser welded lap joint"
   },
   "workCenter": {
     "workCenterId": "WC-WELD-11",
