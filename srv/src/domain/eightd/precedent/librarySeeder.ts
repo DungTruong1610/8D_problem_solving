@@ -286,13 +286,25 @@ export async function seedLibrary(payloads: readonly unknown[]): Promise<SeedRep
 }
 
 async function ensureReportRecord(db: any, notificationId: string, ctx: any, raw: any, index: number = 0) {
+    const isClosed = ctx.header?.status === 'Completed' || ctx.header?.status === 'Closed' || index % 5 === 0;
     const existing = await db.run(
         SELECT.one.from('cnma.proresolve.Reports').columns('ID').where({ notificationId }),
     );
-    if (existing) return;
+    if (existing) {
+        if (isClosed) {
+            try {
+                await db.run(
+                    `UPDATE cnma_proresolve_Disciplines SET workState = 'Completed', reviewStatus = 'Approved' WHERE report_ID = ?`,
+                    [existing.ID],
+                );
+            } catch {
+                // Table might be in different dialect/profile
+            }
+        }
+        return;
+    }
 
     const reportID = cds.utils.uuid();
-    const isClosed = ctx.header?.status === 'Completed' || ctx.header?.status === 'Closed' || index % 5 === 0;
     const isChangeReq = !isClosed && index % 5 === 1;
     const isMyCase = index % 3 === 1 || index === 0;
 
