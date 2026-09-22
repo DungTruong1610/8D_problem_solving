@@ -226,10 +226,11 @@ interface TeamRosterState {
 
 const TeamRosterContext = createContext<TeamRosterState | null>(null);
 
-export function TeamRosterProvider({ disciplineID, caseContext, savedRoster, readOnly = false, children }: {
+export function TeamRosterProvider({ disciplineID, caseContext, savedRoster, suggestedRoster, readOnly = false, children }: {
     disciplineID: string;
     caseContext: Record<string, unknown> | null;
     savedRoster: unknown;
+    suggestedRoster?: RosterRow[];
     readOnly?: boolean;
     children: ReactNode;
 }) {
@@ -242,6 +243,13 @@ export function TeamRosterProvider({ disciplineID, caseContext, savedRoster, rea
     const [savedLabel, setSavedLabel] = useState<string | null>(null);
 
     const caseMembers = useMemo(() => currentCaseMembers(caseContext), [caseContext]);
+
+    const activeSuggested = useMemo(() => {
+        if (Array.isArray(suggestedRoster) && suggestedRoster.length > 0) {
+            return suggestedRoster;
+        }
+        return buildFallbackRoster(caseContext);
+    }, [suggestedRoster, caseContext]);
 
     // Danh ba = kho lich su + nguoi cua chinh case nay. Nguoi lan dau tham gia 8D
     // chua co dong nao trong `HistoricalTeamMembers`, ma van phai chon duoc.
@@ -272,7 +280,7 @@ export function TeamRosterProvider({ disciplineID, caseContext, savedRoster, rea
     // lai ngay o lan mo tiep theo.
     useEffect(() => {
         const persisted = Array.isArray(savedRoster) ? savedRoster : null;
-        if (persisted) {
+        if (persisted && persisted.length > 0) {
             setRows(persisted.filter((item) => item && typeof item === 'object').map((item) => {
                 const row = item as Record<string, unknown>;
                 return {
@@ -283,14 +291,44 @@ export function TeamRosterProvider({ disciplineID, caseContext, savedRoster, rea
             }));
             return;
         }
-        if (rows === null) {
-            setRows(caseMembers.map((member, index) => ({
-                key: nextKey(),
-                partnerId: member.partnerId.replace(/^BP-/i, ''),
-                partnerRole: index === 0 ? PARTNER_ROLES[0] : PARTNER_ROLES[1],
-            })));
+
+        if (rows === null || (readOnly && rows.length === 0)) {
+            if (caseMembers.length > 0) {
+                setRows(caseMembers.map((member, index) => ({
+                    key: nextKey(),
+                    partnerId: member.partnerId.replace(/^BP-/i, ''),
+                    partnerRole: index === 0 ? PARTNER_ROLES[0] : PARTNER_ROLES[1],
+                })));
+                return;
+            }
+
+            // Neu case da Completed / Approved (readOnly) ma savedRoster chua tung duoc ghi rieng:
+            // Tu dong nhan toan bo thanh vien do AI de xuat da duoc giai ma qua danh ba.
+            // Tranh viec mot bao cao da hoan tat 8/8 lai hien "No team members assigned yet" va "Not assigned".
+            if (readOnly && activeSuggested.length > 0 && directory.length > 0) {
+                const autoRows: WorkingRow[] = [];
+                for (const s of activeSuggested) {
+                    const pid = resolveRosterPartnerId(s, caseContext, directory);
+                    if (pid && !autoRows.some((r) => r.partnerId === pid)) {
+                        autoRows.push({
+                            key: nextKey(),
+                            partnerId: pid,
+                            partnerRole: normalize8DRole(s.assigned8DRole)
+                                ?? (autoRows.length === 0 ? PARTNER_ROLES[0] : PARTNER_ROLES[1]),
+                        });
+                    }
+                }
+                if (autoRows.length > 0) {
+                    setRows(autoRows);
+                    return;
+                }
+            }
+
+            if (rows === null) {
+                setRows([]);
+            }
         }
-    }, [caseMembers, savedRoster]);
+    }, [caseMembers, savedRoster, readOnly, activeSuggested, directory, caseContext]);
 
     const workingRows = rows ?? [];
     const persistableRows = (targetRows: WorkingRow[] = workingRows): AssignedTeamRow[] => targetRows

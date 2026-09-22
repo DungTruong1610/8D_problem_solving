@@ -301,6 +301,34 @@ async function ensureReportRecord(db: any, notificationId: string, ctx: any, raw
                 // Table might be in different dialect/profile
             }
         }
+        const allTeam = [
+            ...(ctx.team?.leader ? [ctx.team.leader] : []),
+            ...(ctx.team?.members || []),
+        ];
+        if (allTeam.length > 0) {
+            try {
+                const d1 = await db.run(
+                    SELECT.one.from('cnma.proresolve.Disciplines').where({ report_ID: existing.ID, code: 'D1' }),
+                );
+                if (d1 && d1.resultJson) {
+                    const parsed = JSON.parse(d1.resultJson);
+                    if (!parsed.team?.assignedRoster || parsed.team.assignedRoster.length === 0) {
+                        parsed.team = parsed.team || {};
+                        parsed.team.assignedRoster = allTeam.map((m: any) => ({
+                            partnerId: String(m.partnerId ?? '').replace(/^BP-/i, ''),
+                            partnerRole: m.partnerRole || '8D Team Member',
+                        }));
+                        await db.run(
+                            UPDATE('cnma.proresolve.Disciplines')
+                                .set({ resultJson: JSON.stringify(parsed) })
+                                .where({ ID: d1.ID }),
+                        );
+                    }
+                }
+            } catch {
+                // Ignore dialect / table mismatch
+            }
+        }
         return;
     }
 

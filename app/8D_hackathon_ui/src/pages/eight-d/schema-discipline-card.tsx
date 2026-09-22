@@ -789,7 +789,13 @@ export function SchemaDisciplineCard({ discipline, caseContext, liveFormSchemaJs
 
         if (isD1) {
             return (
-                <TeamRosterProvider disciplineID={discipline.ID} caseContext={context} savedRoster={getPath(data, 'team.assignedRoster')} readOnly={isReadOnly}>
+                <TeamRosterProvider
+                    disciplineID={discipline.ID}
+                    caseContext={context}
+                    savedRoster={getPath(data, 'team.assignedRoster')}
+                    suggestedRoster={getPath(data, 'team.roster') as RosterRow[] | undefined}
+                    readOnly={isReadOnly}
+                >
                     {content}
                 </TeamRosterProvider>
             );
