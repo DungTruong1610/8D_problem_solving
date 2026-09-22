@@ -59,6 +59,10 @@ app/cnma_proresolve_ui/public/samples/
 # Backup của binding, giữ cục bộ để revert profile khi cds deploy ghi đè.
 .cdsrc-private.json*
 
+# Playwright MCP artifacts
+.playwright-mcp/
+
+
 ./venv
 
 # Kế hoạch nội bộ — giữ ở máy, không đưa lên GitHub.
