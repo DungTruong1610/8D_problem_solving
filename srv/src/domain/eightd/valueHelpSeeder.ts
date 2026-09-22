@@ -150,7 +150,6 @@ export const DEFECT_CODES = [
     { key: 'DEF-1340', text: 'Pocket depth inconsistent across units', codeGroup: 'QM-DIM', defectClass: 'Major' },
     { key: 'DEF-1455', text: 'Paint gloss out of specification', codeGroup: 'QM-SUR', defectClass: 'Minor' },
     { key: 'DEF-1610', text: 'Raised metal ridge at bore mouth', codeGroup: 'QM-SUR', defectClass: 'Major' },
-    { key: 'DEF-2210', text: 'Weld seam cracked under straightening load', codeGroup: 'QM-MAT', defectClass: 'Critical' },
 ];
 
 /** Đơn vị đo — cố định theo chuẩn, không đổi theo nhà máy nên để static. */
@@ -182,10 +181,6 @@ export const BATCHES = [
     { key: 'B-50231', text: 'Bracket Housing X240 - Lot 2026-02-A (Quarantined: Internal Porosity Void)', materialId: 'MAT-10247', materialDesc: 'Bracket Housing X240', plant: '1000', status: 'Quarantined', batchDate: '2026-02-10' },
     { key: 'B-51004', text: 'Bracket Housing X240 - Lot 2026-02-B (Unrestricted: Conforming Final Lot)', materialId: 'MAT-10247', materialDesc: 'Bracket Housing X240', plant: '1000', status: 'Unrestricted', batchDate: '2026-02-28' },
     { key: 'B-51288', text: 'Bracket Housing X240 - Lot 2026-03-A (Unrestricted: Released for Assembly)', materialId: 'MAT-10247', materialDesc: 'Bracket Housing X240', plant: '1000', status: 'Unrestricted', batchDate: '2026-03-01' },
-    { key: 'B-55901', text: 'Bracket Housing X240 - Lot 2026-03-B (Quarantined: Burr Height Above Limit)', materialId: 'MAT-10247', materialDesc: 'Bracket Housing X240', plant: '1000', status: 'Quarantined', batchDate: '2026-08-12' },
-    { key: 'B-54390', text: 'Bracket Housing X240 - Lot 2026-03-C (Quarantined: Pocket Depth Inconsistent)', materialId: 'MAT-10247', materialDesc: 'Bracket Housing X240', plant: '1000', status: 'Quarantined', batchDate: '2026-07-19' },
-    // MAT-12800 (Chassis Frame Weldment F70)
-    { key: 'B-56010', text: 'Chassis Frame Weldment F70 - Lot 2026-03-W (Quarantined: Weld Seam Cracked)', materialId: 'MAT-12800', materialDesc: 'Chassis Frame Weldment F70', plant: '1000', status: 'Quarantined', batchDate: '2026-08-12' },
     // MAT-88301 (Shaft Pinion SP-90)
     { key: 'B-55901', text: 'Shaft Pinion SP-90 - Lot 2026-01-SP (Quarantined: Pinion Taper Angle Out of Spec)', materialId: 'MAT-88301', materialDesc: 'Shaft Pinion SP-90', plant: '1000', status: 'Quarantined', batchDate: '2026-01-20' },
     { key: 'B-55902', text: 'Shaft Pinion SP-90 - Lot 2026-02-SP (Unrestricted: Hardness & Dimensions Passed)', materialId: 'MAT-88301', materialDesc: 'Shaft Pinion SP-90', plant: '1000', status: 'Unrestricted', batchDate: '2026-02-05' },

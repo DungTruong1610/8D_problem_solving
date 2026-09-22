@@ -83,59 +83,34 @@ function odataArgs(params: Record<string, string>): string {
  * danh sach mot khac. Bung o day mot lan de phan con lai cua app lam viec voi
  * object.
  */
-const SUPPLEMENTAL_ENTRIES: Partial<Record<ValueHelpId, ValueHelpEntry[]>> = {
-    [VALUE_HELP_IDS.material]: [
-        { key: 'MAT-12800', text: 'Chassis Frame Weldment F70', materialDesc: 'Chassis Frame Weldment F70', materialFamily: 'MG-WELDMENT', materialGroup: 'MG-WELDMENT' },
-    ],
-    [VALUE_HELP_IDS.workCenter]: [
-        { key: 'WC-WELD-11', text: 'Robot Welding Cell 11', workCenterDesc: 'Robot Welding Cell 11' },
-    ],
-    [VALUE_HELP_IDS.defectCode]: [
-        { key: 'DEF-2210', text: 'Weld seam cracked under straightening load', codeGroup: 'QM-MAT', defectClass: 'Critical' },
-    ],
-    [VALUE_HELP_IDS.batch]: [
-        { key: 'B-55901', text: 'Bracket Housing X240 - Lot 2026-03-B', materialId: 'MAT-10247', plant: '1000' },
-        { key: 'B-54390', text: 'Bracket Housing X240 - Lot 2026-03-C', materialId: 'MAT-10247', plant: '1000' },
-        { key: 'B-56010', text: 'Chassis Frame Weldment F70 - Lot 2026-03-W', materialId: 'MAT-12800', plant: '1000' },
-    ],
-};
-
 export async function getValueHelp(
     valueHelpID: ValueHelpId,
     options: { filter?: string; dependsOnValue?: string } = {},
 ): Promise<ValueHelpResult> {
-    const supp = SUPPLEMENTAL_ENTRIES[valueHelpID] ?? [];
-    try {
-        const response = await axiosInstance.get(
-            `api/cnma/VALUEHELP_SRV/getValueHelp(${odataArgs({
-                objectType: DEFECT_OBJECT_TYPE,
-                valueHelpID,
-                filter: options.filter ?? '',
-                dependsOnValue: options.dependsOnValue ?? '',
-            })})`,
-        );
+    // `getValueHelp` la CDS `function`, nen la GET voi cu phap goi ham cua OData
+    // v4: ten(tham='gia tri'). Khong phai POST — day la phep doc, va mot phep doc
+    // duoc khai bao la phep ghi thi cache lan CSRF deu hieu sai.
+    const response = await axiosInstance.get(
+        `api/cnma/VALUEHELP_SRV/getValueHelp(${odataArgs({
+            objectType: DEFECT_OBJECT_TYPE,
+            valueHelpID,
+            filter: options.filter ?? '',
+            dependsOnValue: options.dependsOnValue ?? '',
+        })})`,
+    );
 
-        const raw = response.data?.value ?? response.data;
-        if (!raw) {
-            return {
-                entries: dedupeByKey(supp),
-                returnMapping: [],
-                config: EMPTY.config,
-            };
-        }
+    const raw = response.data?.value ?? response.data;
+    if (!raw) return EMPTY;
+    try {
         const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
-        const incoming = Array.isArray(parsed?.entries) ? parsed.entries : [];
         return {
-            entries: dedupeByKey([...incoming, ...supp]),
+            entries: dedupeByKey(Array.isArray(parsed?.entries) ? parsed.entries : []),
             returnMapping: Array.isArray(parsed?.returnMapping) ? parsed.returnMapping : [],
             config: parsed?.config ?? EMPTY.config,
         };
     } catch {
-        return {
-            entries: dedupeByKey(supp),
-            returnMapping: [],
-            config: EMPTY.config,
-        };
+        // Danh sach hong khong duoc lam sap form: o nhap van go tay duoc.
+        return EMPTY;
     }
 }
 
