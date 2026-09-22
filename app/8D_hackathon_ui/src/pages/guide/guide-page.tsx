@@ -357,14 +357,20 @@ export function GuidePage() {
             if (!parsed.symptomShortText) missing.push("symptomShortText (Defect Description)");
             else passed.push("Symptom Description: " + parsed.symptomShortText.slice(0, 35) + "...");
 
-            if (!parsed.material?.materialId) missing.push("material.materialId (Material Code)");
-            else passed.push("Material: " + parsed.material.materialId);
+            const matId = parsed.materialId || parsed.material?.materialId;
+            if (!matId) missing.push("materialId (Material Code)");
+            else passed.push("Material: " + matId);
 
-            if (!parsed.workCenter?.workCenterId) missing.push("workCenter.workCenterId (Work Center / Line)");
-            else passed.push("Work Center: " + parsed.workCenter.workCenterId);
+            const wcId = parsed.workCenterId || parsed.workCenter?.workCenterId;
+            if (!wcId) missing.push("workCenterId (Work Center / Line)");
+            else passed.push("Work Center: " + wcId);
 
             if (Array.isArray(parsed.inspections) && parsed.inspections.length > 0) {
                 passed.push(`Telemetry Inspections: ${parsed.inspections.length} parameters`);
+            }
+
+            if (Array.isArray(parsed.teamAssignments) && parsed.teamAssignments.length > 0) {
+                passed.push(`Team Assignments: ${parsed.teamAssignments.length} members pre-assigned`);
             }
 
             // Identify potential test quadrant
@@ -1085,7 +1091,7 @@ export function GuidePage() {
                                     <td className="p-3 font-mono font-bold text-foreground">notificationId</td>
                                     <td className="p-3"><span className="text-red-500 font-bold">Mandatory</span></td>
                                     <td className="p-3 font-mono">string</td>
-                                    <td className="p-3">Primary notification identifier used across audit logs.</td>
+                                    <td className="p-3">Primary notification identifier used across audit logs &amp; precedent search.</td>
                                     <td className="p-3 font-mono text-foreground">"8D-10049001"</td>
                                 </tr>
                                 <tr className="hover:bg-muted/10">
@@ -1093,21 +1099,28 @@ export function GuidePage() {
                                     <td className="p-3"><span className="text-red-500 font-bold">Mandatory</span></td>
                                     <td className="p-3 font-mono">string</td>
                                     <td className="p-3">Defect summary reported by shopfloor or customer. Converted to vector embeddings.</td>
-                                    <td className="p-3 font-mono text-foreground">"Rough edge felt on bracket flange after milling"</td>
+                                    <td className="p-3 font-mono text-foreground">"Operator stopped the line - rough edge felt on bracket flange after milling"</td>
                                 </tr>
                                 <tr className="hover:bg-muted/10">
-                                    <td className="p-3 font-mono font-bold text-foreground">material.materialId</td>
+                                    <td className="p-3 font-mono font-bold text-foreground">materialId</td>
                                     <td className="p-3"><span className="text-red-500 font-bold">Mandatory</span></td>
                                     <td className="p-3 font-mono">string</td>
-                                    <td className="p-3">SAP Material Master identifier for the defective component.</td>
+                                    <td className="p-3">SAP Material Master identifier for the defective component (supports flat <code>materialId</code> or <code>material.materialId</code>).</td>
                                     <td className="p-3 font-mono text-foreground">"MAT-10247"</td>
                                 </tr>
                                 <tr className="hover:bg-muted/10">
-                                    <td className="p-3 font-mono font-bold text-foreground">workCenter.workCenterId</td>
+                                    <td className="p-3 font-mono font-bold text-foreground">workCenterId</td>
                                     <td className="p-3"><span className="text-red-500 font-bold">Mandatory</span></td>
                                     <td className="p-3 font-mono">string</td>
-                                    <td className="p-3">Work Center / Machine Line identifier where defect was initiated.</td>
+                                    <td className="p-3">Work Center / Machine Line identifier where defect occurred (supports flat <code>workCenterId</code> or <code>workCenter.workCenterId</code>).</td>
                                     <td className="p-3 font-mono text-foreground">"WC-MILL-07"</td>
+                                </tr>
+                                <tr className="hover:bg-muted/10">
+                                    <td className="p-3 font-mono font-bold text-foreground">defect</td>
+                                    <td className="p-3"><span className="text-blue-500 font-bold">Recommended</span></td>
+                                    <td className="p-3 font-mono">object</td>
+                                    <td className="p-3">SAP Defect Catalogue classification (<code>defectCode</code>, <code>defectText</code>).</td>
+                                    <td className="p-3 font-mono text-foreground">{`{"defectCode": "DEF-0489", "defectText": "Flange edge burr above limit"}`}</td>
                                 </tr>
                                 <tr className="hover:bg-muted/10">
                                     <td className="p-3 font-mono font-bold text-foreground">origin</td>
@@ -1117,18 +1130,95 @@ export function GuidePage() {
                                     <td className="p-3 font-mono text-foreground">"Q3 - Internal Defect"</td>
                                 </tr>
                                 <tr className="hover:bg-muted/10">
+                                    <td className="p-3 font-mono font-bold text-foreground">status</td>
+                                    <td className="p-3">Optional</td>
+                                    <td className="p-3 font-mono">string</td>
+                                    <td className="p-3">Lifecycle processing status in SAP QM (e.g. <code>In Process</code>, <code>Completed</code>).</td>
+                                    <td className="p-3 font-mono text-foreground">"In Process"</td>
+                                </tr>
+                                <tr className="hover:bg-muted/10">
+                                    <td className="p-3 font-mono font-bold text-foreground">foundDate</td>
+                                    <td className="p-3">Optional</td>
+                                    <td className="p-3 font-mono">string</td>
+                                    <td className="p-3">Date defect was detected on production line or reported (YYYY-MM-DD).</td>
+                                    <td className="p-3 font-mono text-foreground">"2026-08-12"</td>
+                                </tr>
+                                <tr className="hover:bg-muted/10">
+                                    <td className="p-3 font-mono font-bold text-foreground">quantityExtent</td>
+                                    <td className="p-3">Optional</td>
+                                    <td className="p-3 font-mono">string</td>
+                                    <td className="p-3">Quantity or production batch extent affected by non-conformance.</td>
+                                    <td className="p-3 font-mono text-foreground">"61 units on hold"</td>
+                                </tr>
+                                <tr className="hover:bg-muted/10">
                                     <td className="p-3 font-mono font-bold text-foreground">inspections</td>
                                     <td className="p-3"><span className="text-blue-500 font-bold">Recommended</span></td>
                                     <td className="p-3 font-mono">array of objects</td>
-                                    <td className="p-3">Inspection telemetry (`characteristic`, `measuredValue`, `specValue`). Crucial for quantitative 5-Why.</td>
-                                    <td className="p-3 font-mono text-foreground">[{`"measuredValue": "0.26mm", "specValue": "max 0.10mm"`}]</td>
+                                    <td className="p-3">Inspection telemetry (<code>characteristic</code>, <code>measuredValue</code>, <code>specValue</code>). Crucial for quantitative 5-Why analysis.</td>
+                                    <td className="p-3 font-mono text-foreground">[{`"characteristic": "Burr height", "measuredValue": "0.26mm", "specValue": "max 0.10mm"`}]</td>
+                                </tr>
+                                <tr className="hover:bg-muted/10">
+                                    <td className="p-3 font-mono font-bold text-foreground">teamAssignments</td>
+                                    <td className="p-3"><span className="text-blue-500 font-bold">Recommended</span></td>
+                                    <td className="p-3 font-mono">array of objects</td>
+                                    <td className="p-3">Pre-assigned cross-functional 8D team members for D1 (<code>partnerId</code>, <code>partnerName</code>, <code>partnerRole</code>, <code>functionTitle</code>).</td>
+                                    <td className="p-3 font-mono text-foreground">[{`"partnerId": "100001", "partnerName": "Heli Weber", "partnerRole": "8D Team Leader"`}]</td>
                                 </tr>
                                 <tr className="hover:bg-muted/10">
                                     <td className="p-3 font-mono font-bold text-foreground">causesIshikawa</td>
                                     <td className="p-3">Optional</td>
+                                    <td className="p-3 font-mono">array of objects</td>
+                                    <td className="p-3">Initial 6M investigation hypotheses (Man, Machine, Method, Material, Measurement, Environment).</td>
+                                    <td className="p-3 font-mono text-foreground">[{`"category": "Machine", "description": "Deburring tool wear", "isRootCause": "Y"`}]</td>
+                                </tr>
+                                <tr className="hover:bg-muted/10">
+                                    <td className="p-3 font-mono font-bold text-foreground">fiveWhyChain</td>
+                                    <td className="p-3">Optional</td>
                                     <td className="p-3 font-mono">array</td>
-                                    <td className="p-3">Initial human 6M hypothesis (Man, Machine, Method, Material).</td>
-                                    <td className="p-3 font-mono text-foreground">[{`"category": "Machine", "cause": "..."`}]</td>
+                                    <td className="p-3">Root cause iterative reasoning chain linking symptom to root cause for D4.</td>
+                                    <td className="p-3 font-mono text-foreground">[{`"stepNo": 1, "question": "Why burr high?", "answer": "Tool worn"`}]</td>
+                                </tr>
+                                <tr className="hover:bg-muted/10">
+                                    <td className="p-3 font-mono font-bold text-foreground">actions</td>
+                                    <td className="p-3">Optional</td>
+                                    <td className="p-3 font-mono">array of objects</td>
+                                    <td className="p-3">Pre-existing containment (D3), corrective (D5), or preventive (D7) action rows (<code>actionType</code>, <code>actionText</code>, <code>status</code>).</td>
+                                    <td className="p-3 font-mono text-foreground">[{`"actionType": "Containment", "actionText": "Hold 61 units", "status": "Done"`}]</td>
+                                </tr>
+                                <tr className="hover:bg-muted/10">
+                                    <td className="p-3 font-mono font-bold text-foreground">batch</td>
+                                    <td className="p-3">Optional</td>
+                                    <td className="p-3 font-mono">object</td>
+                                    <td className="p-3">Manufacturing production batch &amp; lot tracking (<code>batchId</code>, <code>materialId</code>).</td>
+                                    <td className="p-3 font-mono text-foreground">{`{"batchId": "B-55901", "materialId": "MAT-10247"}`}</td>
+                                </tr>
+                                <tr className="hover:bg-muted/10">
+                                    <td className="p-3 font-mono font-bold text-foreground">customerReference</td>
+                                    <td className="p-3">Optional (Q1)</td>
+                                    <td className="p-3 font-mono">object</td>
+                                    <td className="p-3">Customer complaint reference, customer plant contact, and SLA deadline for customer-facing cases.</td>
+                                    <td className="p-3 font-mono text-foreground">{`{"complaintReference": "N/A - internal defect", "slaResponseDue": "N/A"}`}</td>
+                                </tr>
+                                <tr className="hover:bg-muted/10">
+                                    <td className="p-3 font-mono font-bold text-foreground">fmeaLink</td>
+                                    <td className="p-3">Optional</td>
+                                    <td className="p-3 font-mono">object</td>
+                                    <td className="p-3">Link to Process FMEA failure mode record for D7 prevention writeback.</td>
+                                    <td className="p-3 font-mono text-foreground">{`{"fmeaId": "FMEA-MILL07-03", "description": "Deburring tool wear"}`}</td>
+                                </tr>
+                                <tr className="hover:bg-muted/10">
+                                    <td className="p-3 font-mono font-bold text-foreground">costCopq</td>
+                                    <td className="p-3">Optional</td>
+                                    <td className="p-3 font-mono">object</td>
+                                    <td className="p-3">Cost of Poor Quality (COPQ) estimated in EUR.</td>
+                                    <td className="p-3 font-mono text-foreground">{`{"costOfPoorQualityEur": 12750}`}</td>
+                                </tr>
+                                <tr className="hover:bg-muted/10">
+                                    <td className="p-3 font-mono font-bold text-foreground">lessonsLearned</td>
+                                    <td className="p-3">Optional</td>
+                                    <td className="p-3 font-mono">object</td>
+                                    <td className="p-3">Organizational learning recorded for D8 closure (<code>whatWorked</code>, <code>whatDidnt</code>).</td>
+                                    <td className="p-3 font-mono text-foreground">{`{"whatWorked": "Tool PM log isolated root cause", "whatDidnt": "Burr check too late"}`}</td>
                                 </tr>
                             </tbody>
                         </table>
