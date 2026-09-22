@@ -40,7 +40,11 @@
     {
       "characteristic": "Burr height at flange edge",
       "measuredValue": "0.26mm",
-      "specValue": "max 0.10mm"
+      "specUpperLimit": 0.10,
+      "specUom": "mm",
+      "valuation": "Rejected",
+      "specValue": "max 0.10mm",
+      "equipment": "WC-MILL-07-F1"
     }
   ],
   "causesIshikawa": [],

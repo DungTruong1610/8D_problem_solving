@@ -812,21 +812,58 @@ export function CreateDefectDialog({ open, onOpenChange, onCreated, defect }: Cr
 
             // Inspections
             if (rawInspections.length > 0) {
-                const mappedInspections: InspectionFormRow[] = rawInspections.map((ins: any) => ({
-                    characteristic: String(ins.characteristic ?? '').trim(),
-                    measuredValue: String(ins.measured_value ?? ins.measuredValue ?? '').trim(),
-                    // Payload cũ mang `specValue` dạng câu ('max 0.10mm'). Nó KHÔNG
-                    // được nhét vào ô giới hạn: hai ô đó là số, và đổ một câu vào
-                    // đấy chỉ tạo ra một dòng không lưu được. Để trống, kèm cảnh báo
-                    // ở lưới, để người nhập điền lại — đó là toàn bộ điểm của 1.4.
-                    specLowerLimit: String(ins.spec_lower_limit ?? ins.specLowerLimit ?? '').trim(),
-                    specUpperLimit: String(ins.spec_upper_limit ?? ins.specUpperLimit ?? '').trim(),
-                    specUom: String(ins.spec_uom ?? ins.specUom ?? ins.unit ?? '').trim(),
-                    valuation: ['Accepted', 'Rejected'].includes(String(ins.valuation ?? '').trim())
+                const mappedInspections: InspectionFormRow[] = rawInspections.map((ins: any) => {
+                    let specLower = String(ins.spec_lower_limit ?? ins.specLowerLimit ?? '').trim();
+                    let specUpper = String(ins.spec_upper_limit ?? ins.specUpperLimit ?? '').trim();
+                    let uom = String(ins.spec_uom ?? ins.specUom ?? ins.unit ?? '').trim();
+                    let valuation = ['Accepted', 'Rejected'].includes(String(ins.valuation ?? '').trim())
                         ? String(ins.valuation).trim()
-                        : '',
-                    equipment: String(ins.equipment ?? ins.fixture ?? ins.equipment_id ?? '').trim(),
-                })).filter((i: InspectionFormRow) =>
+                        : '';
+                    const measuredRaw = String(ins.measured_value ?? ins.measuredValue ?? '').trim();
+                    const specText = String(ins.spec_value ?? ins.specValue ?? '').trim();
+
+                    // Intelligent fallback parsing if limits/uom/valuation not explicitly structured
+                    if (!specUpper && !specLower && specText) {
+                        const rangeMatch = specText.match(/([0-9]+(?:[.,][0-9]+)?)\s*-\s*([0-9]+(?:[.,][0-9]+)?)/);
+                        const maxMatch = specText.match(/(?:max|<=|<|soll\s*max)\s*([0-9]+(?:[.,][0-9]+)?)/i);
+                        const minMatch = specText.match(/(?:min|>=|>|soll\s*min)\s*([0-9]+(?:[.,][0-9]+)?)/i);
+
+                        if (rangeMatch) {
+                            specLower = rangeMatch[1].replace(',', '.');
+                            specUpper = rangeMatch[2].replace(',', '.');
+                        } else if (maxMatch) {
+                            specUpper = maxMatch[1].replace(',', '.');
+                        } else if (minMatch) {
+                            specLower = minMatch[1].replace(',', '.');
+                        }
+                    }
+
+                    if (!uom) {
+                        const uomMatch = (specText + ' ' + measuredRaw).match(/\b(mm|µm|um|deg|bar|g|kg|m|cm|hrc|sccm)\b/i);
+                        if (uomMatch) uom = uomMatch[1].toLowerCase();
+                    }
+
+                    if (!valuation) {
+                        const mNum = parseFloat(measuredRaw.replace(',', '.').replace(/[^\d.]/g, ''));
+                        const uNum = parseFloat(specUpper);
+                        const lNum = parseFloat(specLower);
+                        if (!isNaN(mNum)) {
+                            if (!isNaN(uNum) && mNum > uNum) valuation = 'Rejected';
+                            else if (!isNaN(lNum) && mNum < lNum) valuation = 'Rejected';
+                            else if (!isNaN(uNum) || !isNaN(lNum)) valuation = 'Accepted';
+                        }
+                    }
+
+                    return {
+                        characteristic: String(ins.characteristic ?? '').trim(),
+                        measuredValue: measuredRaw,
+                        specLowerLimit: specLower,
+                        specUpperLimit: specUpper,
+                        specUom: uom,
+                        valuation,
+                        equipment: String(ins.equipment ?? ins.fixture ?? ins.equipment_id ?? '').trim(),
+                    };
+                }).filter((i: InspectionFormRow) =>
                     i.characteristic || i.measuredValue || i.specUpperLimit || i.specLowerLimit || i.equipment);
 
                 if (mappedInspections.length > 0) {
