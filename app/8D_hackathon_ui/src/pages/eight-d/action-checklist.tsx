@@ -84,7 +84,7 @@ export function getMergedCaseActions(
             // D6 chỉ nhận action từ D5 khi D5 ở trạng thái InProgress hoặc Approved
             if (d.code !== 'D5') continue;
 
-            const isStepActive = d.workState === 'InProgress' || d.reviewStatus === 'Approved';
+            const isStepActive = d.workState === 'InProgress' || d.workState === 'Completed' || d.reviewStatus === 'Approved';
             if (!isStepActive) continue;
 
             const parsed = parseJsonSafe(d.resultJson);

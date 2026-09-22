@@ -268,13 +268,15 @@ export function DisciplineReviewBox({
                         )}
                     </div>
 
-                    {discipline.reviewedBy && discipline.reviewedAt && currentStatus === 'Completed' ? (
+                    {currentStatus === 'Completed' ? (
                         <div className="mt-1 flex flex-col min-w-0">
                             <span className="text-sm font-medium text-foreground">
-                                Completed by <strong className="font-semibold text-foreground">{discipline.reviewedBy}</strong>
+                                Completed{discipline.reviewedBy ? <> by <strong className="font-semibold text-foreground">{discipline.reviewedBy}</strong></> : ' — verified and approved'}
                             </span>
                             <span className="text-sm text-muted-foreground tabular-nums">
-                                {new Date(discipline.reviewedAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                {discipline.reviewedAt
+                                    ? new Date(discipline.reviewedAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                                    : 'All criteria verified'}
                             </span>
                         </div>
                     ) : (

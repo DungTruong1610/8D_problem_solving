@@ -245,7 +245,7 @@ async function runTC03(db: any): Promise<TestCaseResult> {
     if (rep?.ID) {
         try {
             await db.run(
-                `UPDATE cnma_proresolve_Disciplines SET workState = 'Completed', reviewStatus = 'Approved' WHERE report_ID = ?`,
+                `UPDATE cnma_proresolve_Disciplines SET workState = 'Completed', reviewStatus = 'Approved', reviewedBy = 'AI Lead / Quality Manager', reviewedAt = CURRENT_TIMESTAMP WHERE report_ID = ?`,
                 [rep.ID],
             );
         } catch {
