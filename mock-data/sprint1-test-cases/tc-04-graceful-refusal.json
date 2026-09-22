@@ -31,6 +31,7 @@
   },
   "defect": {
     "defectCode": "DEF-2210",
+    "defectCodeGroup": "QM-MAT",
     "defectText": "Weld seam cracked under straightening load"
   },
   "workCenter": {

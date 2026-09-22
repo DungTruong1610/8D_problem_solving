@@ -783,9 +783,46 @@ export function CreateDefectDialog({ open, onOpenChange, onCreated, defect }: Cr
             const nextDefectText = defect.defect_text || defect.defectText || parsed.defectText;
             if (nextDefectText) setDefectText(String(nextDefectText).trim());
 
+            const codeGroupMap: Record<string, string> = {
+                'DEF-1340': 'QM-DIM',
+                'DEF-0220': 'QM-DIM',
+                'DEF-0377': 'QM-DIM',
+                'DEF-1015': 'QM-DIM',
+                'DEF-1233': 'QM-DIM',
+                'DEF-1250': 'QM-DIM',
+                'DEF-2210': 'QM-MAT',
+                'DEF-0318': 'QM-MAT',
+                'DEF-0512': 'QM-MAT',
+                'DEF-0822': 'QM-MAT',
+                'DEF-0910': 'QM-MAT',
+                'DEF-1120': 'QM-MAT',
+                'DEF-1140': 'QM-MAT',
+                'DEF-0580': 'QM-ASM',
+                'DEF-0630': 'QM-ASM',
+                'DEF-0723': 'QM-ASM',
+                'DEF-0810': 'QM-ASM',
+                'DEF-1020': 'QM-ASM',
+                'DEF-0104': 'QM-SUR',
+                'DEF-0440': 'QM-SUR',
+                'DEF-0489': 'QM-SUR',
+                'DEF-0601': 'QM-SUR',
+                'DEF-0714': 'QM-SUR',
+                'DEF-0902': 'QM-SUR',
+                'DEF-1455': 'QM-SUR',
+                'DEF-1610': 'QM-SUR',
+            };
+
             const nextCodeGroup = defect.code_group || defect.codeGroup || defect.defect_code_group
                 || defect.defectCodeGroup || parsed.defectCodeGroup;
-            if (nextCodeGroup) setDefectCodeGroup(String(nextCodeGroup).trim());
+            const derivedGroup = nextDefectCode ? codeGroupMap[String(nextDefectCode).trim()] : undefined;
+
+            if (nextCodeGroup && nextCodeGroup !== 'QM-SUR') {
+                setDefectCodeGroup(String(nextCodeGroup).trim());
+            } else if (derivedGroup) {
+                setDefectCodeGroup(derivedGroup);
+            } else if (nextCodeGroup) {
+                setDefectCodeGroup(String(nextCodeGroup).trim());
+            }
 
             const nextDefectClass = defect.defect_class || defect.defectClass || defect.severity || parsed.defectClass;
             if (nextDefectClass) setDefectClass(String(nextDefectClass).trim());
@@ -823,10 +860,11 @@ export function CreateDefectDialog({ open, onOpenChange, onCreated, defect }: Cr
                     const specText = String(ins.spec_value ?? ins.specValue ?? '').trim();
 
                     // Intelligent fallback parsing if limits/uom/valuation not explicitly structured
-                    if (!specUpper && !specLower && specText) {
+                    if (!specUpper && !specLower && specText && specText !== '-') {
                         const rangeMatch = specText.match(/([0-9]+(?:[.,][0-9]+)?)\s*-\s*([0-9]+(?:[.,][0-9]+)?)/);
                         const maxMatch = specText.match(/(?:max|<=|<|soll\s*max)\s*([0-9]+(?:[.,][0-9]+)?)/i);
                         const minMatch = specText.match(/(?:min|>=|>|soll\s*min)\s*([0-9]+(?:[.,][0-9]+)?)/i);
+                        const plusMinus = specText.match(/([0-9]+(?:[.,][0-9]+)?)\s*(?:mm)?\s*\+\/-0/i);
 
                         if (rangeMatch) {
                             specLower = rangeMatch[1].replace(',', '.');
@@ -835,6 +873,16 @@ export function CreateDefectDialog({ open, onOpenChange, onCreated, defect }: Cr
                             specUpper = maxMatch[1].replace(',', '.');
                         } else if (minMatch) {
                             specLower = minMatch[1].replace(',', '.');
+                        } else if (plusMinus) {
+                            specUpper = plusMinus[1].replace(',', '.');
+                        }
+                    }
+
+                    // Also extract from measuredRaw if German sentence contains Sollwert (e.g. TC-02)
+                    if (!specUpper && !specLower) {
+                        const sollMatch = measuredRaw.match(/(?:sollwert|soll)\s*(?:max)?\s*([0-9]+(?:[.,][0-9]+)?)/i);
+                        if (sollMatch) {
+                            specUpper = sollMatch[1].replace(',', '.');
                         }
                     }
 

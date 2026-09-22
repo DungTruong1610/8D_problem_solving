@@ -30,6 +30,7 @@
   },
   "defect": {
     "defectCode": "DEF-1340",
+    "defectCodeGroup": "QM-DIM",
     "defectText": "Pocket depth inconsistent across units"
   },
   "workCenter": {
