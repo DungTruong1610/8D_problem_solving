@@ -326,7 +326,7 @@ export function VerifyPage() {
                     <div>
                         <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
                             <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                            Section 1: The 4 Strategic Test Cases (Tiêu chí 2 — 12 Điểm)
+                            Section 1: The 4 Strategic Test Cases (Criterion 2 — 12 Points)
                         </h2>
                         <p className="text-xs text-muted-foreground mt-0.5">
                             Designed under the 4-Quadrant Strategic Matrix covering Happy Path, Messy SAP Reality, Confirmation Bias, and Safe Refusal.
@@ -369,7 +369,7 @@ export function VerifyPage() {
                                     <th className="py-3 px-4">Actual AI Outcome</th>
                                     <th className="py-3 px-4 w-24">Duration</th>
                                     <th className="py-3 px-4 w-24 text-center">Status</th>
-                                    <th className="py-3 px-4 w-36 text-center">Báo Cáo 8D</th>
+                                    <th className="py-3 px-4 w-36 text-center">8D Report</th>
                                     <th className="py-3 px-4 w-12"></th>
                                 </tr>
                             </thead>
@@ -409,10 +409,10 @@ export function VerifyPage() {
                                                                 navigate(`/8d/${targetReportId}`);
                                                             }}
                                                             className="text-xs px-2.5 py-1.5 rounded-lg border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary font-semibold inline-flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
-                                                            title={`Xem Báo Cáo 8D ${targetNotificationId}`}
+                                                            title={`View 8D Report ${targetNotificationId}`}
                                                         >
                                                             <FileText className="w-3.5 h-3.5" />
-                                                            <span>Xem Báo Cáo</span>
+                                                            <span>View Report</span>
                                                             <ExternalLink className="w-3 h-3" />
                                                         </button>
                                                     )}
@@ -450,10 +450,10 @@ export function VerifyPage() {
                                                                         </div>
                                                                         <div>
                                                                             <div className="font-bold text-xs">
-                                                                                Báo cáo 8D Chi tiết: <span className="font-mono text-primary">{targetNotificationId}</span>
+                                                                                Detailed 8D Report: <span className="font-mono text-primary">{targetNotificationId}</span>
                                                                             </div>
                                                                             <div className="text-[11px] text-muted-foreground">
-                                                                                Bao gồm đề xuất AI (AI Suggested) và phê duyệt của con người (Human-in-the-Loop) qua 8 bước D1 – D8.
+                                                                                Includes AI suggestions and Human-in-the-Loop review approvals across all 8 disciplines (D1 – D8).
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -463,7 +463,7 @@ export function VerifyPage() {
                                                                         className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs inline-flex items-center gap-2 shadow-sm transition-all cursor-pointer"
                                                                     >
                                                                         <FileText className="w-3.5 h-3.5" />
-                                                                        <span>Mở Chi Tiết Báo Cáo 8D</span>
+                                                                        <span>Open 8D Report Details</span>
                                                                         <ExternalLink className="w-3 h-3" />
                                                                     </button>
                                                                 </div>
@@ -486,14 +486,14 @@ export function VerifyPage() {
                 <div className="border-b border-border pb-4">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 text-xs font-semibold mb-2">
                         <ShieldCheck className="w-3.5 h-3.5" />
-                        Tiêu chí 3: Dữ liệu đầu vào mới của Giám khảo (8 Điểm Tuyệt đối)
+                        Criterion 3: Judge's Live Unseen Inputs (8 Full Points)
                     </div>
                     <h2 className="text-xl font-bold text-foreground">
-                        🛡️ Two-Tier Defense Architecture (Tự động thích ứng hoặc Từ chối có trách nhiệm)
+                        🛡️ Two-Tier Defense Architecture (Adaptive Execution or Responsible Refusal)
                     </h2>
                     <p className="text-sm text-muted-foreground mt-1 max-w-3xl">
-                        Theo barem BTC: "Xử lý hợp lý hoặc từ chối hợp lý cả hai = 8 điểm. Đưa ra kết quả sai nhưng khẳng định đúng = 0 điểm."
-                        Hệ thống tự động phân loại: nếu hợp lệ thì trích xuất D1-D8, nếu dữ liệu rác/thiếu thông số thì từ chối hợp lý và gắn cờ chuyển tiếp.
+                        Per Hackathon Evaluation Rubric: "Appropriately handling or responsibly refusing both inputs = 8 points. False claims or hallucinated confidence = 0 points."
+                        The system classifies automatically: if valid, extracts D1–D8; if out-of-domain or missing critical metrics, refuses responsibly and triggers safe escalation.
                     </p>
                 </div>
 
@@ -502,7 +502,7 @@ export function VerifyPage() {
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <label className="text-xs font-bold uppercase text-foreground">
-                                Input JSON Sự cố mới từ Giám khảo:
+                                Judge's Live Defect Input JSON:
                             </label>
                             <div className="flex gap-2">
                                 <button
@@ -524,7 +524,7 @@ export function VerifyPage() {
                         <textarea
                             value={judgeInputText}
                             onChange={(e) => setJudgeInputText(e.target.value)}
-                            placeholder="Dán payload JSON sự vụ mới vào đây để kiểm tra..."
+                            placeholder="Paste new live JSON defect payload here to test..."
                             className="w-full h-48 p-3 rounded-xl border border-input bg-muted/20 font-mono text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                         />
 
@@ -557,7 +557,7 @@ export function VerifyPage() {
 
                             {!judgeResult && !isEvaluatingJudge && (
                                 <div className="p-8 text-center text-muted-foreground text-xs">
-                                    Dán JSON hoặc bấm chọn mẫu bên trái, sau đó nhấn "Evaluate Judge Input" để xem phản ứng phòng thủ thời gian thực của hệ thống.
+                                    Paste JSON or select a sample on the left, then click "Evaluate Judge Input" to observe real-time defense response.
                                 </div>
                             )}
 
@@ -591,7 +591,7 @@ export function VerifyPage() {
 
                                     <div className="text-xs text-muted-foreground pt-1 flex items-center gap-1">
                                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                                        <span>Bảo đảm đạt điểm tối đa theo Thể lệ cuộc thi (Không khẳng định bừa bãi khi gặp dữ liệu lạ).</span>
+                                        <span>Guaranteed full score per competition rules (Never hallucinating false confidence on anomalous data).</span>
                                     </div>
                                 </div>
                             )}

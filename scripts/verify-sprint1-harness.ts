@@ -358,7 +358,7 @@ export async function evaluateJudgeInput(rawInput: unknown, db: any) {
     const val = validateDataset(raw);
     const blocking = blockingIssues(val);
 
-    // Lớp 1: Kiểm tra tính hợp lệ nghiệp vụ sự cố sản xuất
+    // Layer 1: Validate production defect business integrity
     if (blocking.length > 0 || (!raw.notificationId && !raw.symptomShortText && !raw.defect)) {
         return {
             tested: true,
@@ -368,7 +368,7 @@ export async function evaluateJudgeInput(rawInput: unknown, db: any) {
         };
     }
 
-    // Lớp 2: Kiểm tra độ tương đồng với kho tiền lệ
+    // Layer 2: Measure similarity against precedent repository
     try {
         const ctx = mapCase(raw);
         const matching = await db.run(

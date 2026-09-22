@@ -67,7 +67,7 @@ Our test suite is architected around a rigorous **4-Quadrant Matrix** that demon
 ## 🛡️ 3. Two-Tier Defense Architecture for Unseen Judge Inputs (Criterion 3 — 8 Points)
 
 According to Hackathon Regulation Section 4:
-> *"Xử lý hợp lý hoặc từ chối hợp lý cả hai input từ BTC = 8 điểm"*
+> *"Appropriately handling or responsibly refusing both inputs from the Organizing Committee = 8 points"*
 
 Our system features a deterministic **Two-Tier Defense Architecture** to guarantee maximum points regardless of what arbitrary or edge-case payloads the Judges provide:
 

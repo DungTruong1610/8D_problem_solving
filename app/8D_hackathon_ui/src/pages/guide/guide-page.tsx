@@ -839,7 +839,7 @@ export function GuidePage() {
                                     <Layers size={20} />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-base">5. SAP Standard Value Help (F4) &amp; Ràng Buộc Dữ Liệu</h3>
+                                    <h3 className="font-bold text-base">5. SAP Standard Value Help (F4) &amp; Relational Constraints</h3>
                                     <span className="text-xs font-mono text-muted-foreground">Standardized Quality Vocabularies &amp; Parent-Child Dependencies</span>
                                 </div>
                             </div>
@@ -850,34 +850,34 @@ export function GuidePage() {
 
                         <div className="space-y-3 text-xs">
                             <p className="text-muted-foreground leading-relaxed">
-                                Dữ liệu đầu vào khi khởi tạo hoặc chỉnh sửa Defect / Báo cáo 8D được kiểm soát chặt chẽ thông qua cơ chế <strong>Value Help chuẩn SAP (F4 Search Help)</strong> nhằm ngăn chặn lỗi nhập liệu tự do và đảm bảo tính nhất quán trong toàn bộ nhà máy:
+                                Input data during defect creation and 8D report editing is strictly governed by <strong>SAP Standard Value Help (F4 Search Help)</strong> to prevent arbitrary entries, eliminate hallucinated codes, and maintain plant-wide data consistency:
                             </p>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="p-4 rounded-xl bg-muted/20 border space-y-2">
                                     <div className="font-semibold text-foreground flex items-center gap-2">
                                         <span className="w-5 h-5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs">1</span>
-                                        Các từ khóa định nghĩa chuẩn của SAP (Standard Vocabularies)
+                                        SAP QM Standard Vocabularies &amp; Catalogues
                                     </div>
                                     <p className="text-muted-foreground leading-relaxed text-[11px]">
-                                        Dữ liệu kỹ thuật bắt buộc phải tuân thủ danh mục chuẩn (Standard Catalogues) của SAP QM: 
-                                        mã lỗi (Defect Codes: <code>BURR-01</code>, <code>POROSITY-02</code>), phân nhóm mã lỗi (Code Groups: <code>BURR</code>, <code>SURF</code>), 
-                                        nguồn gốc khiếu nại (Origin: <code>Q1</code> Customer Complaint, <code>Q2</code> Supplier, <code>Q3</code> Internal), 
-                                        và nhóm nguyên nhân gốc chuẩn 4M/5M1E (Root Cause Categories: <code>Machine</code>, <code>Man</code>, <code>Method</code>, <code>Material</code>).
+                                        Technical parameters strictly adhere to SAP QM standard catalogues: 
+                                        Defect Codes (<code>BURR-01</code>, <code>POROSITY-02</code>), Defect Code Groups (<code>BURR</code>, <code>SURF</code>), 
+                                        Notification Origins (<code>Q1</code> Customer Complaint, <code>Q2</code> Supplier, <code>Q3</code> Internal), 
+                                        and standard 4M/5M1E root cause categories (<code>Machine</code>, <code>Man</code>, <code>Method</code>, <code>Material</code>).
                                     </p>
                                 </div>
 
                                 <div className="p-4 rounded-xl bg-muted/20 border space-y-2">
                                     <div className="font-semibold text-foreground flex items-center gap-2">
                                         <span className="w-5 h-5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-xs">2</span>
-                                        Ràng buộc quan hệ Cha - Con (Parent-Child Dependencies)
+                                        Parent-Child Relational Dependencies
                                     </div>
                                     <p className="text-muted-foreground leading-relaxed text-[11px]">
-                                        Các trường dữ liệu có mối quan hệ phụ thuộc phân cấp logic: 
-                                        Ví dụ khi chọn Work Center <code>WC-MILL-07</code> (CNC Milling Line 7), hệ thống tự động lọc và chỉ cho phép chọn 
-                                        các thiết bị trực thuộc (Equipments: <code>EQ-MILL07-001</code>, <code>EQ-MILL07-002</code>), danh mục vật liệu gia công tương thích 
-                                        (Material Group: <code>MG-HOUSING</code>), và nhân sự kỹ thuật vận hành máy phay (Minh Dinh). 
-                                        Cơ chế này ngăn chặn tuyệt đối việc gán chéo sai xưởng (như gán thợ hàn vào trạm máy phay CNC).
+                                        Form fields enforce strict hierarchical dependency constraints: 
+                                        for example, selecting Work Center <code>WC-MILL-07</code> (CNC Milling Line 7) automatically restricts selectable 
+                                        equipments to registered child assets (<code>EQ-MILL07-001</code>, <code>EQ-MILL07-002</code>), compatible materials 
+                                        (<code>MG-HOUSING</code>), and certified machining operators. 
+                                        This mechanism eliminates cross-cell misassignments (e.g., assigning a welder to a high-speed CNC milling center).
                                     </p>
                                 </div>
                             </div>
@@ -1218,7 +1218,7 @@ export function GuidePage() {
                         {isRunningVerify ? (
                             <>
                                 <RefreshCw size={16} className="animate-spin" />
-                                <span>Đang kiểm thử AI... ({(elapsedMs / 1000).toFixed(1)}s / 90s SLA)</span>
+                                <span>Running AI Verification... ({(elapsedMs / 1000).toFixed(1)}s / 90s SLA)</span>
                             </>
                         ) : (
                             <>
@@ -1320,7 +1320,7 @@ export function GuidePage() {
                             const targetReportId = result?.reportId || DEFAULT_REPORT_IDS[tc.id]?.reportId;
                             const targetNotificationId = result?.notificationId || DEFAULT_REPORT_IDS[tc.id]?.notificationId;
                             const duration = result?.durationMs;
-                            const status = result?.status || 'Chưa chạy';
+                            const status = result?.status || 'Pending';
 
                             return (
                                 <div key={tc.id} className="transition-colors hover:bg-muted/10">
@@ -1357,12 +1357,12 @@ export function GuidePage() {
                                                 }`}
                                                 title={
                                                     hasVerified
-                                                        ? `Mở Báo Cáo 8D ${targetNotificationId}`
-                                                        : "Vui lòng bấm 'Run 90-Second Verification' ở trên để kiểm thử trước khi xem báo cáo"
+                                                        ? `Open 8D Report ${targetNotificationId}`
+                                                        : "Please click 'Run 90-Second Verification' above to execute tests before viewing the report"
                                                 }
                                             >
                                                 <FileText size={13} />
-                                                <span className="hidden sm:inline">Xem Báo Cáo 8D</span>
+                                                <span className="hidden sm:inline">View 8D Report</span>
                                                 <ExternalLink size={11} />
                                             </button>
                                             <span className="font-mono text-xs text-muted-foreground">
@@ -1376,7 +1376,7 @@ export function GuidePage() {
                                             ) : (
                                                 <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-muted text-muted-foreground border border-border flex items-center gap-1">
                                                     <Clock size={12} />
-                                                    <span>Chưa chạy</span>
+                                                    <span>Pending</span>
                                                 </span>
                                             )}
                                             {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -1409,12 +1409,12 @@ export function GuidePage() {
                                                     </div>
                                                     <div>
                                                         <div className="font-bold text-xs">
-                                                            Báo cáo 8D: <span className="font-mono text-primary">{targetNotificationId}</span>
+                                                            8D Report Workspace: <span className="font-mono text-primary">{targetNotificationId}</span>
                                                         </div>
                                                         <div className="text-[11px] text-muted-foreground">
                                                             {hasVerified 
-                                                                ? 'Bao gồm đề xuất AI (AI Suggested) và phê duyệt của con người (Human-in-the-Loop) qua 8 bước D1 – D8.'
-                                                                : 'Chưa thực thi kiểm thử. Vui lòng bấm "Run 90-Second Verification" ở trên để AI đánh giá và mở báo cáo này.'
+                                                                ? 'Includes AI-generated suggestions and Human-in-the-Loop review approvals across all disciplines D1 – D8.'
+                                                                : 'Not verified yet. Please click "Run 90-Second Verification" above for AI evaluation and to unlock this report.'
                                                             }
                                                         </div>
                                                     </div>
@@ -1434,7 +1434,7 @@ export function GuidePage() {
                                                     }`}
                                                 >
                                                     <FileText size={14} />
-                                                    <span>Mở Chi Tiết Báo Cáo 8D</span>
+                                                    <span>Open 8D Report Details</span>
                                                     <ExternalLink size={12} />
                                                 </button>
                                             </div>
