@@ -66,6 +66,58 @@ interface VerifyHarnessReport {
 }
 
 const STANDARD_TEST_CASE_TEMPLATE = {
+    "$schema": "",
+    "$testCaseId": "TC-01",
+    "$title": "Milling Burr Defect (Happy Path — Strong Precedent Match)",
+    "$category": "Quadrant 1 — Perfect End-to-End Workflow",
+    "notificationId": "8D-10049001",
+    "origin": "Q3 - Internal Defect",
+    "symptomShortText": "Operator stopped the line - rough edge felt on bracket flange after milling",
+    "status": "In Process",
+    "foundDate": "2026-08-12",
+    "completionDate": null,
+    "quantityExtent": "61 units on hold",
+    "teamSize": null,
+    "material": {
+        "materialId": "MAT-10247",
+        "description": "Bracket Housing X240",
+        "materialGroup": "MG-HOUSING"
+    },
+    "batch": {
+        "batchId": "B-55901",
+        "materialId": "MAT-10247"
+    },
+    "defect": {
+        "defectCode": "DEF-0489",
+        "defectText": "Flange edge burr above limit"
+    },
+    "workCenter": {
+        "workCenterId": "WC-MILL-07",
+        "description": "CNC Milling Line 7"
+    },
+    "inspections": [
+        {
+            "characteristic": "Burr height at flange edge",
+            "measuredValue": "0.26mm",
+            "specValue": "max 0.10mm"
+        }
+    ],
+    "causesIshikawa": [],
+    "fiveWhyChain": [],
+    "actions": [],
+    "teamAssignments": [],
+    "isIsNot": null,
+    "fmeaLink": null,
+    "costCopq": null,
+    "lessonsLearned": null,
+    "customerReference": {
+        "complaintReference": "N/A - internal defect, no customer reference",
+        "customerPlantContact": "N/A",
+        "slaResponseDue": "N/A"
+    }
+};
+
+const SANDBOX_INITIAL_JSON = {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$testCaseId": "TC-CUSTOM-01",
     "$title": "Custom Manufacturing Defect Test Case",
@@ -233,7 +285,7 @@ export function GuidePage() {
     ];
 
     // ── JSON Playground & Validator States ─────────────────────────────────
-    const [jsonInput, setJsonInput] = useState(JSON.stringify(STANDARD_TEST_CASE_TEMPLATE, null, 2));
+    const [jsonInput, setJsonInput] = useState(JSON.stringify(SANDBOX_INITIAL_JSON, null, 2));
     const [validationResult, setValidationResult] = useState<{
         isValid: boolean;
         category?: string;
