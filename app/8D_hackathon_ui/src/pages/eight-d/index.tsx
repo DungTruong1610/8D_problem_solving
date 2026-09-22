@@ -69,8 +69,7 @@ function CompletenessCell({ report }: { report: Report8D }) {
     const steps = report.disciplines ?? [];
     const approved = steps.filter((d) =>
         reviewStatusOf(d) === 'Approved' ||
-        d.workState === 'Completed' ||
-        Boolean(d.resultJson && d.resultJson.length > 20)
+        d.workState === 'Completed'
     ).length;
     const done = approved === TOTAL_STEPS || report.status === 'Closed';
 
