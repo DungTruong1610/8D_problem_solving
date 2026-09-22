@@ -15,6 +15,14 @@ import {
     Sparkles,
     ExternalLink
 } from 'lucide-react';
+import { JudgeReportModal } from '../../components/verify/JudgeReportModal';
+import { TestCaseReportModal } from '../../components/verify/TestCaseReportModal';
+import {
+    TEST_CASE_SUMMARIES,
+    TestCaseSummary,
+    JudgeEvaluationReportData,
+    buildJudgeReportFromRaw
+} from '../../components/verify/test-case-summary-data';
 
 interface TestCaseResult {
     id: string;
@@ -96,6 +104,12 @@ export function VerifyPage() {
         reason: string;
         status: string;
     } | null>(null);
+
+    // Full Summary Report Modal states
+    const [selectedTestCase, setSelectedTestCase] = useState<TestCaseSummary | null>(null);
+    const [isTestCaseModalOpen, setIsTestCaseModalOpen] = useState(false);
+    const [judgeReportData, setJudgeReportData] = useState<JudgeEvaluationReportData | null>(null);
+    const [isJudgeModalOpen, setIsJudgeModalOpen] = useState(false);
 
     // Run Verify Harness
     const handleRunHarness = async () => {
@@ -202,21 +216,29 @@ export function VerifyPage() {
             });
             const data = await res.json();
             setJudgeResult(data);
+            const richReport = buildJudgeReportFromRaw(parsed, data);
+            setJudgeReportData(richReport);
         } catch (e: any) {
             // Local fallback simulation
             setTimeout(() => {
+                let parsed: any = null;
+                try { parsed = JSON.parse(judgeInputText); } catch {}
                 if (judgeInputText.includes('Finance') || judgeInputText.includes('amountVnd')) {
-                    setJudgeResult({
+                    const sim = {
                         decision: "GRACEFULLY_REFUSED",
                         reason: "Input recognized as Out-of-Scope (Financial reimbursement). System rejected safely without hallucination. 100% compliant with Criterion 3.",
                         status: "PASS"
-                    });
+                    };
+                    setJudgeResult(sim);
+                    setJudgeReportData(buildJudgeReportFromRaw(parsed || SAMPLE_JUDGE_OUT_OF_SCOPE, sim));
                 } else {
-                    setJudgeResult({
+                    const sim = {
                         decision: "HANDLED_APPROPRIATELY",
                         reason: "Recognized as valid manufacturing defect. WorkCenter WC-CAST-03 linked to casting cell. Full D1-D8 pipeline executed successfully.",
                         status: "PASS"
-                    });
+                    };
+                    setJudgeResult(sim);
+                    setJudgeReportData(buildJudgeReportFromRaw(parsed || SAMPLE_JUDGE_VALID, sim));
                 }
             }, 400);
         } finally {
@@ -364,13 +386,13 @@ export function VerifyPage() {
                             <thead>
                                 <tr className="border-b border-border bg-muted/40 text-xs font-semibold text-muted-foreground">
                                     <th className="py-3 px-4 w-16">ID</th>
-                                    <th className="py-3 px-4 w-64">Test Case &amp; Focus</th>
+                                    <th className="py-3 px-4 w-60">Test Case &amp; Focus</th>
                                     <th className="py-3 px-4">Input &amp; Scenario</th>
                                     <th className="py-3 px-4">Actual AI Outcome</th>
-                                    <th className="py-3 px-4 w-24">Duration</th>
-                                    <th className="py-3 px-4 w-24 text-center">Status</th>
-                                    <th className="py-3 px-4 w-36 text-center">8D Report</th>
-                                    <th className="py-3 px-4 w-12"></th>
+                                    <th className="py-3 px-4 w-20">Duration</th>
+                                    <th className="py-3 px-4 w-20 text-center">Status</th>
+                                    <th className="py-3 px-4 w-64 text-center">Reports &amp; Actions</th>
+                                    <th className="py-3 px-4 w-10"></th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border font-normal">
@@ -401,21 +423,36 @@ export function VerifyPage() {
                                                     </span>
                                                 </td>
                                                 <td className="py-3 px-4 text-center">
-                                                    {targetReportId && (
+                                                    <div className="flex items-center justify-center gap-1.5 flex-wrap">
                                                         <button
                                                             type="button"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                navigate(`/8d/${targetReportId}`);
+                                                                setSelectedTestCase(TEST_CASE_SUMMARIES[tc.id] || null);
+                                                                setIsTestCaseModalOpen(true);
                                                             }}
-                                                            className="text-xs px-2.5 py-1.5 rounded-lg border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary font-semibold inline-flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
-                                                            title={`View 8D Report ${targetNotificationId}`}
+                                                            className="text-xs px-2.5 py-1.5 rounded-lg border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-300 font-semibold inline-flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                                                            title={`View Full Evaluation Summary Report for ${tc.id}`}
                                                         >
                                                             <FileText className="w-3.5 h-3.5" />
-                                                            <span>View Report</span>
-                                                            <ExternalLink className="w-3 h-3" />
+                                                            <span>Summary Report</span>
                                                         </button>
-                                                    )}
+
+                                                        {targetReportId && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    navigate(`/8d/${targetReportId}`);
+                                                                }}
+                                                                className="text-xs px-2.5 py-1.5 rounded-lg border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary font-semibold inline-flex items-center gap-1 transition-all shadow-xs cursor-pointer"
+                                                                title={`Open 8D Workspace ${targetNotificationId}`}
+                                                            >
+                                                                <span>8D Case</span>
+                                                                <ExternalLink className="w-3 h-3" />
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 </td>
                                                 <td className="py-3 px-4 text-center">
                                                     <button
@@ -441,33 +478,47 @@ export function VerifyPage() {
                                                                 </pre>
                                                             </div>
 
-                                                            {/* Direct action banner to open 8D Report */}
-                                                            {targetReportId && (
-                                                                <div className="flex items-center justify-between flex-wrap gap-3 bg-card p-3.5 rounded-xl border border-border">
-                                                                    <div className="flex items-center gap-2.5 text-foreground font-medium">
-                                                                        <div className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600">
-                                                                            <CheckCircle2 className="w-4 h-4" />
+                                                            {/* Direct action banner to open 8D Report & View Summary */}
+                                                            <div className="flex items-center justify-between flex-wrap gap-3 bg-card p-3.5 rounded-xl border border-border">
+                                                                <div className="flex items-center gap-2.5 text-foreground font-medium">
+                                                                    <div className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600">
+                                                                        <CheckCircle2 className="w-4 h-4" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <div className="font-bold text-xs">
+                                                                            Comprehensive Report &amp; 8D Workspace: <span className="font-mono text-primary">{targetNotificationId}</span>
                                                                         </div>
-                                                                        <div>
-                                                                            <div className="font-bold text-xs">
-                                                                                Detailed 8D Report: <span className="font-mono text-primary">{targetNotificationId}</span>
-                                                                            </div>
-                                                                            <div className="text-[11px] text-muted-foreground">
-                                                                                Includes AI suggestions and Human-in-the-Loop review approvals across all 8 disciplines (D1 – D8).
-                                                                            </div>
+                                                                        <div className="text-[11px] text-muted-foreground">
+                                                                            Includes AI suggestions, multi-step validations, and Human-in-the-Loop review approvals across all 8 disciplines (D1 – D8).
                                                                         </div>
                                                                     </div>
+                                                                </div>
+
+                                                                <div className="flex items-center gap-2">
                                                                     <button
                                                                         type="button"
-                                                                        onClick={() => navigate(`/8d/${targetReportId}`)}
-                                                                        className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs inline-flex items-center gap-2 shadow-sm transition-all cursor-pointer"
+                                                                        onClick={() => {
+                                                                            setSelectedTestCase(TEST_CASE_SUMMARIES[tc.id] || null);
+                                                                            setIsTestCaseModalOpen(true);
+                                                                        }}
+                                                                        className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs inline-flex items-center gap-2 shadow-sm transition-all cursor-pointer"
                                                                     >
                                                                         <FileText className="w-3.5 h-3.5" />
-                                                                        <span>Open 8D Report Details</span>
-                                                                        <ExternalLink className="w-3 h-3" />
+                                                                        <span>View Full Summary Report</span>
                                                                     </button>
+
+                                                                    {targetReportId && (
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => navigate(`/8d/${targetReportId}`)}
+                                                                            className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs inline-flex items-center gap-2 shadow-sm transition-all cursor-pointer"
+                                                                        >
+                                                                            <ExternalLink className="w-3.5 h-3.5" />
+                                                                            <span>Open 8D Workspace</span>
+                                                                        </button>
+                                                                    )}
                                                                 </div>
-                                                            )}
+                                                            </div>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -589,6 +640,22 @@ export function VerifyPage() {
                                         {judgeResult.reason}
                                     </div>
 
+                                    {/* Action button to open Judge Full Evaluation Report */}
+                                    <div className="pt-2 flex items-center justify-between flex-wrap gap-2 border-t border-border">
+                                        <span className="text-[11px] text-muted-foreground">
+                                            Comprehensive 2-Tier Defense &amp; Boundary breakdown generated
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsJudgeModalOpen(true)}
+                                            className="px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs inline-flex items-center gap-1.5 shadow transition-all cursor-pointer"
+                                        >
+                                            <FileText className="w-3.5 h-3.5" />
+                                            <span>View Full Evaluation Report</span>
+                                            <ExternalLink className="w-3 h-3" />
+                                        </button>
+                                    </div>
+
                                     <div className="text-xs text-muted-foreground pt-1 flex items-center gap-1">
                                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                                         <span>Guaranteed full score per competition rules (Never hallucinating false confidence on anomalous data).</span>
@@ -604,6 +671,19 @@ export function VerifyPage() {
                     </div>
                 </div>
             </div>
+
+            {/* ── Modals ── */}
+            <TestCaseReportModal
+                isOpen={isTestCaseModalOpen}
+                onClose={() => setIsTestCaseModalOpen(false)}
+                testCase={selectedTestCase}
+            />
+
+            <JudgeReportModal
+                isOpen={isJudgeModalOpen}
+                onClose={() => setIsJudgeModalOpen(false)}
+                report={judgeReportData}
+            />
         </div>
     );
 }

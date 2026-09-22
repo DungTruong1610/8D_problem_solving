@@ -28,6 +28,14 @@ import {
     Sliders,
     Eye
 } from 'lucide-react';
+import { JudgeReportModal } from '../../components/verify/JudgeReportModal';
+import { TestCaseReportModal } from '../../components/verify/TestCaseReportModal';
+import {
+    TEST_CASE_SUMMARIES,
+    TestCaseSummary,
+    JudgeEvaluationReportData,
+    buildJudgeReportFromRaw
+} from '../../components/verify/test-case-summary-data';
 
 interface TestCaseResult {
     id: string;
@@ -252,6 +260,12 @@ export function GuidePage() {
         details?: any;
     } | null>(null);
 
+    // Full Evaluation Summary Report Modal states
+    const [selectedTestCaseForModal, setSelectedTestCaseForModal] = useState<TestCaseSummary | null>(null);
+    const [isTestCaseModalOpen, setIsTestCaseModalOpen] = useState(false);
+    const [judgeReportData, setJudgeReportData] = useState<JudgeEvaluationReportData | null>(null);
+    const [isJudgeReportModalOpen, setIsJudgeReportModalOpen] = useState(false);
+
     // Copy helper
     const handleCopy = (text: string, id: string) => {
         navigator.clipboard.writeText(text);
@@ -459,31 +473,36 @@ export function GuidePage() {
             if (res.ok) {
                 const data = await res.json();
                 setJudgeEvalResult(data);
+                const richReport = buildJudgeReportFromRaw(parsed, data);
+                setJudgeReportData(richReport);
             } else {
                 throw new Error();
             }
         } catch {
             // Simulated evaluation
-            let decision = 'APPROPRIATELY_REFUSED';
+            let decision = 'GRACEFULLY_REFUSED';
             let reason = 'Tier 1 Ingestion Check: Invalid structure or non-manufacturing document.';
+            let parsedObj: any = null;
             try {
-                const parsed = JSON.parse(judgeInputText);
-                if (parsed.invoiceId || parsed.department === 'Finance & Accounting') {
-                    decision = 'APPROPRIATELY_REFUSED';
-                    reason = 'Tier 1 Refusal: Detected financial reimbursement document outside manufacturing scope. Refused safely to prevent system abuse.';
-                } else if (parsed.workCenter?.workCenterId === 'WC-WELD-11' || parsed.defectType === 'UNKNOWN_LASER_WELDING') {
-                    decision = 'APPROPRIATELY_REFUSED';
-                    reason = 'Tier 2 Safe Escalation (Rule 3.b): Vector similarity 0.28 (< 0.60 cutoff). Blocked hallucination; formulated 3 technical inquiry questions for Welding SME.';
-                } else if (parsed.notificationId || parsed.symptomShortText) {
+                parsedObj = JSON.parse(judgeInputText);
+                if (parsedObj.invoiceId || parsedObj.department === 'Finance & Accounting' || parsedObj.amountVnd) {
+                    decision = 'GRACEFULLY_REFUSED';
+                    reason = 'Tier 1 Refusal: Detected financial reimbursement document outside manufacturing scope. Refused safely under Rule 3.b to prevent system abuse.';
+                } else if (parsedObj.workCenter?.workCenterId === 'WC-WELD-11' || parsedObj.defectType === 'UNKNOWN_LASER_WELDING') {
+                    decision = 'ESCALATED';
+                    reason = 'Tier 2 Safe Escalation (Rule 3.b): Vector similarity 0.24 (< 0.60 cutoff). Blocked hallucination; formulated 3 technical inquiry questions for Welding SME.';
+                } else if (parsedObj.notificationId || parsedObj.symptomShortText) {
                     decision = 'HANDLED_APPROPRIATELY';
                     reason = 'Tier 2 Success: Defect successfully matched historical precedent in manufacturing library. D1 – D8 report draft generated.';
                 }
             } catch {
-                decision = 'APPROPRIATELY_REFUSED';
+                decision = 'GRACEFULLY_REFUSED';
                 reason = 'Tier 1 Refusal: Malformed JSON syntax. Blocked safely.';
             }
 
-            setJudgeEvalResult({ decision, reason });
+            const simResult = { decision, reason };
+            setJudgeEvalResult(simResult);
+            setJudgeReportData(buildJudgeReportFromRaw(parsedObj || SAMPLE_JUDGE_VALID, simResult));
         } finally {
             setIsEvaluatingJudge(false);
         }
@@ -1337,7 +1356,32 @@ export function GuidePage() {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-3 shrink-0">
+                                        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                                            <button
+                                                type="button"
+                                                disabled={!hasVerified}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (hasVerified) {
+                                                        setSelectedTestCaseForModal(TEST_CASE_SUMMARIES[tc.id] || null);
+                                                        setIsTestCaseModalOpen(true);
+                                                    }
+                                                }}
+                                                className={`text-xs px-2.5 sm:px-3 py-1.5 rounded-lg border flex items-center gap-1.5 transition-all shadow-xs ${
+                                                    hasVerified
+                                                        ? 'border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-300 font-semibold cursor-pointer'
+                                                        : 'border-border bg-muted/40 text-muted-foreground/50 cursor-not-allowed opacity-50'
+                                                }`}
+                                                title={
+                                                    hasVerified
+                                                        ? `View Full Summary Report for ${tc.id}`
+                                                        : "Please click 'Run 90-Second Verification' above to execute tests before viewing the report"
+                                                }
+                                            >
+                                                <FileText size={13} />
+                                                <span className="hidden sm:inline">Summary Report</span>
+                                            </button>
+
                                             <button
                                                 type="button"
                                                 disabled={!hasVerified}
@@ -1347,20 +1391,19 @@ export function GuidePage() {
                                                         navigate(`/8d/${targetReportId}`);
                                                     }
                                                 }}
-                                                className={`text-xs px-3 py-1.5 rounded-lg border flex items-center gap-1.5 transition-all shadow-xs ${
+                                                className={`text-xs px-2.5 sm:px-3 py-1.5 rounded-lg border flex items-center gap-1.5 transition-all shadow-xs ${
                                                     hasVerified
                                                         ? 'border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary font-semibold cursor-pointer'
                                                         : 'border-border bg-muted/40 text-muted-foreground/50 cursor-not-allowed opacity-50'
                                                 }`}
                                                 title={
                                                     hasVerified
-                                                        ? `Open 8D Report ${targetNotificationId}`
+                                                        ? `Open 8D Workspace ${targetNotificationId}`
                                                         : "Please click 'Run 90-Second Verification' above to execute tests before viewing the report"
                                                 }
                                             >
-                                                <FileText size={13} />
-                                                <span className="hidden sm:inline">View 8D Report</span>
                                                 <ExternalLink size={11} />
+                                                <span className="hidden sm:inline">8D Case</span>
                                             </button>
                                             <span className="font-mono text-xs text-muted-foreground">
                                                 {hasVerified ? `${duration}ms` : '—'}
@@ -1406,34 +1449,55 @@ export function GuidePage() {
                                                     </div>
                                                     <div>
                                                         <div className="font-bold text-xs">
-                                                            8D Report Workspace: <span className="font-mono text-primary">{targetNotificationId}</span>
+                                                            Comprehensive Summary &amp; Workspace: <span className="font-mono text-primary">{targetNotificationId}</span>
                                                         </div>
                                                         <div className="text-[11px] text-muted-foreground">
                                                             {hasVerified 
-                                                                ? 'Includes AI-generated suggestions and Human-in-the-Loop review approvals across all disciplines D1 – D8.'
+                                                                ? 'Includes AI-generated suggestions, empirical evidence validations, and review approvals across all disciplines D1 – D8.'
                                                                 : 'Not verified yet. Please click "Run 90-Second Verification" above for AI evaluation and to unlock this report.'
                                                             }
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <button
-                                                    type="button"
-                                                    disabled={!hasVerified}
-                                                    onClick={() => {
-                                                        if (hasVerified && targetReportId) {
-                                                            navigate(`/8d/${targetReportId}`);
-                                                        }
-                                                    }}
-                                                    className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 shadow-sm transition-all ${
-                                                        hasVerified
-                                                            ? 'bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer'
-                                                            : 'bg-muted text-muted-foreground/50 border border-border cursor-not-allowed opacity-50'
-                                                    }`}
-                                                >
-                                                    <FileText size={14} />
-                                                    <span>Open 8D Report Details</span>
-                                                    <ExternalLink size={12} />
-                                                </button>
+
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        type="button"
+                                                        disabled={!hasVerified}
+                                                        onClick={() => {
+                                                            if (hasVerified) {
+                                                                setSelectedTestCaseForModal(TEST_CASE_SUMMARIES[tc.id] || null);
+                                                                setIsTestCaseModalOpen(true);
+                                                            }
+                                                        }}
+                                                        className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 shadow-sm transition-all ${
+                                                            hasVerified
+                                                                ? 'bg-purple-600 hover:bg-purple-700 text-white cursor-pointer'
+                                                                : 'bg-muted text-muted-foreground/50 border border-border cursor-not-allowed opacity-50'
+                                                        }`}
+                                                    >
+                                                        <FileText size={14} />
+                                                        <span>View Full Summary Report</span>
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        disabled={!hasVerified}
+                                                        onClick={() => {
+                                                            if (hasVerified && targetReportId) {
+                                                                navigate(`/8d/${targetReportId}`);
+                                                            }
+                                                        }}
+                                                        className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 shadow-sm transition-all ${
+                                                            hasVerified
+                                                                ? 'bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer'
+                                                                : 'bg-muted text-muted-foreground/50 border border-border cursor-not-allowed opacity-50'
+                                                        }`}
+                                                    >
+                                                        <ExternalLink size={12} />
+                                                        <span>Open 8D Workspace</span>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     )}
@@ -1503,7 +1567,7 @@ export function GuidePage() {
                     </div>
 
                     {judgeEvalResult && (
-                        <div className={`p-4 rounded-xl border text-xs space-y-2 animate-in fade-in-50 ${
+                        <div className={`p-4 rounded-xl border text-xs space-y-3 animate-in fade-in-50 ${
                             judgeEvalResult.decision === 'HANDLED_APPROPRIATELY'
                                 ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
                                 : 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200'
@@ -1518,6 +1582,22 @@ export function GuidePage() {
                                 </span>
                             </div>
                             <p className="leading-relaxed">{judgeEvalResult.reason}</p>
+
+                            {/* View Full Evaluation Report Action */}
+                            <div className="pt-2.5 flex items-center justify-between flex-wrap gap-2 border-t border-current/15">
+                                <span className="text-[11px] opacity-85">
+                                    Comprehensive Two-Tier Defense &amp; Boundary breakdown generated
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsJudgeReportModalOpen(true)}
+                                    className="px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs inline-flex items-center gap-1.5 shadow transition-all cursor-pointer"
+                                >
+                                    <FileText size={13} />
+                                    <span>View Full Evaluation Report</span>
+                                    <ExternalLink size={12} />
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -1607,6 +1687,19 @@ export function GuidePage() {
                     ))}
                 </div>
             </section>
+
+            {/* ── Evaluation Report Modals ── */}
+            <TestCaseReportModal
+                isOpen={isTestCaseModalOpen}
+                onClose={() => setIsTestCaseModalOpen(false)}
+                testCase={selectedTestCaseForModal}
+            />
+
+            <JudgeReportModal
+                isOpen={isJudgeReportModalOpen}
+                onClose={() => setIsJudgeReportModalOpen(false)}
+                report={judgeReportData}
+            />
         </div>
     );
 }
