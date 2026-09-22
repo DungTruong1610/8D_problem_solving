@@ -36,7 +36,11 @@ export function CaseStepper({
     isAnalyzing?: boolean;
 }) {
     const total = 8;
-    const approved = disciplines.filter((d) => reviewStatusOf(d) === 'Approved').length;
+    const approved = disciplines.filter((d) =>
+        reviewStatusOf(d) === 'Approved' ||
+        d.workState === 'Completed' ||
+        Boolean(d.resultJson && d.resultJson.length > 20)
+    ).length;
     const pct = (approved / total) * 100;
     const byCode = new Map(disciplines.map((d) => [d.code, d]));
     const completedCodes = new Set(disciplines.map((d) => d.code));
@@ -70,7 +74,8 @@ export function CaseStepper({
 
                     if (discipline) {
                         const revStatus = reviewStatusOf(discipline);
-                        done = revStatus === 'Approved';
+                        const hasResult = Boolean(discipline.resultJson && discipline.resultJson.length > 20);
+                        done = revStatus === 'Approved' || discipline.workState === 'Completed' || hasResult;
                         if (done) {
                             statusText = 'Complete';
                         } else if (revStatus === 'ChangeRequested') {

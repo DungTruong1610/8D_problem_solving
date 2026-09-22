@@ -121,7 +121,8 @@ export function DisciplineReviewBox({
     precedentsJson?: string | null;
 }) {
     const queryClient = useQueryClient();
-    const isApproved = reviewStatusOf(discipline) === 'Approved';
+    const hasResult = Boolean(discipline.resultJson && discipline.resultJson.length > 20);
+    const isApproved = reviewStatusOf(discipline) === 'Approved' || discipline.workState === 'Completed' || hasResult;
     const currentStatus: 'NotStarted' | 'InProgress' | 'Completed' = isApproved
         ? 'Completed'
         : (discipline.workState === 'InProgress' ? 'InProgress' : 'NotStarted');

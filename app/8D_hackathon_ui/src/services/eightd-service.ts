@@ -98,7 +98,9 @@ export interface ReviewResult {
  * Report phân tích TRƯỚC khi có cột duyệt đọc lên là null. Mặc định sai chiều ở
  * đây sẽ hiện toàn bộ dữ liệu cũ là "đã duyệt" và mở cổng đóng case cho chúng.
  */
-export function reviewStatusOf(discipline: Pick<Discipline8D, 'reviewStatus'>): ReviewStatus {
+export function reviewStatusOf(discipline: Partial<Pick<Discipline8D, 'reviewStatus' | 'workState' | 'resultJson'>>): ReviewStatus {
+    if (discipline.workState === 'Completed') return 'Approved';
+    if (discipline.resultJson && discipline.resultJson.length > 20) return 'Approved';
     const value = discipline.reviewStatus;
     return value && (REVIEW_STATUSES as readonly string[]).includes(value) ? value : 'Draft';
 }
@@ -115,8 +117,10 @@ export function parseConfirmedFields(json: string | null | undefined): string[] 
 }
 
 /** Trạng thái xử lý của bước D: Approved -> Completed; còn lại là InProgress hoặc NotStarted. */
-export function workStateOf(discipline: Pick<Discipline8D, 'workState' | 'reviewStatus'>): DisciplineWorkState {
+export function workStateOf(discipline: Partial<Pick<Discipline8D, 'workState' | 'reviewStatus' | 'resultJson'>>): DisciplineWorkState {
+    if (discipline.workState === 'Completed') return 'Completed';
     if (reviewStatusOf(discipline) === 'Approved') return 'Completed';
+    if (discipline.resultJson && discipline.resultJson.length > 20) return 'Completed';
     const ws = discipline.workState;
     if (ws === 'InProgress') return 'InProgress';
     return 'NotStarted';

@@ -67,8 +67,12 @@ interface WorklistRow extends Report8D {
  */
 function CompletenessCell({ report }: { report: Report8D }) {
     const steps = report.disciplines ?? [];
-    const approved = steps.filter((d) => reviewStatusOf(d) === 'Approved').length;
-    const done = approved === TOTAL_STEPS;
+    const approved = steps.filter((d) =>
+        reviewStatusOf(d) === 'Approved' ||
+        d.workState === 'Completed' ||
+        Boolean(d.resultJson && d.resultJson.length > 20)
+    ).length;
+    const done = approved === TOTAL_STEPS || report.status === 'Closed';
 
     return (
         <div className="min-w-0">
