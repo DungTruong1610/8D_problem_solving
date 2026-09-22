@@ -119,22 +119,21 @@ const STANDARD_TEST_CASE_TEMPLATE = {
 
 const SANDBOX_INITIAL_JSON = {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$testCaseId": "TC-CUSTOM-01",
-    "$title": "Custom Manufacturing Defect Test Case",
-    "$category": "Custom Test Case for 8D Workflow Evaluation",
-    "notificationId": "8D-10049999",
+    "$testCaseId": "TC-01",
+    "$title": "Milling Burr Defect (Happy Path — Strong Precedent Match)",
+    "$category": "Quadrant 1 — Perfect End-to-End Workflow",
+    "notificationId": "8D-10049001",
     "origin": "Q3 - Internal Defect",
-    "symptomShortText": "Flange edge burr exceeds 0.10mm limit after milling operation",
-    "status": "In Process",
-    "foundDate": "2026-09-22",
+    "symptomShortText": "Operator stopped the line - rough edge felt on bracket flange after milling",
+    "status": "Completed",
+    "foundDate": "2026-08-12",
+    "completionDate": "2026-08-18",
+    "quantityExtent": "61 units on hold",
+    "teamSize": 4,
     "material": {
         "materialId": "MAT-10247",
         "description": "Bracket Housing X240",
         "materialGroup": "MG-HOUSING"
-    },
-    "workCenter": {
-        "workCenterId": "WC-MILL-07",
-        "description": "CNC Milling Line 7"
     },
     "batch": {
         "batchId": "B-55901",
@@ -144,31 +143,175 @@ const SANDBOX_INITIAL_JSON = {
         "defectCode": "DEF-0489",
         "defectText": "Flange edge burr above limit"
     },
+    "workCenter": {
+        "workCenterId": "WC-MILL-07",
+        "description": "CNC Milling Line 7"
+    },
     "inspections": [
         {
             "characteristic": "Burr height at flange edge",
             "measuredValue": "0.26mm",
             "specValue": "max 0.10mm"
+        },
+        {
+            "characteristic": "Flange flatness",
+            "measuredValue": "0.08mm",
+            "specValue": "0.05mm +/-0"
         }
     ],
     "causesIshikawa": [
-        { "category": "Machine", "cause": "Deburring tool insert worn beyond 250 cycles" }
+        {
+            "category": "Man",
+            "description": "EMP-2340, Shift C operator deburring technique verified per SOP-MILL-04",
+            "metricValue": null,
+            "isRootCause": "N",
+            "source": "MES/HR log audit"
+        },
+        {
+            "category": "Machine",
+            "description": "Deburring tool EQ-MILL07-002 ran to 11,800 cycles past 8,000-cycle replacement limit",
+            "metricValue": "11,800 cycles",
+            "isRootCause": "Y",
+            "source": "SAP PM maintenance log"
+        },
+        {
+            "category": "Method",
+            "description": "DOC-4610 Rev B - Milling & deburring work instruction unchanged and valid",
+            "metricValue": null,
+            "isRootCause": "N",
+            "source": "SAP DMS routing"
+        },
+        {
+            "category": "Material",
+            "description": "Alloy batch cert conforming to DIN EN 1706",
+            "metricValue": null,
+            "isRootCause": "N",
+            "source": "SAP QALS incoming inspect"
+        },
+        {
+            "category": "Measurement",
+            "description": "Optical comparator GA-0044 calibrated 2026-06-20",
+            "metricValue": "4.2% GR&R",
+            "isRootCause": "N",
+            "source": "Test equipment mgmt"
+        },
+        {
+            "category": "Environment",
+            "description": "Ambient temperature 22.8C within allowable limits",
+            "metricValue": "22.8C",
+            "isRootCause": "N",
+            "source": "Shopfloor IoT telemetry"
+        }
     ],
     "fiveWhyChain": [
-        "Why 1: Burr height exceeds 0.10mm limit",
-        "Why 2: Deburring cutter edge lost sharpness",
-        "Why 3: Tool life counter not reset during previous changeover",
-        "Why 4: Manual counter reset relying on operator memory",
-        "Why 5: Lack of automatic RFID tool tracking"
+        {
+            "stepNo": 1,
+            "question": "Why is the flange edge burr height 0.26mm above 0.10mm specification?",
+            "answer": "The deburring cutter insert no longer sheared cleanly during contour pass",
+            "evidenceCitation": "Inspection telemetry characteristic 'Burr height at flange edge'"
+        },
+        {
+            "stepNo": 2,
+            "question": "Why did the deburring cutter insert stop shearing cleanly?",
+            "answer": "Deburring tool EQ-MILL07-002 reached 11,800 cycles, exceeding 8,000-cycle replacement limit",
+            "evidenceCitation": "Equipment maintenance log EQ-MILL07-002"
+        },
+        {
+            "stepNo": 3,
+            "question": "Why was the tool-life replacement limit exceeded without notice?",
+            "answer": "No automated tool-life counter interlock was configured on CNC controller WC-MILL-07",
+            "evidenceCitation": "Preventive maintenance plan PM-MILL-07"
+        },
+        {
+            "stepNo": 4,
+            "question": "Why was there no automated counter interlock configured?",
+            "answer": "Line relied on manual whiteboard tally tracking prone to shift-handover omissions",
+            "evidenceCitation": "Operating procedure SOP-MILL-04"
+        },
+        {
+            "stepNo": 5,
+            "question": "Why was manual tracking retained for critical finishing tooling?",
+            "answer": "FMEA-MILL07-03 had not assigned high RPN severity to tool over-cycling",
+            "evidenceCitation": "Process FMEA review audit FMEA-MILL07-03"
+        }
     ],
     "actions": [
         {
-            "actionType": "PCA",
-            "title": "Replace tool insert and implement automated RFID cycle interlock",
-            "assignedTo": "Quality & Tooling Lead",
-            "dueDate": "2026-09-30"
+            "lineNo": 1,
+            "actionType": "Containment",
+            "actionText": "Quarantine 61 units from batch B-55901 and perform 100% manual deburring audit",
+            "status": "Done"
+        },
+        {
+            "lineNo": 2,
+            "actionType": "Corrective",
+            "actionText": "Replace worn deburring tool insert EQ-MILL07-002 and recalibrate tool offset",
+            "status": "Done"
+        },
+        {
+            "lineNo": 3,
+            "actionType": "Preventive",
+            "actionText": "Implement automated cycle counter interlock on WC-MILL-07 controller at 8,000 cycles",
+            "status": "Done"
         }
-    ]
+    ],
+    "teamAssignments": [
+        {
+            "partnerId": "100001",
+            "partnerName": "Heli Weber",
+            "functionTitle": "Quality Engineer",
+            "partnerRole": "8D Team Leader",
+            "source": "Assigned from Quality Assurance"
+        },
+        {
+            "partnerId": "100012",
+            "partnerName": "Minh Dinh",
+            "functionTitle": "CNC Machining Process Engineer",
+            "partnerRole": "8D Team Member",
+            "source": "Assigned from Production Engineering"
+        },
+        {
+            "partnerId": "100018",
+            "partnerName": "Karl Wagner",
+            "functionTitle": "Machine Maintenance Technician",
+            "partnerRole": "8D Team Member",
+            "source": "Assigned from Maintenance"
+        },
+        {
+            "partnerId": "100011",
+            "partnerName": "Quyen La",
+            "functionTitle": "Quality Inspector",
+            "partnerRole": "8D Team Member",
+            "source": "Assigned from Quality Inspection"
+        }
+    ],
+    "isIsNot": {
+        "whatIs": "Flange edge burr height 0.26mm",
+        "whatIsNot": "Pocket depth deviation or bolt-hole pitch",
+        "whereIs": "Bracket flange edge at CNC Milling Line 7 (WC-MILL-07)",
+        "whereIsNot": "Other machining cells WC-PRESS-12 or WC-MILL-08",
+        "whenIs": "Batch B-55901 during second half of shift",
+        "whenIsNot": "Early shift parts before tool cycle overrun",
+        "extentIs": "61 units affected in batch B-55901",
+        "extentIsNot": "Batches before tool changeover",
+        "notes": "Problem isolated specifically to tool wear overrun on cutter EQ-MILL07-002"
+    },
+    "fmeaLink": {
+        "fmeaId": "FMEA-MILL07-03",
+        "description": "Process FMEA for CNC Milling Operations (Deburring Tool Wear)"
+    },
+    "costCopq": {
+        "costOfPoorQualityEur": 12750
+    },
+    "lessonsLearned": {
+        "whatWorked": "Tool-life telemetry in PM log isolated the root cause within single shift",
+        "whatDidnt": "Manual tally board allowed 3,800 overrun cycles before optical detection"
+    },
+    "customerReference": {
+        "complaintReference": "N/A - internal defect, no customer reference",
+        "customerPlantContact": "N/A",
+        "slaResponseDue": "N/A"
+    }
 };
 
 const SAMPLE_JUDGE_VALID = {
