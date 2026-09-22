@@ -12,7 +12,7 @@ Hệ thống quản lý sự cố chất lượng và tự động hóa quy trì
 | Hạng mục | Đường dẫn truy cập | Ghi chú |
 | :--- | :--- | :--- |
 | 🌐 **Trải nghiệm trực tuyến (Live Web)** | 👉 **[https://8-d-problem-solving.vercel.app](https://8-d-problem-solving.vercel.app)** | Vận hành thật 100% trên Vercel, không cần tài khoản, không cần cài đặt |
-| 🎬 **Video Demo sản phẩm (3 phút)** | 👉 **[https://drive.google.com/drive/folders/1EMNPvJtuusw9Dh1NjabfNLnO5E_v8n-h](YOUR_VIDEO_LINK_HERE)** | Video demo web |
+| 🎬 **Video Demo sản phẩm (3 phút)** | 👉 **[https://drive.google.com/drive/folders/1EMNPvJtuusw9Dh1NjabfNLnO5E_v8n-h](https://8-d-problem-solving.vercel.app)** | Video demo web |
 | 📦 **Kho mã nguồn (GitHub Repo)** | 👉 **[DungTruong1610/8D_problem_solving](https://github.com/DungTruong1610/8D_problem_solving)** | Nhánh `main`, đầy đủ commit history minh bạch |
 | 📊 **Slide thuyết trình** | 👉 **[Slide](https://drive.google.com/file/d/1L1WfLCbpMJxRpsIr45puTv2WzfOvzjfL/view?usp=sharing)** | Slide chuẩn format BTC |
 | 🧪 **Bộ 25 Testcase mẫu (Golden Dataset)** | 👉 **[Xem chi tiết 25 Testcase bên dưới](#-danh-mục-25-test-case-mẫu-golden-dataset--benchmark-suites)** | Thư mục `mock-data/clean` & `mock-data/dirty`, nạp sẵn trên Web |
