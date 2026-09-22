@@ -25,7 +25,7 @@
     "materialGroup": "MG-HOUSING"
   },
   "batch": {
-    "batchId": "B-54390",
+    "batchId": "B-50231",
     "materialId": "MAT-10247"
   },
   "defect": {
@@ -41,11 +41,18 @@
     {
       "characteristic": "Pocket depth",
       "measuredValue": "12.84mm",
+      "specLowerLimit": 12.95,
+      "specUpperLimit": 13.05,
+      "specUom": "mm",
+      "valuation": "Rejected",
       "specValue": "12.95-13.05mm"
     },
     {
       "characteristic": "Pocket depth spread",
       "measuredValue": "0.62mm",
+      "specUpperLimit": 0.10,
+      "specUom": "mm",
+      "valuation": "Rejected",
       "specValue": "max 0.10mm"
     }
   ],

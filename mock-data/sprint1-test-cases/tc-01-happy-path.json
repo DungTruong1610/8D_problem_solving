@@ -25,11 +25,12 @@
     "materialGroup": "MG-HOUSING"
   },
   "batch": {
-    "batchId": "B-55901",
+    "batchId": "B-49172",
     "materialId": "MAT-10247"
   },
   "defect": {
     "defectCode": "DEF-0489",
+    "defectCodeGroup": "QM-SUR",
     "defectText": "Flange edge burr above limit"
   },
   "workCenter": {

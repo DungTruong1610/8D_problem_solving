@@ -34,6 +34,7 @@
   },
   "defect": {
     "defectCode": "DEF-0489",
+    "defectCodeGroup": "QM-SUR",
     "defectText": "Flange edge burr above limit"
   },
   "workCenter": {
@@ -44,11 +45,17 @@
     {
       "characteristic": "Flange burr height",
       "measuredValue": "Flange burr height: gemessen 0,32mm, Sollwert max 0,10mm",
-      "specValue": "-"
+      "specUpperLimit": 0.10,
+      "specUom": "mm",
+      "valuation": "Rejected",
+      "specValue": "max 0.10mm"
     },
     {
       "characteristic": "Flange flatness",
       "measuredValue": "0.09mm",
+      "specUpperLimit": 0.05,
+      "specUom": "mm",
+      "valuation": "Rejected",
       "specValue": "0.05mm +/-0"
     }
   ],
