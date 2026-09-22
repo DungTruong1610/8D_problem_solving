@@ -379,6 +379,18 @@ class EightDService extends BaseODataService<Report8D> {
      * rõ, và một báo cáo 8D hiện lộn xộn D5 trước D2 thì vô nghĩa.
      */
     async getWithDisciplines(id: string) {
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+        if (!isUuid) {
+            const list = await this.getList(
+                new ODataQueryBuilder()
+                    .filter(`notificationId eq '${id}'`)
+                    .expand('disciplines($orderby=sequence)')
+                    .top(1),
+            );
+            if (list?.value?.length) {
+                return list.value[0];
+            }
+        }
         return this.getById(
             id,
             new ODataQueryBuilder().expand('disciplines($orderby=sequence)'),
@@ -387,6 +399,18 @@ class EightDService extends BaseODataService<Report8D> {
 
     /** Chỉ trạng thái — dùng cho vòng poll, tránh kéo cả báo cáo về mỗi 3 giây. */
     async getStatus(id: string) {
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+        if (!isUuid) {
+            const list = await this.getList(
+                new ODataQueryBuilder()
+                    .filter(`notificationId eq '${id}'`)
+                    .select(['ID', 'status', 'errorMessage'])
+                    .top(1),
+            );
+            if (list?.value?.length) {
+                return list.value[0] as Pick<Report8D, 'ID' | 'status' | 'errorMessage'>;
+            }
+        }
         return this.getById(
             id,
             new ODataQueryBuilder().select(['ID', 'status', 'errorMessage']),

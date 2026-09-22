@@ -83,6 +83,30 @@ cds.on('bootstrap', (app: express.Application) => {
         }
     });
 
+    // ===== SPRINT 1 VERIFY HARNESS REST ENDPOINTS =====
+    app.use(express.json({ limit: '10mb' }));
+
+    app.get('/api/verify/sprint1', async (req, res) => {
+        try {
+            const { runVerifyHarness } = await import('../scripts/verify-sprint1-harness');
+            const report = await runVerifyHarness();
+            res.json(report);
+        } catch (error: any) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+
+    app.post('/api/verify/judge-input', async (req, res) => {
+        try {
+            const { evaluateJudgeInput } = await import('../scripts/verify-sprint1-harness');
+            const db = await cds.connect.to('db');
+            const result = await evaluateJudgeInput(req.body, db);
+            res.json(result);
+        } catch (error: any) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+
     logger.info('Custom bootstrap initialized');
 });
 

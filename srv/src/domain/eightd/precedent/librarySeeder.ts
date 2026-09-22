@@ -345,20 +345,25 @@ async function ensureReportRecord(db: any, notificationId: string, ctx: any, raw
         }),
     );
 
+    const allTeam = [
+        ...(ctx.team?.leader ? [ctx.team.leader] : []),
+        ...(ctx.team?.members || []),
+    ];
+
     const disciplines = [
         {
             code: 'D1', sequence: 1, title: 'D1 — Team Roster',
             summary: 'Formed cross-functional 8D team.',
             resultJson: JSON.stringify({
                 team: {
-                    roster: (ctx.team?.members || []).map((m: any) => ({
+                    roster: allTeam.map((m: any) => ({
                         name: m.partnerName, organizationalRole: m.functionTitle,
                         assigned8DRole: m.partnerRole, caseResponsibility: m.functionTitle,
                     })),
-                    assignedRoster: [
-                        ...(ctx.team?.leader ? [{ partnerId: ctx.team.leader.partnerId, partnerRole: '8D Team Leader' }] : []),
-                        ...(ctx.team?.members || []).map((m: any) => ({ partnerId: m.partnerId, partnerRole: m.partnerRole || '8D Team Member' })),
-                    ],
+                    assignedRoster: allTeam.map((m: any) => ({
+                        partnerId: m.partnerId,
+                        partnerRole: m.partnerRole || '8D Team Member',
+                    })),
                 },
             }),
         },
@@ -427,12 +432,16 @@ async function ensureReportRecord(db: any, notificationId: string, ctx: any, raw
         INSERT.into('cnma.proresolve.Disciplines').entries(
             disciplines.map((d, dIdx) => {
                 let reviewStatus = 'Draft';
+                let workState = 'InProgress';
                 if (isClosed) {
                     reviewStatus = 'Approved';
+                    workState = 'Completed';
                 } else if (isChangeReq && d.code === 'D4') {
                     reviewStatus = 'ChangeRequested';
+                    workState = 'InProgress';
                 } else if (dIdx < 3) {
                     reviewStatus = 'Approved';
+                    workState = 'Completed';
                 }
                 return {
                     ID: cds.utils.uuid(),
@@ -444,6 +453,7 @@ async function ensureReportRecord(db: any, notificationId: string, ctx: any, raw
                     content: d.summary,
                     aiGenerated: true,
                     reviewStatus,
+                    workState,
                     resultJson: d.resultJson,
                     formSchemaJson: schemaByCode.get(d.code) ?? null,
                 };

@@ -62,5 +62,6 @@ app/cnma_proresolve_ui/public/samples/
 ./venv
 
 # Kế hoạch nội bộ — giữ ở máy, không đưa lên GitHub.
-# (Lưu ý: `./docs` không phải cú pháp gitignore hợp lệ, phải là `docs/`.)
 docs/
+!docs/SPRINT1-VERIFY-RUNBOOK.md
+!docs/USER-AND-JUDGE-GUIDE.md

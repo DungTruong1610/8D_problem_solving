@@ -10,6 +10,7 @@ import {
     EightDListPage,
     EightDDetailPage,
     MasterDataPage,
+    GuidePage,
 } from '@/pages';
  
 // Sync React Router navigation with parent FLP shell URL
@@ -50,6 +51,8 @@ export default function App() {
                             <Route path="/8d/:id" element={<EightDDetailPage />} />
                             <Route path="/master-data" element={<MasterDataPage />} />
                             <Route path="/workflow" element={<WorkflowPage />} />
+                            <Route path="/guide" element={<GuidePage />} />
+                            <Route path="/verify" element={<Navigate to="/guide" replace />} />
 
                             <Route path="*" element={<Navigate to="/8d" replace />} />
                         </Route>
