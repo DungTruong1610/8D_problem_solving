@@ -4,6 +4,7 @@
   "rewrites": [
     { "source": "/odata/:path*", "destination": "https://eightd-hackathon-backend.onrender.com/odata/:path*" },
     { "source": "/api/cnma/:path*", "destination": "https://eightd-hackathon-backend.onrender.com/api/cnma/:path*" },
+    { "source": "/api/verify/:path*", "destination": "https://eightd-hackathon-backend.onrender.com/api/verify/:path*" },
     { "source": "/identity/:path*", "destination": "https://eightd-hackathon-backend.onrender.com/identity/:path*" },
     { "source": "/identity-admin/:path*", "destination": "https://eightd-hackathon-backend.onrender.com/identity-admin/:path*" },
     { "source": "/workflow/:path*", "destination": "https://eightd-hackathon-backend.onrender.com/workflow/:path*" },
