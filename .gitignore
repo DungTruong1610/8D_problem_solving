@@ -64,3 +64,4 @@ app/cnma_proresolve_ui/public/samples/
 # Kế hoạch nội bộ — giữ ở máy, không đưa lên GitHub.
 docs/
 !docs/SPRINT1-VERIFY-RUNBOOK.md
+!docs/USER-AND-JUDGE-GUIDE.md
