@@ -44,7 +44,7 @@ function useNavTree(): NavEntry[] {
         { type: 'leaf', to: '/8d', icon: ClipboardList, label: '8D Reports' },
         { type: 'leaf', to: '/master-data', icon: Database, label: 'Master Data' },
         { type: 'leaf', to: '/workflow', icon: Workflow, label: t('nav.workflow') },
-        { type: 'leaf', to: '/guide', icon: BookOpen, label: 'Hướng dẫn & Đánh giá' },
+        { type: 'leaf', to: '/guide', icon: BookOpen, label: 'User & Judge Guide' },
     ];
 }
 

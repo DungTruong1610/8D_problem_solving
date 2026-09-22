@@ -1,111 +1,111 @@
-# 📖 Cẩm Nang Vận Hành & Hướng Dẫn Đánh Giá 8D Problem Solving Copilot
+# 📖 User & Judge Guide — Autonomous 8D Problem Solving Copilot
 
 > **MLAI Hackathon 2026**  
 > **Track 1:** OrganizationAI  
 > **Challenge B:** The Whole Workflow (Autonomous 8D Copilot)  
-> **Cơ sở dữ liệu:** PostgreSQL 16 + pgvector (`localhost:5432` qua Docker, độc lập không phụ thuộc SAP HANA)
+> **Database:** PostgreSQL 16 + pgvector (`localhost:5432` via Docker, standalone with zero SAP HANA dependency)
 
 ---
 
-## 🧭 Mục Lục
-1. [Giới Thiệu & Tính Năng WalkMe Tour](#1-giới-thiệu--tính-năng-walkme-tour)
-2. [Công Dụng Từng Màn Hình & Kịch Bản Thao Tác Chuẩn](#2-công-dụng-từng-màn-hình--kịch-bản-thao-tác-chuẩn)
-3. [Hướng Dẫn Cấu Hình Hệ Thống Trên Web (`/#/workflow`)](#3-hướng-dẫn-cấu-hình-hệ-thống-trên-web-workflow)
-4. [Cấu Trúc JSON Chuẩn Để Tự Tạo Test Case (Schema Playground)](#4-cấu-trúc-json-chuẩn-để-tự-tạo-test-case-schema-playground)
-   - [Từ điển các trường dữ liệu (Schema Dictionary)](#từ-điển-các-trường-dữ-liệu-schema-dictionary)
-   - [File JSON Template mẫu chuẩn](#file-json-template-mẫu-chuẩn)
-   - [Bí kíp tạo 4 loại Test Case (4-Quadrant Strategy)](#bí-kíp-tạo-4-loại-test-case-4-quadrant-strategy)
-5. [Trung Tâm Đánh Giá Sprint 1 & Verify Sandbox](#5-trung-tâm-đánh-giá-sprint-1--verify-sandbox)
-   - [Barem điểm & Tiêu chí đánh giá Sprint 1](#barem-điểm--tiêu-chí-đánh-giá-sprint-1)
-   - [Cách chạy Verify Harness 90 Giây (1-Click Run)](#cách-chạy-verify-harness-90-giây-1-click-run)
-   - [Thử nghiệm Test Case ẩn của Ban Giám Khảo](#thử-nghiệm-test-case-ẩn-của-ban-giám-khảo)
-6. [Bảng Tra Cứu Lệnh Dòng Lệnh Nhanh (CLI Reference)](#6-bảng-tra-cứu-lệnh-dòng-lệnh-nhanh-cli-reference)
+## 🧭 Table of Contents
+1. [Introduction & WalkMe Tour](#1-introduction--walkme-tour)
+2. [Module Purpose & Standard Operating Procedures](#2-module-purpose--standard-operating-procedures)
+3. [AI Workflow & System Configuration (`/#/workflow`)](#3-ai-workflow--system-configuration-workflow)
+4. [Standard JSON Schema & Test Case Authoring Playground](#4-standard-json-schema--test-case-authoring-playground)
+   - [Schema Field Dictionary](#schema-field-dictionary)
+   - [Reference JSON Template](#reference-json-template)
+   - [4-Quadrant Test Strategy](#4-quadrant-test-strategy)
+5. [Sprint 1 Evaluation Suite & Defense Sandbox](#5-sprint-1-evaluation-suite--defense-sandbox)
+   - [Scoring Rubric & Sprint 1 Criteria](#scoring-rubric--sprint-1-criteria)
+   - [90-Second Verify Harness Execution (1-Click Run)](#90-second-verify-harness-execution-1-click-run)
+   - [Testing Arbitrary Judge Benchmark Test Cases](#testing-arbitrary-judge-benchmark-test-cases)
+6. [Quick Command-Line Reference (CLI)](#6-quick-command-line-reference-cli)
 
 ---
 
-## 1. Giới Thiệu & Tính Năng WalkMe Tour
+## 1. Introduction & WalkMe Tour
 
-**8D Problem Solving Copilot** là giải pháp trợ lý AI chuyên sâu cho ngành cơ khí chính xác và sản xuất ô tô, tự động hóa toàn bộ quy trình giải quyết sự cố chất lượng theo chuẩn quốc tế **8D (Eight Disciplines - Ford/AIAG/VDA)**.
+The **8D Problem Solving Copilot** is a specialized AI assistant engineered for precision manufacturing and automotive production. It fully automates the eight-discipline root cause resolution methodology adhering to the international **8D standard (Ford / AIAG / VDA)**.
 
-### 🚀 Tính năng WalkMe Tour (Trải nghiệm 5 phút dắt tay chỉ việc):
-Trên giao diện Web (`/#/guide`), bạn chỉ cần bấm nút **"🚀 Bắt Đầu WalkMe Tour"**, hệ thống sẽ mở trình hướng dẫn tương tác dẫn dắt qua 5 trạm nghiệp vụ thực tế:
-* **Trạm 1:** Khám phá danh sách sự cố tại `/#/8d` (Cách lọc và mở sự cố mẫu `8D-10048412`).
-* **Trạm 2:** Khám phá không gian giải quyết sự cố `/#/8d/:id` (Xem AI gợi ý 8 bước và tra cứu tiền lệ lịch sử).
-* **Trạm 3:** Chẩn đoán mù & Bằng chứng vật lý (Kiểm tra sensor đối chứng, lật ngược thiên kiến đổ lỗi con người).
-* **Trạm 4:** Cấu hình AI Workflow tại `/#/workflow` (Cách đổi Model AI, sửa Prompt và chỉnh thanh trượt trọng số).
-* **Trạm 5:** Tạo Test Case JSON & Chạy Verify 90 Giây (Tải mẫu JSON, kiểm tra hợp lệ và bấm chạy kiểm thử).
-
----
-
-## 2. Công Dụng Từng Màn Hình & Kịch Bản Thao Tác Chuẩn
-
-Tình huống mẫu xuyên suốt: *Sự cố bavia mép bích phay CNC Line 7 (`WC-MILL-07`, `MAT-10247`)*.
-
-### 1. Trang Danh Sách Hồ Sơ 8D (`/#/8d`)
-* **Mục đích:** Bảng điều khiển trung tâm quản lý vòng đời của toàn bộ các thông báo chất lượng.
-* **Đối tượng:** Kỹ sư chất lượng (QE), Trưởng chuyền, Quản lý nhà máy.
-* **3 Bước thao tác chuẩn:**
-  1. Lọc danh sách theo trạng thái (*Open*, *In Progress*, *Completed*) hoặc SLA xử lý.
-  2. Bấm vào dòng sự cố để mở không gian làm việc chi tiết.
-  3. Hoặc bấm nút *"Create Defect"* ở góc phải để nhập nhanh một sự cố mới.
-
-### 2. Không Gian Giải Quyết Sự Cố 8 Bước (`/#/8d/:id`)
-* **Mục đích:** Không gian làm việc chi tiết thực hiện chuẩn phương pháp luận D1 $\to$ D8.
-* **Tính năng độc quyền:**
-  * **Precedent Panel:** AI tự động quét vector database để gợi ý các vụ án tương tự trong lịch sử kèm % khớp.
-  * **Physical Evidence:** Đối chiếu số liệu cảm biến thực tế với lời khai để loại bỏ thiên kiến xác nhận.
-* **3 Bước thao tác chuẩn:**
-  1. Xem các ca tiền lệ tương đồng trong lịch sử tại thanh bên phải.
-  2. Duyệt qua từng bước D1 $\to$ D8, bấm vào các gợi ý do AI đề xuất để chỉnh sửa hoặc chấp thuận.
-  3. Bấm *"Approve Step"* để khóa bước hiện tại và mở khóa bước kế tiếp.
-
-### 3. Quản Lý Dữ Liệu Gốc Master Data (`/#/master-data`)
-* **Mục đích:** Tra cứu danh mục công nghiệp của nhà máy: Dây chuyền (Work Centers), Vật tư (Materials), Chuyên gia (SMEs), Bảng mã lỗi (Defect Catalogue).
-* **Ứng dụng:** Tra cứu mã chuẩn SAP (`WC-MILL-07`, `MAT-10247`) khi soạn test case mới hoặc gán đội D1.
-
-### 4. Cấu Hình AI Workflow (`/#/workflow`)
-* **Mục đích:** Trung tâm điều khiển toàn bộ trí thông minh AI của hệ thống. Tinh chỉnh câu lệnh Prompt cho từng bước D1-D8, chọn nhà cung cấp mô hình LLM và cài đặt trọng số tìm kiếm tiền lệ.
+### 🚀 WalkMe Guided Tour (5-Minute Interactive Onboarding):
+From the Web UI (`/#/guide`), click **"Start WalkMe Tour (5 Min)"** to launch an interactive, step-by-step walkthrough covering 5 core operational stations:
+* **Station 1: 8D Incident Worklist (`/#/8d`)** — Filter active quality notifications and open reference case `8D-10048412`.
+* **Station 2: 8D Resolution Workspace (`/#/8d/:id`)** — Inspect step-by-step AI suggestions across D1 through D8 and view precedent history.
+* **Station 3: Blind Diagnosis & Physical Evidence** — Compare sensory inspection logs against operator statements to detect confirmation bias.
+* **Station 4: AI Workflow Configuration (`/#/workflow`)** — Switch LLM providers, edit prompt templates, and adjust multi-factor retrieval weights.
+* **Station 5: Test Authoring & 90s Verify Suite** — Download schema templates, validate custom JSON, and trigger the automated 90-second verify harness.
 
 ---
 
-## 3. Hướng Dẫn Cấu Hình Hệ Thống Trên Web (`/#/workflow`)
+## 2. Module Purpose & Standard Operating Procedures
 
-Người dùng có thể tinh chỉnh toàn bộ hệ thống ngay trên giao diện web qua 3 trụ cột chính:
+Running Benchmark Scenario: *Flange edge burr defect on CNC Milling Line 7 (`WC-MILL-07`, `MAT-10247`)*.
 
-### 1. Đổi Mô Hình AI (LLM Provider)
-* **DeepSeek V4.1 Flash (Khuyến nghị):** Tốc độ phản hồi cực nhanh, suy luận logic 5-Why sắc bén, chi phí tối ưu.
-* **Gemini 2.5 Flash:** Khả năng trích xuất thực thể và hiểu ngôn ngữ kỹ thuật đa ngôn ngữ rất tốt.
-* **Local Mock Mode (Free / Zero-Cost):** Chạy độc lập hoàn toàn trong máy, không cần kết nối mạng hay API key.
+### 1. 8D Incident Worklist (`/#/8d`)
+* **Purpose:** Central management dashboard overseeing the entire lifecycle of manufacturing quality notifications.
+* **Target Users:** Quality Engineers (QE), Shift Supervisors, Plant Quality Managers.
+* **Standard 3-Step Procedure:**
+  1. Filter records by resolution status (*Open*, *In Progress*, *Completed*) or SLA risk.
+  2. Click any incident card/row to open its detailed 8D resolution workspace.
+  3. Or click *"Create Defect"* in the top-right toolbar to register a new incident.
 
-### 2. Quản Lý Prompt D1 - D8
-Mỗi bước D1-D8 có System Prompt & User Prompt độc lập. Khi chỉnh sửa, bạn có thể sử dụng các biến nội suy:
-* `{{symptomShortText}}`: Mô tả hiện tượng lỗi ban đầu.
-* `{{material}}`: Thông tin mã & nhóm linh kiện.
-* `{{workCenter}}`: Dây chuyền/máy sản xuất.
-* `{{inspections}}`: Bảng số đo dung sai kỹ thuật.
-* `{{precedents}}`: Danh sách hồ sơ tiền lệ tương đồng.
+### 2. 8-Discipline Resolution Workspace (`/#/8d/:id`)
+* **Purpose:** Detailed step-by-step workbench guiding engineers through disciplines D1 through D8.
+* **Distinctive Capabilities:**
+  * **Precedent Panel:** The AI engine scans the PostgreSQL vector database and recommends historical matching cases with exact similarity percentages.
+  * **Physical Evidence:** Cross-examines sensor and tool telemetry against operator statements to eliminate human bias.
+* **Standard 3-Step Procedure:**
+  1. Review top historical precedent matches in the right sidebar.
+  2. Step through D1 to D8, clicking AI suggestions to inspect, accept, or refine them.
+  3. Click *"Approve Step"* to lock the current discipline and unlock the subsequent step.
 
-### 3. Tinh Chỉnh Bộ Máy Tìm Kiếm Tiền Lệ (Retrieval Engine)
-* **Scoring Weights:** Kéo thanh trượt để điều chỉnh mức độ ưu tiên: Ưu tiên trùng máy (Work Center: 40%), trùng linh kiện (Material: 35%), hay trùng triệu chứng (25%).
-* **Ngưỡng An Toàn Cutoff 60% (Rule 3.b):** Nếu điểm tương đồng vector dưới 0.60, hệ thống tự động kích hoạt chế độ **Safe Refusal** để ngăn chặn AI sinh ảo giác.
+### 3. Master Data Registry (`/#/master-data`)
+* **Purpose:** Search and verify industrial plant master registries: Work Centers (lines/machines), Materials (part numbers), Subject Matter Experts (SMEs), and Defect Catalogues.
+* **Application:** Lookup canonical SAP codes (`WC-MILL-07`, `MAT-10247`) when authoring new test cases or establishing the D1 containment team.
+
+### 4. AI Workflow Configuration (`/#/workflow`)
+* **Purpose:** Control tower for system intelligence. Fine-tune system/user prompts for D1–D8, switch LLM providers, and calibrate retrieval scoring weights.
 
 ---
 
-## 4. Cấu Trúc JSON Chuẩn Để Tự Tạo Test Case (Schema Playground)
+## 3. AI Workflow & System Configuration (`/#/workflow`)
 
-### Từ điển các trường dữ liệu (Schema Dictionary):
+Engineers and administrators can configure system intelligence directly in the browser across 3 key pillars:
 
-| Tên Trường (Field) | Bắt Buộc? | Kiểu Dữ Liệu | Ý Nghĩa Trong 8D | Ví Dụ Mẫu |
+### 1. LLM Model Providers
+* **DeepSeek V4.1 Flash (Recommended):** Ultra-fast inference, rigorous 5-Why logical decomposition, optimal token efficiency.
+* **Gemini 2.5 Flash:** High multimodal accuracy, multilingual technical text parsing, and complex entity extraction.
+* **Local Mock Mode (Offline / Zero-Cost):** 100% deterministic local execution without network access or API keys.
+
+### 2. D1–D8 Prompt Management
+Each discipline from D1 to D8 features independent System and User prompts. Prompts support dynamic parameter interpolation:
+* `{{symptomShortText}}`: Original symptom description.
+* `{{material}}`: Material code and product family.
+* `{{workCenter}}`: Work center / manufacturing machine.
+* `{{inspections}}`: Dimensional inspection metrics and tolerances.
+* `{{precedents}}`: Retrieved historical cases and solutions.
+
+### 3. Precedent Retrieval Calibration
+* **Scoring Weights:** Adjust sliders to tune multi-factor matching priorities: Work Center match (default 40%), Material match (default 35%), Symptom vector similarity (default 25%).
+* **Safety Cutoff Threshold (Rule 3.b):** When maximum similarity falls below 0.60 (60%), the system automatically triggers **Safe Refusal** mode to prevent hallucinations.
+
+---
+
+## 4. Standard JSON Schema & Test Case Authoring Playground
+
+### Schema Field Dictionary:
+
+| Field Name | Required? | Data Type | Role in 8D Methodology | Example Value |
 |---|---|---|---|---|
-| `notificationId` | **Bắt buộc** | string | Mã hồ sơ sự cố định danh | `"8D-10049001"` |
-| `symptomShortText` | **Bắt buộc** | string | Mô tả hiện tượng lỗi (dùng tính vector) | `"Rough edge felt on bracket flange after milling"` |
-| `material.materialId` | **Bắt buộc** | string | Mã linh kiện/vật tư bị lỗi | `"MAT-10247"` |
-| `workCenter.workCenterId` | **Bắt buộc** | string | Mã dây chuyền/máy sản xuất | `"WC-MILL-07"` |
-| `origin` | Tùy chọn | string | Nguồn phát hiện: Q1 (Khách), Q3 (Nội bộ) | `"Q3 - Internal Defect"` |
-| `inspections` | **Khuyên dùng** | array | Bảng số đo thực tế vs dung sai quy định | `[{"measuredValue": "0.26mm", "specValue": "max 0.10mm"}]` |
-| `causesIshikawa` | Tùy chọn | array | Nhận định xương cá ban đầu của kỹ sư | `[{"category": "Machine", "cause": "..."}]` |
+| `notificationId` | **Required** | string | Unique incident identifier | `"8D-10049001"` |
+| `symptomShortText` | **Required** | string | Defect symptom text (used for semantic embedding) | `"Rough edge felt on bracket flange after milling"` |
+| `material.materialId` | **Required** | string | Defective component / material code | `"MAT-10247"` |
+| `workCenter.workCenterId` | **Required** | string | Production line / machine code | `"WC-MILL-07"` |
+| `origin` | Optional | string | Defect origin: Q1 (Customer), Q3 (Internal Plant) | `"Q3 - Internal Defect"` |
+| `inspections` | **Recommended** | array | Physical measurements vs engineering specifications | `[{"measuredValue": "0.26mm", "specValue": "max 0.10mm"}]` |
+| `causesIshikawa` | Optional | array | Initial engineer Ishikawa fishbone observations | `[{"category": "Machine", "cause": "..."}]` |
 
-### File JSON Template mẫu chuẩn:
+### Reference JSON Template:
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -113,7 +113,7 @@ Mỗi bước D1-D8 có System Prompt & User Prompt độc lập. Khi chỉnh s�
   "$title": "Custom Manufacturing Defect Test Case",
   "notificationId": "8D-10049999",
   "origin": "Q3 - Internal Defect",
-  "symptomShortText": "Bavia mep bich vuot qua gioi han cho phep sau khi phay",
+  "symptomShortText": "Excess burr on flange edge exceeding tolerance after milling",
   "status": "In Process",
   "foundDate": "2026-09-22",
   "material": {
@@ -134,50 +134,50 @@ Mỗi bước D1-D8 có System Prompt & User Prompt độc lập. Khi chỉnh s�
   ]
 }
 ```
-*(Trên Web UI, bạn có thể bấm nút **"Tải .json về"** để lưu file `test-case-template-8D.json` trực tiếp về máy).*
+*(On the Web UI, click **"Download .json"** to save `test-case-template-8D.json` directly to disk).*
 
-### Bí kíp tạo 4 loại Test Case (4-Quadrant Strategy):
-1. **Happy Path (TC-01):** Dùng mã máy `WC-MILL-07`, mã vật tư `MAT-10247`, số đo bavia `0.26mm`. Hệ thống sẽ khớp 100% với case tiền lệ `8D-10048412`.
-2. **Dirty Data (TC-02):** Dùng chuỗi tiếng Đức `"Grat an Flanschkante"`, số thập phân phẩy `"0,32 mm"`, ID thừa khoảng trắng `" MAT-10247 "`. Hệ thống sẽ chuẩn hóa tự động và báo cáo các trường thiếu.
-3. **Bias Hunter (TC-03):** Nhập nhận định kỹ sư đổ lỗi cho `Man`, nhưng trong `inspections` ghi nhận độ rơ dao lệch `0.9mm` (trần 0.2mm) trên cả 3 ca. AI sẽ phản biện và kết luận do `Machine`.
-4. **Safe Refusal (TC-04):** Dùng công nghệ hàn laser mới `WC-WELD-11`, linh kiện `MAT-12800`. Độ tương đồng < 60% sẽ kích hoạt từ chối an toàn và chuyển giao chuyên gia hàn.
+### 4-Quadrant Test Strategy:
+1. **Happy Path (TC-01):** Uses machine `WC-MILL-07`, material `MAT-10247`, burr measurement `0.26mm`. The retrieval engine matches 100% with historical precedent `8D-10048412`.
+2. **Dirty Data (TC-02):** Injects raw German input `"Grat an Flanschkante"`, European decimal comma `"0,32 mm"`, and padded whitespace `" MAT-10247 "`. The pipeline normalizes dirty input and flags missing fields cleanly.
+3. **Bias Hunter (TC-03):** Initial engineer feedback attributes defect to `Man`, but inspection records prove spindle runout of `0.9mm` (tolerance 0.2mm) across 3 shifts. The AI overrides human bias to conclude `Machine`.
+4. **Safe Refusal (TC-04):** Novel fiber-laser welding cell `WC-WELD-11` and experimental material `MAT-12800`. Similarity < 60% safely triggers refusal with 3 structured handover questions for welding SMEs.
 
 ---
 
-## 5. Trung Tâm Đánh Giá Sprint 1 & Verify Sandbox
+## 5. Sprint 1 Evaluation Suite & Defense Sandbox
 
-### Barem điểm & Tiêu chí đánh giá Sprint 1:
-* **Tiêu Chí 2 (12 Điểm):** Bộ 4 test case chiến lược chạy tự động trong < 90s (Thực tế: **~0.8s**, PASS 4/4).
-* **Tiêu Chí 3 (8 Điểm):** Two-Tier Defense xử lý hợp lý hoặc từ chối hợp lý cả 2 test case của Giám Khảo.
-* **Quy Định Bắt Buộc 3.b:** Chặn đứng ảo giác khi độ tương đồng < 60%, tự động soạn 3 câu hỏi chuyển giao SME.
+### Scoring Rubric & Sprint 1 Criteria:
+* **Criterion 2 (12 Points):** Automated execution of the 4 strategic test cases in < 90 seconds (Actual runtime: **~0.8s**, PASS 4/4).
+* **Criterion 3 (8 Points):** Two-Tier Defense pipeline appropriately processes or safely refuses both Judge benchmark cases.
+* **Mandatory Rule 3.b:** Hallucination firewall blocks false positives when similarity < 60%, generating 3 structured handover questions for SMEs.
 
-### Cách chạy Verify Harness 90 Giây (1-Click Run):
-* **Trên Web:** Vào `/#/guide` $\to$ cuộn xuống mục **"4. Đánh Giá Sprint 1"** $\to$ bấm **"Chạy Kiểm Thử 90 Giây"**.
-* **Qua Terminal:**
+### 90-Second Verify Harness Execution (1-Click Run):
+* **On Web UI:** Navigate to `/#/guide` $\to$ scroll to **"4. Sprint 1 Evaluation Suite"** $\to$ click **"Run 90s Verify Suite"**.
+* **Via Terminal:**
   ```bash
   npm run verify:sprint1
   ```
 
-### Thử nghiệm Test Case ẩn của Ban Giám Khảo:
-* **Trên Web:** Dán JSON bất kỳ của BTC vào ô **Two-Tier Defense Sandbox** và bấm **"Kiểm Tra Quyết Định Phòng Thủ"**.
-* **Qua Terminal:**
+### Testing Arbitrary Judge Benchmark Test Cases:
+* **On Web UI:** Paste any JSON into the **Two-Tier Defense Sandbox** and click **"Test Defense Decision"**.
+* **Via Terminal:**
   ```bash
   npm run verify:sprint1 -- --judge-input <file.json>
   ```
 
 ---
 
-## 6. Bảng Tra Cứu Lệnh Dòng Lệnh Nhanh (CLI Reference)
+## 6. Quick Command-Line Reference (CLI)
 
-| Mục Đích | Câu Lệnh Thực Thi |
+| Purpose | Execution Command |
 |---|---|
-| **Bật trọn gói hệ thống (BE + FE)** | `npm run dev:pg` |
-| **Chạy Verify Harness 90s (Sprint 1)** | `npm run verify:sprint1` |
-| **Kiểm thử case của Giám khảo** | `npm run verify:sprint1 -- --judge-input <file.json>` |
-| **Xuất kết quả Verify dạng Raw JSON** | `npm run verify:sprint1 -- --json` |
-| **Bật cơ sở dữ liệu Postgres Docker** | `docker compose up -d` |
-| **Chạy toàn bộ 1230 Unit Tests** | `npm test` |
-| **Kiểm tra biên dịch TypeScript** | `npm run typecheck && npx tsc -b app/8D_hackathon_ui` |
+| **Start Fullstack System (BE + FE)** | `npm run dev:pg` |
+| **Run 90s Verify Harness (Sprint 1)** | `npm run verify:sprint1` |
+| **Test Judge Benchmark Case** | `npm run verify:sprint1 -- --judge-input <file.json>` |
+| **Export Verify Output as Raw JSON** | `npm run verify:sprint1 -- --json` |
+| **Start Postgres Database via Docker** | `docker compose up -d` |
+| **Run Full Automated Unit Test Suite (1230 tests)** | `npm test` |
+| **Perform Full TypeScript Verification** | `npm run typecheck && npx tsc -b app/8D_hackathon_ui` |
 
 ---
-*Tài liệu được biên soạn và bảo chứng bởi Đội ngũ Kỹ thuật Autonomous 8D Copilot — MLAI Hackathon 2026.*
+*Maintained and verified by the Autonomous 8D Copilot Engineering Team — MLAI Hackathon 2026.*
