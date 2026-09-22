@@ -12,6 +12,8 @@ import { toast } from 'sonner';
 import {
     reviewDiscipline,
     reviewStatusOf,
+    isStepUnlocked,
+    STEP_CODES,
     saveDisciplineField,
     setDisciplineWorkState,
     type Discipline8D,
@@ -121,10 +123,15 @@ export function DisciplineReviewBox({
     precedentsJson?: string | null;
 }) {
     const queryClient = useQueryClient();
+    const allSiblings = siblings || [];
     const isApproved = reviewStatusOf(discipline) === 'Approved' || discipline.workState === 'Completed';
+    const unlocked = isApproved || isStepUnlocked(discipline.code, allSiblings);
+    const stepIdx = STEP_CODES.indexOf(discipline.code as any);
+    const prevCode = stepIdx > 0 ? STEP_CODES[stepIdx - 1] : null;
+
     const currentStatus: 'NotStarted' | 'InProgress' | 'Completed' = isApproved
         ? 'Completed'
-        : (discipline.workState === 'InProgress' ? 'InProgress' : 'NotStarted');
+        : (unlocked && discipline.workState === 'InProgress' ? 'InProgress' : 'NotStarted');
 
     const submit = useMutation({
         mutationFn: ({ decision, text }: { decision: ReviewDecision; text?: string }) =>
@@ -144,6 +151,11 @@ export function DisciplineReviewBox({
 
     const handleStatusChange = async (value: 'NotStarted' | 'InProgress' | 'Completed') => {
         if (value === currentStatus) return;
+
+        if (value === 'Completed' && !isApproved && !unlocked) {
+            toast.error(`Cannot complete ${discipline.code}: Please complete previous step (${prevCode}) first.`);
+            return;
+        }
 
         const parsed = parseJsonSafe(discipline.resultJson);
 
@@ -282,7 +294,9 @@ export function DisciplineReviewBox({
                         <p className="mt-0.5 text-sm text-muted-foreground">
                             {currentStatus === 'InProgress'
                                 ? 'In process — editing and confirmation enabled'
-                                : 'Not started (read-only) — switch status to "In process" to edit'}
+                                : !unlocked
+                                    ? `Not started (locked) — complete previous step (${prevCode}) to unlock`
+                                    : 'Not started (read-only) — switch status to "In process" to edit'}
                         </p>
                     )}
                 </div>
@@ -290,7 +304,7 @@ export function DisciplineReviewBox({
                 <div className="flex shrink-0 items-center gap-2.5">
                     <Select
                         value={currentStatus}
-                        disabled={busy}
+                        disabled={busy || (!unlocked && !isApproved)}
                         onValueChange={(val) => handleStatusChange(val as 'NotStarted' | 'InProgress' | 'Completed')}
                     >
                         <SelectTrigger className="h-9 w-[150px] px-3 text-sm font-medium bg-background">

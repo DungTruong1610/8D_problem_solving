@@ -1,6 +1,6 @@
 import { Check, Loader2 } from 'lucide-react';
 import { cn } from '@cnma/react-ui';
-import { reviewStatusOf, type Discipline8D } from '@/services/eightd-service';
+import { reviewStatusOf, isStepUnlocked, type Discipline8D } from '@/services/eightd-service';
 import { blockedBy, stepProgress, type StepCode } from '../../../../../shared/step-status';
 
 /**
@@ -70,6 +70,7 @@ export function CaseStepper({
                     let statusText = 'Pending';
                     let done = false;
                     let isCurrentAnalyzing = false;
+                    const unlocked = done || (discipline ? isStepUnlocked(code, disciplines) : false);
 
                     if (discipline) {
                         const revStatus = reviewStatusOf(discipline);
@@ -79,7 +80,7 @@ export function CaseStepper({
                         } else if (revStatus === 'ChangeRequested') {
                             statusText = 'Changes requested';
                         } else {
-                            statusText = discipline.workState === 'InProgress' ? 'In process' : 'Not started';
+                            statusText = (unlocked && discipline.workState === 'InProgress') ? 'In process' : 'Not started';
                         }
                     } else if (isAnalyzing) {
                         // Backend sinh theo ĐỢT song song, nên bước về đích không
@@ -111,8 +112,8 @@ export function CaseStepper({
                                     'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold',
                                     done && 'bg-success text-white',
                                     !done && discipline && reviewStatusOf(discipline) === 'ChangeRequested' && 'bg-warning text-white',
-                                    !done && discipline && reviewStatusOf(discipline) === 'Draft' && discipline.workState === 'InProgress' && 'border border-primary text-primary bg-primary/10',
-                                    !done && discipline && reviewStatusOf(discipline) === 'Draft' && discipline.workState !== 'InProgress' && 'border border-border text-muted-foreground',
+                                    !done && discipline && reviewStatusOf(discipline) === 'Draft' && unlocked && discipline.workState === 'InProgress' && 'border border-primary text-primary bg-primary/10',
+                                    !done && discipline && reviewStatusOf(discipline) === 'Draft' && (!unlocked || discipline.workState !== 'InProgress') && 'border border-border text-muted-foreground',
                                     !discipline && isCurrentAnalyzing && 'border border-info text-info bg-info/10',
                                     !discipline && !isCurrentAnalyzing && 'border border-border/50 text-muted-foreground/50',
                                 )}
@@ -141,7 +142,7 @@ export function CaseStepper({
                                         'block text-sm',
                                         done ? 'text-success'
                                             : discipline && reviewStatusOf(discipline) === 'ChangeRequested' ? 'text-warning'
-                                                : discipline && discipline.workState === 'InProgress' ? 'text-primary font-medium'
+                                                : discipline && unlocked && discipline.workState === 'InProgress' ? 'text-primary font-medium'
                                                     : isCurrentAnalyzing ? 'text-info font-medium'
                                                         : 'text-muted-foreground',
                                     )}

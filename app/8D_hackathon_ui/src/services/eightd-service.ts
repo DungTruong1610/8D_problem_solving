@@ -57,6 +57,9 @@ export interface Discipline8D {
 
 export type DisciplineWorkState = 'NotStarted' | 'InProgress' | 'Completed';
 
+export const STEP_CODES = ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8'] as const;
+export type StepCode = typeof STEP_CODES[number];
+
 export const REVIEW_STATUSES = ['Draft', 'Approved', 'ChangeRequested'] as const;
 export type ReviewStatus = typeof REVIEW_STATUSES[number];
 
@@ -115,10 +118,30 @@ export function parseConfirmedFields(json: string | null | undefined): string[] 
     }
 }
 
-/** Trạng thái xử lý của bước D: Approved -> Completed; còn lại là InProgress hoặc NotStarted. */
-export function workStateOf(discipline: Partial<Pick<Discipline8D, 'workState' | 'reviewStatus'>>): DisciplineWorkState {
+/**
+ * Kiểm tra một bước D có được mở khóa để thực hiện hay không (Stage-Gate khắt khe):
+ * - D1 luôn mở khóa.
+ * - Các bước tiếp theo (D2..D8) chỉ mở khóa khi bước ngay trước đó đã Completed / Approved.
+ */
+export function isStepUnlocked(code: string, disciplines: Discipline8D[] = []): boolean {
+    const idx = STEP_CODES.indexOf(code as StepCode);
+    if (idx <= 0) return true;
+    const prevCode = STEP_CODES[idx - 1];
+    const prev = disciplines.find((d) => d.code === prevCode);
+    if (!prev) return false;
+    return reviewStatusOf(prev) === 'Approved' || prev.workState === 'Completed';
+}
+
+/** Trạng thái xử lý của bước D: Approved -> Completed; còn lại là InProgress hoặc NotStarted (theo Stage-Gate). */
+export function workStateOf(
+    discipline: Partial<Pick<Discipline8D, 'workState' | 'reviewStatus' | 'code'>>,
+    allDisciplines?: Discipline8D[],
+): DisciplineWorkState {
     if (discipline.workState === 'Completed') return 'Completed';
     if (discipline.reviewStatus === 'Approved') return 'Completed';
+    if (discipline.code && allDisciplines && !isStepUnlocked(discipline.code, allDisciplines)) {
+        return 'NotStarted';
+    }
     const ws = discipline.workState;
     if (ws === 'InProgress') return 'InProgress';
     return 'NotStarted';
