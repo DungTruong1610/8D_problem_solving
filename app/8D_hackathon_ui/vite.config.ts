@@ -59,6 +59,7 @@ export default defineConfig({
         proxy: {
             '/odata': api(),
             '/api/cnma': api(),
+            '/api/verify': api(),
             '/identity': api(),
             '/identity-admin': api({
                 configure: (proxy: any) => {
