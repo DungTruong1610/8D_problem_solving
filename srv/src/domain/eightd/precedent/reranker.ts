@@ -23,6 +23,7 @@
  */
 
 import cds from '@sap/cds';
+import { createHash } from 'node:crypto';
 import { complete } from '../../../core/ai/llmClient';
 import { callAndParse } from '../jsonExtract';
 import { BUDGET } from '../schemas';
@@ -50,7 +51,11 @@ const ACTIVITY_RERANK = 'reviewQuality';
  * `RERANK_TIMEOUT_MS` ghi đè được để đo lại khi đổi model hoặc đổi prompt — và
  * PHẢI đo lại khi làm hai việc đó.
  */
-const RERANK_TIMEOUT_MS = Number(process.env.RERANK_TIMEOUT_MS ?? 45_000);
+const CONFIGURED_RERANK_TIMEOUT_MS = Number(process.env.RERANK_TIMEOUT_MS ?? 45_000);
+const RERANK_TIMEOUT_MS = Number.isFinite(CONFIGURED_RERANK_TIMEOUT_MS)
+    && CONFIGURED_RERANK_TIMEOUT_MS > 0
+    ? CONFIGURED_RERANK_TIMEOUT_MS
+    : 45_000;
 
 /** Mỗi ứng viên chỉ đưa chừng này ký tự văn bản — đủ để phán, không phình prompt. */
 const CANDIDATE_TEXT_CHARS = 700;
@@ -201,6 +206,67 @@ Rules:
 - reason is a one-line summary of analysis, not a separate judgement.
 - Return ONLY JSON matching the schema. No prose, no code fences.`;
 
+/**
+ * Reranking costs an external model call. Repeated analyses often submit the same
+ * query and the same precedent texts, so memoize the normalized verdicts. The
+ * content-addressed key means edits to a case, rubric, or prompt cannot reuse a
+ * stale score. Keep the cache bounded because each value may include model text.
+ */
+const RERANK_CACHE_TTL_MS = 15 * 60 * 1000;
+const RERANK_CACHE_MAX_ENTRIES = 256;
+const rerankCache = new Map<string, { value: Map<string, RerankVerdict>; expiresAt: number }>();
+const rerankInFlight = new Map<string, Promise<Map<string, RerankVerdict>>>();
+
+export function clearRerankCache(): void {
+    rerankCache.clear();
+    rerankInFlight.clear();
+}
+
+function rerankCacheKey(
+    frame: RerankFrame,
+    queryText: string,
+    candidates: readonly RerankCandidate[],
+): string {
+    const content = JSON.stringify({
+        version: 1,
+        systemPrompt: SYSTEM_PROMPT,
+        frame,
+        queryText,
+        candidates: candidates.map((c) => ({
+            notificationId: c.notificationId,
+            symptomShortText: c.symptomShortText ?? null,
+            searchText: c.searchText ?? null,
+        })),
+    });
+    return createHash('sha256').update(content).digest('hex');
+}
+
+function readRerankCache(key: string): Map<string, RerankVerdict> | null {
+    const entry = rerankCache.get(key);
+    if (!entry) return null;
+    if (entry.expiresAt <= Date.now()) {
+        rerankCache.delete(key);
+        return null;
+    }
+    // Map insertion order is the LRU order.
+    rerankCache.delete(key);
+    rerankCache.set(key, entry);
+    return new Map([...entry.value].map(([id, verdict]) => [id, { ...verdict }]));
+}
+
+function writeRerankCache(key: string, value: Map<string, RerankVerdict>): void {
+    rerankCache.delete(key);
+    rerankCache.set(key, {
+        value: new Map([...value].map(([id, verdict]) => [id, { ...verdict }])),
+        expiresAt: Date.now() + RERANK_CACHE_TTL_MS,
+    });
+    while (rerankCache.size > RERANK_CACHE_MAX_ENTRIES) {
+        const oldest = rerankCache.keys().next().value;
+        if (oldest === undefined) break;
+        rerankCache.delete(oldest);
+    }
+}
+
 function clip(text: string | null | undefined, max: number): string {
     const t = String(text ?? '').replace(/\s+/g, ' ').trim();
     return t.length > max ? `${t.slice(0, max - 1)}…` : t;
@@ -276,18 +342,55 @@ export async function rerankCandidates(
     frame: RerankFrame,
     queryText: string,
     candidates: readonly RerankCandidate[],
+    options: { timeoutMs?: number } = {},
 ): Promise<Map<string, RerankVerdict>> {
     if (!candidates.length) return new Map();
 
+    const cacheKey = rerankCacheKey(frame, queryText, candidates);
+    const cached = readRerankCache(cacheKey);
+    if (cached) {
+        LOG.info(`Re-rank cache hit: ${cached.size}/${candidates.length} candidates`);
+        return cached;
+    }
+
+    const inFlight = rerankInFlight.get(cacheKey);
+    if (inFlight) {
+        LOG.info(`Re-rank in-flight deduplicated: ${candidates.length} candidates`);
+        return inFlight.then((value) => new Map([...value].map(([id, verdict]) => [id, { ...verdict }])));
+    }
+
+    const pending = runRerankCandidates(frame, queryText, candidates, options, cacheKey);
+    rerankInFlight.set(cacheKey, pending);
+    try {
+        const value = await pending;
+        return new Map([...value].map(([id, verdict]) => [id, { ...verdict }]));
+    } finally {
+        if (rerankInFlight.get(cacheKey) === pending) rerankInFlight.delete(cacheKey);
+    }
+}
+
+async function runRerankCandidates(
+    frame: RerankFrame,
+    queryText: string,
+    candidates: readonly RerankCandidate[],
+    options: { timeoutMs?: number },
+    cacheKey: string,
+): Promise<Map<string, RerankVerdict>> {
     const sentIds = candidates.map((c) => c.notificationId);
 
+    const requestedTimeoutMs = Number(options.timeoutMs);
+    const timeoutMs = Number.isFinite(requestedTimeoutMs) && requestedTimeoutMs > 0
+        ? Math.floor(requestedTimeoutMs)
+        : RERANK_TIMEOUT_MS;
+
+    let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
     const timeout = new Promise<never>((_, reject) => {
-        const t = setTimeout(
-            () => reject(new Error(`Re-rank quá ${RERANK_TIMEOUT_MS / 1000}s`)),
-            RERANK_TIMEOUT_MS,
+        timeoutHandle = setTimeout(
+            () => reject(new Error(`Re-rank quá ${timeoutMs / 1000}s`)),
+            timeoutMs,
         );
         // Không giữ event loop sống chỉ vì cái đồng hồ này.
-        (t as unknown as { unref?: () => void }).unref?.();
+        (timeoutHandle as unknown as { unref?: () => void }).unref?.();
     });
 
     const call = callAndParse<{ rankings: unknown }>('rerank', async (repairHint) => {
@@ -316,9 +419,17 @@ export async function rerankCandidates(
     });
 
     const started = Date.now();
-    const { value } = await Promise.race([call, timeout]);
+    let value: unknown;
+    try {
+        ({ value } = await Promise.race([call, timeout]));
+    } finally {
+        if (timeoutHandle) clearTimeout(timeoutHandle);
+    }
     const elapsed = Date.now() - started;
     const verdicts = normalizeRerankOutput(value, sentIds);
+    // Cache only complete judgments. A partial/malformed provider response may be
+    // transient, so the next request should be allowed to retry it.
+    if (verdicts.size === sentIds.length) writeRerankCache(cacheKey, verdicts);
 
     // Lập luận về CASE ĐANG MỞ là mốc mà mọi điểm số được đo theo. Không log nó
     // thì khi một thứ hạng trông vô lý, chẳng còn gì để soi ngoài con số.

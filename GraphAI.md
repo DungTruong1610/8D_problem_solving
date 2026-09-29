@@ -210,6 +210,19 @@ Bao gồm tối thiểu các lát cắt:
 
 ## 5. Thiết kế performance và cache
 
+### Đã triển khai: cache kết quả reranker
+
+`srv/src/domain/eightd/precedent/reranker.ts` hiện cache verdict listwise trong bộ nhớ tiến trình:
+
+- Key SHA-256 bao gồm system prompt, rubric/frame của bước D, query và toàn bộ nội dung ứng viên. Sửa query, prompt hoặc nội dung case sẽ tạo key mới.
+- TTL 15 phút, tối đa 256 key theo LRU; quá giới hạn sẽ bỏ entry cũ nhất.
+- Chỉ cache output có verdict hợp lệ cho đủ tất cả ứng viên. Response lỗi/thiếu judgment sẽ không bị lưu lại để request sau có thể thử lại.
+- Gộp các request đồng thời có cùng key thành một lần gọi model (single-flight).
+- Giá trị trả về được clone để caller không thể sửa object đang nằm trong cache.
+- Cache nằm trong RAM từng process; restart sẽ xóa cache. Chưa có persistent/shared cache và chưa có invalidation chủ động theo library version.
+
+Đây là tối ưu có hiệu quả ngay cho request lặp, đồng thời không thay đổi xếp hạng lần đầu. Bước tiếp theo là đo hit rate, latency warm/cold và bổ sung invalidation/versioning khi local index được triển khai.
+
 Với dataset seed nhỏ, ưu tiên giảm round trip/model calls trước khi thêm thuật toán ANN:
 
 1. **Một lần lấy cấu trúc:** gom relation features cho case library/query bằng batch SQL/repository hoặc snapshot index; tránh mỗi candidate lại query actions/team.
@@ -319,4 +332,3 @@ Tên module trên là gợi ý, cần giữ naming/import convention đang dùng
 - SAP HANA Cloud vector engine / fuzzy text search docs chỉ là tham khảo so sánh khả năng; kiến trúc đề xuất không cần SAP HANA. <https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-vector-engine-guide/writing-queries> · <https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-search-developer-guide/fuzzy-text-search>
 - Santhanam et al., NAACL 2022, *ColBERTv2: Effective and Efficient Retrieval via Lightweight Late Interaction*; kỹ thuật cân nhắc khi retrieval scale lớn và đã có benchmark chứng minh cần. <https://aclanthology.org/2022.naacl-main.272/>
 - Yu et al., EACL 2026, *Evaluation of Retrieval-Augmented Generation: A Survey*; tham khảo lựa chọn các metric MRR/nDCG và phân tầng đánh giá. <https://aclanthology.org/2026.eacl-long.391.pdf>
-
