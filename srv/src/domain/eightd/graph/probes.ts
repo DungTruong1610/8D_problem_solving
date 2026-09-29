@@ -13,14 +13,15 @@
  * định "Cypher trong code, admin chỉnh tham số" — và đường bằng chứng hiện ra
  * miễn phí, vì mỗi dòng probe CHÍNH LÀ một chặng của đường đó.
  *
- * ── Phân vai giữa Cypher và SQL ──
- * Phương ngữ openCypher của HANA không có hàm tổng hợp nào (xem `graphClient`).
- * Nên Cypher khớp mẫu và trả về từng cặp thô; SQL đếm và gom nhóm. Ranh giới đó
- * lộ rõ trong từng hàm dưới đây và là cố ý.
+ * ── Hai backend, cùng một bằng chứng ──
+ * HANA dùng openCypher để đi qua vertex/edge rồi SQL tổng hợp kết quả. SQLite
+ * chạy phép nối tương đương trực tiếp trên các cột đã chuẩn hoá trong kho case.
+ * Cả hai nhánh trả cùng `EvidenceHit`, nên phần trọng số và xếp hạng dùng chung.
  */
 
+import cds from '@sap/cds';
 import { EDGE, NODE, TABLE, CLOSED_STATUSES } from './model';
-import { runGraphQuery } from './graphClient';
+import { getGraphBackend, runGraphQuery } from './graphClient';
 import { keywordPredicate, type GraphAnchor } from './anchor';
 
 /** Một chặng bằng chứng: case nào, chạm anchor bằng cách gì, bao nhiêu lần. */
@@ -52,6 +53,24 @@ export type EvidenceKind =
 
 const CLOSED_LIST = CLOSED_STATUSES.map(() => '?').join(', ');
 
+const SQLITE_CASE_COLUMN: Partial<Record<EvidenceKind, string>> = {
+    workCenter: 'WORKCENTERID',
+    material: 'MATERIALID',
+    defectCode: 'DEFECTCODE',
+};
+
+async function runSqlite<Row extends object>(
+    sql: string,
+    values: readonly (string | number | null)[] = [],
+): Promise<Row[]> {
+    const db = await cds.connect.to('db');
+    return db.run(sql, [...values]) as Promise<Row[]>;
+}
+
+function closedCasePredicate(alias: string): string {
+    return `${alias}."SAPSTATUS" IN (${CLOSED_LIST})`;
+}
+
 /**
  * Chỉ case đã đóng mới được làm tiền lệ, và case đang mở luôn bị loại.
  *
@@ -77,6 +96,18 @@ async function touchesNode(
     value: string | null,
 ): Promise<EvidenceHit[]> {
     if (!value) return [];
+
+    if (await getGraphBackend() === 'sqlite') {
+        const column = SQLITE_CASE_COLUMN[kind];
+        if (!column) return [];
+        const rows = await runSqlite<{ NID: string }>(
+            `SELECT DISTINCT h."NOTIFICATIONID" AS "NID" `
+            + `FROM "${TABLE.historicalCases}" h `
+            + `WHERE ${closedCasePredicate('h')} AND h."NOTIFICATIONID" <> ? AND h."${column}" = ?`,
+            [...CLOSED_STATUSES, anchor.notificationId, value],
+        );
+        return rows.map((r) => ({ notificationId: r.NID, kind, detail: value, count: 1 }));
+    }
 
     const rows = await runGraphQuery<{ NID: string }>({
         cypher:
@@ -111,6 +142,19 @@ export const sameDefectCode = (a: GraphAnchor) =>
 export async function sameMaterialFamily(anchor: GraphAnchor): Promise<EvidenceHit[]> {
     if (!anchor.materialFamily) return [];
 
+    if (await getGraphBackend() === 'sqlite') {
+        const rows = await runSqlite<{ NID: string }>(
+            `SELECT DISTINCT h."NOTIFICATIONID" AS "NID" `
+            + `FROM "${TABLE.historicalCases}" h `
+            + `WHERE ${closedCasePredicate('h')} AND h."NOTIFICATIONID" <> ? `
+            + 'AND h."MATERIALFAMILY" = ?',
+            [...CLOSED_STATUSES, anchor.notificationId, anchor.materialFamily],
+        );
+        return rows.map((r) => ({
+            notificationId: r.NID, kind: 'materialFamily', detail: anchor.materialFamily!, count: 1,
+        }));
+    }
+
     const rows = await runGraphQuery<{ NID: string }>({
         cypher:
             `MATCH (c:${NODE.case})-[e1:${EDGE.onMaterial}]->(m:${NODE.material}), `
@@ -144,6 +188,35 @@ export async function sameMaterialFamily(anchor: GraphAnchor): Promise<EvidenceH
 export async function sharedKeywords(anchor: GraphAnchor): Promise<EvidenceHit[]> {
     const predicate = keywordPredicate(anchor.keywords);
     if (!predicate) return [];
+
+    if (await getGraphBackend() === 'sqlite') {
+        // SEARCHKEYWORDS là danh sách token đã được chuẩn hoá lúc import. instr trên
+        // chuỗi có dấu cách hai đầu kiểm tra token chính xác, tránh LIKE bắt nhầm tiền tố.
+        const tokenPredicate = anchor.keywords
+            .map(() => `instr(' ' || COALESCE(h."SEARCHKEYWORDS", '') || ' ', ' ' || ? || ' ') > 0`)
+            .join(' OR ');
+        const rows = await runSqlite<{ NID: string; SEARCHKEYWORDS: string | null }>(
+            `SELECT h."NOTIFICATIONID" AS "NID", h."SEARCHKEYWORDS" AS "SEARCHKEYWORDS" `
+            + `FROM "${TABLE.historicalCases}" h `
+            + `WHERE ${closedCasePredicate('h')} AND h."NOTIFICATIONID" <> ? AND (${tokenPredicate})`,
+            [...CLOSED_STATUSES, anchor.notificationId, ...anchor.keywords],
+        );
+
+        return rows.flatMap((row) => {
+            // HANA Graph view lấy tối đa 60 token mỗi case; giữ cùng giới hạn để
+            // hai backend trả cùng tập bằng chứng.
+            const candidateTokens = new Set(
+                String(row.SEARCHKEYWORDS ?? '').split(/\s+/).filter(Boolean).slice(0, 60),
+            );
+            const shared = [...new Set(anchor.keywords)].filter((token) => candidateTokens.has(token)).sort();
+            return shared.length ? [{
+                notificationId: row.NID,
+                kind: 'keywords' as const,
+                detail: shared.join(', '),
+                count: shared.length,
+            }] : [];
+        });
+    }
 
     const rows = await runGraphQuery<{ NID: string; SHARED: number; TOKENS: string }>({
         cypher:
@@ -184,6 +257,30 @@ export async function resolvedByActionType(
     candidates: readonly string[],
 ): Promise<EvidenceHit[]> {
     if (!candidates.length) return [];
+
+    if (await getGraphBackend() === 'sqlite') {
+        const placeholders = candidates.map(() => '?').join(', ');
+        const rows = await runSqlite<{ NID: string; TASK_CODE: string }>(
+            `SELECT DISTINCT h."NOTIFICATIONID" AS "NID", a."TASKCODE" AS "TASK_CODE" `
+            + `FROM "${TABLE.historicalActions}" a `
+            + `JOIN "${TABLE.historicalCases}" h ON h."ID" = a."HISTORICALCASE_ID" `
+            + `WHERE ${closedCasePredicate('h')} AND a."ACTIONTYPE" = ? `
+            + 'AND h."NOTIFICATIONID" <> ? AND h."NOTIFICATIONID" IN (' + placeholders + ') '
+            + 'AND a."TASKCODE" IS NOT NULL',
+            [...CLOSED_STATUSES, actionType, anchor.notificationId, ...candidates],
+        );
+
+        const codesByCase = new Map<string, Set<string>>();
+        for (const row of rows) {
+            const codes = codesByCase.get(row.NID) ?? new Set<string>();
+            codes.add(row.TASK_CODE);
+            codesByCase.set(row.NID, codes);
+        }
+        return [...codesByCase].map(([notificationId, codes]) => {
+            const sorted = [...codes].sort();
+            return { notificationId, kind, detail: sorted.join(', '), count: sorted.length };
+        });
+    }
 
     const rows = await runGraphQuery<{ NID: string; CODES: string; N: number }>({
         cypher:

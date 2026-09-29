@@ -87,38 +87,56 @@ export async function hydratePrecedents(scored: readonly ScoredCase[]): Promise<
     if (!scored.length) return [];
 
     const db = await cds.connect.to('db');
+    const sqlite = String((cds.env.requires as any)?.db?.kind ?? '').startsWith('sqlite');
     const ids = scored.map((s) => s.notificationId);
     const holes = ids.map(() => '?').join(', ');
+    const completionDate = sqlite
+        ? 'date("COMPLETIONDATE")'
+        : `TO_VARCHAR("COMPLETIONDATE", 'YYYY-MM-DD')`;
+    const plannedEndDate = sqlite
+        ? 'date(a."PLANNEDENDDATE")'
+        : `TO_VARCHAR(a."PLANNEDENDDATE", 'YYYY-MM-DD')`;
 
-    const [cases, team, actions] = await Promise.all([
-        db.run(
-            `SELECT "NOTIFICATIONID", "SYMPTOMSHORTTEXT", "SAPSTATUS",
-                    TO_VARCHAR("COMPLETIONDATE", 'YYYY-MM-DD') AS "COMPLETIONDATE",
-                    "QUANTITYEXTENT", "WORKCENTERID", "WORKCENTERDESC", "DEFECTCODE",
-                    "DEFECTTEXT", "MATERIALID", "MATERIALDESC", "ROOTCAUSECATEGORY",
-                    "COPQEUR", "FMEAID"
-             FROM "${TABLE.historicalCases}" WHERE "NOTIFICATIONID" IN (${holes})`,
-            ids,
-        ) as Promise<CaseRow[]>,
-        db.run(
-            `SELECT h."NOTIFICATIONID", t."PARTNERID", t."PARTNERNAME", t."FUNCTIONTITLE",
-                    t."PARTNERROLE", t."EMAIL", t."PHONE"
-             FROM "${TABLE.historicalTeam}" t
-             JOIN "${TABLE.historicalCases}" h ON h."ID" = t."HISTORICALCASE_ID"
-             WHERE h."NOTIFICATIONID" IN (${holes})`,
-            ids,
-        ) as Promise<TeamRow[]>,
-        db.run(
-            `SELECT h."NOTIFICATIONID", a."LINENO", a."ACTIONTYPE", a."ACTIONTEXT", a."STATUS",
-                    a."TASKCODE", a."TASKCODEGROUP", a."TASKPROCESSOR", a."TIMEEFFORT",
-                    TO_VARCHAR(a."PLANNEDENDDATE", 'YYYY-MM-DD') AS "PLANNEDENDDATE"
-             FROM "${TABLE.historicalActions}" a
-             JOIN "${TABLE.historicalCases}" h ON h."ID" = a."HISTORICALCASE_ID"
-             WHERE h."NOTIFICATIONID" IN (${holes})
-             ORDER BY a."LINENO"`,
-            ids,
-        ) as Promise<ActionRow[]>,
-    ]);
+    const readCases = () => db.run(
+        `SELECT "NOTIFICATIONID", "SYMPTOMSHORTTEXT", "SAPSTATUS",
+                ${completionDate} AS "COMPLETIONDATE",
+                "QUANTITYEXTENT", "WORKCENTERID", "WORKCENTERDESC", "DEFECTCODE",
+                "DEFECTTEXT", "MATERIALID", "MATERIALDESC", "ROOTCAUSECATEGORY",
+                "COPQEUR", "FMEAID"
+         FROM "${TABLE.historicalCases}" WHERE "NOTIFICATIONID" IN (${holes})`,
+        ids,
+    ) as Promise<CaseRow[]>;
+    const readTeam = () => db.run(
+        `SELECT h."NOTIFICATIONID", t."PARTNERID", t."PARTNERNAME", t."FUNCTIONTITLE",
+                t."PARTNERROLE", t."EMAIL", t."PHONE"
+         FROM "${TABLE.historicalTeam}" t
+         JOIN "${TABLE.historicalCases}" h ON h."ID" = t."HISTORICALCASE_ID"
+         WHERE h."NOTIFICATIONID" IN (${holes})`,
+        ids,
+    ) as Promise<TeamRow[]>;
+    const readActions = () => db.run(
+        `SELECT h."NOTIFICATIONID", a."LINENO", a."ACTIONTYPE", a."ACTIONTEXT", a."STATUS",
+                a."TASKCODE", a."TASKCODEGROUP", a."TASKPROCESSOR", a."TIMEEFFORT",
+                ${plannedEndDate} AS "PLANNEDENDDATE"
+         FROM "${TABLE.historicalActions}" a
+         JOIN "${TABLE.historicalCases}" h ON h."ID" = a."HISTORICALCASE_ID"
+         WHERE h."NOTIFICATIONID" IN (${holes})
+         ORDER BY a."LINENO"`,
+        ids,
+    ) as Promise<ActionRow[]>;
+
+    // CAP SQLite dùng một connection cho tenant; tuần tự hoá để tránh các truy vấn
+    // hydrate tranh nhau connection trong cùng lượt Graph retrieval.
+    let cases: CaseRow[];
+    let team: TeamRow[];
+    let actions: ActionRow[];
+    if (sqlite) {
+        cases = await readCases();
+        team = await readTeam();
+        actions = await readActions();
+    } else {
+        [cases, team, actions] = await Promise.all([readCases(), readTeam(), readActions()]);
+    }
 
     const caseById = new Map(cases.map((c) => [c.NOTIFICATIONID, c]));
     const teamById = group(team);

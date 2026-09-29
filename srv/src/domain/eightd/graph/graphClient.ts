@@ -25,7 +25,7 @@
  */
 
 import cds from '@sap/cds';
-import { WORKSPACE } from './model';
+import { TABLE, WORKSPACE } from './model';
 
 const LOG = cds.log('graph');
 
@@ -103,6 +103,10 @@ export function buildCypherTable(
 export async function runGraphQuery<Row = Record<string, unknown>>(
     query: GraphQuery<Row>,
 ): Promise<Row[]> {
+    const backend = await getGraphBackend();
+    if (backend !== 'hana') {
+        throw new Error(`openCypher cần HANA Graph workspace; backend hiện tại là ${backend ?? 'unavailable'}.`);
+    }
     const db = await cds.connect.to('db');
     const { sql: graph, values } = buildCypherTable(query.cypher, query.params);
     const sql = query.wrap ? query.wrap(`${graph} g`) : `SELECT * FROM ${graph} g`;
@@ -114,30 +118,37 @@ export async function runGraphQuery<Row = Record<string, unknown>>(
     return rows;
 }
 
-/**
- * Graph có dùng được ở môi trường này không.
- *
- * ── Vì sao hỏi DB chứ không đọc cấu hình ──
- * `kind === 'hana'` mới chỉ nói database là HANA. Nó KHÔNG nói workspace đã
- * deploy — và giữa hai điều đó là toàn bộ khoảng thời gian một container mới
- * chưa chạy `cds deploy`. Đoán bằng cấu hình ở đó cho ra một chuỗi lỗi runtime
- * ngay giữa lượt phân tích, thay vì một lần rơi về engine cũ.
- *
- * Kết quả được nhớ: câu hỏi này không đổi trong vòng đời tiến trình, và hỏi lại
- * mỗi lượt phân tích là thêm một lần khứ hồi tới DB để nhận cùng một câu trả lời.
- */
-let availability: Promise<boolean> | null = null;
+/** Backend selection is stable for the process, so cache the readiness check. */
+export type GraphBackend = 'hana' | 'sqlite' | null;
+
+let availability: Promise<GraphBackend> | null = null;
 
 export function resetGraphAvailability(): void {
     availability = null;
 }
 
-export async function isGraphAvailable(): Promise<boolean> {
+/** Chọn backend retrieval; SQLite dựng quan hệ từ kho case đã chuẩn hoá. */
+export async function getGraphBackend(): Promise<GraphBackend> {
     availability ??= (async () => {
         const kind = String((cds.env.requires as any)?.db?.kind ?? '');
+
+        if (kind.startsWith('sqlite')) {
+            try {
+                const db = await cds.connect.to('db');
+                // Bảng HistoricalCases đã lưu sẵn các cạnh phẳng (mã lỗi, vật tư,
+                // work center, họ vật tư, từ khoá); không cần graph workspace riêng.
+                await db.run(`SELECT "NOTIFICATIONID" FROM "${TABLE.historicalCases}" LIMIT 0`);
+                LOG.info('SQLite graph backend sẵn sàng; dựng cạnh từ HistoricalCases/HistoricalActions.');
+                return 'sqlite';
+            } catch (e: any) {
+                LOG.warn(`Không đọc được kho precedent trên SQLite (${e.message}) — dùng engine chấm điểm.`);
+                return null;
+            }
+        }
+
         if (!kind.startsWith('hana')) {
-            LOG.info(`db.kind = ${kind || '(không rõ)'} — không phải HANA, dùng engine chấm điểm.`);
-            return false;
+            LOG.info(`db.kind = ${kind || '(không rõ)'} — không có graph backend, dùng engine chấm điểm.`);
+            return null;
         }
         try {
             const db = await cds.connect.to('db');
@@ -154,11 +165,15 @@ export async function isGraphAvailable(): Promise<boolean> {
                     + ' — dùng engine chấm điểm. Chạy `npm run deploy:graph`.',
                 );
             }
-            return valid;
+            return valid ? 'hana' : null;
         } catch (e: any) {
             LOG.warn(`Không kiểm được graph workspace (${e.message}) — dùng engine chấm điểm.`);
-            return false;
+            return null;
         }
     })();
     return availability;
+}
+
+export async function isGraphAvailable(): Promise<boolean> {
+    return (await getGraphBackend()) !== null;
 }

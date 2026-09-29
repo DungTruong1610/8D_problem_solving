@@ -269,8 +269,9 @@ export async function findPrecedentsByStepGraph(
 /**
  * Điểm vào duy nhất: chọn engine, và luôn trả về một kết quả dùng được.
  *
- * Ba điều kiện phải cùng đúng thì graph mới chạy — cấu hình bật, database là
- * HANA, workspace đã deploy và hợp lệ. Thiếu bất cứ điều nào là rơi về engine cũ,
+ * Cấu hình phải bật và một graph backend phải sẵn sàng: SQLite dựng cạnh từ kho
+ * HistoricalCases/HistoricalActions; HANA cần workspace đã deploy và hợp lệ. Nếu
+ * thiếu backend phù hợp thì rơi về engine cũ,
  * kèm một dòng log nói rõ điều nào thiếu: "không có tiền lệ" và "engine không
  * chạy" nhìn ngoài giống hệt nhau, và phân biệt được hai thứ đó là việc của log.
  *
