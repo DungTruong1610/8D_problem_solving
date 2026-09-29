@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
     BookOpen,
     CheckCircle2, 
@@ -353,6 +353,22 @@ const DEFAULT_REPORT_IDS: Record<string, { reportId: string; notificationId: str
 
 export function GuidePage() {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const scrollToGuideSection = (sectionId: string) => {
+        window.requestAnimationFrame(() => {
+            document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    };
+
+    useEffect(() => {
+        const sectionId = new URLSearchParams(location.search).get('section');
+        if (!sectionId) return;
+        const frame = window.requestAnimationFrame(() => {
+            document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        return () => window.cancelAnimationFrame(frame);
+    }, [location.search]);
 
     // ── WalkMe Interactive Tour States ─────────────────────────────────────
     const [isWalkMeOpen, setIsWalkMeOpen] = useState(false);
@@ -743,26 +759,36 @@ export function GuidePage() {
 
             {/* ── Clean Section Anchor Bar ── */}
             <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs border-b border-muted">
-                <a href="#section-pages" className="px-3 py-1.5 rounded-lg hover:bg-muted font-medium text-muted-foreground hover:text-foreground transition-colors shrink-0 flex items-center gap-1.5">
+                <Link to="/guide?section=section-pages" replace preventScrollReset onClick={() => {
+                    if (location.search === '?section=section-pages') scrollToGuideSection('section-pages');
+                }} className="px-3 py-1.5 rounded-lg hover:bg-muted font-medium text-muted-foreground hover:text-foreground transition-colors shrink-0 flex items-center gap-1.5">
                     <Eye size={13} />
                     <span>1. Page Features &amp; Walkthrough</span>
-                </a>
-                <a href="#section-config" className="px-3 py-1.5 rounded-lg hover:bg-muted font-medium text-muted-foreground hover:text-foreground transition-colors shrink-0 flex items-center gap-1.5">
+                </Link>
+                <Link to="/guide?section=section-config" replace preventScrollReset onClick={() => {
+                    if (location.search === '?section=section-config') scrollToGuideSection('section-config');
+                }} className="px-3 py-1.5 rounded-lg hover:bg-muted font-medium text-muted-foreground hover:text-foreground transition-colors shrink-0 flex items-center gap-1.5">
                     <Sliders size={13} />
                     <span>2. Web AI Configuration</span>
-                </a>
-                <a href="#section-json" className="px-3 py-1.5 rounded-lg hover:bg-muted font-medium text-muted-foreground hover:text-foreground transition-colors shrink-0 flex items-center gap-1.5">
+                </Link>
+                <Link to="/guide?section=section-json" replace preventScrollReset onClick={() => {
+                    if (location.search === '?section=section-json') scrollToGuideSection('section-json');
+                }} className="px-3 py-1.5 rounded-lg hover:bg-muted font-medium text-muted-foreground hover:text-foreground transition-colors shrink-0 flex items-center gap-1.5">
                     <Code2 size={13} />
                     <span>3. Test Case JSON Format</span>
-                </a>
-                <a href="#section-verify" className="px-3 py-1.5 rounded-lg hover:bg-muted font-medium text-muted-foreground hover:text-foreground transition-colors shrink-0 flex items-center gap-1.5">
+                </Link>
+                <Link to="/guide?section=section-verify" replace preventScrollReset onClick={() => {
+                    if (location.search === '?section=section-verify') scrollToGuideSection('section-verify');
+                }} className="px-3 py-1.5 rounded-lg hover:bg-muted font-medium text-muted-foreground hover:text-foreground transition-colors shrink-0 flex items-center gap-1.5">
                     <ShieldCheck size={13} />
                     <span>4. Sprint 1 Evaluation &amp; Sandbox</span>
-                </a>
-                <a href="#section-cli" className="px-3 py-1.5 rounded-lg hover:bg-muted font-medium text-muted-foreground hover:text-foreground transition-colors shrink-0 flex items-center gap-1.5">
+                </Link>
+                <Link to="/guide?section=section-cli" replace preventScrollReset onClick={() => {
+                    if (location.search === '?section=section-cli') scrollToGuideSection('section-cli');
+                }} className="px-3 py-1.5 rounded-lg hover:bg-muted font-medium text-muted-foreground hover:text-foreground transition-colors shrink-0 flex items-center gap-1.5">
                     <Terminal size={13} />
                     <span>5. CLI Quick Reference</span>
-                </a>
+                </Link>
             </div>
 
             {/* ══════════════════════════════════════════════════════════════ */}
