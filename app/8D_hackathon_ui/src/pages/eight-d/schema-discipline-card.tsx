@@ -6,6 +6,7 @@ import { AlertCircle, AlertTriangle, CheckCircle2, Link2 } from 'lucide-react';
 import {
     reviewStatusOf,
     type Discipline8D,
+    type ReportStatus,
 } from '@/services/eightd-service';
 import { Markdown } from './markdown';
 import { AiSuggestWidget, DecisionTableWidget, TeamRosterProvider, type RosterRow } from './team-roster-widget';
@@ -347,7 +348,20 @@ function EvidenceList({ paths, context }: { paths: string[]; context: Record<str
     })}</div>;
 }
 
-function FieldValue({ field, value, context, disciplineID, data, siblings, readOnly = false, reportID = '', disciplineCode = '' }: { field: SnapshotField; value: unknown; context: Record<string, unknown> | null; disciplineID: string; data: Record<string, unknown>; siblings: Discipline8D[]; readOnly?: boolean; reportID?: string; disciplineCode?: string }) {
+function FieldValue({ field, value, context, disciplineID, data, siblings, readOnly = false, reportID = '', disciplineCode = '', aiFinding = null, reportStatus, precedentsJson = null }: {
+    field: SnapshotField;
+    value: unknown;
+    context: Record<string, unknown> | null;
+    disciplineID: string;
+    data: Record<string, unknown>;
+    siblings: Discipline8D[];
+    readOnly?: boolean;
+    reportID?: string;
+    disciplineCode?: string;
+    aiFinding?: string | null;
+    reportStatus?: ReportStatus;
+    precedentsJson?: string | null;
+}) {
     const isLocked = readOnly;
     if ((value === undefined || value === null || value === '') && !SELF_EMPTY_WIDGETS.has(field.widget)) return <span className="text-sm italic text-muted-foreground">Not provided</span>;
     if (field.widget === 'evidence-list' && Array.isArray(value)) return <EvidenceList paths={value.map(String)} context={context} />;
@@ -417,7 +431,17 @@ function FieldValue({ field, value, context, disciplineID, data, siblings, readO
             />
         );
     }
-    if (field.widget === 'ai-draft') return <AiDraftWidget value={value} disciplineID={disciplineID} readOnly={isLocked} reportID={reportID} fieldKey={field.key} />;
+    if (field.widget === 'ai-draft') return <AiDraftWidget
+        value={value}
+        disciplineID={disciplineID}
+        readOnly={isLocked}
+        reportID={reportID}
+        fieldKey={field.key}
+        disciplineCode={disciplineCode}
+        aiFinding={aiFinding}
+        reportStatus={reportStatus}
+        precedentsJson={precedentsJson}
+    />;
     if (field.widget === 'fmea-link') return <FmeaLinkWidget value={value} />;
     // Cổng đóng case là sự thật về CẢ report, nên nó đọc trạng thái duyệt của các
     // bước anh em chứ không đọc `resultJson` — để model tự trả lời câu này là để
@@ -446,6 +470,9 @@ export function FieldBlock({
     readOnly = false,
     reportID = '',
     disciplineCode = '',
+    aiFinding = null,
+    reportStatus,
+    precedentsJson = null,
 }: {
     field: SnapshotField;
     value: unknown;
@@ -457,6 +484,9 @@ export function FieldBlock({
     readOnly?: boolean;
     reportID?: string;
     disciplineCode?: string;
+    aiFinding?: string | null;
+    reportStatus?: ReportStatus;
+    precedentsJson?: string | null;
 }) {
     const hasError = violations.some((item) => item.severity === 'error');
     const hasWarning = violations.some((item) => item.severity === 'warning');
@@ -496,6 +526,9 @@ export function FieldBlock({
                     readOnly={readOnly}
                     reportID={reportID}
                     disciplineCode={disciplineCode}
+                    aiFinding={aiFinding}
+                    reportStatus={reportStatus}
+                    precedentsJson={precedentsJson}
                 />
             </div>
             {violations.length > 0 && (
@@ -647,11 +680,14 @@ function isExcludedField(code: string, key: string, label?: string, value?: unkn
     return false;
 }
 
-export function SchemaDisciplineCard({ discipline, caseContext, liveFormSchemaJson, siblings = [], reportID = '' }: {
+export function SchemaDisciplineCard({ discipline, caseContext, liveFormSchemaJson, siblings = [], reportID = '', aiFinding = null, reportStatus, precedentsJson = null }: {
     discipline: Discipline8D;
     caseContext?: string;
     siblings?: Discipline8D[];
     reportID?: string;
+    aiFinding?: string | null;
+    reportStatus?: ReportStatus;
+    precedentsJson?: string | null;
     /**
      * Bo cuc dang cau hinh trong Form Editor, doc song tu `StepPrompts`.
      *
@@ -776,6 +812,9 @@ export function SchemaDisciplineCard({ discipline, caseContext, liveFormSchemaJs
                                                 readOnly={isReadOnly}
                                                 reportID={reportID || (discipline as any).report_ID || (discipline as any).reportID || ''}
                                                 disciplineCode={discipline.code}
+                                                aiFinding={aiFinding}
+                                                reportStatus={reportStatus}
+                                                precedentsJson={precedentsJson}
                                             />
                                         );
                                     })}

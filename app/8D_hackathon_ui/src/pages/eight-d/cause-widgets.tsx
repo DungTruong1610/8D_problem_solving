@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import {
     Button,
     Dialog,
@@ -31,7 +30,13 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
-import { reanalyzeDownstream, saveDisciplineField } from '@/services/eightd-service';
+import {
+    parseFinding,
+    parseStoredPrecedents,
+    reanalyzeDownstream,
+    saveDisciplineField,
+    type ReportStatus,
+} from '@/services/eightd-service';
 import { TaskTable } from './action-table';
 import {
     actionLabel,
@@ -42,7 +47,7 @@ import {
     taskFromAction,
     type ActionTask,
 } from '../../../../../shared/action-task';
-import { ComparativeDiagnosisBadge } from './comparative-diagnosis-badge';
+import { ReasoningPanel } from './reasoning-panel';
 import { AiProvenanceInfo } from './ai-provenance-info';
 
 const DEFAULT_DURATION_BY_DISCIPLINE: Record<string, number> = {
@@ -753,16 +758,26 @@ export function AiDraftWidget({
     readOnly = false,
     reportID = '',
     fieldKey = 'rootCause.statement',
+    disciplineCode = '',
+    aiFinding = null,
+    reportStatus,
+    precedentsJson = null,
 }: {
     value: unknown;
     disciplineID?: string;
     readOnly?: boolean;
     reportID?: string;
     fieldKey?: string;
+    disciplineCode?: string;
+    aiFinding?: string | null;
+    reportStatus?: ReportStatus;
+    precedentsJson?: string | null;
 }) {
     const queryClient = useQueryClient();
-    const params = useParams<{ id?: string }>();
-    const effectiveReportID = reportID || params.id || '';
+    const effectiveReportID = reportID;
+    const refereeAnalysis = parseFinding(aiFinding);
+    const topPrecedent = parseStoredPrecedents(precedentsJson)?.precedents?.[0] ?? null;
+    const refereeDraft = refereeAnalysis?.finding?.rootCauseStatement?.trim();
     const text = typeof value === 'string' ? value.trim() : '';
     const [editing, setEditing] = useState(false);
     const [draft, setDraft] = useState(text);
@@ -818,153 +833,169 @@ export function AiDraftWidget({
     };
 
     return (
-        <div className="relative rounded-xl border border-primary/25 bg-primary/[0.03] p-4 shadow-xs transition-all">
-            <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5 pb-2 border-b border-primary/15">
-                <div className="flex items-center gap-2 min-w-0 flex-wrap">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                        <Sparkles className="h-3.5 w-3.5" />
-                    </span>
-                    <span className="text-base font-bold text-foreground">
-                        {disciplineID ? 'Root cause conclusion' : 'AI Draft'}
-                    </span>
-                    <ComparativeDiagnosisBadge compact reportID={effectiveReportID} />
-                </div>
-                {!readOnly && disciplineID && !editing && (
-                    <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-8 px-2.5 text-sm text-muted-foreground hover:text-foreground gap-1.5"
-                        onClick={handleStartEdit}
-                    >
-                        <Edit3 className="h-3.5 w-3.5" />
-                        Edit
-                    </Button>
-                )}
-            </div>
+        <div className="space-y-3">
+            {disciplineCode === 'D4' && (
+                <ReasoningPanel
+                    analysis={refereeAnalysis}
+                    reportStatus={reportStatus}
+                    precedent={topPrecedent}
+                    readOnly={readOnly}
+                    onUseAsDraft={refereeDraft
+                        ? () => {
+                            setDraft(refereeDraft);
+                            setEditing(true);
+                        }
+                        : undefined}
+                />
+            )}
 
-            {editing ? (
-                <div className="space-y-3 pt-1">
-                    <Textarea
-                        value={draft}
-                        onChange={(e) => setDraft(e.target.value)}
-                        rows={3}
-                        placeholder="Enter concise root cause conclusion..."
-                        className="text-sm leading-relaxed resize-y bg-background font-normal"
-                        autoFocus
-                    />
-                    <div className="flex items-center justify-between gap-2">
-                        <span className="text-sm text-muted-foreground">
-                            {draft.length} characters
+            <div className="relative rounded-xl border border-primary/25 bg-primary/[0.03] p-4 shadow-xs transition-all">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5 pb-2 border-b border-primary/15">
+                    <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                            <Sparkles className="h-3.5 w-3.5" />
                         </span>
-                        <div className="flex items-center gap-2">
+                        <span className="text-base font-bold text-foreground">
+                            {disciplineID ? 'Root cause conclusion' : 'AI Draft'}
+                        </span>
+                    </div>
+                    {!readOnly && disciplineID && !editing && (
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 px-2.5 text-sm text-muted-foreground hover:text-foreground gap-1.5"
+                            onClick={handleStartEdit}
+                        >
+                            <Edit3 className="h-3.5 w-3.5" />
+                            Edit
+                        </Button>
+                    )}
+                </div>
+
+                {editing ? (
+                    <div className="space-y-3 pt-1">
+                        <Textarea
+                            value={draft}
+                            onChange={(e) => setDraft(e.target.value)}
+                            rows={3}
+                            placeholder="Enter concise root cause conclusion..."
+                            className="text-sm leading-relaxed resize-y bg-background font-normal"
+                            autoFocus
+                        />
+                        <div className="flex items-center justify-between gap-2">
+                            <span className="text-sm text-muted-foreground">
+                                {draft.length} characters
+                            </span>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-8 text-sm"
+                                    onClick={handleCancel}
+                                    disabled={saving}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="default"
+                                    className="h-8 text-sm gap-1.5"
+                                    onClick={handleRequestSave}
+                                    disabled={saving || !draft.trim()}
+                                >
+                                    Save Changes
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="min-w-0">
+                        {text ? (
+                            <p className="break-words text-sm leading-relaxed text-foreground font-normal">
+                                {text}
+                            </p>
+                        ) : (
+                            <p className="text-sm italic text-muted-foreground">
+                                The AI produced no conclusion for this step.
+                            </p>
+                        )}
+                    </div>
+                )}
+
+                {/* Warning Confirmation Modal */}
+                <Dialog open={confirmOpen} onOpenChange={(open) => { if (!open && !saving) setConfirmOpen(false); }}>
+                    <DialogContent className="max-w-md">
+                        <DialogHeader>
+                            <div className="flex items-center gap-2 text-warning mb-1">
+                                <AlertTriangle className="h-5 w-5 shrink-0" />
+                                <DialogTitle className="text-base font-bold text-foreground">
+                                    Confirm Root Cause Modification
+                                </DialogTitle>
+                            </div>
+                            <DialogDescription className="text-sm text-muted-foreground leading-relaxed pt-1">
+                                Modifying the Root Cause in D4 impacts subsequent action and prevention steps:
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="space-y-2 rounded-lg border border-warning/30 bg-warning/5 p-3 text-sm">
+                            <div className="font-semibold text-warning-foreground flex items-center gap-1.5">
+                                <RefreshCw className="h-3.5 w-3.5" />
+                                Downstream dependencies to be updated:
+                            </div>
+                            <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-1">
+                                <li><strong className="text-foreground">D5 (Corrective Actions):</strong> Realignment with new root cause.</li>
+                                <li><strong className="text-foreground">D6 (Verification Plan):</strong> Validation against new mechanism.</li>
+                                <li><strong className="text-foreground">D7 (Preventive Actions):</strong> Recurrence prevention and FMEA link.</li>
+                                <li><strong className="text-foreground">D8 (Closure & Lessons):</strong> Summary and team closure gates.</li>
+                            </ul>
+                        </div>
+
+                        <div className="text-sm text-muted-foreground">
+                            The system will save the new root cause and automatically re-analyze from D5 onward.
+                        </div>
+
+                        <DialogFooter className="flex-col sm:flex-row gap-2 mt-2">
                             <Button
-                                size="sm"
                                 variant="outline"
-                                className="h-8 text-sm"
-                                onClick={handleCancel}
+                                size="sm"
+                                onClick={() => setConfirmOpen(false)}
                                 disabled={saving}
+                                className="h-8 text-sm"
                             >
                                 Cancel
                             </Button>
                             <Button
+                                variant="secondary"
                                 size="sm"
-                                variant="default"
-                                className="h-8 text-sm gap-1.5"
-                                onClick={handleRequestSave}
-                                disabled={saving || !draft.trim()}
+                                onClick={() => handleSaveAndReanalyze(false)}
+                                disabled={saving}
+                                className="h-8 text-sm"
                             >
-                                Save Changes
+                                Save D4 Only
                             </Button>
-                        </div>
-                    </div>
+                            <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => handleSaveAndReanalyze(true)}
+                                disabled={saving}
+                                className="h-8 text-sm gap-1.5 bg-primary font-semibold"
+                            >
+                                {saving ? (
+                                    <>
+                                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                        Processing...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Sparkles className="h-3.5 w-3.5" />
+                                        Save & Reanalyze D5-D8
+                                    </>
+                                )}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
                 </div>
-            ) : (
-                <div className="min-w-0">
-                    {text ? (
-                        <p className="break-words text-sm leading-relaxed text-foreground font-normal">
-                            {text}
-                        </p>
-                    ) : (
-                        <p className="text-sm italic text-muted-foreground">
-                            The AI produced no conclusion for this step.
-                        </p>
-                    )}
-                </div>
-            )}
-
-            {/* Warning Confirmation Modal */}
-            <Dialog open={confirmOpen} onOpenChange={(open) => { if (!open && !saving) setConfirmOpen(false); }}>
-                <DialogContent className="max-w-md">
-                    <DialogHeader>
-                        <div className="flex items-center gap-2 text-warning mb-1">
-                            <AlertTriangle className="h-5 w-5 shrink-0" />
-                            <DialogTitle className="text-base font-bold text-foreground">
-                                Confirm Root Cause Modification
-                            </DialogTitle>
-                        </div>
-                        <DialogDescription className="text-sm text-muted-foreground leading-relaxed pt-1">
-                            Modifying the Root Cause in D4 impacts subsequent action and prevention steps:
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="space-y-2 rounded-lg border border-warning/30 bg-warning/5 p-3 text-sm">
-                        <div className="font-semibold text-warning-foreground flex items-center gap-1.5">
-                            <RefreshCw className="h-3.5 w-3.5" />
-                            Downstream dependencies to be updated:
-                        </div>
-                        <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-1">
-                            <li><strong className="text-foreground">D5 (Corrective Actions):</strong> Realignment with new root cause.</li>
-                            <li><strong className="text-foreground">D6 (Verification Plan):</strong> Validation against new mechanism.</li>
-                            <li><strong className="text-foreground">D7 (Preventive Actions):</strong> Recurrence prevention and FMEA link.</li>
-                            <li><strong className="text-foreground">D8 (Closure & Lessons):</strong> Summary and team closure gates.</li>
-                        </ul>
-                    </div>
-
-                    <div className="text-sm text-muted-foreground">
-                        The system will save the new root cause and automatically re-analyze from D5 onward.
-                    </div>
-
-                    <DialogFooter className="flex-col sm:flex-row gap-2 mt-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setConfirmOpen(false)}
-                            disabled={saving}
-                            className="h-8 text-sm"
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => handleSaveAndReanalyze(false)}
-                            disabled={saving}
-                            className="h-8 text-sm"
-                        >
-                            Save D4 Only
-                        </Button>
-                        <Button
-                            variant="default"
-                            size="sm"
-                            onClick={() => handleSaveAndReanalyze(true)}
-                            disabled={saving}
-                            className="h-8 text-sm gap-1.5 bg-primary font-semibold"
-                        >
-                            {saving ? (
-                                <>
-                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                    Processing...
-                                </>
-                            ) : (
-                                <>
-                                    <Sparkles className="h-3.5 w-3.5" />
-                                    Save & Reanalyze D5-D8
-                                </>
-                            )}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </div>
     );
 }

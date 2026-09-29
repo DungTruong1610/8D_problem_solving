@@ -346,27 +346,37 @@ export function EightDDetailPage() {
                                                     precedentsJson={report.precedentsJson}
                                                 />
 
-                                            {selected.code !== 'D6' && (
-                                                (selected.formSchemaJson || stepPrompts.byCode[selected.code]?.formSchemaJson)
-                                                    ? <SchemaDisciplineCard discipline={selected} caseContext={report.caseContext} liveFormSchemaJson={stepPrompts.byCode[selected.code]?.formSchemaJson ?? null} siblings={disciplines} reportID={id} />
-                                                    : <DisciplineCard discipline={selected} />
-                                            )}
+                                                {selected.code !== 'D6' && (
+                                                    (selected.formSchemaJson || stepPrompts.byCode[selected.code]?.formSchemaJson)
+                                                        ? <SchemaDisciplineCard
+                                                            discipline={selected}
+                                                            caseContext={report.caseContext}
+                                                            liveFormSchemaJson={stepPrompts.byCode[selected.code]?.formSchemaJson ?? null}
+                                                            siblings={disciplines}
+                                                            reportID={id}
+                                                            aiFinding={report.aiFinding}
+                                                            reportStatus={report.status}
+                                                            precedentsJson={report.precedentsJson}
+                                                        />
+                                                        : <DisciplineCard discipline={selected} />
+                                                )}
 
-                                            {selected.code === 'D6' && (() => {
-                                                const d4 = disciplines.find((d) => d.code === 'D4');
-                                                const d4RootCause = resolveD4RootCause(d4, report.caseContext);
-                                                return (
-                                                    <ActionChecklist
-                                                        actions={caseActions}
-                                                        disciplines={disciplines}
-                                                        caseContext={report.caseContext}
-                                                        reportID={id}
-                                                        rootCause={d4RootCause !== '—' ? d4RootCause : (report.rootCauseCategory ?? '')}
-                                                    />
-                                                );
-                                            })()}
-                                        </div>
-                                    );
+                                                {selected.code === 'D6' && (() => {
+                                                    const d4 = disciplines.find((d) => d.code === 'D4');
+                                                    const d4RootCause = resolveD4RootCause(d4, report.caseContext);
+                                                    return (
+                                                        <ActionChecklist
+                                                            actions={caseActions}
+                                                            disciplines={disciplines}
+                                                            caseContext={report.caseContext}
+                                                            reportID={id}
+                                                            rootCause={d4RootCause !== '—' ? d4RootCause : (report.rootCauseCategory ?? '')}
+                                                        />
+                                                    );
+                                                })()}
+
+                                            </div>
+                                        );
                                 }
                                 if (running) {
                                     return (

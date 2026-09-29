@@ -171,7 +171,7 @@ export interface IndependentAnalysis {
     verdict: {
         recordedCategory: string | null;
         aiCategory: string;
-        agrees: boolean;
+        agrees: boolean | null;
         aiStepCount: number;
         recordedStepCount: number;
     };
@@ -586,8 +586,9 @@ export function parseList(raw: string | null | undefined): string[] {
 /**
  * Đọc `aiFinding` thành object.
  *
- * Trả `null` khi chưa có hoặc hỏng — panel sẽ ẩn đi. Report chạy trước khi có
- * bước chẩn đoán mù sẽ rơi vào trường hợp này, và đó là hành vi đúng.
+ * Trả `null` khi chưa có hoặc hỏng — panel sẽ hiển thị trạng thái chưa có kết
+ * quả thay vì tự suy đoán. Report chạy trước khi có bước chẩn đoán mù cũng rơi
+ * vào trường hợp này.
  */
 export function parseFinding(raw: string | null | undefined): IndependentAnalysis | null {
     if (!raw) return null;
