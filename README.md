@@ -75,16 +75,24 @@ cp .env.example .env
 
 Mở file `.env` vừa tạo và cấu hình AI:
 
-#### 👉 Cách A: DeepSeek V4.1 Flash (khuyên dùng)
-1. Lấy API Key: [OpenCode](https://opencode.ai/auth) (gói Go/Zen) hoặc [DeepSeek Platform](https://platform.deepseek.com).
+#### 👉 Cách A: DeepSeek (khuyên dùng)
+1. Lấy API Key: [DeepSeek Platform](https://platform.deepseek.com) (chính hãng, rẻ hơn) hoặc [OpenCode](https://opencode.ai/auth) (gói Go/Zen).
 2. Lấy thêm key embedding miễn phí tại [Jina AI](https://jina.ai/embeddings/) — DeepSeek không có API embedding, thiếu key này thì tìm kiếm ngữ nghĩa sẽ bị bỏ qua (không báo lỗi).
 3. Điền vào file `.env`:
-   ```env
-   DEEPSEEK_API_KEY=sk-your-key
-   DEEPSEEK_BASE_URL=https://opencode.ai/zen/go/v1
-   DEEPSEEK_MODEL=deepseek-v4.1-flash
-   JINA_API_KEY=jina-your-key
-   ```
+   - **Tùy chọn 1: DeepSeek chính hãng (Platform API)**:
+     ```env
+     DEEPSEEK_API_KEY=sk-your-key
+     DEEPSEEK_BASE_URL=https://api.deepseek.com
+     DEEPSEEK_MODEL=deepseek-flash
+     JINA_API_KEY=jina-your-key
+     ```
+   - **Tùy chọn 2: OpenCode Go / Zen**:
+     ```env
+     DEEPSEEK_API_KEY=sk-your-key
+     DEEPSEEK_BASE_URL=https://opencode.ai/zen/go/v1
+     DEEPSEEK_MODEL=deepseek-v4.1-flash
+     JINA_API_KEY=jina-your-key
+     ```
 
 #### 👉 Cách B: Google Gemini (vẫn dùng được)
 ```env

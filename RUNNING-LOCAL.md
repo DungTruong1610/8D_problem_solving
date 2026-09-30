@@ -106,11 +106,20 @@ Chế độ này bị **chặn cứng khi `NODE_ENV=production`**, không sợ l
 
 Dùng khi viết logic gọi AI và muốn chạy nhanh, không tốn tiền, không cần mạng.
 
-### Chế độ C — DeepSeek V4.1 Flash + Jina (khuyến nghị)
+### Chế độ C — DeepSeek (chính hãng hoặc OpenCode) + Jina (khuyến nghị)
 
 Điền vào `.env`:
 
+**Lựa chọn 1: DeepSeek chính hãng (Platform API)**
+```env
+DEEPSEEK_API_KEY=sk-...
+DEEPSEEK_BASE_URL=https://api.deepseek.com
+DEEPSEEK_MODEL=deepseek-flash
+JINA_API_KEY=jina-...
 ```
+
+**Lựa chọn 2: OpenCode Go / Zen**
+```env
 DEEPSEEK_API_KEY=sk-...
 DEEPSEEK_BASE_URL=https://opencode.ai/zen/go/v1
 DEEPSEEK_MODEL=deepseek-v4.1-flash

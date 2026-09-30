@@ -71,25 +71,40 @@ export class DeepSeekLlmProvider implements LlmProvider {
 
   constructor(options: DeepSeekProviderOptions = {}) {
     this.apiKey = options.apiKey || process.env.DEEPSEEK_API_KEY || '';
+    const providerPreset = (process.env.DEEPSEEK_PROVIDER || '').toLowerCase();
+    const defaultUrl = providerPreset.includes('opencode')
+      ? 'https://opencode.ai/zen/go/v1'
+      : 'https://api.deepseek.com';
+
     this.baseUrl = (
       options.baseUrl ||
       process.env.DEEPSEEK_BASE_URL ||
-      'https://api.deepseek.com'
+      defaultUrl
     ).replace(/\/+$/, '');
+
+    const defaultModelForUrl = this.baseUrl.includes('opencode.ai')
+      ? 'deepseek-v4.1-flash'
+      : 'deepseek-flash';
+
     this.defaultModel =
       options.model ||
       process.env.DEEPSEEK_MODEL ||
-      'deepseek-flash';
+      defaultModelForUrl;
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.apiKey}`,
+      'User-Agent': USER_AGENT,
+    };
+
+    if (this.baseUrl.includes('opencode.ai')) {
+      headers['x-opencode-session'] = SESSION_ID;
+    }
 
     this.http = axios.create({
       baseURL: this.baseUrl,
       timeout: options.timeoutMs ?? 180_000,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
-        'User-Agent': USER_AGENT,
-        'x-opencode-session': SESSION_ID,
-      },
+      headers,
     });
   }
 
@@ -100,16 +115,28 @@ export class DeepSeekLlmProvider implements LlmProvider {
   /**
    * Tên model thật sự gửi lên API.
    *
-   * Model họ DeepSeek (từ AI Settings, hoặc từ `AICORE_DEFAULT_MODEL`) đi thẳng
-   * qua. Mọi tên khác — `anthropic--claude-4.5-haiku`, `gemini-2.5-pro`, alias
-   * còn sót trong catalog AI Core — được ánh xạ về model DeepSeek đang cấu
-   * hình, để một DB cũ không làm request 404.
+   * Tự động chuẩn hoá tên model phù hợp với cổng API:
+   * - api.deepseek.com (chính hãng): dùng `deepseek-flash` hoặc `deepseek-v4-pro`
+   *   (tự động map deepseek-v4.1-flash / deepseek-v4-flash -> deepseek-flash)
+   * - opencode.ai: dùng `deepseek-v4.1-flash`
+   *   (tự động map deepseek-flash -> deepseek-v4.1-flash)
    */
   public getModelName(requestedModel?: string): string {
-    if (!requestedModel) return this.defaultModel;
-    const clean = requestedModel.trim();
-    if (/^deepseek/i.test(clean)) return clean;
-    return this.defaultModel;
+    const raw = (requestedModel || this.defaultModel).trim();
+    const candidate = /^deepseek/i.test(raw) ? raw : this.defaultModel;
+
+    const isOfficial = this.baseUrl.includes('api.deepseek.com');
+    if (isOfficial) {
+      if (/^deepseek-v?4(\.1)?-flash$/i.test(candidate)) {
+        return 'deepseek-flash';
+      }
+    } else if (this.baseUrl.includes('opencode.ai')) {
+      if (/^deepseek-flash$/i.test(candidate)) {
+        return 'deepseek-v4.1-flash';
+      }
+    }
+
+    return candidate;
   }
 
   private normalizeText(content?: string | ContentPart[]): string {

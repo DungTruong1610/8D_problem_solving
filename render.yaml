@@ -30,30 +30,27 @@ services:
       - key: CDS_CONFIG
         value: '{"requires":{"db":{"kind":"sqlite","credentials":{"url":"db.sqlite"}},"auth":{"kind":"mocked"}}}'
 
-      # ── Chat: DeepSeek V4.1 Flash qua OpenCode Go ──
-      # DEEPSEEK_API_KEY điền tay trong Render Dashboard (sync: false).
-      # Đổi cổng API:
-      #   OpenCode Zen (trả theo token) : https://opencode.ai/zen/v1
-      #   DeepSeek Platform             : https://api.deepseek.com + model deepseek-flash
+      # ── Chat: DeepSeek chính hãng (Platform API) ──
+      # DEEPSEEK_API_KEY điền tay trong Render Dashboard (sync: false) để bảo mật tuyệt đối, không lộ ra git/frontend.
+      # Cổng mặc định: DeepSeek chính hãng (https://api.deepseek.com) + model deepseek-flash
+      # Nếu muốn đổi sang OpenCode Go: DEEPSEEK_BASE_URL=https://opencode.ai/zen/go/v1 và DEEPSEEK_MODEL=deepseek-v4.1-flash
       - key: DEEPSEEK_API_KEY
         sync: false
       - key: DEEPSEEK_BASE_URL
-        value: https://opencode.ai/zen/go/v1
+        value: https://api.deepseek.com
       - key: DEEPSEEK_MODEL
-        value: deepseek-v4.1-flash
+        value: deepseek-flash
 
       # ── Model mặc định cho từng loại bước (đọc trong srv/src/config/ai.ts) ──
-      # Không đặt thì các bước này rơi về tên model Claude của AI Core và được
-      # provider DeepSeek ánh xạ lại — chạy được, nhưng log và UI sẽ hiển thị
-      # một cái tên không tồn tại. Đặt thẳng tên DeepSeek cho rõ ràng.
+      # DeepSeek chính hãng dùng model deepseek-flash cho các bước D1-D8, fallback dùng deepseek-v4-pro
       - key: AICORE_DEFAULT_MODEL
-        value: deepseek-v4.1-flash
+        value: deepseek-flash
       - key: AICORE_MODEL_PARSE
-        value: deepseek-v4.1-flash
+        value: deepseek-flash
       - key: AICORE_MODEL_STRUCTURE
-        value: deepseek-v4.1-flash
+        value: deepseek-flash
       - key: AICORE_MODEL_ANALYZE
-        value: deepseek-v4.1-flash
+        value: deepseek-flash
       # Lượt leo thang khi bước viết báo cáo trả JSON thiếu trường — model mạnh hơn.
       - key: AICORE_MODEL_ANALYZE_FALLBACK
         value: deepseek-v4-pro
