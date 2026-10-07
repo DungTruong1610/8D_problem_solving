@@ -543,14 +543,14 @@ export function EightDDetailPage() {
 
             {/* ── Dialog Audit Log ── */}
             <Dialog open={showAudit} onOpenChange={setShowAudit}>
-                <DialogContent className="max-w-xl">
+                <DialogContent className="sm:max-w-2xl">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <History className="w-4 h-4 text-primary" />
                             Audit Trail — {report.notificationId}
                         </DialogTitle>
                         <DialogDescription>
-                            Sign-offs, change requests, and status transitions recorded for this 8D case.
+                            Every human decision on this case: what was done, when, on which data, and why.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="py-1">

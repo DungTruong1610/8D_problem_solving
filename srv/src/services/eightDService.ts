@@ -53,6 +53,7 @@ import {
     saveResult,
     setCaseCommitments,
     setDisciplineWorkState,
+    recordTaskDoneByEvidence,
     sweepStuckAnalyzing,
     type AssignedTeamRow,
 } from '../domain/eightd/eightDRepository';
@@ -715,7 +716,7 @@ export function registerEightDHandlers(srv: any): void {
         if (typeof value === 'string' && !value.trim()) value = null;
 
         try {
-            await saveDisciplineFieldValue(disciplineID, fieldKey, value);
+            await saveDisciplineFieldValue(disciplineID, fieldKey, value, String(req.user?.id ?? 'anonymous'));
         } catch (e: any) {
             return req.error(e?.code === 404 ? 404 : e?.code === 400 ? 400 : 500, describe(e));
         }
@@ -1002,6 +1003,14 @@ export function registerEightDHandlers(srv: any): void {
                 await UPDATE('cnma.proresolve.Disciplines')
                     .set({ resultJson: updatedJson })
                     .where({ ID: discipline.ID });
+                await recordTaskDoneByEvidence({
+                    reportID,
+                    disciplineCode,
+                    taskId,
+                    resultJson: discipline.resultJson,
+                    evidenceId: req.data.ID ?? null,
+                    actor: req.data.uploadedBy,
+                });
             }
         }
     });

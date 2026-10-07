@@ -301,6 +301,24 @@ entity ReviewEvents : cuid {
     /** Danh tính lấy từ req.user lúc ghi. */
     actor          : String(120);
     at             : DateTime;
+
+    /**
+     * ── Từ Sprint 2: dòng vết trả lời được "dựa trên dữ kiện nào, vì sao" ──
+     * Null ở các dòng ghi trước khi có cột — UI nói "không lưu lúc đó" chứ không
+     * dựng lại từ trạng thái hiện tại. Thêm cột vào DB cũ: `auditSchema.ts`.
+     */
+    /** approve | request-change | reopen | task-done | stop-resolved. */
+    eventType         : String(32);
+    /** Đối tượng của hành động: mã bước, id task, hoặc id lần dừng. */
+    subjectId         : String(64);
+    /** Lý do người dùng nhập (bắt buộc với trả / mở lại / gỡ dừng). */
+    reason            : String(500);
+    /** Bản chụp dữ kiện theo danh sách trắng, có trần kích thước — `auditTrail.ts`. */
+    inputSnapshotJson : LargeString;
+    /** Chỉ các trường đã đổi: { field: { before, after } }. */
+    beforeAfterJson   : LargeString;
+    /** Lượt phân tích AI đã sinh bản nháp (model@analyzedAt), nếu có. */
+    traceId           : String(64);
 }
 
 /**

@@ -30,6 +30,18 @@ import {
 } from './fieldConfirm';
 import { assignedFieldFor, normalizeActionStatus, normalizeTasks } from '../../../../shared/action-task';
 import { describeBlockers, evaluateDisciplineCompletion } from '../../../../shared/discipline-completion';
+import {
+    BEFORE_AFTER_MAX_CHARS,
+    SNAPSHOT_MAX_CHARS,
+    beforeAfter,
+    buildDecisionSnapshot,
+    buildTaskDoneSnapshot,
+    capJson,
+    newlyDoneTasks,
+    traceIdOf,
+    type AuditEventType,
+    type ReportFacts,
+} from './auditTrail';
 import { getPath } from './runtimeConfig';
 import { writeClosedCaseToLibrary, type WriteBackResult } from './precedent/closedCaseWriteBack';
 
@@ -628,6 +640,7 @@ export async function saveDisciplineFieldValue(
     disciplineID: string,
     fieldKey: string,
     value: unknown,
+    actor = 'anonymous',
 ): Promise<void> {
     const row = await SELECT.one.from(DISCIPLINES)
         .columns('ID', 'code', 'report_ID', 'resultJson', 'reviewStatus', 'workState')
@@ -671,6 +684,8 @@ export async function saveDisciplineFieldValue(
     // Khoa dang `a.b` la object long nhau trong resultJson, khong phai mot khoa
     // phang co dau cham - dat sai tang thi `getPath` o UI khong bao gio tim thay.
     const parts = fieldKey.split('.');
+    // Danh sách task TRƯỚC khi ghi — để biết task nào vừa được người hoàn tất.
+    const tasksBefore = isTaskActionUpdate ? getPath(data, fieldKey) : null;
     let cursor = data;
     for (const part of parts.slice(0, -1)) {
         const next = cursor[part];
@@ -697,6 +712,32 @@ export async function saveDisciplineFieldValue(
 
     if (fieldKey === 'team.assignedRoster') {
         await syncTeamLeader((row as any).report_ID, data);
+    }
+
+    /**
+     * Task hoàn tất bằng ghi chú thực thi (task không bắt buộc bằng chứng) đi qua
+     * đường ghi trường chung này. Đó là một quyết định của người phụ trách, nên
+     * mỗi task vừa thành Done để lại một dòng vết riêng — cùng bảng với duyệt.
+     */
+    if (isTaskActionUpdate) {
+        for (const task of newlyDoneTasks(tasksBefore, value)) {
+            await recordReviewEvent({
+                reportID: String((row as any).report_ID ?? ''),
+                disciplineCode: String(row.code ?? ''),
+                eventType: 'task-done',
+                subjectId: task.id,
+                reason: task.note,
+                snapshot: buildTaskDoneSnapshot({
+                    code: String(row.code ?? ''),
+                    taskId: task.id,
+                    taskName: task.name,
+                    outcome: task.note,
+                    via: 'execution-note',
+                }),
+                beforeAfter: beforeAfter({ taskStatus: [task.fromStatus, 'Done'] }),
+                actor,
+            });
+        }
     }
 
     cds.log('eightd-repo').info(`Saved ${fieldKey} on discipline ${disciplineID} (${row.code})`);
@@ -831,6 +872,90 @@ export async function setDisciplineWorkState(
 // Duyệt từng bước
 // ─────────────────────────────────────────────────────────────────────────────
 
+/** Loại sự kiện tương ứng với trạng thái đích của một quyết định duyệt. */
+function eventTypeForStatus(toStatus: ReviewStatus): AuditEventType {
+    if (toStatus === 'Approved') return 'approve';
+    if (toStatus === 'ChangeRequested') return 'request-change';
+    return 'reopen';
+}
+
+export interface ReviewEventEntry {
+    reportID: string;
+    disciplineCode: string;
+    eventType: AuditEventType;
+    subjectId?: string | null;
+    fromStatus?: string | null;
+    toStatus?: string | null;
+    reason?: string | null;
+    snapshot?: Record<string, unknown> | null;
+    beforeAfter?: Record<string, unknown> | null;
+    traceId?: string | null;
+    actor: string;
+    at?: string;
+}
+
+/**
+ * Đường ghi DUY NHẤT vào `ReviewEvents`.
+ *
+ * Mọi hành động của người (duyệt, trả, mở lại, hoàn tất task, gỡ dừng) đi qua
+ * đây, nên mọi dòng vết có cùng hình dạng và cùng trần kích thước. Gọi từ bên
+ * trong handler của request, nên câu INSERT chạy trong CÙNG transaction với lệnh
+ * đổi trạng thái — một trong hai hỏng thì cả hai cuộn lại.
+ *
+ * `note` được ghi song song với `reason` cho các chỗ đọc cũ chỉ biết `note`.
+ */
+export async function recordReviewEvent(entry: ReviewEventEntry): Promise<void> {
+    const reason = entry.reason ? String(entry.reason).slice(0, 500) : null;
+    await INSERT.into(REVIEW_EVENTS).entries({
+        reportID: entry.reportID,
+        disciplineCode: entry.disciplineCode,
+        eventType: entry.eventType,
+        subjectId: entry.subjectId ?? null,
+        fromStatus: entry.fromStatus ?? null,
+        toStatus: entry.toStatus ?? null,
+        note: reason,
+        reason,
+        inputSnapshotJson: capJson(entry.snapshot ?? null, SNAPSHOT_MAX_CHARS),
+        beforeAfterJson: capJson(entry.beforeAfter ?? null, BEFORE_AFTER_MAX_CHARS),
+        traceId: entry.traceId ?? null,
+        actor: entry.actor || 'anonymous',
+        at: entry.at ?? new Date().toISOString(),
+    });
+}
+
+/**
+ * Một task vừa thành Done nhờ bằng chứng được upload — ghi vết.
+ *
+ * Gọi từ cả hai đường upload (handler OData `TaskEvidences` và `createTaskEvidence`).
+ */
+export async function recordTaskDoneByEvidence(params: {
+    reportID: string;
+    disciplineCode: string;
+    taskId: string;
+    resultJson: unknown;
+    evidenceId: string | null;
+    actor: string;
+}): Promise<void> {
+    const task = findTaskInResultJson(params.resultJson as any, params.taskId) as any;
+    await recordReviewEvent({
+        reportID: params.reportID,
+        disciplineCode: params.disciplineCode,
+        eventType: 'task-done',
+        subjectId: params.taskId,
+        reason: task?.note || 'Completion evidence uploaded.',
+        snapshot: buildTaskDoneSnapshot({
+            code: params.disciplineCode,
+            taskId: params.taskId,
+            taskName: task?.name,
+            outcome: task?.note,
+            evidenceIds: params.evidenceId ? [params.evidenceId] : [],
+            via: 'evidence-upload',
+        }),
+        beforeAfter: beforeAfter({ taskStatus: [task?.status ?? 'Open', 'Done'] }),
+        actor: params.actor,
+    });
+}
+
 export interface ReviewResult {
     disciplineID: string;
     code: string;
@@ -870,10 +995,24 @@ export async function reviewDiscipline(
     if (!row) throw Object.assign(new Error(`Discipline ${disciplineID} not found.`), { code: 404 });
 
     const reportID = String((row as any).report_ID ?? '');
+    const code = String(row.code ?? '');
     const fromStatus = normalizeStatus((row as any).reviewStatus);
+    const fromWorkState = String((row as any).workState ?? 'NotStarted');
     const at = new Date().toISOString();
 
-    let nextWorkState = String((row as any).workState ?? 'NotStarted');
+    // Dữ kiện của chính bước này + của case — dùng cho cả cổng duyệt lẫn bản chụp
+    // lưu vào vết. Đọc MỘT lần, trước khi ghi, để bản chụp là đúng thứ người
+    // quyết định đang nhìn thấy.
+    const [self, evidence, report] = await Promise.all([
+        SELECT.one.from(DISCIPLINES).columns('resultJson', 'summary').where({ ID: disciplineID }),
+        SELECT.from(TASK_EVIDENCES).columns('taskId').where({ reportID, disciplineCode: code }),
+        SELECT.one.from(REPORTS)
+            .columns('notificationId', 'caseContext', 'precedentsJson', 'rootCauseCategory', 'aiRootCause', 'aiModelAnalyze', 'analyzedAt')
+            .where({ ID: reportID }),
+    ]);
+    const evidenceTaskIds = (evidence as any[]).map((e) => String(e.taskId));
+
+    let nextWorkState = fromWorkState;
 
     if (toStatus === 'Approved') {
         /**
@@ -885,7 +1024,7 @@ export async function reviewDiscipline(
          * kéo theo một dòng ghi vào kho tiền lệ, nên một case đóng non không chỉ
          * sai trong audit: nó trở thành bằng chứng cho những case sau.
          */
-        if (String(row.code ?? '') === 'D8') {
+        if (code === 'D8') {
             const prereqs = await SELECT.from(DISCIPLINES)
                 .columns('code', 'reviewStatus')
                 .where({ report_ID: reportID });
@@ -901,18 +1040,13 @@ export async function reviewDiscipline(
          * bản UI dùng để hiện checklist; ở đây là chỗ chặn thật, vì một lời gọi
          * thẳng vào action không đi qua màn hình nào cả.
          */
-        const code = String(row.code ?? '');
-        const [self, siblings, evidence] = await Promise.all([
-            SELECT.one.from(DISCIPLINES).columns('resultJson').where({ ID: disciplineID }),
-            code === 'D6'
-                ? SELECT.from(DISCIPLINES).columns('code', 'resultJson').where({ report_ID: reportID })
-                : Promise.resolve([]),
-            SELECT.from(TASK_EVIDENCES).columns('taskId').where({ reportID, disciplineCode: code }),
-        ]);
+        const siblings = code === 'D6'
+            ? await SELECT.from(DISCIPLINES).columns('code', 'resultJson').where({ report_ID: reportID })
+            : [];
         const verdict = evaluateDisciplineCompletion({
             code,
             resultJson: (self as any)?.resultJson,
-            evidenceTaskIds: (evidence as any[]).map((e) => String(e.taskId)),
+            evidenceTaskIds,
             siblings: siblings as any[],
         });
         if (!verdict.canApprove) {
@@ -935,12 +1069,26 @@ export async function reviewDiscipline(
         workState: nextWorkState,
     }).where({ ID: disciplineID });
 
-    await INSERT.into(REVIEW_EVENTS).entries({
+    await recordReviewEvent({
         reportID,
-        disciplineCode: String(row.code ?? ''),
+        disciplineCode: code,
+        eventType: eventTypeForStatus(toStatus),
+        subjectId: code,
         fromStatus,
         toStatus,
-        note: note ?? null,
+        reason: note,
+        snapshot: buildDecisionSnapshot({
+            code,
+            resultJson: (self as any)?.resultJson,
+            summary: (self as any)?.summary,
+            report: report as ReportFacts | null,
+            evidenceTaskIds,
+        }),
+        beforeAfter: beforeAfter({
+            reviewStatus: [fromStatus, toStatus],
+            workState: [fromWorkState, nextWorkState],
+        }),
+        traceId: traceIdOf(report as ReportFacts | null),
         actor,
         at,
     });
@@ -1200,6 +1348,14 @@ export async function createTaskEvidence(params: {
             await UPDATE(DISCIPLINES)
                 .set({ resultJson: updatedJson })
                 .where({ ID: (discipline as any).ID });
+            await recordTaskDoneByEvidence({
+                reportID,
+                disciplineCode,
+                taskId,
+                resultJson: (discipline as any).resultJson,
+                evidenceId: ID,
+                actor: actor || 'anonymous',
+            });
         }
     }
 

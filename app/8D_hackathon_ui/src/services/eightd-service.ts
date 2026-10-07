@@ -83,6 +83,18 @@ export interface ReviewEvent {
     note: string | null;
     actor: string;
     at: string;
+    /**
+     * Có từ Sprint 2. Null ở dòng ghi trước đó — UI nói "không lưu lúc đó",
+     * không dựng lại từ trạng thái hiện tại.
+     */
+    eventType?: 'approve' | 'request-change' | 'reopen' | 'task-done' | 'stop-resolved' | null;
+    subjectId?: string | null;
+    reason?: string | null;
+    /** JSON: dữ kiện quyết định dựa vào, chụp đúng lúc quyết định. */
+    inputSnapshotJson?: string | null;
+    /** JSON: { field: { before, after } }. */
+    beforeAfterJson?: string | null;
+    traceId?: string | null;
 }
 
 export interface ReviewResult {

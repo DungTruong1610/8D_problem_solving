@@ -15,6 +15,7 @@ import { registerEightDHandlers, sweepOnStartup } from './src/services/eightDSer
 import { seedRetrievalConfig } from './src/domain/eightd/precedent/configRepository';
 import { seedRetrievalProfiles } from './src/domain/eightd/precedent/profileRepository';
 import { seedGraphStepParams } from './src/domain/eightd/graph/settings';
+import { ensureReviewEventColumns } from './src/domain/eightd/auditSchema';
 import {
     embedLibraryInBackground,
     seedLibraryFromBundle,
@@ -166,8 +167,16 @@ cds.on('serving', (srv) => {
     }
 });
 
-cds.on('served', () => {
+cds.on('served', async () => {
     logger.info('All CDS services served successfully');
+
+    // TRƯỚC khi mở cổng (CAP chờ handler này): request duyệt đầu tiên đã ghi vào
+    // các cột mới của ReviewEvents. Chỉ là một PRAGMA khi DB đã đủ cột.
+    try {
+        await ensureReviewEventColumns();
+    } catch (e: any) {
+        logger.error('Không thêm được cột mới cho ReviewEvents:', e?.message ?? e);
+    }
 
     // Báo AI Core có thông hay không ngay bây giờ, thay vì để vỡ ở lời gọi model
     // đầu tiên. Không chặn khởi động.
