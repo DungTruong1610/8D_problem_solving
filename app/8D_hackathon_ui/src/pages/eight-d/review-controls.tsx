@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+    Button,
     Select,
     SelectContent,
     SelectItem,
@@ -8,7 +9,7 @@ import {
     SelectValue,
     cn,
 } from '@cnma/react-ui';
-import { Lock, LockOpen } from 'lucide-react';
+import { CheckCircle2, Lock, LockOpen, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import {
     listTaskEvidence,
@@ -166,8 +167,8 @@ export function DisciplineReviewBox({
     );
 
     // Mở lại một bước đã duyệt cần lý do (backend bắt buộc) — hỏi trong popup,
-    // chỉ khi người dùng thật sự chọn đổi trạng thái của bước đó.
-    const [reopenTarget, setReopenTarget] = useState<'NotStarted' | 'InProgress' | null>(null);
+    // chỉ khi người dùng bấm Reopen.
+    const [reopenOpen, setReopenOpen] = useState(false);
 
     const submit = useMutation({
         mutationFn: ({ decision, text }: { decision: ReviewDecision; text?: string }) =>
@@ -229,16 +230,13 @@ export function DisciplineReviewBox({
         submit.mutate({ decision: 'approve' });
     };
 
-    const handleStatusChange = async (value: 'NotStarted' | 'InProgress' | 'Completed') => {
+    /**
+     * Dropdown chỉ đổi trạng thái làm việc (Not started / In process). Không bước
+     * nào tự chuyển sang "In process": bước trước xong chỉ MỞ KHOÁ quyền đổi
+     * trạng thái của bước sau — bắt đầu hay chưa là do người dùng chọn.
+     */
+    const handleStatusChange = async (value: 'NotStarted' | 'InProgress') => {
         if (value === currentStatus) return;
-        if (value === 'Completed') {
-            approve();
-            return;
-        }
-        if (isApproved) {
-            setReopenTarget(value);
-            return;
-        }
         try {
             await changeWorkState(value);
             toast.success(value === 'InProgress' ? 'Status: In process' : 'Status: Not started');
@@ -249,16 +247,9 @@ export function DisciplineReviewBox({
     };
 
     const confirmReopen = async (reason: string) => {
-        const target = reopenTarget;
         try {
             await submit.mutateAsync({ decision: 'reopen', text: reason });
-            // Mở lại đưa bước về "In process"; người dùng chọn "Not started" thì
-            // hạ tiếp một nấc sau khi bước đã hết trạng thái duyệt.
-            if (target === 'NotStarted') {
-                await setDisciplineWorkState(discipline.ID, 'NotStarted');
-                void queryClient.invalidateQueries({ queryKey: ['8d'] });
-            }
-            setReopenTarget(null);
+            setReopenOpen(false);
         } catch {
             // Lỗi đã được toast trong onError của mutation.
         }
@@ -302,42 +293,63 @@ export function DisciplineReviewBox({
                     )}
                 </div>
 
-                <div className="flex shrink-0 items-center gap-2.5">
-                    <Select
-                        value={currentStatus}
-                        disabled={busy || (!unlocked && !isApproved)}
-                        onValueChange={(val) => handleStatusChange(val as 'NotStarted' | 'InProgress' | 'Completed')}
-                    >
-                        <SelectTrigger className="h-9 w-[150px] px-3 text-sm font-medium bg-background">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="NotStarted">
-                                <div className="flex items-center gap-1.5">
-                                    <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50" />
-                                    <span>Not started</span>
-                                </div>
-                            </SelectItem>
-                            <SelectItem value="InProgress">
-                                <div className="flex items-center gap-1.5">
-                                    <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                                    <span>In process</span>
-                                </div>
-                            </SelectItem>
-                            <SelectItem value="Completed">
-                                <div className="flex items-center gap-1.5">
-                                    <span className="h-1.5 w-1.5 rounded-full bg-success" />
-                                    <span>Complete</span>
-                                </div>
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
+                <div className="flex shrink-0 flex-wrap items-center gap-2">
+                    {isApproved ? (
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="gap-1.5"
+                            disabled={busy}
+                            onClick={() => setReopenOpen(true)}
+                        >
+                            <RotateCcw className="h-3.5 w-3.5" />
+                            Reopen
+                        </Button>
+                    ) : (
+                        <>
+                            <Select
+                                value={currentStatus}
+                                disabled={busy || !unlocked}
+                                onValueChange={(val) => handleStatusChange(val as 'NotStarted' | 'InProgress')}
+                            >
+                                <SelectTrigger className="h-9 w-[140px] px-3 text-sm font-medium bg-background" aria-label="Work status">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="NotStarted">
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50" />
+                                            <span>Not started</span>
+                                        </div>
+                                    </SelectItem>
+                                    <SelectItem value="InProgress">
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                                            <span>In process</span>
+                                        </div>
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Button
+                                type="button"
+                                size="sm"
+                                className="gap-1.5"
+                                disabled={busy || !unlocked}
+                                onClick={approve}
+                                title={unlocked ? `Approve ${discipline.code}` : `Complete ${prevCode} first`}
+                            >
+                                <CheckCircle2 className="h-3.5 w-3.5" />
+                                Approve step
+                            </Button>
+                        </>
+                    )}
                 </div>
             </div>
 
             <ReasonDialog
-                open={reopenTarget !== null}
-                onOpenChange={(open) => { if (!open) setReopenTarget(null); }}
+                open={reopenOpen}
+                onOpenChange={setReopenOpen}
                 title={`Reopen ${discipline.code}`}
                 description="This withdraws the approval. The step must be completed again, and your reason is stored in the audit log."
                 placeholder="Why is the approval being withdrawn? e.g. a new measurement contradicts the root cause"

@@ -48,6 +48,24 @@ export function decisionRequiresReason(decision: ReviewDecision): boolean {
     return decision === 'request-change' || decision === 'reopen';
 }
 
+/** Thứ tự tám bước — bước sau chỉ được bắt đầu / duyệt khi bước ngay trước đã duyệt. */
+export const STEP_ORDER = ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8'] as const;
+
+/**
+ * Bước ngay trước còn chặn bước `code` không. Trả mã bước chặn, hoặc null khi
+ * được phép (D1, mã lạ, hoặc bước trước đã Approved).
+ *
+ * Không có chuyện bước sau TỰ chuyển sang "đang làm" khi bước trước xong: mở
+ * khoá chỉ cho phép người dùng bắt đầu, việc bắt đầu vẫn là thao tác của họ.
+ */
+export function blockingPreviousStep(code: string, siblings: readonly DisciplineReviewState[]): string | null {
+    const idx = (STEP_ORDER as readonly string[]).indexOf(code);
+    if (idx <= 0) return null;
+    const prev = STEP_ORDER[idx - 1];
+    const row = siblings.find((d) => d.code === prev);
+    return row && normalizeStatus(row.reviewStatus) === 'Approved' ? null : prev;
+}
+
 /** Chuẩn hoá giá trị đọc từ DB. Hàng cũ có `reviewStatus` null vì được ghi trước khi có cột này. */
 export function normalizeStatus(value: unknown): ReviewStatus {
     return isReviewStatus(value) ? value : 'Draft';

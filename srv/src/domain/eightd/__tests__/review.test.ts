@@ -8,6 +8,7 @@
 
 import {
     CLOSURE_PREREQUISITES,
+    blockingPreviousStep,
     decisionRequiresReason,
     evaluateClosureGate,
     isReviewDecision,
@@ -103,5 +104,31 @@ describe('decisionRequiresReason', () => {
 
     it('duyệt thì không — bằng chứng của bước là lý do', () => {
         expect(decisionRequiresReason('approve')).toBe(false);
+    });
+});
+
+describe('blockingPreviousStep', () => {
+    const steps = (approved: string[]) => ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8']
+        .map((code) => ({ code, reviewStatus: approved.includes(code) ? 'Approved' : 'Draft' }));
+
+    it('D1 luôn được bắt đầu', () => {
+        expect(blockingPreviousStep('D1', steps([]))).toBeNull();
+    });
+
+    it('bước trước chưa duyệt thì chặn, và nêu đúng bước chặn', () => {
+        expect(blockingPreviousStep('D2', steps([]))).toBe('D1');
+        expect(blockingPreviousStep('D5', steps(['D1', 'D2', 'D3']))).toBe('D4');
+    });
+
+    it('bước trước đã duyệt thì được', () => {
+        expect(blockingPreviousStep('D2', steps(['D1']))).toBeNull();
+    });
+
+    it('chỉ xét bước NGAY trước — bước xa hơn chưa duyệt không làm đổi kết quả', () => {
+        expect(blockingPreviousStep('D3', steps(['D2']))).toBeNull();
+    });
+
+    it('bước trước thiếu hẳn thì chặn', () => {
+        expect(blockingPreviousStep('D2', [{ code: 'D3', reviewStatus: 'Approved' }])).toBe('D1');
     });
 });

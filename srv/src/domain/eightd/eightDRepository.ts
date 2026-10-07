@@ -20,6 +20,7 @@
 import cds from '@sap/cds';
 import type { AnalyzeOutcome, CaseContext, DisciplineCode } from './types';
 import {
+    blockingPreviousStep,
     evaluateClosureGate,
     normalizeStatus,
     type ClosureGate,
@@ -276,7 +277,10 @@ export async function savePartialDiscipline(
         configVersion: item.runtime?.configVersion ?? null,
         aiGenerated: true,
         reviewStatus: 'Draft',
-        workState: 'InProgress',
+        // Mọi bước bắt đầu ở "Not started". Trước đây là InProgress cho cả tám
+        // bước, nên duyệt D1 xong thì D2 trông như TỰ chuyển sang "In process" —
+        // bắt đầu một bước là thao tác của người, không phải hệ quả của bước trước.
+        workState: 'NotStarted',
     });
 }
 
@@ -848,9 +852,17 @@ export async function setDisciplineWorkState(
     }
 
     const row = await SELECT.one.from(DISCIPLINES)
-        .columns('ID', 'code', 'reviewStatus', 'workState')
+        .columns('ID', 'code', 'reviewStatus', 'workState', 'report_ID')
         .where({ ID: disciplineID });
     if (!row) throw Object.assign(new Error(`Discipline ${disciplineID} not found.`), { code: 404 });
+    // Chỉ bắt đầu được một bước khi bước ngay trước đã duyệt (D1 luôn được).
+    if (state === 'InProgress') {
+        const siblings = await SELECT.from(DISCIPLINES).columns('code', 'reviewStatus').where({ report_ID: (row as any).report_ID });
+        const blocker = blockingPreviousStep(String(row.code ?? ''), siblings as any[]);
+        if (blocker) {
+            throw Object.assign(new Error(`Complete ${blocker} before starting ${row.code}.`), { code: 400 });
+        }
+    }
     // Đổi workState sẽ hạ `reviewStatus` về Draft. Với một bước ĐÃ DUYỆT, đó là
     // huỷ duyệt — phải đi qua `reopen` để có lý do và dòng vết, không lặng lẽ ở đây.
     if (normalizeStatus((row as any).reviewStatus) === 'Approved') {
@@ -1155,6 +1167,13 @@ export async function reviewDiscipline(
     let nextWorkState = fromWorkState;
 
     if (toStatus === 'Approved') {
+        // Duyệt theo đúng thứ tự: bước ngay trước phải đã duyệt.
+        const order = await SELECT.from(DISCIPLINES).columns('code', 'reviewStatus').where({ report_ID: reportID });
+        const blocker = blockingPreviousStep(code, order as any[]);
+        if (blocker) {
+            throw Object.assign(new Error(`Complete ${blocker} before approving ${code}.`), { code: 400 });
+        }
+
         /**
          * Duyệt D8 = ĐÓNG CASE. Cổng phải chặn ở đây, không chỉ ở màn hình.
          *

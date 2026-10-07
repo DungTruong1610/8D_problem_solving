@@ -472,7 +472,8 @@ async function ensureReportRecord(db: any, notificationId: string, ctx: any, raw
         INSERT.into('cnma.proresolve.Disciplines').entries(
             disciplines.map((d, dIdx) => {
                 let reviewStatus = 'Draft';
-                let workState = 'InProgress';
+                // Bước chưa duyệt bắt đầu ở "Not started" — xem `savePartialDiscipline`.
+                let workState = 'NotStarted';
                 if (isClosed) {
                     reviewStatus = 'Approved';
                     workState = 'Completed';
