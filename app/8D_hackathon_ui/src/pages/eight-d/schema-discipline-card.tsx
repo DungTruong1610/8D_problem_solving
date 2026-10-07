@@ -732,7 +732,10 @@ export function SchemaDisciplineCard({ discipline, caseContext, liveFormSchemaJs
     const visibleGroups = groups;
     const violations = validation?.violations ?? [];
     const isCompleted = reviewStatusOf(discipline) === 'Approved';
-    const isReadOnly = isCompleted;
+    // Chỉ sửa được khi bước đang "In process". "Not started" là chỉ đọc — khớp với
+    // backend (`saveDisciplineFieldValue`, upload bằng chứng đều từ chối khi
+    // workState khác InProgress), để người dùng không gõ xong mới bị báo lỗi.
+    const isReadOnly = isCompleted || discipline.workState !== 'InProgress';
 
     const W2H_SET = new Set<string>(W2H_FIELD_KEYS);
     const IS_NOT_SET = new Set<string>(IS_NOT_FIELD_KEYS);
