@@ -84,7 +84,19 @@ cds.on('bootstrap', (app: express.Application) => {
     });
 
     // ===== SPRINT 1 VERIFY HARNESS REST ENDPOINTS =====
-    app.use(express.json({ limit: '10mb' }));
+    // Parser JSON CHỈ gắn cho route cần nó. Trước đây `app.use(express.json())`
+    // chạy trên MỌI request, kể cả OData — và lỗi parse của nó không có ai bắt:
+    // một body JSON hỏng gửi vào bất kỳ endpoint nào là "Uncaught SyntaxError"
+    // và cả tiến trình backend chết. Giờ body hỏng ở đây là 400, còn OData tự
+    // parse và tự báo lỗi theo cách của CAP.
+    const verifyJson = express.json({ limit: '10mb' });
+    const rejectBadJson: express.ErrorRequestHandler = (err, req, res, next) => {
+        if (err?.type === 'entity.parse.failed') {
+            res.status(400).json({ error: `Request body is not valid JSON: ${err.message}` });
+            return;
+        }
+        next(err);
+    };
 
     app.get('/api/verify/sprint1', async (req, res) => {
         try {
@@ -96,7 +108,7 @@ cds.on('bootstrap', (app: express.Application) => {
         }
     });
 
-    app.post('/api/verify/judge-input', async (req, res) => {
+    app.post('/api/verify/judge-input', verifyJson, async (req, res) => {
         try {
             const { evaluateJudgeInput } = await import('../scripts/verify-sprint1-harness');
             const db = await cds.connect.to('db');
@@ -105,7 +117,7 @@ cds.on('bootstrap', (app: express.Application) => {
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }
-    });
+    }, rejectBadJson);
 
     logger.info('Custom bootstrap initialized');
 });
