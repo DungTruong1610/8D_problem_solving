@@ -24,7 +24,8 @@ import {
 } from './problem-widgets';
 import { ActionCardsWidget, AiDraftWidget, IshikawaGridWidget, WhyChainWidget } from './cause-widgets';
 import { assignedFieldFor } from '../../../../../shared/action-task';
-import { ClosureGateWidget, FmeaLinkWidget } from './closure-widgets';
+import { FmeaLinkWidget } from './closure-widgets';
+import { ClosureSummaryWidget } from './closure-summary';
 
 interface SnapshotField { key: string; label: string; widget: string; visible?: boolean; colSpan?: number; rowSpan?: number }
 interface SnapshotGroup { id: string; label: string; fieldKeys: string[]; order?: number }
@@ -446,7 +447,9 @@ function FieldValue({ field, value, context, disciplineID, data, siblings, readO
     // Cổng đóng case là sự thật về CẢ report, nên nó đọc trạng thái duyệt của các
     // bước anh em chứ không đọc `resultJson` — để model tự trả lời câu này là để
     // nó tự cấp phép đóng case.
-    if (field.widget === 'closure-gate') return <ClosureGateWidget siblings={siblings} />;
+    // Cổng đóng case không hiện thành một hộp riêng: D8 đã có bố cục riêng, và
+    // trạng thái D1–D7 đọc được ở cột tiến độ bên trái.
+    if (field.widget === 'closure-gate') return null;
     if (field.widget === 'markdown' || field.widget === 'textarea') return <Markdown>{String(value)}</Markdown>;
     if (field.widget === 'status') return <Badge variant={/ready|agree|complete|verified|effective/i.test(String(value)) ? 'success' : 'secondary'} className="max-w-full whitespace-normal break-words text-left leading-relaxed">{String(value)}</Badge>;
     if (typeof value === 'boolean') return <Badge variant={value ? 'success' : 'secondary'}>{value ? 'Yes' : 'No'}</Badge>;
@@ -549,9 +552,9 @@ function isExcludedField(code: string, key: string, label?: string, value?: unkn
     if (code === 'D2' && (key === 'problem.isIsNotStatus' || key === 'isIsNotStatus')) {
         if (!value || value === 'Not provided' || !String(value).trim()) return true;
     }
-    if (code === 'D1' && (key === 'team.suggestionStatus' || key === 'suggestionStatus')) {
-        if (!value || value === 'Not provided' || !String(value).trim()) return true;
-    }
+    // D1: dòng "Suggestion status" không hiện — danh sách đề xuất và bảng đội
+    // ở ngay trên đã nói đủ, và câu này còn nói ngược khi đã có người được nhận.
+    if (code === 'D1' && (key === 'team.suggestionStatus' || key === 'suggestionStatus')) return true;
     if (code === 'D3') {
         if (
             key === 'containment.gaps'
@@ -744,6 +747,17 @@ export function SchemaDisciplineCard({ discipline, caseContext, liveFormSchemaJs
             fieldKeys: g.fieldKeys.filter((k) => k !== 'team.roster' && k !== 'team.assignedRoster'),
         })).filter((g) => g.fieldKeys.length > 0)
         : visibleGroups;
+
+    if (discipline.code === 'D8') {
+        return (
+            <ClosureSummaryWidget
+                data={data}
+                context={context}
+                siblings={siblings}
+                rootCause={resolveD4RootCause(siblings.find((d) => d.code === 'D4'), caseContext)}
+            />
+        );
+    }
 
     const content = (
         <div className="min-w-0 space-y-3">

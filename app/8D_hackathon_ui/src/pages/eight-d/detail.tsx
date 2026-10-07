@@ -39,7 +39,7 @@ import { EvidenceTab } from './evidence-tab';
 import { CaseStepper } from './case-stepper';
 import { CaseCommitments } from './case-commitments';
 import { AuditTrailPanel } from './audit-trail-panel';
-import { StopsPanel } from './stops-panel';
+import { StopsButton } from './stops-panel';
 import { export8DToExcel } from './export-8d-excel';
 import { CaseProvenanceProvider } from './ai-provenance-info';
 
@@ -265,6 +265,15 @@ export function EightDDetailPage() {
                         <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                         {exporting ? 'Exporting…' : 'Export Excel'}
                     </Button>
+                    {/* AI dừng ở đâu, ai phải trả lời — chỉ mở khi bấm. */}
+                    {!running && (
+                        <StopsButton
+                            reportID={report.ID}
+                            stops={stopsQuery.data ?? []}
+                            isError={stopsQuery.isError}
+                            isLoading={stopsQuery.isLoading}
+                        />
+                    )}
                     <Button
                         variant="outline"
                         size="sm"
@@ -310,11 +319,6 @@ export function EightDDetailPage() {
                         </p>
                     </div>
                 </div>
-            )}
-
-            {/* ── AI dừng ở đâu, ai phải trả lời ── */}
-            {!running && (
-                <StopsPanel reportID={report.ID} stops={stopsQuery.data ?? []} isError={stopsQuery.isError} />
             )}
 
             {/* ── Main Content ── */}

@@ -1,18 +1,17 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button, cn } from '@cnma/react-ui';
+import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, cn } from '@cnma/react-ui';
 import { CheckCircle2, OctagonPause } from 'lucide-react';
 import { toast } from 'sonner';
 import { resolveStop, type CaseStop, type StopType } from '@/services/eightd-service';
 import { ReasonDialog } from './reason-dialog';
 
 /**
- * "AI stopped here" — những chỗ AI không được tự đi tiếp, và ai phải trả lời.
+ * Các lần AI dừng — những chỗ AI không được tự đi tiếp, và ai phải trả lời.
  *
- * Ba loại, mỗi loại một màu tiết chế (viền + chấm, không tô nền cả khối):
- * dữ kiện chưa xác minh / ngoài phạm vi / vượt thẩm quyền. Lần dừng `blocking`
- * khoá nút duyệt của đúng bước đó (cả ở backend) cho tới khi có người gỡ kèm ghi
- * chú — ghi chú đó vào nhật ký kiểm toán cùng dữ kiện gây dừng.
+ * Ba loại, mỗi loại một màu tiết chế: dữ kiện chưa xác minh / ngoài phạm vi /
+ * vượt thẩm quyền. Lần dừng `blocking` khoá duyệt đúng bước đó (ở backend) cho
+ * tới khi có người gỡ kèm ghi chú — ghi chú đó vào nhật ký kiểm toán.
  */
 
 export const STOP_TYPE_META: Record<StopType, { label: string; hint: string; dot: string; border: string }> = {
@@ -90,8 +89,20 @@ function StopRow({ stop, onResolve }: { stop: CaseStop; onResolve: (stop: CaseSt
     );
 }
 
-export function StopsPanel({ reportID, stops, isError }: { reportID: string; stops: CaseStop[]; isError?: boolean }) {
+/**
+ * Nút "AI stops" ở thanh công cụ đầu trang — danh sách chỉ mở ra khi bấm.
+ *
+ * Số trên nút là số lần dừng còn mở: người xem biết có việc đang chờ mình mà
+ * không phải đọc một khối chữ cố định trên mọi trang chi tiết.
+ */
+export function StopsButton({ reportID, stops, isError, isLoading }: {
+    reportID: string;
+    stops: CaseStop[];
+    isError?: boolean;
+    isLoading?: boolean;
+}) {
     const queryClient = useQueryClient();
+    const [open, setOpen] = useState(false);
     const [target, setTarget] = useState<CaseStop | null>(null);
 
     const resolve = useMutation({
@@ -106,33 +117,53 @@ export function StopsPanel({ reportID, stops, isError }: { reportID: string; sto
         },
     });
 
-    if (isError) {
-        return (
-            <div className="rounded-lg border border-destructive/40 bg-destructive/[0.04] px-4 py-3 text-sm text-muted-foreground">
-                Could not check where the AI must stop for this case. Approvals are still checked on the server.
-            </div>
-        );
-    }
-    if (stops.length === 0) return null;
-
-    const open = stops.filter((s) => s.status === 'open');
+    const openCount = stops.filter((s) => s.status === 'open').length;
 
     return (
-        <section className="rounded-lg border bg-card px-4 py-3" aria-label="AI stopped here">
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <OctagonPause className={cn('h-4 w-4 shrink-0', open.length ? 'text-warning' : 'text-muted-foreground')} />
-                <h2 className="text-sm font-semibold text-foreground">
-                    {open.length ? `AI stopped here — ${open.length} open` : 'AI stops — all handled'}
-                </h2>
-                <span className="text-sm text-muted-foreground">
-                    The AI hands these to a person instead of guessing. Resolving one records your note in the audit trail.
-                </span>
-            </div>
-            <ul className="mt-2 divide-y">
-                {stops.map((stop) => (
-                    <StopRow key={stop.id} stop={stop} onResolve={setTarget} />
-                ))}
-            </ul>
+        <>
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setOpen(true)}
+                disabled={isLoading}
+                title="Where the AI stopped and handed over to a person"
+            >
+                <OctagonPause className={cn('w-4 h-4', openCount ? 'text-warning' : 'text-primary')} />
+                AI Stops
+                {openCount > 0 && (
+                    <span className="ml-0.5 inline-flex min-w-5 items-center justify-center rounded-full bg-warning px-1.5 text-xs font-semibold text-white tabular-nums">
+                        {openCount}
+                    </span>
+                )}
+            </Button>
+
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <OctagonPause className="h-4 w-4 text-primary" />
+                            AI Stops
+                        </DialogTitle>
+                        <DialogDescription>
+                            Where the AI handed the decision to a person instead of guessing. Resolving one records your note in the audit trail.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {isError ? (
+                        <p className="text-sm text-muted-foreground">
+                            Could not load the stops for this case. Approvals are still checked on the server.
+                        </p>
+                    ) : stops.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">No stops — the AI could proceed on every step of this case.</p>
+                    ) : (
+                        <ul className="divide-y">
+                            {stops.map((stop) => (
+                                <StopRow key={stop.id} stop={stop} onResolve={setTarget} />
+                            ))}
+                        </ul>
+                    )}
+                </DialogContent>
+            </Dialog>
 
             <ReasonDialog
                 open={target !== null}
@@ -146,6 +177,6 @@ export function StopsPanel({ reportID, stops, isError }: { reportID: string; sto
                 busy={resolve.isPending}
                 onConfirm={(note) => target && resolve.mutate({ stopId: target.id, note })}
             />
-        </section>
+        </>
     );
 }

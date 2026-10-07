@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-    Button,
     Select,
     SelectContent,
     SelectItem,
@@ -9,7 +8,7 @@ import {
     SelectValue,
     cn,
 } from '@cnma/react-ui';
-import { CheckCircle2, CircleAlert, Lock, LockOpen, MessageSquareWarning, OctagonPause, RotateCcw } from 'lucide-react';
+import { Lock, LockOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import {
     listTaskEvidence,
@@ -25,7 +24,7 @@ import {
     type ReviewStatus,
 } from '@/services/eightd-service';
 import { normalizeActionStatus } from '../../../../../shared/action-task';
-import { evaluateDisciplineCompletion, type CompletionBlocker } from '../../../../../shared/discipline-completion';
+import { evaluateDisciplineCompletion } from '../../../../../shared/discipline-completion';
 import { AiProvenanceInfo } from './ai-provenance-info';
 import { ReasonDialog } from './reason-dialog';
 
@@ -166,19 +165,17 @@ export function DisciplineReviewBox({
         [discipline.code, discipline.resultJson, evidence, allSiblings],
     );
 
-    const [dialog, setDialog] = useState<'request-change' | 'reopen' | null>(null);
+    // Mở lại một bước đã duyệt cần lý do (backend bắt buộc) — hỏi trong popup,
+    // chỉ khi người dùng thật sự chọn đổi trạng thái của bước đó.
+    const [reopenTarget, setReopenTarget] = useState<'NotStarted' | 'InProgress' | null>(null);
 
     const submit = useMutation({
         mutationFn: ({ decision, text }: { decision: ReviewDecision; text?: string }) =>
             reviewDiscipline(discipline.ID, decision, text),
         onSuccess: (result, { decision }) => {
-            const title = decision === 'approve'
-                ? `${result.code} — Complete`
-                : decision === 'reopen'
-                    ? `${result.code} reopened`
-                    : `${result.code} sent back for changes`;
-            toast.success(title, { description: result.gate.reason });
-            setDialog(null);
+            toast.success(decision === 'approve' ? `${result.code} — Complete` : `${result.code} reopened`, {
+                description: result.gate.reason,
+            });
             void queryClient.invalidateQueries({ queryKey: ['8d'] });
         },
         onError: (e: any) => {
@@ -187,38 +184,63 @@ export function DisciplineReviewBox({
     });
 
     const busy = submit.isPending;
-    const reviewStatus = reviewStatusOf(discipline);
     // AI đã dừng ở bước này và chưa ai gỡ: không duyệt được (backend cũng chặn).
     const openStops = stops.filter((s) => s.blocking && s.status === 'open');
-    const canApprove = completion.canApprove && openStops.length === 0;
+
+    /** Đổi trạng thái làm việc của một bước CHƯA duyệt. */
+    const changeWorkState = async (value: 'NotStarted' | 'InProgress') => {
+        const parsed = parseJsonSafe(discipline.resultJson);
+        await setDisciplineWorkState(discipline.ID, value);
+
+        // Bắt đầu làm một bước hành động thì task đã lên kế hoạch chuyển sang Open
+        // để người phụ trách nộp được bằng chứng. Không task nào thành Done ở đây.
+        if (value === 'InProgress' && ['D3', 'D5', 'D7'].includes(discipline.code)) {
+            const keyPrefix = discipline.code === 'D3' ? 'containment' : discipline.code === 'D5' ? 'corrective' : 'preventive';
+            const assignedField = `${keyPrefix}.assignedActions`;
+            const currentTasks = parsed?.[keyPrefix]?.assignedActions || parsed?.assignedActions;
+            if (Array.isArray(currentTasks) && currentTasks.length > 0) {
+                const updatedTasks = currentTasks.map((t: any) => ({
+                    ...t,
+                    status: normalizeActionStatus(t.status) === 'Planned' ? 'Open' : normalizeActionStatus(t.status),
+                }));
+                await saveDisciplineField(discipline.ID, assignedField, updatedTasks);
+            }
+        }
+    };
 
     /**
-     * Dropdown chỉ còn đổi TRẠNG THÁI LÀM VIỆC (chưa bắt đầu / đang làm). Duyệt,
-     * trả về sửa và mở lại là QUYẾT ĐỊNH của người — mỗi cái một nút riêng, hai
-     * cái sau bắt buộc có lý do. Trước đây cả ba nằm chung một ô chọn và "mở lại"
-     * xảy ra ngầm khi ai đó đổi ô chọn của một bước đã duyệt.
+     * Duyệt KHÔNG đổi trạng thái task nào: từng task phải được người phụ trách
+     * hoàn tất riêng. Chưa đủ điều kiện thì nói lý do NGAY khi người dùng chọn
+     * Complete — không treo checklist cố định trên màn hình. Backend kiểm lại.
      */
-    const handleWorkStateChange = async (value: 'NotStarted' | 'InProgress') => {
+    const approve = () => {
+        if (!unlocked) {
+            toast.error(`Cannot complete ${discipline.code}: complete the previous step (${prevCode}) first.`);
+            return;
+        }
+        const reasons = [
+            ...openStops.map((s) => `AI stopped here — ${s.questionForHuman} (open "AI stops" at the top to resolve it)`),
+            ...completion.blockers.map((b) => b.message),
+        ];
+        if (reasons.length > 0) {
+            toast.error(`Cannot complete ${discipline.code} yet`, { description: reasons.join('\n') });
+            return;
+        }
+        submit.mutate({ decision: 'approve' });
+    };
+
+    const handleStatusChange = async (value: 'NotStarted' | 'InProgress' | 'Completed') => {
         if (value === currentStatus) return;
-        const parsed = parseJsonSafe(discipline.resultJson);
+        if (value === 'Completed') {
+            approve();
+            return;
+        }
+        if (isApproved) {
+            setReopenTarget(value);
+            return;
+        }
         try {
-            await setDisciplineWorkState(discipline.ID, value);
-
-            // Bắt đầu làm một bước hành động thì task đã lên kế hoạch chuyển sang Open
-            // để người phụ trách nộp được bằng chứng. Không task nào thành Done ở đây.
-            if (value === 'InProgress' && ['D3', 'D5', 'D7'].includes(discipline.code)) {
-                const keyPrefix = discipline.code === 'D3' ? 'containment' : discipline.code === 'D5' ? 'corrective' : 'preventive';
-                const assignedField = `${keyPrefix}.assignedActions`;
-                const currentTasks = parsed?.[keyPrefix]?.assignedActions || parsed?.assignedActions;
-                if (Array.isArray(currentTasks) && currentTasks.length > 0) {
-                    const updatedTasks = currentTasks.map((t: any) => ({
-                        ...t,
-                        status: normalizeActionStatus(t.status) === 'Planned' ? 'Open' : normalizeActionStatus(t.status),
-                    }));
-                    await saveDisciplineField(discipline.ID, assignedField, updatedTasks);
-                }
-            }
-
+            await changeWorkState(value);
             toast.success(value === 'InProgress' ? 'Status: In process' : 'Status: Not started');
             void queryClient.invalidateQueries({ queryKey: ['8d'] });
         } catch (err: any) {
@@ -226,24 +248,20 @@ export function DisciplineReviewBox({
         }
     };
 
-    const approve = () => {
-        if (!unlocked) {
-            toast.error(`Cannot complete ${discipline.code}: complete the previous step (${prevCode}) first.`);
-            return;
+    const confirmReopen = async (reason: string) => {
+        const target = reopenTarget;
+        try {
+            await submit.mutateAsync({ decision: 'reopen', text: reason });
+            // Mở lại đưa bước về "In process"; người dùng chọn "Not started" thì
+            // hạ tiếp một nấc sau khi bước đã hết trạng thái duyệt.
+            if (target === 'NotStarted') {
+                await setDisciplineWorkState(discipline.ID, 'NotStarted');
+                void queryClient.invalidateQueries({ queryKey: ['8d'] });
+            }
+            setReopenTarget(null);
+        } catch {
+            // Lỗi đã được toast trong onError của mutation.
         }
-        // Duyệt KHÔNG đổi trạng thái task nào. Từng task phải được người phụ trách
-        // hoàn tất riêng (bằng chứng / ghi chú thực thi); ở đây chỉ kiểm tra rằng
-        // điều đó đã xảy ra. Backend kiểm lại đúng luật này trước khi ghi.
-        if (!canApprove) {
-            toast.error(`Cannot complete ${discipline.code} yet`, {
-                description: [
-                    ...openStops.map((s) => `AI stopped here: ${s.reason}`),
-                    ...completion.blockers.map((b) => b.message),
-                ].join('\n'),
-            });
-            return;
-        }
-        submit.mutate({ decision: 'approve' });
     };
 
     return (
@@ -284,116 +302,48 @@ export function DisciplineReviewBox({
                     )}
                 </div>
 
-                <div className="flex shrink-0 flex-wrap items-center gap-2">
-                    {isApproved ? (
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="gap-1.5"
-                            disabled={busy}
-                            onClick={() => setDialog('reopen')}
-                        >
-                            <RotateCcw className="h-3.5 w-3.5" />
-                            Reopen
-                        </Button>
-                    ) : (
-                        <>
-                            <Select
-                                value={currentStatus}
-                                disabled={busy || !unlocked}
-                                onValueChange={(val) => handleWorkStateChange(val as 'NotStarted' | 'InProgress')}
-                            >
-                                <SelectTrigger className="h-9 w-[140px] px-3 text-sm font-medium bg-background" aria-label="Work status">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="NotStarted">
-                                        <div className="flex items-center gap-1.5">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50" />
-                                            <span>Not started</span>
-                                        </div>
-                                    </SelectItem>
-                                    <SelectItem value="InProgress">
-                                        <div className="flex items-center gap-1.5">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                                            <span>In process</span>
-                                        </div>
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                className="gap-1.5"
-                                disabled={busy || !unlocked}
-                                onClick={() => setDialog('request-change')}
-                                title="Send this step back with a reason"
-                            >
-                                <MessageSquareWarning className="h-3.5 w-3.5" />
-                                Request changes
-                            </Button>
-                            <Button
-                                type="button"
-                                size="sm"
-                                className="gap-1.5"
-                                disabled={busy || !unlocked || !canApprove}
-                                onClick={approve}
-                                title={canApprove ? `Approve ${discipline.code}` : 'Resolve the open items first'}
-                            >
-                                <CheckCircle2 className="h-3.5 w-3.5" />
-                                Approve step
-                            </Button>
-                        </>
-                    )}
+                <div className="flex shrink-0 items-center gap-2.5">
+                    <Select
+                        value={currentStatus}
+                        disabled={busy || (!unlocked && !isApproved)}
+                        onValueChange={(val) => handleStatusChange(val as 'NotStarted' | 'InProgress' | 'Completed')}
+                    >
+                        <SelectTrigger className="h-9 w-[150px] px-3 text-sm font-medium bg-background">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="NotStarted">
+                                <div className="flex items-center gap-1.5">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50" />
+                                    <span>Not started</span>
+                                </div>
+                            </SelectItem>
+                            <SelectItem value="InProgress">
+                                <div className="flex items-center gap-1.5">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                                    <span>In process</span>
+                                </div>
+                            </SelectItem>
+                            <SelectItem value="Completed">
+                                <div className="flex items-center gap-1.5">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-success" />
+                                    <span>Complete</span>
+                                </div>
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
 
-            {reviewStatus === 'ChangeRequested' && discipline.reviewNote && (
-                <div className="mt-3 rounded-md border border-warning/40 bg-warning/[0.06] px-3 py-2.5 text-sm">
-                    <p className="font-medium text-foreground">
-                        Changes requested{discipline.reviewedBy ? ` by ${discipline.reviewedBy}` : ''}
-                        {discipline.reviewedAt ? <span className="font-normal text-muted-foreground"> · {formatReviewedAt(discipline.reviewedAt)}</span> : null}
-                    </p>
-                    <p className="mt-0.5 whitespace-pre-line text-muted-foreground">{discipline.reviewNote}</p>
-                </div>
-            )}
-
-            {!isApproved && openStops.length > 0 && (
-                <div className="mt-3 flex items-start gap-1.5 rounded-md border border-warning/40 bg-warning/[0.06] px-3 py-2.5 text-sm">
-                    <OctagonPause className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
-                    <span className="text-foreground">
-                        The AI stopped at {discipline.code} and is waiting for a person:{' '}
-                        <span className="text-muted-foreground">{openStops.map((s) => s.questionForHuman).join(' ')}</span>{' '}
-                        Resolve it in <strong className="font-medium">AI stopped here</strong> at the top of the page to enable approval.
-                    </span>
-                </div>
-            )}
-
-            {!isApproved && unlocked && completion.blockers.length > 0 && (
-                <CompletionChecklist code={discipline.code} blockers={completion.blockers} />
-            )}
-
             <ReasonDialog
-                open={dialog === 'request-change'}
-                onOpenChange={(open) => setDialog(open ? 'request-change' : null)}
-                title={`Request changes on ${discipline.code}`}
-                description="The step goes back to In process and the owner sees your reason."
-                placeholder={'What is wrong:\nWhat evidence is needed:\nWho should act:'}
-                confirmLabel="Send back"
-                busy={busy}
-                onConfirm={(reason) => submit.mutate({ decision: 'request-change', text: reason })}
-            />
-            <ReasonDialog
-                open={dialog === 'reopen'}
-                onOpenChange={(open) => setDialog(open ? 'reopen' : null)}
+                open={reopenTarget !== null}
+                onOpenChange={(open) => { if (!open) setReopenTarget(null); }}
                 title={`Reopen ${discipline.code}`}
-                description="This withdraws the approval. The step returns to In process and must be approved again."
+                description="This withdraws the approval. The step must be completed again, and your reason is stored in the audit log."
                 placeholder="Why is the approval being withdrawn? e.g. a new measurement contradicts the root cause"
                 confirmLabel="Reopen step"
                 busy={busy}
-                onConfirm={(reason) => submit.mutate({ decision: 'reopen', text: reason })}
+                onConfirm={confirmReopen}
             />
         </div>
     );
@@ -401,26 +351,4 @@ export function DisciplineReviewBox({
 
 function formatReviewedAt(value: string): string {
     return new Date(value).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-}
-
-/**
- * Việc còn thiếu trước khi duyệt được bước, nêu đích danh từng task.
- *
- * Hiện ngay trên ô duyệt để người dùng không phải bấm Complete rồi mới biết bị
- * chặn vì đâu. Cùng luật với backend (`shared/discipline-completion.ts`).
- */
-function CompletionChecklist({ code, blockers }: { code: string; blockers: CompletionBlocker[] }) {
-    return (
-        <div className="mt-3 rounded-md border border-warning/40 bg-warning/[0.06] px-3 py-2.5">
-            <p className="flex items-center gap-1.5 text-sm font-medium text-foreground">
-                <CircleAlert className="h-4 w-4 shrink-0 text-warning" />
-                {code} can be completed once {blockers.length === 1 ? 'this item is' : `these ${blockers.length} items are`} done:
-            </p>
-            <ul className="mt-1.5 space-y-1 pl-6 text-sm text-muted-foreground">
-                {blockers.map((b, i) => (
-                    <li key={`${b.taskId ?? b.issue}-${i}`} className="list-disc">{b.message}</li>
-                ))}
-            </ul>
-        </div>
-    );
 }

@@ -744,6 +744,50 @@ export function ActionCardsWidget({
    Khoi ban nhap cua AI
    ───────────────────────────────────────────────────────────────────────── */
 
+/**
+ * AI Referee (kiểm tra nguyên nhân gốc độc lập) — gói sau một nút, mở ra trong
+ * popup khi người dùng bấm. Bên cạnh nút là kết luận ngắn của Referee để người
+ * xem biết có đáng mở hay không.
+ */
+function AiRefereeButton({ analysis, reportStatus, precedent }: {
+    analysis: ReturnType<typeof parseFinding>;
+    reportStatus?: ReportStatus;
+    precedent: Parameters<typeof ReasoningPanel>[0]['precedent'];
+}) {
+    const [open, setOpen] = useState(false);
+    const finding = (analysis as any)?.finding;
+    const verdict = (analysis as any)?.verdict;
+    const category: string | null = finding?.rootCauseCategory || verdict?.aiCategory || null;
+    const disagrees = verdict?.recordedCategory && verdict?.agrees === false;
+
+    return (
+        <>
+            <div className="flex flex-wrap items-center gap-2">
+                <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={() => setOpen(true)}>
+                    <Cpu className="h-3.5 w-3.5 text-primary" />
+                    AI Referee
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                    {category
+                        ? <>Independent root-cause check points to <strong className="font-medium text-foreground">{category}</strong>{disagrees ? ' — differs from the recorded cause' : ''}.</>
+                        : 'Independent root-cause check'}
+                </span>
+            </div>
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent className="max-h-[88vh] overflow-y-auto sm:max-w-4xl">
+                    <DialogHeader>
+                        <DialogTitle>AI Referee</DialogTitle>
+                        <DialogDescription>
+                            The AI forms its own root-cause hypothesis from the evidence, without seeing the recorded cause. Use it to challenge the conclusion — it decides nothing.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <ReasoningPanel analysis={analysis} reportStatus={reportStatus} precedent={precedent} readOnly />
+                </DialogContent>
+            </Dialog>
+        </>
+    );
+}
+
 /* ─────────────────────────────────────────────────────────────────────────────
    Khối kết luận Root Cause (AI Draft + Chỉnh sửa & Chạy lại các bước sau)
    ───────────────────────────────────────────────────────────────────────── */
@@ -777,7 +821,6 @@ export function AiDraftWidget({
     const effectiveReportID = reportID;
     const refereeAnalysis = parseFinding(aiFinding);
     const topPrecedent = parseStoredPrecedents(precedentsJson)?.precedents?.[0] ?? null;
-    const refereeDraft = refereeAnalysis?.finding?.rootCauseStatement?.trim();
     const text = typeof value === 'string' ? value.trim() : '';
     const [editing, setEditing] = useState(false);
     const [draft, setDraft] = useState(text);
@@ -832,22 +875,14 @@ export function AiDraftWidget({
         }
     };
 
+    // D4: khối kết luận không hiện trên trang; AI Referee nằm sau một nút và chỉ
+    // mở ra khi người dùng bấm. Kết luận nguyên nhân gốc vẫn đọc được ở Ishikawa.
+    if (disciplineCode === 'D4') {
+        return <AiRefereeButton analysis={refereeAnalysis} reportStatus={reportStatus} precedent={topPrecedent} />;
+    }
+
     return (
         <div className="space-y-3">
-            {disciplineCode === 'D4' && (
-                <ReasoningPanel
-                    analysis={refereeAnalysis}
-                    reportStatus={reportStatus}
-                    precedent={topPrecedent}
-                    readOnly={readOnly}
-                    onUseAsDraft={refereeDraft
-                        ? () => {
-                            setDraft(refereeDraft);
-                            setEditing(true);
-                        }
-                        : undefined}
-                />
-            )}
 
             <div className="relative rounded-xl border border-primary/25 bg-primary/[0.03] p-4 shadow-xs transition-all">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5 pb-2 border-b border-primary/15">
