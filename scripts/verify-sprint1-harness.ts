@@ -81,38 +81,13 @@ async function initDatabaseConnection() {
     }
 }
 
-async function ensureDisciplinesCompleted(
-    db: any,
-    reportId: string | undefined,
-    defaultRoster?: Array<{ partnerId: string; partnerRole: string }>,
-) {
-    if (!reportId) return;
-    try {
-        await db.run(
-            `UPDATE cnma_proresolve_Disciplines SET workState = 'Completed', reviewStatus = 'Approved', reviewedBy = 'AI Lead / Quality Manager', reviewedAt = CURRENT_TIMESTAMP WHERE report_ID = ?`,
-            [reportId],
-        );
-        if (defaultRoster && defaultRoster.length > 0) {
-            const d1 = await db.run(
-                SELECT.one.from('cnma.proresolve.Disciplines').where({ report_ID: reportId, code: 'D1' }),
-            );
-            if (d1 && d1.resultJson) {
-                const parsed = JSON.parse(d1.resultJson);
-                if (!parsed.team?.assignedRoster || parsed.team.assignedRoster.length === 0) {
-                    parsed.team = parsed.team || {};
-                    parsed.team.assignedRoster = defaultRoster;
-                    await db.run(
-                        (UPDATE as any)('cnma.proresolve.Disciplines')
-                            .set({ resultJson: JSON.stringify(parsed) })
-                            .where({ ID: d1.ID }),
-                    );
-                }
-            }
-        }
-    } catch {
-        // Table or dialect might vary
-    }
-}
+/**
+ * ── Vì sao KHÔNG còn `ensureDisciplinesCompleted` ──
+ * Bản cũ ghi thẳng `reviewStatus = 'Approved'` cho MỌI bước của các report mẫu,
+ * ký tên "AI Lead / Quality Manager", không để lại dòng vết nào — mỗi lần ai đó
+ * bấm Verify. Đó chính là "máy duyệt thay người" mà sản phẩm phải chứng minh
+ * ngược lại, và nó ghi đè quyết định thật trong DB. Verify giờ chỉ ĐỌC.
+ */
 
 /**
  * Executes TC-01: Happy Path End-to-End Workflow (Strong Precedent Match)
@@ -159,17 +134,7 @@ async function runTC01(db: any): Promise<TestCaseResult> {
     const rep = await db.run(
         SELECT.one.from('cnma.proresolve.Reports').where({ notificationId: '8D-10048412' })
     );
-    if (rep?.ID) {
-        await ensureDisciplinesCompleted(db, rep.ID, [
-            { partnerId: '100001', partnerRole: '8D Team Leader' },
-            { partnerId: '100012', partnerRole: '8D Team Member' },
-            { partnerId: '100018', partnerRole: '8D Team Member' },
-            { partnerId: '100011', partnerRole: '8D Team Member' },
-        ]);
-    }
 
-    // Realistic multi-discipline pipeline processing time
-    await new Promise((r) => setTimeout(r, 1200 + Math.floor(Math.random() * 400)));
 
     const durationMs = Date.now() - t0;
     return {
@@ -177,9 +142,9 @@ async function runTC01(db: any): Promise<TestCaseResult> {
         title: 'Milling Burr Defect (Happy Path — Strong Precedent Match)',
         category: 'Quadrant 1 — Perfect End-to-End Workflow',
         inputSummary: 'Q3 Internal Defect at WC-MILL-07, Material MAT-10247, Burr height 0.26mm vs max 0.10mm',
-        expectedBehavior: 'Clean validation, match top precedent 8D-10048412, complete D1-D8 draft generation',
+        expectedBehavior: 'Clean validation, match precedent 8D-10048412 from the case library, inputs complete for a D1-D8 draft',
         actualBehavior: isE2EOk
-            ? `Successfully matched precedent 8D-10048412 (Score 100%). Root cause: Machine (Tool wear). D1-D8 generated with accepted roster in ${durationMs}ms.`
+            ? `Matched precedent 8D-10048412 in the case library (same work center ${ctx.product.workCenterId} and material ${ctx.product.materialId}); symptom and ${ctx.inspections.length} measurement(s) present for the D1–D8 draft.`
             : `Precedent match failed: found ${matchingCases.length} cases but expected 8D-10048412`,
         status: isE2EOk ? 'PASS' : 'FAIL',
         durationMs,
@@ -228,16 +193,7 @@ async function runTC02(db: any): Promise<TestCaseResult> {
     const rep = await db.run(
         SELECT.one.from('cnma.proresolve.Reports').where({ notificationId: '8D-90048412' })
     );
-    if (rep?.ID) {
-        await ensureDisciplinesCompleted(db, rep.ID, [
-            { partnerId: '100001', partnerRole: '8D Team Leader' },
-            { partnerId: '100018', partnerRole: '8D Team Member' },
-            { partnerId: '100012', partnerRole: '8D Team Member' },
-        ]);
-    }
 
-    // Realistic AI normalization processing time
-    await new Promise((r) => setTimeout(r, 1100 + Math.floor(Math.random() * 300)));
 
     const isOk = isCleanOfBlocking && idTrimmed && metricExtracted && hasGapsReported;
     const durationMs = Date.now() - t0;
@@ -290,16 +246,7 @@ async function runTC03(db: any): Promise<TestCaseResult> {
     const rep = await db.run(
         SELECT.one.from('cnma.proresolve.Reports').where({ notificationId: '8D-10048880' })
     );
-    if (rep?.ID) {
-        await ensureDisciplinesCompleted(db, rep.ID, [
-            { partnerId: '100001', partnerRole: '8D Team Leader' },
-            { partnerId: '100018', partnerRole: '8D Team Member' },
-            { partnerId: '100012', partnerRole: '8D Team Member' },
-        ]);
-    }
 
-    // Realistic AI Blind Diagnosis processing time
-    await new Promise((r) => setTimeout(r, 1300 + Math.floor(Math.random() * 300)));
 
     const biasDetected = engineerCause?.category === 'Man' && aiDetermination === 'Machine';
     const isOk = biasDetected && Boolean(contested);
@@ -349,32 +296,22 @@ async function runTC04(db: any): Promise<TestCaseResult> {
         (c: any) => c.notificationId !== ctx.notificationId && c.notificationId !== '8D-10049003'
     );
 
-    // 2. Precedent cutoff rule: Laser welding on milling cell has 0 records in historical library
+    // 2. Precedent rule: no closed case shares this work center AND defect code,
+    // so there is nothing the AI may cite. (The old harness printed an invented
+    // "similarity 28%"; the measured fact is the count below.)
     const hasPrecedent = matchingCases.length > 0;
-    const similarityScore = hasPrecedent ? 0.95 : 0.28;
-    const CUTOFF_THRESHOLD = 0.60;
-
-    const refusalTriggered = similarityScore < CUTOFF_THRESHOLD;
+    const refusalTriggered = !hasPrecedent;
 
     // 3. Query active 8D Report record
     const rep = await db.run(
         SELECT.one.from('cnma.proresolve.Reports').where({ notificationId: '8D-10049003' })
     );
-    if (rep?.ID) {
-        await ensureDisciplinesCompleted(db, rep.ID, [
-            { partnerId: '100001', partnerRole: '8D Team Leader' },
-            { partnerId: '100018', partnerRole: '8D Team Member' },
-            { partnerId: '100012', partnerRole: '8D Team Member' },
-        ]);
-    }
 
-    // Realistic AI Guardrail & Vector Search processing time
-    await new Promise((r) => setTimeout(r, 1400 + Math.floor(Math.random() * 300)));
 
     // 4. Generate structured technical escalation instead of fake answer
     const escalationPacket = {
         escalatedTo: 'Welding SME / Quality Director',
-        reason: `No precedent in historical library (similarity ${Math.round(similarityScore * 100)}% < ${Math.round(CUTOFF_THRESHOLD * 100)}% cutoff). Hallucination blocked.`,
+        reason: `No closed case in the library shares work center ${ctx.product.workCenterId} and defect code ${ctx.product.defectCode} (${matchingCases.length} found). No precedent is cited.`,
         suggestedInquiries: [
             'Verify robot welding arc current (A) and travel speed (cm/min) against WPS-12800.',
             'Perform destructive cross-section macro-etching on sample B-49172 to measure weld throat depth.',
@@ -391,9 +328,9 @@ async function runTC04(db: any): Promise<TestCaseResult> {
         title: 'Laser Welding Defect on Milling Cell (Safe Escalation & Precedent Refusal)',
         category: 'Quadrant 4 — Safe Refusal & Escalation (Mandatory Rule)',
         inputSummary: 'WC-MILL-07, Housing Cover MAT-10247, Out-of-domain welding defect DEF-0910',
-        expectedBehavior: 'Score < 0.60 -> Refuse to hallucinate precedents, trigger safe escalation to Welding SME',
+        expectedBehavior: 'No matching precedent -> refuse to cite one, escalate to a welding SME with concrete questions',
         actualBehavior: isOk
-            ? `Refusal OK: Detected out-of-domain welding defect DEF-0910 on milling cell (Similarity 28% < 60% threshold). Hallucination blocked. Generated 3 technical questions for Welding SME.`
+            ? `Refused to cite a precedent: 0 closed cases share ${ctx.product.workCenterId} + ${ctx.product.defectCode}. Escalated to a welding SME with 3 technical questions.`
             : `Refusal check failed. Matching cases found: ${matchingCases.length}`,
         status: isOk ? 'PASS' : 'FAIL',
         durationMs,
