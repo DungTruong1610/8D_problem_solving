@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+    Button,
     Select,
     SelectContent,
     SelectItem,
@@ -8,7 +9,7 @@ import {
     SelectValue,
     cn,
 } from '@cnma/react-ui';
-import { CircleAlert, Lock, LockOpen } from 'lucide-react';
+import { CheckCircle2, CircleAlert, Lock, LockOpen, MessageSquareWarning, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import {
     listTaskEvidence,
@@ -25,6 +26,7 @@ import {
 import { normalizeActionStatus } from '../../../../../shared/action-task';
 import { evaluateDisciplineCompletion, type CompletionBlocker } from '../../../../../shared/discipline-completion';
 import { AiProvenanceInfo } from './ai-provenance-info';
+import { ReasonDialog } from './reason-dialog';
 
 /** Bước có luật hoàn tất theo task (D6 đọc task của D5). */
 const ACTION_CODES = new Set(['D3', 'D5', 'D6', 'D7']);
@@ -160,13 +162,19 @@ export function DisciplineReviewBox({
         [discipline.code, discipline.resultJson, evidence, allSiblings],
     );
 
+    const [dialog, setDialog] = useState<'request-change' | 'reopen' | null>(null);
+
     const submit = useMutation({
         mutationFn: ({ decision, text }: { decision: ReviewDecision; text?: string }) =>
             reviewDiscipline(discipline.ID, decision, text),
-        onSuccess: (result) => {
-            toast.success(`${result.code} — ${result.toStatus === 'Approved' ? 'Complete' : 'In process'}`, {
-                description: result.gate.reason,
-            });
+        onSuccess: (result, { decision }) => {
+            const title = decision === 'approve'
+                ? `${result.code} — Complete`
+                : decision === 'reopen'
+                    ? `${result.code} reopened`
+                    : `${result.code} sent back for changes`;
+            toast.success(title, { description: result.gate.reason });
+            setDialog(null);
             void queryClient.invalidateQueries({ queryKey: ['8d'] });
         },
         onError: (e: any) => {
@@ -175,63 +183,57 @@ export function DisciplineReviewBox({
     });
 
     const busy = submit.isPending;
+    const reviewStatus = reviewStatusOf(discipline);
 
-    const handleStatusChange = async (value: 'NotStarted' | 'InProgress' | 'Completed') => {
+    /**
+     * Dropdown chỉ còn đổi TRẠNG THÁI LÀM VIỆC (chưa bắt đầu / đang làm). Duyệt,
+     * trả về sửa và mở lại là QUYẾT ĐỊNH của người — mỗi cái một nút riêng, hai
+     * cái sau bắt buộc có lý do. Trước đây cả ba nằm chung một ô chọn và "mở lại"
+     * xảy ra ngầm khi ai đó đổi ô chọn của một bước đã duyệt.
+     */
+    const handleWorkStateChange = async (value: 'NotStarted' | 'InProgress') => {
         if (value === currentStatus) return;
+        const parsed = parseJsonSafe(discipline.resultJson);
+        try {
+            await setDisciplineWorkState(discipline.ID, value);
 
-        if (value === 'Completed' && !isApproved && !unlocked) {
-            toast.error(`Cannot complete ${discipline.code}: Please complete previous step (${prevCode}) first.`);
+            // Bắt đầu làm một bước hành động thì task đã lên kế hoạch chuyển sang Open
+            // để người phụ trách nộp được bằng chứng. Không task nào thành Done ở đây.
+            if (value === 'InProgress' && ['D3', 'D5', 'D7'].includes(discipline.code)) {
+                const keyPrefix = discipline.code === 'D3' ? 'containment' : discipline.code === 'D5' ? 'corrective' : 'preventive';
+                const assignedField = `${keyPrefix}.assignedActions`;
+                const currentTasks = parsed?.[keyPrefix]?.assignedActions || parsed?.assignedActions;
+                if (Array.isArray(currentTasks) && currentTasks.length > 0) {
+                    const updatedTasks = currentTasks.map((t: any) => ({
+                        ...t,
+                        status: normalizeActionStatus(t.status) === 'Planned' ? 'Open' : normalizeActionStatus(t.status),
+                    }));
+                    await saveDisciplineField(discipline.ID, assignedField, updatedTasks);
+                }
+            }
+
+            toast.success(value === 'InProgress' ? 'Status: In process' : 'Status: Not started');
+            void queryClient.invalidateQueries({ queryKey: ['8d'] });
+        } catch (err: any) {
+            toast.error(err?.response?.data?.error?.message ?? err?.message ?? 'Could not update status.');
+        }
+    };
+
+    const approve = () => {
+        if (!unlocked) {
+            toast.error(`Cannot complete ${discipline.code}: complete the previous step (${prevCode}) first.`);
             return;
         }
-
-        const parsed = parseJsonSafe(discipline.resultJson);
-
         // Duyệt KHÔNG đổi trạng thái task nào. Từng task phải được người phụ trách
         // hoàn tất riêng (bằng chứng / ghi chú thực thi); ở đây chỉ kiểm tra rằng
         // điều đó đã xảy ra. Backend kiểm lại đúng luật này trước khi ghi.
-        if (value === 'Completed' && !completion.canApprove) {
+        if (!completion.canApprove) {
             toast.error(`Cannot complete ${discipline.code} yet`, {
                 description: completion.blockers.map((b) => b.message).join('\n'),
             });
             return;
         }
-
-        try {
-            if (value === 'Completed') {
-                submit.mutate({ decision: 'approve' });
-            } else if (value === 'InProgress') {
-                if (isApproved) {
-                    await reviewDiscipline(discipline.ID, 'reopen');
-                }
-                await setDisciplineWorkState(discipline.ID, value);
-
-                // Tự động đồng bộ task khi bước chuyển InProgress: chuyển Planned -> Open
-                if (['D3', 'D5', 'D7'].includes(discipline.code)) {
-                    const keyPrefix = discipline.code === 'D3' ? 'containment' : discipline.code === 'D5' ? 'corrective' : 'preventive';
-                    const assignedField = `${keyPrefix}.assignedActions`;
-                    const currentTasks = parsed?.[keyPrefix]?.assignedActions || parsed?.assignedActions;
-                    if (Array.isArray(currentTasks) && currentTasks.length > 0) {
-                        const updatedTasks = currentTasks.map((t: any) => ({
-                            ...t,
-                            status: normalizeActionStatus(t.status) === 'Planned' ? 'Open' : normalizeActionStatus(t.status),
-                        }));
-                        await saveDisciplineField(discipline.ID, assignedField, updatedTasks);
-                    }
-                }
-
-                toast.success(`Status: In process`);
-                void queryClient.invalidateQueries({ queryKey: ['8d'] });
-            } else {
-                if (isApproved) {
-                    await reviewDiscipline(discipline.ID, 'reopen');
-                }
-                await setDisciplineWorkState(discipline.ID, value);
-                toast.success(`Status: Not started`);
-                void queryClient.invalidateQueries({ queryKey: ['8d'] });
-            }
-        } catch (err: any) {
-            toast.error(err?.response?.data?.error?.message ?? err?.message ?? 'Could not update status.');
-        }
+        submit.mutate({ decision: 'approve' });
     };
 
     return (
@@ -258,9 +260,7 @@ export function DisciplineReviewBox({
                                 Completed{discipline.reviewedBy ? <> by <strong className="font-semibold text-foreground">{discipline.reviewedBy}</strong></> : ' — verified and approved'}
                             </span>
                             <span className="text-sm text-muted-foreground tabular-nums">
-                                {discipline.reviewedAt
-                                    ? new Date(discipline.reviewedAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-                                    : 'All criteria verified'}
+                                {discipline.reviewedAt ? formatReviewedAt(discipline.reviewedAt) : 'All criteria verified'}
                             </span>
                         </div>
                     ) : (
@@ -274,44 +274,112 @@ export function DisciplineReviewBox({
                     )}
                 </div>
 
-                <div className="flex shrink-0 items-center gap-2.5">
-                    <Select
-                        value={currentStatus}
-                        disabled={busy || (!unlocked && !isApproved)}
-                        onValueChange={(val) => handleStatusChange(val as 'NotStarted' | 'InProgress' | 'Completed')}
-                    >
-                        <SelectTrigger className="h-9 w-[150px] px-3 text-sm font-medium bg-background">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="NotStarted">
-                                <div className="flex items-center gap-1.5">
-                                    <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50" />
-                                    <span>Not started</span>
-                                </div>
-                            </SelectItem>
-                            <SelectItem value="InProgress">
-                                <div className="flex items-center gap-1.5">
-                                    <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                                    <span>In process</span>
-                                </div>
-                            </SelectItem>
-                            <SelectItem value="Completed" disabled={!isApproved && !completion.canApprove}>
-                                <div className="flex items-center gap-1.5">
-                                    <span className="h-1.5 w-1.5 rounded-full bg-success" />
-                                    <span>Complete</span>
-                                </div>
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
+                <div className="flex shrink-0 flex-wrap items-center gap-2">
+                    {isApproved ? (
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="gap-1.5"
+                            disabled={busy}
+                            onClick={() => setDialog('reopen')}
+                        >
+                            <RotateCcw className="h-3.5 w-3.5" />
+                            Reopen
+                        </Button>
+                    ) : (
+                        <>
+                            <Select
+                                value={currentStatus}
+                                disabled={busy || !unlocked}
+                                onValueChange={(val) => handleWorkStateChange(val as 'NotStarted' | 'InProgress')}
+                            >
+                                <SelectTrigger className="h-9 w-[140px] px-3 text-sm font-medium bg-background" aria-label="Work status">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="NotStarted">
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50" />
+                                            <span>Not started</span>
+                                        </div>
+                                    </SelectItem>
+                                    <SelectItem value="InProgress">
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                                            <span>In process</span>
+                                        </div>
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="gap-1.5"
+                                disabled={busy || !unlocked}
+                                onClick={() => setDialog('request-change')}
+                                title="Send this step back with a reason"
+                            >
+                                <MessageSquareWarning className="h-3.5 w-3.5" />
+                                Request changes
+                            </Button>
+                            <Button
+                                type="button"
+                                size="sm"
+                                className="gap-1.5"
+                                disabled={busy || !unlocked || !completion.canApprove}
+                                onClick={approve}
+                                title={completion.canApprove ? `Approve ${discipline.code}` : 'Resolve the open items below first'}
+                            >
+                                <CheckCircle2 className="h-3.5 w-3.5" />
+                                Approve step
+                            </Button>
+                        </>
+                    )}
                 </div>
             </div>
+
+            {reviewStatus === 'ChangeRequested' && discipline.reviewNote && (
+                <div className="mt-3 rounded-md border border-warning/40 bg-warning/[0.06] px-3 py-2.5 text-sm">
+                    <p className="font-medium text-foreground">
+                        Changes requested{discipline.reviewedBy ? ` by ${discipline.reviewedBy}` : ''}
+                        {discipline.reviewedAt ? <span className="font-normal text-muted-foreground"> · {formatReviewedAt(discipline.reviewedAt)}</span> : null}
+                    </p>
+                    <p className="mt-0.5 whitespace-pre-line text-muted-foreground">{discipline.reviewNote}</p>
+                </div>
+            )}
 
             {!isApproved && unlocked && completion.blockers.length > 0 && (
                 <CompletionChecklist code={discipline.code} blockers={completion.blockers} />
             )}
+
+            <ReasonDialog
+                open={dialog === 'request-change'}
+                onOpenChange={(open) => setDialog(open ? 'request-change' : null)}
+                title={`Request changes on ${discipline.code}`}
+                description="The step goes back to In process and the owner sees your reason."
+                placeholder={'What is wrong:\nWhat evidence is needed:\nWho should act:'}
+                confirmLabel="Send back"
+                busy={busy}
+                onConfirm={(reason) => submit.mutate({ decision: 'request-change', text: reason })}
+            />
+            <ReasonDialog
+                open={dialog === 'reopen'}
+                onOpenChange={(open) => setDialog(open ? 'reopen' : null)}
+                title={`Reopen ${discipline.code}`}
+                description="This withdraws the approval. The step returns to In process and must be approved again."
+                placeholder="Why is the approval being withdrawn? e.g. a new measurement contradicts the root cause"
+                confirmLabel="Reopen step"
+                busy={busy}
+                onConfirm={(reason) => submit.mutate({ decision: 'reopen', text: reason })}
+            />
         </div>
     );
+}
+
+function formatReviewedAt(value: string): string {
+    return new Date(value).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
 /**

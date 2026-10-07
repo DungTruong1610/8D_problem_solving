@@ -36,6 +36,18 @@ export function statusForDecision(decision: ReviewDecision): ReviewStatus {
     return DECISION_TO_STATUS[decision];
 }
 
+/**
+ * Quyết định nào bắt buộc kèm lý do.
+ *
+ * Trả lại mà không nói sửa gì thì người nhận không làm được gì. Gỡ duyệt mà
+ * không nói vì sao thì vết duyệt chỉ còn "đã duyệt, rồi không duyệt nữa" — đúng
+ * câu hỏi mà người kiểm tra sẽ hỏi và không ai trả lời được. Duyệt thì không bắt:
+ * bản thân bằng chứng của bước là lý do.
+ */
+export function decisionRequiresReason(decision: ReviewDecision): boolean {
+    return decision === 'request-change' || decision === 'reopen';
+}
+
 /** Chuẩn hoá giá trị đọc từ DB. Hàng cũ có `reviewStatus` null vì được ghi trước khi có cột này. */
 export function normalizeStatus(value: unknown): ReviewStatus {
     return isReviewStatus(value) ? value : 'Draft';

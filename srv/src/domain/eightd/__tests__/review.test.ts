@@ -8,6 +8,7 @@
 
 import {
     CLOSURE_PREREQUISITES,
+    decisionRequiresReason,
     evaluateClosureGate,
     isReviewDecision,
     normalizeStatus,
@@ -91,5 +92,16 @@ describe('statusForDecision', () => {
         for (const v of ['reject', 'APPROVE', '', null, undefined]) {
             expect(isReviewDecision(v)).toBe(false);
         }
+    });
+});
+
+describe('decisionRequiresReason', () => {
+    it('trả lại và gỡ duyệt phải có lý do', () => {
+        expect(decisionRequiresReason('request-change')).toBe(true);
+        expect(decisionRequiresReason('reopen')).toBe(true);
+    });
+
+    it('duyệt thì không — bằng chứng của bước là lý do', () => {
+        expect(decisionRequiresReason('approve')).toBe(false);
     });
 });

@@ -57,6 +57,7 @@ import {
     type AssignedTeamRow,
 } from '../domain/eightd/eightDRepository';
 import {
+    decisionRequiresReason,
     isReviewDecision,
     statusForDecision,
     REVIEW_DECISIONS,
@@ -585,10 +586,12 @@ export function registerEightDHandlers(srv: any): void {
         }
 
         const note = String(req.data?.note ?? '').trim() || null;
-        // Trả lại mà không nói sửa gì thì người nhận không làm được gì — chặn ở
-        // đây chứ không nhắc nhở trên UI, vì UI là thứ duy nhất thay thế được.
-        if (decision === 'request-change' && !note) {
-            return req.error(400, 'note is required when requesting a change.');
+        // Trả lại hay gỡ duyệt mà không nói vì sao thì người nhận không làm được
+        // gì — chặn ở đây chứ không chỉ nhắc trên UI, vì UI là thứ thay thế được.
+        if (decisionRequiresReason(decision) && !note) {
+            return req.error(400, decision === 'reopen'
+                ? 'A reason is required to reopen an approved step.'
+                : 'A reason is required when requesting changes.');
         }
         if (note && note.length > 500) {
             return req.error(400, `note is ${note.length} characters; the limit is 500.`);
@@ -1018,8 +1021,11 @@ export function registerEightDHandlers(srv: any): void {
             .columns('ID', 'reportID', 'disciplineCode')
             .where({ ID: id });
         if (row) {
+            // Thiếu `.where` thì câu này lấy một discipline BẤT KỲ, và cổng khoá
+            // bên dưới phán theo bước của report khác.
             const discipline = await SELECT.one.from('cnma.proresolve.Disciplines')
                 .columns('ID', 'reviewStatus', 'workState')
+                .where({ report_ID: row.reportID, code: row.disciplineCode });
             if (discipline) {
                 const isActionStep = ['D3', 'D5', 'D7'].includes(String(row.disciplineCode));
                 if (discipline.reviewStatus === 'Approved' && !isActionStep) {
