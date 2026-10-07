@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Badge, Button, Card, cn } from '@cnma/react-ui';
 import {
     ArrowRight,
@@ -149,20 +149,6 @@ export function ReasoningPanel({
             : agrees === false
                 ? 'AI Referee found a disagreement'
                 : 'AI produced an independent hypothesis';
-    const statusTone = compromised
-        ? 'border-destructive/40 bg-destructive/[0.04]'
-        : agrees === true
-            ? 'border-success/35 bg-success/[0.025]'
-            : agrees === false
-                ? 'border-warning/45 bg-warning/[0.035]'
-                : 'border-info/30 bg-info/[0.025]';
-    const statusIconTone = compromised
-        ? 'bg-destructive/10 text-destructive'
-        : agrees === true
-            ? 'bg-success/10 text-success'
-            : agrees === false
-                ? 'bg-warning/10 text-warning'
-                : 'bg-info/10 text-info';
     const comparisonLabel = compromised
         ? 'Comparison shown; independence is not guaranteed'
         : agrees === true
@@ -185,245 +171,218 @@ export function ReasoningPanel({
                 : precedent.score)
         : null;
 
+    const verdictTone = compromised
+        ? { ring: 'border-destructive/40 bg-destructive/[0.05]', icon: 'bg-destructive/10 text-destructive' }
+        : agrees === true
+            ? { ring: 'border-success/35 bg-success/[0.05]', icon: 'bg-success/10 text-success' }
+            : agrees === false
+                ? { ring: 'border-warning/45 bg-warning/[0.06]', icon: 'bg-warning/10 text-warning' }
+                : { ring: 'border-border bg-muted/30', icon: 'bg-primary/10 text-primary' };
+
+    const SectionTitle = ({ children }: { children: ReactNode }) => (
+        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{children}</h3>
+    );
+
     return (
-        <Card
-            role="region"
-            aria-label="AI Referee independent root-cause check"
-            className={cn('overflow-hidden border-2 p-0', statusTone)}
-        >
-            <div className="p-4 sm:p-5">
-                <div className="flex items-start gap-3">
-                    <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', statusIconTone)}>
-                        <Brain className="h-5 w-5" aria-hidden="true" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                            <h2 className="text-base font-bold">AI Referee</h2>
-                            <Badge variant="outline" className="text-xs font-medium">
-                                Independent root-cause check
-                            </Badge>
-                        </div>
-                        <div className="mt-1 flex items-start gap-2 text-sm font-semibold">
-                            <StatusIcon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-                            <span>{statusLabel}</span>
-                        </div>
-                        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                            {independenceCopy}
-                        </p>
-                    </div>
+        <div role="region" aria-label="AI Referee independent root-cause check" className="space-y-5">
+            {/* Kết luận một dòng */}
+            <div className={cn('flex items-start gap-3 rounded-xl border p-4', verdictTone.ring)}>
+                <div className={cn('flex size-10 shrink-0 items-center justify-center rounded-xl', verdictTone.icon)}>
+                    <StatusIcon className="size-5" aria-hidden="true" />
                 </div>
-
-                <div className="mt-4 grid grid-cols-1 items-stretch gap-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center">
-                    <div className="min-w-0 rounded-lg border border-border/70 bg-background/70 p-3">
-                        <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                            Cause recorded when analysis ran
-                        </div>
-                        <CategoryChip category={verdict.recordedCategory} />
-                    </div>
-                    <div className="hidden items-center justify-center text-muted-foreground sm:flex" aria-hidden="true">
-                        <ArrowRight className="h-4 w-4" />
-                    </div>
-                    <div className="min-w-0 rounded-lg border border-border/70 bg-background/70 p-3">
-                        <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                            AI Referee finding
-                        </div>
-                        <CategoryChip category={finding.rootCauseCategory || verdict.aiCategory} />
-                    </div>
+                <div className="min-w-0 flex-1">
+                    <p className="text-base font-semibold text-foreground">{statusLabel}</p>
+                    <p className="mt-0.5 text-sm text-muted-foreground">{independenceCopy}</p>
                 </div>
-
-                <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-                    <span>{comparisonLabel}</span>
-                    <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                        {confidence !== null && <span>AI-stated confidence: <strong className="text-foreground">{confidence}%</strong></span>}
-                        <span>5-Why built: <strong className="text-foreground">{derivedFiveWhy.length}</strong> steps</span>
-                    </span>
-                </div>
-
-                <p className="mt-3 break-words text-sm font-medium leading-relaxed text-foreground">
-                    {finding.rootCauseStatement || 'The AI did not provide a root-cause statement.'}
-                </p>
-
-                <section className="mt-3 rounded-lg border border-border/70 bg-background/65 p-3" aria-label="Evidence cited by AI">
-                    {citedEvidence.length > 0 ? (
-                        <>
-                            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                                Evidence cited by AI
-                            </h3>
-                            <ul className="mt-2 space-y-1.5">
-                                {citedEvidence.map((item, index) => (
-                                    <li key={`${index}-${item}`} className="flex items-start gap-2 text-sm leading-relaxed">
-                                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
-                                        <span>{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                            <p className="mt-2 text-xs text-muted-foreground">
-                                AI-cited text is generated from the submitted investigation. Verify it against the source records.
-                            </p>
-                        </>
-                    ) : (
-                        <p className="text-sm text-muted-foreground">
-                            No evidence snippets were returned for this finding. Review the source records before relying on it.
-                        </p>
-                    )}
-                </section>
-
-                {agrees === false && !compromised && (
-                    <div className="mt-3 flex items-start gap-2 rounded-lg bg-warning/10 px-3 py-2 text-sm text-warning">
-                        <Scale className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-                        <span>A disagreement is a signal to review the evidence. It does not prove either conclusion is wrong.</span>
+                {confidence !== null && (
+                    <div className="shrink-0 text-right">
+                        <p className="text-2xl font-semibold tabular-nums leading-none text-foreground">{confidence}%</p>
+                        <p className="mt-1 text-xs text-muted-foreground">AI-stated confidence</p>
                     </div>
                 )}
-
-                {compromised && (
-                    <div role="alert" className="mt-3 flex items-start gap-2 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                        <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-                        <div>
-                            <p className="font-semibold">The blind-evidence audit found {leaks.length} possible answer leak{leaks.length === 1 ? '' : 's'}.</p>
-                            <ul className="mt-1 list-inside list-disc">
-                                {leaks.map((leak, index) => <li key={`${index}-${leak}`}>{leak}</li>)}
-                            </ul>
-                            <p className="mt-1">Treat this comparison as potentially non-independent.</p>
-                        </div>
-                    </div>
-                )}
-
-                {evidenceGaps.length > 0 && (
-                    <p className="mt-3 text-sm text-muted-foreground">
-                        <HelpCircle className="mr-1 inline h-4 w-4 align-[-3px]" aria-hidden="true" />
-                        The AI flagged {evidenceGaps.length} evidence gap{evidenceGaps.length === 1 ? '' : 's'} for human review.
-                    </p>
-                )}
-
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="-ml-2 gap-1.5 text-sm"
-                        aria-expanded={open}
-                        onClick={() => setOpen((value) => !value)}
-                    >
-                        <ChevronDown className={cn('h-4 w-4 transition-transform', open && 'rotate-180')} aria-hidden="true" />
-                        {open ? 'Hide reasoning and inputs' : 'Review reasoning and inputs'}
-                    </Button>
-                    {!readOnly && !compromised && onUseAsDraft && (
-                        <Button type="button" size="sm" variant="outline" onClick={onUseAsDraft}>
-                            Use AI wording as D4 draft
-                        </Button>
-                    )}
-                    {readOnly && (
-                        <span className="text-xs text-muted-foreground">D4 is approved and read-only.</span>
-                    )}
-                </div>
-                {!readOnly && !compromised && onUseAsDraft && (
-                    <p className="mt-1 text-xs text-muted-foreground">
-                        This fills the D4 editor only. Saving and approval remain separate engineer actions.
-                    </p>
-                )}
-                <p className="mt-2 text-xs text-muted-foreground">
-                    Comparison uses the cause recorded when this analysis ran. The current D4 conclusion remains editable below.
-                </p>
             </div>
 
-            {open && (
-                <div className="space-y-5 border-t border-border/70 bg-background/50 px-4 py-5 sm:px-5">
-                    <section>
-                        <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-muted-foreground">What the AI received</h3>
-                        <p className="text-sm leading-relaxed text-foreground/80">
-                            Raw inspection measurements, investigation findings, Is / Is-Not evidence, case context, and containment actions.
-                        </p>
-                        <h3 className="mb-2 mt-4 text-sm font-bold uppercase tracking-wide text-muted-foreground">What was withheld</h3>
-                        <p className="text-sm leading-relaxed text-foreground/80">
-                            The recorded 5-Why chain, root-cause marker, corrective and preventive actions, FMEA link, and lessons learned.
-                        </p>
-                    </section>
+            {/* So sánh hai nguyên nhân */}
+            <div>
+                <SectionTitle>Comparison</SectionTitle>
+                <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[1fr_auto_1fr]">
+                    <div className="rounded-xl border bg-card p-3.5">
+                        <p className="text-xs text-muted-foreground">Recorded when analysis ran</p>
+                        <div className="mt-1.5"><CategoryChip category={verdict.recordedCategory} /></div>
+                    </div>
+                    <ArrowRight className="mx-auto hidden size-4 text-muted-foreground sm:block" aria-hidden="true" />
+                    <div className="rounded-xl border bg-card p-3.5">
+                        <p className="text-xs text-muted-foreground">AI Referee finding</p>
+                        <div className="mt-1.5"><CategoryChip category={finding.rootCauseCategory || verdict.aiCategory} /></div>
+                    </div>
+                </div>
+                <p className="mt-1.5 text-xs text-muted-foreground">{comparisonLabel}</p>
+            </div>
 
-                    {derivedFiveWhy.length > 0 && (
-                        <section>
-                            <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-muted-foreground">5-Why chain built by AI</h3>
-                            <ol className="space-y-3">
-                                {derivedFiveWhy.map((step, index) => (
-                                    <li key={`${step.stepNo ?? index}-${step.question}`} className="flex gap-3">
-                                        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                                            {step.stepNo ?? index + 1}
-                                        </span>
-                                        <div className="min-w-0">
-                                            <p className="text-sm font-semibold">{step.question}</p>
-                                            <p className="mt-0.5 text-sm text-foreground/85">{step.answer}</p>
-                                            {step.evidence && <p className="mt-1 text-sm italic text-muted-foreground">AI-cited evidence: {step.evidence}</p>}
-                                        </div>
-                                    </li>
-                                ))}
-                            </ol>
-                            <p className="mt-2 text-xs text-muted-foreground">Evidence text is not a source-record link; verify it against the original case data.</p>
-                        </section>
-                    )}
+            {/* Giả thuyết */}
+            <div>
+                <SectionTitle>Hypothesis</SectionTitle>
+                <blockquote className="rounded-r-lg border-l-4 border-primary/50 bg-muted/30 px-4 py-3 text-sm leading-relaxed text-foreground">
+                    {finding.rootCauseStatement || 'The AI did not provide a root-cause statement.'}
+                </blockquote>
+            </div>
 
-                    {ruledOut.length > 0 && (
-                        <section>
-                            <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-muted-foreground">Branches considered and ruled out</h3>
-                            <div className="space-y-2">
-                                {ruledOut.map((item, index) => (
-                                    <div key={`${item.category}-${index}`} className="flex items-start gap-3 rounded-lg border border-border/60 bg-background/70 p-3">
-                                        <CategoryChip category={item.category} className="shrink-0 opacity-80" />
-                                        <p className="text-sm leading-relaxed text-foreground/80">{item.reason}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                    )}
+            {/* Bằng chứng */}
+            <div>
+                <SectionTitle>Evidence cited by AI</SectionTitle>
+                {citedEvidence.length > 0 ? (
+                    <ul className="space-y-2">
+                        {citedEvidence.map((item, index) => (
+                            <li key={`${index}-${item}`} className="flex items-start gap-2.5 rounded-lg border bg-card px-3 py-2.5 text-sm leading-relaxed">
+                                <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-semibold text-primary">{index + 1}</span>
+                                <span>{item}</span>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className="text-sm text-muted-foreground">No evidence snippets were returned. Review the source records before relying on this finding.</p>
+                )}
+                <p className="mt-1.5 text-xs text-muted-foreground">Generated from the submitted investigation — verify against the source records.</p>
+            </div>
 
-                    {finding.runnerUpCategory && (
-                        <section>
-                            <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-muted-foreground">Next most likely cause</h3>
-                            <div className="flex items-start gap-3 rounded-lg border border-border/60 bg-background/70 p-3">
-                                <CategoryChip category={finding.runnerUpCategory} className="shrink-0" />
-                                <p className="text-sm leading-relaxed text-foreground/80">
-                                    {finding.runnerUpReason || 'No switching evidence was provided.'}
-                                </p>
-                            </div>
-                        </section>
-                    )}
+            {agrees === false && !compromised && (
+                <div className="flex items-start gap-2 rounded-lg border border-warning/40 bg-warning/[0.06] px-3 py-2.5 text-sm text-foreground">
+                    <Scale className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden="true" />
+                    <span>A disagreement is a signal to review the evidence. It does not prove either conclusion is wrong.</span>
+                </div>
+            )}
 
-                    {evidenceGaps.length > 0 && (
-                        <section>
-                            <h3 className="mb-2 flex items-center gap-1.5 text-sm font-bold uppercase tracking-wide text-muted-foreground">
-                                <HelpCircle className="h-4 w-4" aria-hidden="true" /> Evidence the AI would ask for
-                            </h3>
-                            <ul className="space-y-1.5">
-                                {evidenceGaps.map((gap, index) => (
-                                    <li key={`${index}-${gap}`} className="flex items-start gap-2 text-sm text-foreground/80">
-                                        <span className="text-muted-foreground" aria-hidden="true">·</span>
-                                        <span>{gap}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </section>
-                    )}
-
-                    {precedent && (
-                        <section className="rounded-lg border border-info/25 bg-info/[0.04] p-3">
-                            <h3 className="text-sm font-semibold">Related closed case · {precedent.notificationId}</h3>
-                            <p className="mt-1 text-sm text-muted-foreground">
-                                {precedentScore !== null ? `${precedentScore}% similarity. ` : ''}
-                                A precedent is a reference, not proof of this case's root cause.
-                            </p>
-                            {(precedent.defectText || precedent.symptomShortText) && (
-                                <p className="mt-2 text-sm text-foreground/80">{precedent.defectText || precedent.symptomShortText}</p>
-                            )}
-                            {precedent.rerankReason && (
-                                <p className="mt-2 text-sm text-info">Match rationale: {precedent.rerankReason}</p>
-                            )}
-                        </section>
-                    )}
-
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border/60 pt-3 text-xs text-muted-foreground">
-                        <span>Recorded 5-Why steps: <strong className="text-foreground">{verdict.recordedStepCount}</strong></span>
-                        <span>Independent 5-Why steps: <strong className="text-foreground">{verdict.aiStepCount}</strong></span>
+            {compromised && (
+                <div role="alert" className="flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/[0.06] px-3 py-2.5 text-sm">
+                    <TriangleAlert className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden="true" />
+                    <div>
+                        <p className="font-semibold text-foreground">The blind-evidence audit found {leaks.length} possible answer leak{leaks.length === 1 ? '' : 's'}.</p>
+                        <ul className="mt-1 list-inside list-disc text-muted-foreground">
+                            {leaks.map((leak, index) => <li key={`${index}-${leak}`}>{leak}</li>)}
+                        </ul>
                     </div>
                 </div>
             )}
-        </Card>
+
+            {/* Chi tiết, mở khi cần */}
+            <div className="rounded-xl border">
+                <button
+                    type="button"
+                    className="flex w-full cursor-pointer items-center justify-between gap-3 px-4 py-3 text-left"
+                    aria-expanded={open}
+                    onClick={() => setOpen((value) => !value)}
+                >
+                    <span className="text-sm font-medium text-foreground">
+                        Reasoning and inputs
+                        <span className="ml-2 text-xs font-normal text-muted-foreground">
+                            {derivedFiveWhy.length} 5-Why steps
+                            {evidenceGaps.length > 0 ? ` · ${evidenceGaps.length} evidence gap${evidenceGaps.length === 1 ? '' : 's'}` : ''}
+                            {ruledOut.length > 0 ? ` · ${ruledOut.length} ruled out` : ''}
+                        </span>
+                    </span>
+                    <ChevronDown className={cn('size-4 shrink-0 text-muted-foreground transition-transform', open && 'rotate-180')} aria-hidden="true" />
+                </button>
+
+                {open && (
+                    <div className="space-y-5 border-t px-4 py-4">
+                        <section>
+                            <SectionTitle>What the AI received</SectionTitle>
+                            <p className="text-sm leading-relaxed text-foreground/80">
+                                Raw inspection measurements, investigation findings, Is / Is-Not evidence, case context, and containment actions.
+                            </p>
+                            <div className="mt-3"><SectionTitle>What was withheld</SectionTitle></div>
+                            <p className="text-sm leading-relaxed text-foreground/80">
+                                The recorded 5-Why chain, root-cause marker, corrective and preventive actions, FMEA link, and lessons learned.
+                            </p>
+                        </section>
+
+                        {derivedFiveWhy.length > 0 && (
+                            <section>
+                                <SectionTitle>5-Why chain built by AI</SectionTitle>
+                                <ol className="space-y-3">
+                                    {derivedFiveWhy.map((step, index) => (
+                                        <li key={`${step.stepNo ?? index}-${step.question}`} className="flex gap-3">
+                                            <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                                                {step.stepNo ?? index + 1}
+                                            </span>
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-semibold">{step.question}</p>
+                                                <p className="mt-0.5 text-sm text-foreground/85">{step.answer}</p>
+                                                {step.evidence && <p className="mt-1 text-sm italic text-muted-foreground">Evidence: {step.evidence}</p>}
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ol>
+                            </section>
+                        )}
+
+                        {ruledOut.length > 0 && (
+                            <section>
+                                <SectionTitle>Ruled out</SectionTitle>
+                                <div className="space-y-2">
+                                    {ruledOut.map((item, index) => (
+                                        <div key={`${item.category}-${index}`} className="flex items-start gap-3 rounded-lg border bg-card p-3">
+                                            <CategoryChip category={item.category} className="shrink-0 opacity-80" />
+                                            <p className="text-sm leading-relaxed text-foreground/80">{item.reason}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {finding.runnerUpCategory && (
+                            <section>
+                                <SectionTitle>Next most likely cause</SectionTitle>
+                                <div className="flex items-start gap-3 rounded-lg border bg-card p-3">
+                                    <CategoryChip category={finding.runnerUpCategory} className="shrink-0" />
+                                    <p className="text-sm leading-relaxed text-foreground/80">
+                                        {finding.runnerUpReason || 'No switching evidence was provided.'}
+                                    </p>
+                                </div>
+                            </section>
+                        )}
+
+                        {evidenceGaps.length > 0 && (
+                            <section>
+                                <SectionTitle>Evidence the AI would ask for</SectionTitle>
+                                <ul className="space-y-1.5">
+                                    {evidenceGaps.map((gap, index) => (
+                                        <li key={`${index}-${gap}`} className="flex items-start gap-2 text-sm text-foreground/80">
+                                            <HelpCircle className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                                            <span>{gap}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </section>
+                        )}
+
+                        {precedent && (
+                            <section className="rounded-lg border border-info/25 bg-info/[0.04] p-3">
+                                <h3 className="text-sm font-semibold">Related closed case · {precedent.notificationId}</h3>
+                                <p className="mt-1 text-sm text-muted-foreground">
+                                    {precedentScore !== null ? `${precedentScore}% similarity. ` : ''}
+                                    A precedent is a reference, not proof of this case's root cause.
+                                </p>
+                                {(precedent.defectText || precedent.symptomShortText) && (
+                                    <p className="mt-2 text-sm text-foreground/80">{precedent.defectText || precedent.symptomShortText}</p>
+                                )}
+                                {precedent.rerankReason && (
+                                    <p className="mt-2 text-sm text-info">Match rationale: {precedent.rerankReason}</p>
+                                )}
+                            </section>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {!readOnly && !compromised && onUseAsDraft && (
+                <div className="flex items-center gap-3">
+                    <Button type="button" size="sm" variant="outline" onClick={onUseAsDraft}>
+                        Use AI wording as D4 draft
+                    </Button>
+                    <span className="text-xs text-muted-foreground">Fills the editor only — saving and approval stay separate.</span>
+                </div>
+            )}
+        </div>
     );
 }

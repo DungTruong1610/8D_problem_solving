@@ -359,7 +359,6 @@ export function IshikawaGridWidget({
         ? (proposed as CauseRow[]).filter((r) => String(r?.finding ?? r?.description ?? '').trim())
         : [];
 
-    const usingProposal = recorded.length === 0 && suggested.length > 0;
     const rows: CauseRow[] = recorded.length ? recorded : suggested;
 
     const byCategory = new Map(
@@ -427,14 +426,6 @@ export function IshikawaGridWidget({
                 </span>
             </div>
 
-            {usingProposal && (
-                <p className="rounded-md border border-warning/40 bg-warning/[0.07] px-3 py-2 text-sm text-muted-foreground">
-                    <span className="font-semibold text-warning-foreground">Proposed by AI.</span>{' '}
-                    This case has no recorded 6M assessment in system. The findings below are
-                    the AI reading the evidence, not a confirmed assessment — review each
-                    one before relying on it.
-                </p>
-            )}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {SIX_M.map((category) => {
                 const meta = getSixMMeta(category);
