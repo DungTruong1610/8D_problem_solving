@@ -339,6 +339,7 @@ export function EightDDetailPage() {
                                         return (
                                             <div key={selected.ID} className="min-w-0 space-y-4">
                                                 <DisciplineReviewBox
+                                                    reportID={report.ID}
                                                     discipline={selected}
                                                     siblings={disciplines}
                                                     liveFormSchemaJson={stepPrompts.byCode[selected.code]?.formSchemaJson ?? null}

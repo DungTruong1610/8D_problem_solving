@@ -1,4 +1,5 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
     Select,
     SelectContent,
@@ -7,9 +8,10 @@ import {
     SelectValue,
     cn,
 } from '@cnma/react-ui';
-import { Lock, LockOpen } from 'lucide-react';
+import { CircleAlert, Lock, LockOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import {
+    listTaskEvidence,
     reviewDiscipline,
     reviewStatusOf,
     isStepUnlocked,
@@ -21,7 +23,11 @@ import {
     type ReviewStatus,
 } from '@/services/eightd-service';
 import { normalizeActionStatus } from '../../../../../shared/action-task';
+import { evaluateDisciplineCompletion, type CompletionBlocker } from '../../../../../shared/discipline-completion';
 import { AiProvenanceInfo } from './ai-provenance-info';
+
+/** Bước có luật hoàn tất theo task (D6 đọc task của D5). */
+const ACTION_CODES = new Set(['D3', 'D5', 'D6', 'D7']);
 
 /**
  * Duyệt từng bước 8D.
@@ -111,11 +117,13 @@ function parseJsonSafe(val: unknown): Record<string, any> | null {
 
 /** Ô quyết định và trạng thái nằm dưới nội dung của một bước. */
 export function DisciplineReviewBox({
+    reportID,
     discipline,
     siblings,
     caseContext,
     precedentsJson,
 }: {
+    reportID: string;
     discipline: Discipline8D;
     siblings?: Discipline8D[];
     liveFormSchemaJson?: string | null;
@@ -132,6 +140,25 @@ export function DisciplineReviewBox({
     const currentStatus: 'NotStarted' | 'InProgress' | 'Completed' = isApproved
         ? 'Completed'
         : (unlocked && discipline.workState === 'InProgress' ? 'InProgress' : 'NotStarted');
+
+    // Bằng chứng đã upload — cùng queryKey với bảng task, nên upload xong là
+    // checklist bên dưới tự cập nhật.
+    const { data: evidence } = useQuery({
+        queryKey: ['8d', 'evidence', reportID],
+        queryFn: () => listTaskEvidence(reportID),
+        enabled: Boolean(reportID) && ACTION_CODES.has(discipline.code),
+    });
+    const completion = useMemo(
+        () => evaluateDisciplineCompletion({
+            code: discipline.code,
+            resultJson: discipline.resultJson,
+            evidenceTaskIds: (evidence ?? [])
+                .filter((e) => e.disciplineCode === discipline.code)
+                .map((e) => e.taskId),
+            siblings: allSiblings.map((s) => ({ code: s.code, resultJson: s.resultJson })),
+        }),
+        [discipline.code, discipline.resultJson, evidence, allSiblings],
+    );
 
     const submit = useMutation({
         mutationFn: ({ decision, text }: { decision: ReviewDecision; text?: string }) =>
@@ -159,72 +186,18 @@ export function DisciplineReviewBox({
 
         const parsed = parseJsonSafe(discipline.resultJson);
 
-        // 1. Validation Logic
-        if (value === 'Completed') {
-            if (discipline.code === 'D6') {
-                const allDiscs = siblings || [];
-                const actionSteps = allDiscs.filter((d) => d.code === 'D5');
-
-                const uncompletedTasks: { step: string; text: string; status: string }[] = [];
-
-                for (const d of actionSteps) {
-                    const parsedD = parseJsonSafe(d.resultJson);
-                    const keyPrefix = 'corrective';
-                    const currentTasks = parsedD?.[keyPrefix]?.assignedActions || parsedD?.assignedActions;
-                    if (Array.isArray(currentTasks) && currentTasks.length > 0) {
-                        for (const t of currentTasks) {
-                            const normStatus = normalizeActionStatus(t?.status);
-                            if (normStatus !== 'Done') {
-                                uncompletedTasks.push({
-                                    step: d.code,
-                                    text: t?.name || t?.actionText || t?.action || 'Task',
-                                    status: normStatus || 'Planned',
-                                });
-                            }
-                        }
-                    }
-                }
-
-                if (uncompletedTasks.length > 0) {
-                    toast.error('There are tasks in D5 still not complete.');
-                    return;
-                }
-            } else if (discipline.code === 'D5') {
-                const assigned = parsed?.corrective?.assignedActions || parsed?.assignedActions;
-                const actions = parsed?.corrective?.actions;
-                const hasActions = (Array.isArray(assigned) && assigned.length > 0) || (Array.isArray(actions) && actions.length > 0);
-                if (!hasActions) {
-                    toast.error('Cannot complete D5: Please add or accept at least one corrective action before completing this step.');
-                    return;
-                }
-            } else if (discipline.code === 'D7') {
-                const assigned = parsed?.preventive?.assignedActions || parsed?.assignedActions;
-                const actions = parsed?.preventive?.actions;
-                const hasPreventive = (Array.isArray(assigned) && assigned.length > 0) || (Array.isArray(actions) && actions.length > 0);
-                if (!hasPreventive) {
-                    toast.error('Cannot complete D7: Please add or accept at least one preventive action before completing this step.');
-                    return;
-                }
-            }
+        // Duyệt KHÔNG đổi trạng thái task nào. Từng task phải được người phụ trách
+        // hoàn tất riêng (bằng chứng / ghi chú thực thi); ở đây chỉ kiểm tra rằng
+        // điều đó đã xảy ra. Backend kiểm lại đúng luật này trước khi ghi.
+        if (value === 'Completed' && !completion.canApprove) {
+            toast.error(`Cannot complete ${discipline.code} yet`, {
+                description: completion.blockers.map((b) => b.message).join('\n'),
+            });
+            return;
         }
 
         try {
             if (value === 'Completed') {
-
-                if (['D3', 'D5', 'D7'].includes(discipline.code)) {
-                    // Khi các bước D3, D5, D7 hoàn thành: chuyển task chưa Done -> Done
-                    const keyPrefix = discipline.code === 'D3' ? 'containment' : discipline.code === 'D5' ? 'corrective' : 'preventive';
-                    const assignedField = `${keyPrefix}.assignedActions`;
-                    const currentTasks = parsed?.[keyPrefix]?.assignedActions || parsed?.assignedActions;
-                    if (Array.isArray(currentTasks) && currentTasks.length > 0) {
-                        const updatedTasks = currentTasks.map((t: any) => ({
-                            ...t,
-                            status: 'Done',
-                        }));
-                        await saveDisciplineField(discipline.ID, assignedField, updatedTasks);
-                    }
-                }
-
                 submit.mutate({ decision: 'approve' });
             } else if (value === 'InProgress') {
                 if (isApproved) {
@@ -323,7 +296,7 @@ export function DisciplineReviewBox({
                                     <span>In process</span>
                                 </div>
                             </SelectItem>
-                            <SelectItem value="Completed">
+                            <SelectItem value="Completed" disabled={!isApproved && !completion.canApprove}>
                                 <div className="flex items-center gap-1.5">
                                     <span className="h-1.5 w-1.5 rounded-full bg-success" />
                                     <span>Complete</span>
@@ -333,6 +306,32 @@ export function DisciplineReviewBox({
                     </Select>
                 </div>
             </div>
+
+            {!isApproved && unlocked && completion.blockers.length > 0 && (
+                <CompletionChecklist code={discipline.code} blockers={completion.blockers} />
+            )}
+        </div>
+    );
+}
+
+/**
+ * Việc còn thiếu trước khi duyệt được bước, nêu đích danh từng task.
+ *
+ * Hiện ngay trên ô duyệt để người dùng không phải bấm Complete rồi mới biết bị
+ * chặn vì đâu. Cùng luật với backend (`shared/discipline-completion.ts`).
+ */
+function CompletionChecklist({ code, blockers }: { code: string; blockers: CompletionBlocker[] }) {
+    return (
+        <div className="mt-3 rounded-md border border-warning/40 bg-warning/[0.06] px-3 py-2.5">
+            <p className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+                <CircleAlert className="h-4 w-4 shrink-0 text-warning" />
+                {code} can be completed once {blockers.length === 1 ? 'this item is' : `these ${blockers.length} items are`} done:
+            </p>
+            <ul className="mt-1.5 space-y-1 pl-6 text-sm text-muted-foreground">
+                {blockers.map((b, i) => (
+                    <li key={`${b.taskId ?? b.issue}-${i}`} className="list-disc">{b.message}</li>
+                ))}
+            </ul>
         </div>
     );
 }

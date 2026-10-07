@@ -29,6 +29,7 @@ import {
     parseConfirmedFields,
 } from './fieldConfirm';
 import { assignedFieldFor, normalizeActionStatus, normalizeTasks } from '../../../../shared/action-task';
+import { describeBlockers, evaluateDisciplineCompletion } from '../../../../shared/discipline-completion';
 import { getPath } from './runtimeConfig';
 import { writeClosedCaseToLibrary, type WriteBackResult } from './precedent/closedCaseWriteBack';
 
@@ -788,9 +789,18 @@ export async function setDisciplineWorkState(
     newWorkState: string,
 ): Promise<{ workState: string }> {
     const state = String(newWorkState ?? '').trim();
-    if (state !== 'NotStarted' && state !== 'InProgress' && state !== 'Completed') {
+    // `Completed` từng được nhận ở đây và ghi thẳng `reviewStatus = Approved` —
+    // một cửa sau vượt mọi cổng duyệt mà không để lại dòng vết nào. Hoàn tất một
+    // bước là QUYẾT ĐỊNH của người, nên chỉ đi qua `reviewDiscipline`.
+    if (state === 'Completed') {
         throw Object.assign(
-            new Error(`Invalid workState "${state}". Allowed values: NotStarted, InProgress, Completed.`),
+            new Error('A step is completed by approving it (reviewDiscipline), not by setting its work state.'),
+            { code: 400 },
+        );
+    }
+    if (state !== 'NotStarted' && state !== 'InProgress') {
+        throw Object.assign(
+            new Error(`Invalid workState "${state}". Allowed values: NotStarted, InProgress.`),
             { code: 400 },
         );
     }
@@ -799,12 +809,18 @@ export async function setDisciplineWorkState(
         .columns('ID', 'code', 'reviewStatus', 'workState')
         .where({ ID: disciplineID });
     if (!row) throw Object.assign(new Error(`Discipline ${disciplineID} not found.`), { code: 404 });
-
-    const reviewStatus = state === 'Completed' ? 'Approved' : 'Draft';
+    // Đổi workState sẽ hạ `reviewStatus` về Draft. Với một bước ĐÃ DUYỆT, đó là
+    // huỷ duyệt — phải đi qua `reopen` để có lý do và dòng vết, không lặng lẽ ở đây.
+    if (normalizeStatus((row as any).reviewStatus) === 'Approved') {
+        throw Object.assign(
+            new Error(`${row.code} is approved. Reopen it with a reason before changing its work state.`),
+            { code: 400 },
+        );
+    }
 
     await UPDATE(DISCIPLINES).set({
         workState: state,
-        reviewStatus: reviewStatus,
+        reviewStatus: 'Draft',
     }).where({ ID: disciplineID });
 
     cds.log('eightd-repo').info(`Set workState to ${state} on discipline ${disciplineID} (${row.code})`);
@@ -879,33 +895,28 @@ export async function reviewDiscipline(
             }
         }
 
-        if (String(row.code ?? '') === 'D6') {
-            const siblings = await SELECT.from(DISCIPLINES)
-                .columns('code', 'resultJson')
-                .where({ report_ID: reportID });
-
-            for (const s of siblings) {
-                if (String(s.code) === 'D5') {
-                    let parsed: any = {};
-                    try {
-                        parsed = JSON.parse(String(s.resultJson ?? '{}'));
-                    } catch { /* empty */ }
-                    const keyPrefix = 'corrective';
-                    const tasks = parsed?.[keyPrefix]?.assignedActions || parsed?.assignedActions || [];
-                    if (Array.isArray(tasks) && tasks.length > 0) {
-                        for (const t of tasks) {
-                            const status = normalizeActionStatus(t?.status);
-                            if (status !== 'Done') {
-                                const taskName = t?.name || t?.actionText || t?.action || 'Task';
-                                throw Object.assign(
-                                    new Error(`There are tasks in D5 still not complete.`),
-                                    { code: 400 },
-                                );
-                            }
-                        }
-                    }
-                }
-            }
+        /**
+         * Task phải xong TỪNG CÁI, do người phụ trách đánh dấu — không suy ra từ
+         * việc bước được duyệt. Luật nằm ở `shared/discipline-completion.ts`, cùng
+         * bản UI dùng để hiện checklist; ở đây là chỗ chặn thật, vì một lời gọi
+         * thẳng vào action không đi qua màn hình nào cả.
+         */
+        const code = String(row.code ?? '');
+        const [self, siblings, evidence] = await Promise.all([
+            SELECT.one.from(DISCIPLINES).columns('resultJson').where({ ID: disciplineID }),
+            code === 'D6'
+                ? SELECT.from(DISCIPLINES).columns('code', 'resultJson').where({ report_ID: reportID })
+                : Promise.resolve([]),
+            SELECT.from(TASK_EVIDENCES).columns('taskId').where({ reportID, disciplineCode: code }),
+        ]);
+        const verdict = evaluateDisciplineCompletion({
+            code,
+            resultJson: (self as any)?.resultJson,
+            evidenceTaskIds: (evidence as any[]).map((e) => String(e.taskId)),
+            siblings: siblings as any[],
+        });
+        if (!verdict.canApprove) {
+            throw Object.assign(new Error(describeBlockers(verdict.blockers)), { code: 400 });
         }
         nextWorkState = 'Completed';
     } else if (toStatus === 'Draft') {
