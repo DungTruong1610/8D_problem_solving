@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Card, Spinner } from '@cnma/react-ui';
-import { GitBranch, Info, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
+import { Card, Spinner, cn } from '@cnma/react-ui';
+import { AlertTriangle, Cpu, GitBranch, Info, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import { eightDService, parseStoredPrecedents, type PrecedentResult, type Report8D } from '@/services/eightd-service';
 
 /**
@@ -45,12 +45,13 @@ export function PrecedentPanel({ reportID, precedentsJson }: {
             if (found) {
                 toast.success(`Opening 8D Report: ${found.notificationId}`);
                 navigate(`/8d/${found.ID}`);
-            } else if (rows.length > 0) {
-                // If this is a historical reference case not yet in active Reports, open the first available report
-                toast.info(`Historical case ${notificationId} reference (opening active report ${rows[0].notificationId})`);
-                navigate(`/8d/${rows[0].ID}`);
             } else {
-                toast.error(`Case ${notificationId} not found in database.`);
+                // Trước đây nhánh này mở report ĐẦU TIÊN trong danh sách — tức là một
+                // case khác hẳn, trong khi toast nói là đang mở tiền lệ. Tiền lệ sống
+                // trong kho case đã đóng; không có 8D report tương ứng thì nói thẳng.
+                toast.info(`${notificationId} is a closed case in the case library — it has no 8D report in this system.`, {
+                    description: 'Its details are shown on this card and under Master Data → Closed Case Library.',
+                });
             }
         } catch (err) {
             toast.error(`Could not open case: ${err instanceof Error ? err.message : String(err)}`);
@@ -75,6 +76,7 @@ export function PrecedentPanel({ reportID, precedentsJson }: {
     }
 
     const precedents = Array.isArray(data.precedents) ? data.precedents : [];
+    const engine = data.engine;
 
     return (
         <div className="space-y-4">
@@ -90,12 +92,38 @@ export function PrecedentPanel({ reportID, precedentsJson }: {
                 )}
             </div>
 
+            {/*
+              Engine nào đã chạy. Danh sách rỗng vì "không có case giống" và vì
+              "engine không chạy được" trông y hệt nhau — dòng này phân biệt hai thứ.
+              Dữ liệu phân tích trước khi có trường này: nói là không biết.
+            */}
+            <div className={cn(
+                'flex items-start gap-2 rounded-md border px-3 py-2 text-xs',
+                engine?.fallbackReason ? 'border-warning/40 bg-warning/[0.06]' : 'border-border bg-muted/30',
+            )}>
+                {engine?.fallbackReason
+                    ? <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning" />
+                    : <Cpu className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />}
+                <div className="min-w-0">
+                    <span className="font-medium text-foreground">
+                        Engine: {engine ? engine.label : 'not recorded (analysed before engine tracking)'}
+                    </span>
+                    {engine?.fallbackReason && (
+                        <p className="mt-0.5 text-muted-foreground">{engine.fallbackReason}</p>
+                    )}
+                </div>
+            </div>
+
             {!precedents.length ? (
                 <Card className="flex items-start gap-3 border-dashed p-5">
                     <Info className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                     <div className="space-y-1">
-                        <p className="text-sm font-medium">No comparable case found</p>
-                        <p className="text-sm text-muted-foreground">{data.reason}</p>
+                        <p className="text-sm font-medium">
+                            {engine?.engine === 'none' ? 'Precedent search did not run' : 'No comparable case found'}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                            {data.reason ?? 'No reason was recorded for this search.'}
+                        </p>
                     </div>
                 </Card>
             ) : (

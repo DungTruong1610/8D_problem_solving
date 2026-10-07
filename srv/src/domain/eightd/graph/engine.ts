@@ -55,8 +55,27 @@ import {
     type PrecedentResult,
 } from '../precedent/findPrecedents';
 import type { CaseContext } from '../types';
+import { makeEngineInfo } from '../../../../../shared/retrieval-engine';
 
 const LOG = cds.log('graph');
+
+/**
+ * Kết quả của engine chấm điểm khi graph lẽ ra phải chạy mà không chạy được —
+ * ghi lại LÝ DO lên chính kết quả, để màn hình nói "Scoring fallback — graph
+ * unavailable" thay vì để người xem tưởng graph đã chạy.
+ */
+function asGraphFallback(result: PerStepPrecedents, why: string): PerStepPrecedents {
+    const prior = result.engine;
+    const reasons = [why, prior?.fallbackReason].filter(Boolean).join(' ');
+    return {
+        ...result,
+        engine: makeEngineInfo({
+            engine: prior?.engine ?? 'scoring',
+            semantic: prior?.semantic ?? 'not-configured',
+            fallbackReason: reasons || null,
+        }),
+    };
+}
 
 /**
  * Gom TẤT CẢ bằng chứng một lần, dùng chung cho cả tám bước.
@@ -263,7 +282,12 @@ export async function findPrecedentsByStepGraph(
         + STEP_CODES.map((code) => `${code}:${byStep[code].precedents.length}`).join(' '),
     );
 
-    return { union, byStep, profileByStep };
+    return {
+        union,
+        byStep,
+        profileByStep,
+        engine: makeEngineInfo({ engine: 'graph', semantic: 'n/a', fallbackReason: null }),
+    };
 }
 
 /**
@@ -281,8 +305,14 @@ export async function findPrecedentsByStepGraph(
 export async function findPrecedents(context: CaseContext, raw?: unknown): Promise<PerStepPrecedents> {
     const settings = await getGraphSettings();
 
+    // Cấu hình chọn chấm điểm: đó là lựa chọn, không phải dự phòng — không gắn lý do.
     if (settings.engine !== 'graph') return findPrecedentsByScoring(context, raw);
-    if (!(await isGraphAvailable())) return findPrecedentsByScoring(context, raw);
+    if (!(await isGraphAvailable())) {
+        return asGraphFallback(
+            await findPrecedentsByScoring(context, raw),
+            'Graph retrieval is configured but no graph backend is available.',
+        );
+    }
 
     try {
         return await findPrecedentsByStepGraph(context);
@@ -293,7 +323,7 @@ export async function findPrecedents(context: CaseContext, raw?: unknown): Promi
         }
         LOG.warn(`Truy hồi bằng graph hỏng (${e.message}) — rơi về engine chấm điểm.`);
         try {
-            return await findPrecedentsByScoring(context, raw);
+            return asGraphFallback(await findPrecedentsByScoring(context, raw), `Graph retrieval failed: ${e.message}.`);
         } catch (fallbackError: any) {
             LOG.error(`Cả hai engine đều hỏng: ${fallbackError.message}`);
             return emptyPerStepPrecedents(`Precedent search failed: ${fallbackError.message}`);

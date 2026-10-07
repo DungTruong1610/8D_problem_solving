@@ -6,6 +6,7 @@ import {
     normalizePrecedents as normalizeShape,
     parseStoredPrecedents as parseStoredShape,
 } from '../../../../shared/precedent-shape';
+import type { RetrievalEngineInfo } from '../../../../shared/retrieval-engine';
 
 /**
  * Truy cập EightDService.
@@ -256,6 +257,8 @@ export interface PrecedentResult {
     reason: string | null;
     /** Thang điểm tối đa, lấy từ tiền lệ đầu tiên — nó thuộc về từng tiền lệ. */
     maxScore: number;
+    /** Engine đã chạy (graph / chấm điểm / dự phòng). Null ở dữ liệu lưu trước khi có trường này. */
+    engine: RetrievalEngineInfo | null;
 }
 
 export interface Report8D {

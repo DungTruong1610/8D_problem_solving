@@ -19,6 +19,8 @@
  */
 
 /** Chỉ khai phần hình dạng mà phép chuẩn hoá thực sự chạm tới. */
+import { readEngineInfo, type RetrievalEngineInfo } from './retrieval-engine';
+
 export interface PrecedentLike {
     notificationId?: string;
     score?: number;
@@ -34,6 +36,8 @@ export interface NormalizedPrecedents<T = PrecedentLike> {
     maxScore: number;
     /** Vì sao rỗng. Null khi có tiền lệ. */
     reason: string | null;
+    /** Engine đã chạy. Null ở dữ liệu lưu trước khi có trường này — "không biết", không đoán. */
+    engine: RetrievalEngineInfo | null;
 }
 
 export const NO_PRECEDENT_REASON =
@@ -51,10 +55,16 @@ export function normalizePrecedents<T = PrecedentLike>(raw: unknown): Normalized
         : {}) as Record<string, unknown>;
 
     const byStep: Record<string, T[]> = {};
+    const stepReasons: Record<string, string> = {};
     for (const [code, result] of Object.entries(rawByStep)) {
         const list = (result as { precedents?: unknown } | null)?.precedents;
         byStep[code] = Array.isArray(list) ? (list as T[]) : [];
+        const why = (result as { reason?: unknown } | null)?.reason;
+        if (typeof why === 'string' && why.trim()) stepReasons[code] = why.trim();
     }
+    // Lý do CỤ THỂ của engine ("0 ứng viên đạt 3/16, profile …", "kho rỗng") thay
+    // cho một câu chung. D4 là bước người xem hay hỏi nhất về tiền lệ.
+    const specificReason = stepReasons.D4 ?? Object.values(stepReasons)[0] ?? null;
 
     const first = union[0] as PrecedentLike | undefined;
 
@@ -62,7 +72,8 @@ export function normalizePrecedents<T = PrecedentLike>(raw: unknown): Normalized
         precedents: union,
         byStep,
         maxScore: typeof first?.maxScore === 'number' ? first.maxScore : 0,
-        reason: union.length ? null : NO_PRECEDENT_REASON,
+        reason: union.length ? null : (specificReason ?? NO_PRECEDENT_REASON),
+        engine: readEngineInfo(root.engine),
     };
 }
 

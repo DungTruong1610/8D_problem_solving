@@ -42,6 +42,7 @@ import {
     type CandidateRow,
     type TeamMemberRow,
 } from './precedentRepository';
+import { makeEngineInfo, type RetrievalEngineInfo } from '../../../../../shared/retrieval-engine';
 import { buildQueryText } from './searchText';
 import { embed, currentEmbeddingModel } from '../../../core/ai/llmClient';
 import { isDegenerateVector } from '../../../core/ai/vectorQuality';
@@ -144,19 +145,21 @@ function toCandidate(row: CandidateRow): CandidateRow {
  */
 async function embedQuery(
     context: CaseContext,
-): Promise<{ embedding: number[]; embeddingModel: string } | null> {
+): Promise<{ embedding: number[]; embeddingModel: string } | { failed: string }> {
     try {
         const embedding = await embed(buildQueryText(context));
         // Mảng rỗng = chưa cấu hình nhà cung cấp embedding; vector 0 = provider
         // trả về "thành công" nhưng không có nội dung. Cả hai đều không so được.
-        if (isDegenerateVector(embedding)) return null;
+        if (isDegenerateVector(embedding)) {
+            return { failed: 'no embedding provider is configured (e.g. JINA_API_KEY missing) or it returned an empty vector' };
+        }
         return { embedding, embeddingModel: currentEmbeddingModel() };
     } catch (e: any) {
         LOG.warn(
             `Không nhúng được case ${context.notificationId} (${e.message}) — `
             + 'bỏ tiêu chí ngữ nghĩa, vẫn chấm theo các tiêu chí còn lại.',
         );
-        return null;
+        return { failed: `the embedding call failed: ${e.message}` };
     }
 }
 
@@ -350,7 +353,7 @@ export async function findPrecedents(
     let semanticAvailable = false;
     if (needsEmbedding(profile)) {
         const q = await embedQuery(context);
-        if (q) {
+        if ('embedding' in q) {
             current.embedding = q.embedding;
             current.embeddingModel = q.embeddingModel;
             semanticAvailable = true;
@@ -394,6 +397,11 @@ export interface PerStepPrecedents {
     byStep: Record<StepCode, PrecedentResult>;
     /** Profile nào phục vụ bước nào — cho log và cho UI. */
     profileByStep: Record<StepCode, string>;
+    /**
+     * Engine nào đã THẬT SỰ chạy, có dùng ngữ nghĩa không, và vì sao phải dùng
+     * đường dự phòng. Lưu cùng `precedentsJson` để màn hình nói đúng điều log biết.
+     */
+    engine?: RetrievalEngineInfo;
 }
 
 /**
@@ -436,6 +444,7 @@ export function mergeStepPrecedents(
  * lượt phân tích, đắt hơn nhiều so với việc viết báo cáo không có tiền lệ.
  */
 export function emptyPerStepPrecedents(reason = 'Precedent search failed.'): PerStepPrecedents {
+    const engine = makeEngineInfo({ engine: 'none', semantic: 'n/a', fallbackReason: reason });
     const blank: PrecedentResult = {
         precedents: [],
         reason,
@@ -451,6 +460,7 @@ export function emptyPerStepPrecedents(reason = 'Precedent search failed.'): Per
         union: [],
         byStep: Object.fromEntries(STEP_CODES.map((code) => [code, blank])) as Record<StepCode, PrecedentResult>,
         profileByStep: Object.fromEntries(STEP_CODES.map((code) => [code, 'default'])) as Record<StepCode, string>,
+        engine,
     };
 }
 
@@ -477,12 +487,16 @@ export async function findPrecedentsByStep(
     const usedProfiles = usedKeys.map((key) => byKey.get(key)).filter(Boolean) as RetrievalProfile[];
 
     let semanticAvailable = false;
-    if (usedProfiles.some(needsEmbedding)) {
+    let semanticFailure: string | null = null;
+    const wantsSemantic = usedProfiles.some(needsEmbedding);
+    if (wantsSemantic) {
         const q = await embedQuery(context);
-        if (q) {
+        if ('embedding' in q) {
             current.embedding = q.embedding;
             current.embeddingModel = q.embeddingModel;
             semanticAvailable = true;
+        } else {
+            semanticFailure = q.failed;
         }
     }
 
@@ -522,5 +536,11 @@ export async function findPrecedentsByStep(
         + STEP_CODES.map((code) => `${code}→${bindings[code]}:${byStep[code].precedents.length}`).join(' '),
     );
 
-    return { union, byStep, profileByStep };
+    const engine = makeEngineInfo({
+        engine: 'scoring',
+        semantic: !wantsSemantic ? 'not-configured' : semanticAvailable ? 'used' : 'unavailable',
+        fallbackReason: semanticFailure ? `Semantic search skipped: ${semanticFailure}.` : null,
+    });
+
+    return { union, byStep, profileByStep, engine };
 }

@@ -66,7 +66,7 @@ import {
     REVIEW_DECISIONS,
 } from '../domain/eightd/review';
 import { DISCIPLINE_CODES, STEP_CODES, PipelineError, type CaseContext, type DisciplineCode } from '../domain/eightd/types';
-import { findPrecedentsByStep } from '../domain/eightd/precedent/findPrecedents';
+import { findPrecedents as findPrecedentsWithEngine } from '../domain/eightd/graph/engine';
 import { clearLibrary, embedLibrary, seedLibrary } from '../domain/eightd/precedent/librarySeeder';
 import { tokenizeDefectText } from '../domain/eightd/precedent/scoring';
 import { allocateNumber, numericPart, raiseNumberRange, peekNextNumber } from '../domain/numberRange';
@@ -517,7 +517,9 @@ export function registerEightDHandlers(srv: any): void {
             raw = undefined;
         }
 
-        return JSON.stringify(await findPrecedentsByStep(context, raw));
+        // CÙNG bộ chọn engine mà lượt phân tích dùng (graph khi bật và sẵn sàng,
+        // không thì chấm điểm) — kết quả mang nhãn `engine` nói đúng cái đã chạy.
+        return JSON.stringify(await findPrecedentsWithEngine(context, raw));
     });
 
     // ── seedCaseLibrary ──────────────────────────────────────────────────────
