@@ -27,6 +27,7 @@ import { useUserInfo } from '@/hooks/use-user-info';
 import { VALUE_HELP_IDS } from '@/services/value-help-service';
 import { ReportStatusBadge } from './status-badge';
 import { AnalyzeDialog } from './analyze-dialog';
+import { GettingStartedBanner } from './getting-started-banner';
 
 /**
  * Danh sách báo cáo 8D — worklist.
@@ -704,6 +705,8 @@ export function EightDListPage() {
                     </Button>
                 </div>
             </div>
+
+            <GettingStartedBanner />
 
             {running > 0 && (
                 <div className="flex items-center gap-2 text-sm text-info bg-info/5 border border-info/20 rounded-lg px-3.5 py-2.5">
