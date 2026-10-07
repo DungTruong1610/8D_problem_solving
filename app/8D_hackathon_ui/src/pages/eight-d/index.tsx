@@ -16,8 +16,6 @@ import {
     compareByUrgency,
     getCaseWorkload,
     matchesFilter,
-    PRIORITY_LABEL,
-    STEP_SHORT_LABEL,
     WORKLIST_FILTER_LABEL,
     type CaseWorkload,
     type WorklistFilter,
@@ -25,7 +23,6 @@ import {
 import { useValueHelp } from '@/hooks/use-value-help';
 import { useUserInfo } from '@/hooks/use-user-info';
 import { VALUE_HELP_IDS } from '@/services/value-help-service';
-import { ReportStatusBadge } from './status-badge';
 import { AnalyzeDialog } from './analyze-dialog';
 import { GettingStartedBanner } from './getting-started-banner';
 
@@ -89,13 +86,6 @@ function CompletenessCell({ report }: { report: Report8D }) {
     );
 }
 
-/** Màu của mức nghiêm trọng — ba mức của FECLAS, không phải thang tự chế. */
-const SEVERITY_TONE: Record<string, string> = {
-    Critical: 'bg-destructive/10 text-destructive',
-    Major: 'bg-warning/10 text-warning',
-    Minor: 'bg-muted text-muted-foreground',
-};
-
 function formatDateTime(value?: string | null): string {
     if (!value) return '—';
     const d = new Date(value);
@@ -114,15 +104,6 @@ function formatDate(value?: string | null): string {
     const d = new Date(value);
     if (Number.isNaN(d.getTime())) return String(value);
     return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-}
-
-function RunningSpinner() {
-    return (
-        <div className="flex items-center gap-1.5 text-primary">
-            <Spinner className="w-3.5 h-3.5" />
-            <span className="text-sm font-medium">Analyzing…</span>
-        </div>
-    );
 }
 
 /**
@@ -146,24 +127,6 @@ const CORE_COLUMNS: DataTableColumn<WorklistRow>[] = [
         width: 140,
         minWidth: 120,
         className: 'font-mono text-sm font-semibold',
-    },
-    {
-        // Mắt xích ngược về bản ghi lỗi. Hiện Ở ĐÂY chứ không chỉ ở trang chi
-        // tiết, vì câu hỏi "case này mở từ lỗi nào" là câu hỏi của người quét
-        // danh sách, không phải của người đã mở một case ra đọc.
-        //
-        // Gạch ngang KHÔNG phải lỗi dữ liệu: case nhập bằng JSON không đi qua bản
-        // ghi lỗi nào, và đó là đường nhập hợp lệ.
-        key: 'sourceDefectId',
-        labelKey: 'Defect',
-        width: 140,
-        minWidth: 110,
-        renderType: 'custom',
-        render: (_v, row) => (
-            row.sourceDefectId
-                ? <span className="font-mono text-sm">{row.sourceDefectId}</span>
-                : <span className="text-sm text-muted-foreground" title="Imported as JSON — no defect record">—</span>
-        ),
     },
     {
         key: 'origin',
@@ -230,87 +193,12 @@ const CORE_COLUMNS: DataTableColumn<WorklistRow>[] = [
         ),
     },
     {
-        /**
-         * Mức nghiêm trọng (SAP FECLAS).
-         *
-         * `Reports.defectClass` gần như luôn rỗng ở dữ liệu hiện có, nên giá trị
-         * thật đến từ danh mục mã lỗi — xem `defectClassOf` ở dưới. Gạch ngang
-         * nghĩa là mã lỗi không có trong danh mục, một tình huống mà bài test
-         * `defectCatalogue` đã canh sẵn.
-         */
-        key: 'defectClass',
-        labelKey: 'Severity',
-        width: 110,
-        minWidth: 95,
-        renderType: 'custom',
-        render: (_v, row) => {
-            const cls = row.work.defectClass;
-            if (!cls) return <span className="text-sm text-muted-foreground">—</span>;
-            return (
-                <span
-                    className={cn(
-                        'inline-block rounded-full px-2.5 py-1 text-sm font-medium',
-                        SEVERITY_TONE[cls] ?? 'bg-muted text-muted-foreground',
-                    )}
-                    title={`${PRIORITY_LABEL[row.work.priority]} priority — ${row.work.priorityReason}`}
-                >
-                    {cls}
-                </span>
-            );
-        },
-    },
-    {
-        /**
-         * Bước đang nợ chữ ký, cạnh thanh tiến độ.
-         *
-         * "0/8" nói case chưa xong; nó KHÔNG nói case đang nằm ở đâu. Hai case
-         * cùng 3/8 mà một đang ở D4 còn một đang chờ D2 thì cần hai người khác
-         * nhau. Bước bị trả lại hiện đè lên bước kế tiếp, vì nó gấp hơn.
-         */
-        key: 'currentStep',
-        labelKey: 'Current step',
-        width: 150,
-        minWidth: 125,
-        renderType: 'custom',
-        render: (_v, row) => {
-            const { currentStep, currentStepLabel, changeRequested, closed } = row.work;
-            if (closed) return <span className="text-sm text-success">Signed off</span>;
-            if (changeRequested.length) {
-                return (
-                    <span
-                        className="inline-block rounded-full bg-warning/10 px-2.5 py-1 text-sm font-medium text-warning"
-                        title={`Sent back for changes: ${changeRequested.join(', ')}`}
-                    >
-                        {changeRequested[0]} · changes
-                    </span>
-                );
-            }
-            if (!currentStep) return <span className="text-sm text-muted-foreground">—</span>;
-            return (
-                <span className="text-sm">
-                    <span className="font-mono font-semibold">{currentStep}</span>
-                    <span className="text-muted-foreground"> {currentStepLabel ?? STEP_SHORT_LABEL[currentStep]}</span>
-                </span>
-            );
-        },
-    },
-    {
         key: 'disciplines',
         labelKey: 'Completeness',
         width: 130,
         minWidth: 115,
         renderType: 'custom',
         render: (_v, row) => <CompletenessCell report={row} />,
-    },
-    {
-        key: 'status',
-        labelKey: 'Status',
-        width: 120,
-        minWidth: 105,
-        renderType: 'custom',
-        render: (_v, row) => (
-            row.status === 'Analyzing' ? <RunningSpinner /> : <ReportStatusBadge status={row.status} />
-        ),
     },
     {
         /**
@@ -384,32 +272,6 @@ const CORE_COLUMNS: DataTableColumn<WorklistRow>[] = [
                         </div>
                     )}
                 </div>
-            );
-        },
-    },
-    {
-        /**
-         * Ai đang giữ case.
-         *
-         * Trưởng nhóm 8D chốt ở D1. Trước lúc đó hiện người điều phối, LÀM MỜ —
-         * "đã có người tiếp nhận" và "đã có người nhận việc" là hai trạng thái
-         * khác nhau, và hiện chúng giống hệt nhau là nói dối về trạng thái thứ hai.
-         */
-        key: 'teamLeader',
-        labelKey: '8D Team Leader',
-        width: 160,
-        minWidth: 130,
-        renderType: 'custom',
-        render: (_v, row) => {
-            const { owner, ownerIsFallback } = row.work;
-            if (!owner) return <span className="text-sm text-muted-foreground">Unassigned</span>;
-            return (
-                <span
-                    className={cn('text-sm truncate', ownerIsFallback ? 'text-muted-foreground italic' : 'text-foreground')}
-                    title={ownerIsFallback ? 'Coordinator — 8D team leader not confirmed in D1 yet' : '8D Team Leader (D1)'}
-                >
-                    {owner}
-                </span>
             );
         },
     },
