@@ -108,7 +108,7 @@ cds.on('bootstrap', (app: express.Application) => {
         }
     });
 
-    app.post('/api/verify/judge-input', verifyJson, async (req, res) => {
+    app.post('/api/verify/judge-input', verifyJson, async (req: express.Request, res: express.Response) => {
         try {
             const { evaluateJudgeInput } = await import('../scripts/verify-sprint1-harness');
             const db = await cds.connect.to('db');
