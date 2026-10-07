@@ -19,13 +19,15 @@ import { JudgeReportModal } from '@/components/verify/JudgeReportModal';
 import { TestCaseReportModal } from '@/components/verify/TestCaseReportModal';
 import {
     TEST_CASE_SUMMARIES,
-    buildJudgeReportFromRaw,
-    type JudgeEvaluationReportData,
     type TestCaseSummary,
 } from '@/components/verify/test-case-summary-data';
 import {
+    JUDGE_STOP_LABEL,
+    type JudgeEvaluation,
+    type JudgeStopType,
+} from '../../../../../../shared/judge-evaluation';
+import {
     JUDGE_PRESETS,
-    SAMPLE_JUDGE_VALID,
     TEST_CASES,
     buildReferenceReport,
     type VerifyHarnessReport,
@@ -34,31 +36,91 @@ import { GuideCard, TabIntro } from '../guide-ui';
 
 type ReportSource = 'live' | 'reference';
 
-interface JudgeResult {
-    decision: string;
-    reason: string;
-    simulated: boolean;
+/**
+ * Kết quả khi KHÔNG gọi được backend: chỉ là luật đơn giản chạy ở trình duyệt,
+ * không tra kho case, và được đánh dấu `simulated`. Không đưa ra con số nào mà
+ * nó không thật sự tính.
+ */
+function localEvaluation(parsed: any, reason: string, decision: JudgeEvaluation['decision'], stopType: JudgeStopType | null, simulated: boolean): JudgeEvaluation {
+    const str = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim() : null);
+    const stops = stopType ? [{
+        id: `${stopType}:local:D1`,
+        type: stopType,
+        step: 'D1',
+        reason,
+        questionForHuman: stopType === 'outside-scope'
+            ? 'This is not a quality notification. Should it be routed to another process?'
+            : 'Please provide the missing defect data.',
+        requiredRole: stopType === 'outside-scope' ? 'Requester' : 'Quality Engineer',
+        blocking: true,
+    }] : [];
+    return {
+        decision,
+        reason,
+        timestamp: new Date().toISOString(),
+        durationMs: 0,
+        primaryStopType: stopType,
+        stops,
+        facts: {
+            notificationId: str(parsed?.notificationId) ?? str(parsed?.invoiceId),
+            documentType: decision === 'GRACEFULLY_REFUSED' ? 'Not evaluated as a defect' : 'Quality notification',
+            symptom: str(parsed?.symptomShortText) ?? str(parsed?.description),
+            materialId: str(parsed?.material?.materialId),
+            workCenterId: str(parsed?.workCenter?.workCenterId),
+            defectCode: str(parsed?.defect?.defectCode),
+            measurements: Array.isArray(parsed?.inspections)
+                ? parsed.inspections.map((i: any) => ({ characteristic: String(i?.characteristic ?? 'Inspection'), measured: String(i?.measuredValue ?? ''), spec: String(i?.specValue ?? '') }))
+                : [],
+            gaps: [],
+        },
+        validation: { blocking: [], warnings: 0 },
+        precedentCheck: { performed: false, matchingCases: 0, basis: 'Not run — the case library is only searched on the server.', sample: [] },
+        nextStep: {
+            title: decision === 'GRACEFULLY_REFUSED' ? 'Refused' : 'Run again when the backend is reachable',
+            summary: simulated
+                ? 'Without the server, only the basic input checks ran. Precedent search and the full stop rules need the backend.'
+                : reason,
+            questions: stops.map((s) => s.questionForHuman),
+            roles: stops.map((s) => s.requiredRole),
+        },
+        simulated,
+    };
 }
 
-/** Same rules the harness applies, used only when the backend can't be reached. */
-function simulateJudge(text: string): { decision: string; reason: string; parsed: any } {
-    let parsed: any = null;
-    try {
-        parsed = JSON.parse(text);
-    } catch {
-        return { decision: 'GRACEFULLY_REFUSED', reason: 'Malformed JSON — refused safely.', parsed };
+/** Luật tối thiểu khi backend không trả lời. */
+function simulateJudge(parsed: any): JudgeEvaluation {
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        return localEvaluation(parsed, 'The input is not a JSON object.', 'GRACEFULLY_REFUSED', 'unverified-facts', true);
     }
-    if (parsed.invoiceId || parsed.department === 'Finance & Accounting' || parsed.amountVnd) {
-        return { decision: 'GRACEFULLY_REFUSED', reason: 'Financial document outside manufacturing scope — refused.', parsed };
+    if (parsed.invoiceId || parsed.amountVnd || /finance|accounting|hr|payroll/i.test(String(parsed.department ?? ''))) {
+        return localEvaluation(parsed, 'This looks like a finance document, not a quality notification — refused.', 'GRACEFULLY_REFUSED', 'outside-scope', true);
     }
-    if (parsed.workCenter?.workCenterId === 'WC-WELD-11' || parsed.defectType === 'UNKNOWN_LASER_WELDING') {
-        return { decision: 'ESCALATED', reason: 'No precedent above the 0.60 cutoff — escalated to a welding SME instead of guessing.', parsed };
+    if (!parsed.notificationId && !parsed.symptomShortText && !parsed.defect) {
+        return localEvaluation(parsed, 'No notificationId, symptom or defect — the defect cannot be identified.', 'GRACEFULLY_REFUSED', 'unverified-facts', true);
     }
-    if (parsed.notificationId || parsed.symptomShortText) {
-        return { decision: 'HANDLED_APPROPRIATELY', reason: 'Recognised as a manufacturing defect and matched against the case library.', parsed };
-    }
-    return { decision: 'GRACEFULLY_REFUSED', reason: 'Not enough defect information to proceed — refused.', parsed };
+    return localEvaluation(parsed, 'Looks like a quality notification. The precedent search and stop rules need the server, so no verdict is given here.', 'ESCALATED', null, true);
 }
+
+const STOP_PILL: Record<JudgeStopType, string> = {
+    'unverified-facts': 'border-warning/40 text-warning',
+    'outside-scope': 'border-info/40 text-info',
+    'exceeds-authority': 'border-primary/40 text-primary',
+};
+
+function StopPill({ type }: { type?: JudgeStopType | null }) {
+    if (!type) return <span className="inline-flex w-[124px] justify-center text-xs text-muted-foreground">no stop</span>;
+    return (
+        <span className={cn('inline-flex w-[124px] justify-center rounded-full border px-2 py-0.5 text-xs font-medium', STOP_PILL[type])}>
+            {JUDGE_STOP_LABEL[type]}
+        </span>
+    );
+}
+
+const DECISION_LABEL: Record<JudgeEvaluation['decision'], string> = {
+    HANDLED_APPROPRIATELY: 'Handled — no stop',
+    ESCALATED: 'Stopped — handed to a person',
+    GRACEFULLY_REFUSED: 'Refused',
+};
 
 const DECISION_STYLE: Record<string, string> = {
     HANDLED_APPROPRIATELY: 'border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200',
@@ -90,8 +152,7 @@ export function EvaluationTab() {
     // ── Judge sandbox ──
     const [judgeText, setJudgeText] = useState('');
     const [isJudging, setIsJudging] = useState(false);
-    const [judgeResult, setJudgeResult] = useState<JudgeResult | null>(null);
-    const [judgeReport, setJudgeReport] = useState<JudgeEvaluationReportData | null>(null);
+    const [judgeResult, setJudgeResult] = useState<JudgeEvaluation | null>(null);
 
     // ── Modals ──
     const [summaryCase, setSummaryCase] = useState<TestCaseSummary | null>(null);
@@ -131,23 +192,26 @@ export function EvaluationTab() {
 
     const evaluateJudge = async () => {
         if (!judgeText.trim()) return;
+        // JSON hỏng là lỗi của đầu vào, không phải backend sập — nói đúng như vậy.
+        let parsed: unknown;
+        try {
+            parsed = JSON.parse(judgeText);
+        } catch (err: any) {
+            setJudgeResult(localEvaluation(null, `The input is not valid JSON (${err?.message ?? 'parse error'}), so it was refused.`, 'GRACEFULLY_REFUSED', 'unverified-facts', false));
+            return;
+        }
         setIsJudging(true);
         setJudgeResult(null);
         try {
-            const parsed = JSON.parse(judgeText);
             const res = await fetch('/api/verify/judge-input', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(parsed),
             });
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            setJudgeResult({ decision: data.decision, reason: data.reason, simulated: false });
-            setJudgeReport(buildJudgeReportFromRaw(parsed, data));
+            setJudgeResult(await res.json());
         } catch {
-            const sim = simulateJudge(judgeText);
-            setJudgeResult({ decision: sim.decision, reason: sim.reason, simulated: true });
-            setJudgeReport(buildJudgeReportFromRaw(sim.parsed || SAMPLE_JUDGE_VALID, sim));
+            setJudgeResult(simulateJudge(parsed));
         } finally {
             setIsJudging(false);
         }
@@ -227,6 +291,7 @@ export function EvaluationTab() {
                                         <span className="w-16 text-right font-mono text-xs text-muted-foreground">
                                             {result ? `${result.durationMs}ms` : '—'}
                                         </span>
+                                        {result ? <StopPill type={result.stopType} /> : <span className="inline-flex w-[124px] justify-center text-xs text-muted-foreground">—</span>}
                                         <StatusPill status={result?.status} />
                                         <Button
                                             type="button"
@@ -267,6 +332,19 @@ export function EvaluationTab() {
                                             <p className="text-xs font-medium text-muted-foreground">Actual</p>
                                             <p className="text-foreground">{result?.actualBehavior ?? 'Run verification to see the result.'}</p>
                                         </div>
+                                        {result?.stops && result.stops.length > 0 && (
+                                            <div className="space-y-1 md:col-span-3">
+                                                <p className="text-xs font-medium text-muted-foreground">Where the AI stopped</p>
+                                                <ul className="space-y-1">
+                                                    {result.stops.map((st) => (
+                                                        <li key={st.id} className="text-foreground">
+                                                            <span className="font-medium">{JUDGE_STOP_LABEL[st.type]} · {st.step}</span> — {st.reason}{' '}
+                                                            <span className="text-muted-foreground">Asks {st.requiredRole}: {st.questionForHuman}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
                                         <p className="font-mono text-xs text-muted-foreground md:col-span-3">{tc.jsonPath}</p>
                                     </div>
                                 )}
@@ -285,7 +363,7 @@ export function EvaluationTab() {
                         </div>
                         <div>
                             <h3 className="text-sm font-semibold text-foreground">Judge sandbox</h3>
-                            <p className="mt-0.5 text-sm text-muted-foreground">Paste any JSON and see whether it is handled, escalated or refused.</p>
+                            <p className="mt-0.5 text-sm text-muted-foreground">Paste any JSON and see whether it is handled, stopped for a person, or refused — and why.</p>
                         </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
@@ -322,9 +400,16 @@ export function EvaluationTab() {
                 {judgeResult && (
                     <div className={cn('flex flex-col gap-3 rounded-lg border px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between', DECISION_STYLE[judgeResult.decision] ?? DECISION_STYLE.GRACEFULLY_REFUSED)}>
                         <div className="min-w-0 space-y-0.5">
-                            <p className="font-semibold">
-                                {judgeResult.decision.replace(/_/g, ' ').toLowerCase().replace(/^\w/, (c) => c.toUpperCase())}
-                                {judgeResult.simulated && <span className="ml-2 text-xs font-normal opacity-75">(simulated — backend unreachable)</span>}
+                            <p className="flex flex-wrap items-center gap-2 font-semibold">
+                                {judgeResult.decision === 'HANDLED_APPROPRIATELY' && judgeResult.stops.length > 0
+                                    ? 'Handled — sign-off needed at closure'
+                                    : DECISION_LABEL[judgeResult.decision]}
+                                {judgeResult.primaryStopType && (
+                                    <span className="rounded-full border border-current/30 px-2 py-px text-xs font-medium">
+                                        Stop: {JUDGE_STOP_LABEL[judgeResult.primaryStopType]}
+                                    </span>
+                                )}
+                                {judgeResult.simulated && <span className="text-xs font-normal opacity-75">(browser check only — backend unreachable)</span>}
                             </p>
                             <p>{judgeResult.reason}</p>
                         </div>
@@ -337,7 +422,7 @@ export function EvaluationTab() {
             </GuideCard>
 
             <TestCaseReportModal isOpen={!!summaryCase} onClose={() => setSummaryCase(null)} testCase={summaryCase} />
-            <JudgeReportModal isOpen={isJudgeModalOpen} onClose={() => setIsJudgeModalOpen(false)} report={judgeReport} />
+            <JudgeReportModal isOpen={isJudgeModalOpen} onClose={() => setIsJudgeModalOpen(false)} report={judgeResult} />
         </div>
     );
 }

@@ -897,6 +897,45 @@ export async function reviewDiscipline(
 }
 
 /** Vet duyet + cong dong case cua mot report. Moi nhat truoc. */
+// ─────────────────────────────────────────────────────────────────────────────
+// Các lần AI dừng — luật ở srv/src/domain/eightd/stops.ts
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type StopType = 'unverified-facts' | 'outside-scope' | 'exceeds-authority';
+
+export interface CaseStop {
+    id: string;
+    type: StopType;
+    rule: string;
+    step: string;
+    reason: string;
+    questionForHuman: string;
+    requiredRole: string;
+    /** true = bước `step` không duyệt được cho tới khi có người gỡ. */
+    blocking: boolean;
+    facts: string[];
+    status: 'open' | 'resolved' | 'step-approved';
+    resolvedBy?: string | null;
+    resolvedAt?: string | null;
+    resolution?: string | null;
+}
+
+export async function getCaseStops(reportID: string): Promise<CaseStop[]> {
+    const response = await axiosInstance.get(
+        `api/cnma/EIGHTD_SRV/getCaseStops(reportID='${encodeURIComponent(reportID)}')`,
+    );
+    const raw = response.data?.value ?? response.data;
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    return parsed?.stops ?? [];
+}
+
+export async function resolveStop(reportID: string, stopId: string, note: string): Promise<CaseStop[]> {
+    const response = await axiosInstance.post('api/cnma/EIGHTD_SRV/resolveStop', { reportID, stopId, note });
+    const raw = response.data?.value ?? response.data;
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    return parsed?.stops ?? [];
+}
+
 export async function getReviewTrail(
     reportID: string,
 ): Promise<{ gate: ClosureGate; trail: ReviewEvent[] }> {

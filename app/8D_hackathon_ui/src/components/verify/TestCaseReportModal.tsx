@@ -102,6 +102,16 @@ Hallucination Check: ${testCase.auditCompliance.hallucinationCheck}
 
                 {/* ── Modal Body (Scrollable) ── */}
                 <div className="p-6 overflow-y-auto space-y-6 text-sm">
+                    {/*
+                      Nội dung modal này là bản viết tay soạn từ Sprint 1, KHÔNG phải
+                      kết quả của lần chạy vừa rồi — phải nói rõ, nếu không người
+                      xem sẽ đọc các con số tĩnh bên dưới như số đo trực tiếp.
+                    */}
+                    <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2.5 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
+                        Reference write-up prepared for this test case. It is static content, not the output of the run you just did —
+                        live results (status, timing, stop type) are in the Verify table.
+                    </div>
+
                     {/* Top KPI Summary Banner */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-muted/20 p-4 rounded-xl border border-border">
                         <div>

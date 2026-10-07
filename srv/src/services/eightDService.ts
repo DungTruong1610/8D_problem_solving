@@ -54,6 +54,8 @@ import {
     setCaseCommitments,
     setDisciplineWorkState,
     recordTaskDoneByEvidence,
+    getCaseStops,
+    resolveStop,
     sweepStuckAnalyzing,
     type AssignedTeamRow,
 } from '../domain/eightd/eightDRepository';
@@ -625,6 +627,31 @@ export function registerEightDHandlers(srv: any): void {
             return JSON.stringify({ gate, trail });
         } catch (e: any) {
             return req.error(500, describe(e));
+        }
+    });
+
+    // ── Các lần AI dừng ──────────────────────────────────────────────────────
+    srv.on('getCaseStops', async (req: any) => {
+        const reportID = String(req.data?.reportID ?? '').trim();
+        if (!reportID) return req.error(400, 'reportID is required.');
+        try {
+            return JSON.stringify({ stops: await getCaseStops(reportID) });
+        } catch (e: any) {
+            return req.error(e?.code === 404 ? 404 : 500, describe(e));
+        }
+    });
+
+    srv.on('resolveStop', async (req: any) => {
+        const reportID = String(req.data?.reportID ?? '').trim();
+        const stopId = String(req.data?.stopId ?? '').trim();
+        if (!reportID || !stopId) return req.error(400, 'reportID and stopId are required.');
+        // Danh tính từ ngữ cảnh xác thực, không từ payload.
+        const actor = String(req.user?.id ?? 'anonymous');
+        try {
+            const stops = await resolveStop(reportID, stopId, String(req.data?.note ?? ''), actor);
+            return JSON.stringify({ stops });
+        } catch (e: any) {
+            return req.error(e?.code === 404 ? 404 : e?.code === 400 ? 400 : 500, describe(e));
         }
     });
 

@@ -42,6 +42,7 @@ import {
     type AuditEventType,
     type ReportFacts,
 } from './auditTrail';
+import { evaluateStops, type Stop } from './stops';
 import { getPath } from './runtimeConfig';
 import { writeClosedCaseToLibrary, type WriteBackResult } from './precedent/closedCaseWriteBack';
 
@@ -956,6 +957,145 @@ export async function recordTaskDoneByEvidence(params: {
     });
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Các lần AI dừng (stops.ts) — tính lại mỗi lần đọc, gỡ bằng một dòng vết
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface CaseStop extends Stop {
+    /**
+     * open           chưa ai gỡ — nếu `blocking` thì bước `step` không duyệt được.
+     * resolved       có người gỡ kèm ghi chú (dòng `stop-resolved` trong vết).
+     * step-approved  bước đã được duyệt TRƯỚC khi có cơ chế dừng; quyết định đó
+     *                là của người, nhưng không có ghi chú gỡ riêng.
+     */
+    status: 'open' | 'resolved' | 'step-approved';
+    resolvedBy?: string | null;
+    resolvedAt?: string | null;
+    resolution?: string | null;
+}
+
+/** Câu hành động của một bước: đề xuất của AI + task người đã nhận. */
+function stepActionTexts(resultJson: unknown, prefix: 'containment' | 'preventive'): string[] {
+    let data: any = null;
+    try {
+        data = typeof resultJson === 'string' ? JSON.parse(resultJson) : resultJson;
+    } catch { /* bỏ qua */ }
+    const node = data?.[prefix] ?? {};
+    const suggested = Array.isArray(node.actions) ? node.actions.map((a: any) => a?.action ?? a?.actionText) : [];
+    const assigned = Array.isArray(node.assignedActions) ? node.assignedActions.map((t: any) => t?.name) : [];
+    return [...suggested, ...assigned].filter((x): x is string => typeof x === 'string' && x.trim().length > 0);
+}
+
+/** Tiền lệ đã tìm cho D4, hoặc null khi chưa tìm — không dừng vì điều chưa biết. */
+function d4Precedents(precedentsJson: unknown): { count: number; reason: string | null; basis: string } | null {
+    let p: any = null;
+    try {
+        p = typeof precedentsJson === 'string' ? JSON.parse(precedentsJson) : precedentsJson;
+    } catch {
+        return null;
+    }
+    const step = p?.byStep?.D4;
+    if (step && Array.isArray(step.precedents)) {
+        return {
+            count: step.precedents.length,
+            reason: typeof step.reason === 'string' ? step.reason : null,
+            basis: `${step.precedents.length} precedent(s) qualified for D4 (${step.candidatesScored ?? '?'} candidates scored)`,
+        };
+    }
+    return null;
+}
+
+/**
+ * Các lần dừng của một case, kèm trạng thái gỡ.
+ *
+ * Tính lại từ dữ liệu hiện tại mỗi lần đọc (luật thuần, rẻ), nên sửa dữ kiện —
+ * ví dụ nhập lại số đo — làm lần dừng tự biến mất mà không cần ai bấm gì. Việc
+ * gỡ thì lưu trong `ReviewEvents` theo `id` ổn định của lần dừng.
+ */
+export async function getCaseStops(reportID: string): Promise<CaseStop[]> {
+    const report = await SELECT.one.from(REPORTS)
+        .columns('ID', 'caseContext', 'precedentsJson', 'rootCauseCategory', 'aiRootCause')
+        .where({ ID: reportID });
+    if (!report) throw Object.assign(new Error(`Report ${reportID} not found.`), { code: 404 });
+
+    let caseContext: any = null;
+    try {
+        caseContext = JSON.parse(String((report as any).caseContext ?? ''));
+    } catch { /* chưa phân tích */ }
+    // Report chưa có caseContext là report chưa phân tích xong — chưa có gì để xét.
+    if (!caseContext || typeof caseContext !== 'object') return [];
+
+    const [disciplines, resolutions] = await Promise.all([
+        SELECT.from(DISCIPLINES).columns('code', 'reviewStatus', 'reviewedBy', 'resultJson').where({ report_ID: reportID }),
+        SELECT.from(REVIEW_EVENTS).columns('subjectId', 'reason', 'actor', 'at')
+            .where({ reportID, eventType: 'stop-resolved' })
+            .orderBy('at desc'),
+    ]);
+    const byCode = new Map((disciplines as any[]).map((d) => [String(d.code), d]));
+
+    const stops = evaluateStops({
+        caseContext,
+        recordedRootCause: (report as any).rootCauseCategory,
+        independentRootCause: (report as any).aiRootCause,
+        precedents: d4Precedents((report as any).precedentsJson),
+        stepActions: {
+            D3: stepActionTexts(byCode.get('D3')?.resultJson, 'containment'),
+            D7: stepActionTexts(byCode.get('D7')?.resultJson, 'preventive'),
+        },
+    });
+
+    return stops.map((stop) => {
+        const resolved = (resolutions as any[]).find((e) => e.subjectId === stop.id);
+        if (resolved) {
+            return { ...stop, status: 'resolved' as const, resolvedBy: resolved.actor, resolvedAt: resolved.at, resolution: resolved.reason };
+        }
+        const step = byCode.get(stop.step);
+        if (normalizeStatus(step?.reviewStatus) === 'Approved') {
+            return { ...stop, status: 'step-approved' as const, resolvedBy: step?.reviewedBy ?? null };
+        }
+        return { ...stop, status: 'open' as const };
+    });
+}
+
+/**
+ * Người gỡ một lần dừng: ghi chú bắt buộc, lưu dữ kiện gây dừng vào vết.
+ *
+ * Từ chối khi lần dừng không còn áp dụng (dữ kiện đã được sửa) — gỡ một thứ
+ * không tồn tại sẽ để lại dòng vết nói về một vấn đề không có thật.
+ */
+export async function resolveStop(reportID: string, stopId: string, note: string, actor: string): Promise<CaseStop[]> {
+    const reason = String(note ?? '').trim();
+    if (!reason) throw Object.assign(new Error('A note is required to resolve a stop.'), { code: 400 });
+    if (reason.length > 500) throw Object.assign(new Error(`note is ${reason.length} characters; the limit is 500.`), { code: 400 });
+
+    const stops = await getCaseStops(reportID);
+    const stop = stops.find((s) => s.id === stopId);
+    if (!stop) {
+        throw Object.assign(new Error(`Stop "${stopId}" does not apply to this case any more.`), { code: 400 });
+    }
+    if (stop.status === 'resolved') {
+        throw Object.assign(new Error(`Stop "${stopId}" was already resolved by ${stop.resolvedBy}.`), { code: 400 });
+    }
+
+    await recordReviewEvent({
+        reportID,
+        disciplineCode: stop.step,
+        eventType: 'stop-resolved',
+        subjectId: stop.id,
+        reason,
+        snapshot: {
+            stopType: stop.type,
+            stopReason: stop.reason,
+            question: stop.questionForHuman,
+            requiredRole: stop.requiredRole,
+            facts: stop.facts,
+        },
+        beforeAfter: beforeAfter({ stop: ['open', 'resolved'] }),
+        actor,
+    });
+    return getCaseStops(reportID);
+}
+
 export interface ReviewResult {
     disciplineID: string;
     code: string;
@@ -1040,6 +1180,19 @@ export async function reviewDiscipline(
          * bản UI dùng để hiện checklist; ở đây là chỗ chặn thật, vì một lời gọi
          * thẳng vào action không đi qua màn hình nào cả.
          */
+        /**
+         * AI đã dừng ở bước này (dữ kiện chưa xác minh, vượt thẩm quyền…) và chưa
+         * ai gỡ: không duyệt được. Kiểm ở đây chứ không chỉ khoá nút trên UI.
+         */
+        const openStops = (await getCaseStops(reportID))
+            .filter((s) => s.step === code && s.blocking && s.status === 'open');
+        if (openStops.length > 0) {
+            throw Object.assign(new Error([
+                `Cannot approve ${code}: the AI stopped here and nobody has resolved it yet.`,
+                ...openStops.map((s) => `• ${s.reason} — ${s.questionForHuman}`),
+            ].join('\n')), { code: 400 });
+        }
+
         const siblings = code === 'D6'
             ? await SELECT.from(DISCIPLINES).columns('code', 'resultJson').where({ report_ID: reportID })
             : [];

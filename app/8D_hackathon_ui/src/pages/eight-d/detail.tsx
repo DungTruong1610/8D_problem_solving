@@ -25,6 +25,7 @@ import {
 import { toast } from 'sonner';
 import {
     eightDService,
+    getCaseStops,
     isCustomerComplaint,
     type Report8D,
 } from '@/services/eightd-service';
@@ -38,6 +39,7 @@ import { EvidenceTab } from './evidence-tab';
 import { CaseStepper } from './case-stepper';
 import { CaseCommitments } from './case-commitments';
 import { AuditTrailPanel } from './audit-trail-panel';
+import { StopsPanel } from './stops-panel';
 import { export8DToExcel } from './export-8d-excel';
 import { CaseProvenanceProvider } from './ai-provenance-info';
 
@@ -127,6 +129,16 @@ export function EightDDetailPage() {
         // tab bị ẩn, nên đổi tab đi làm việc khác rồi quay lại là gặp đúng cái
         // spinner cũ. Cho chạy tiếp cả khi tab ở nền.
         refetchIntervalInBackground: true,
+    });
+
+    // Các lần AI dừng: tính lại trên server mỗi lần đọc. Cùng tiền tố ['8d'] nên
+    // duyệt / gỡ dừng / sửa dữ kiện ở đâu thì danh sách cũng được làm mới.
+    const stopsReportID = report?.ID ?? '';
+    const stopsQuery = useQuery({
+        queryKey: ['8d', 'stops', stopsReportID],
+        queryFn: () => getCaseStops(stopsReportID),
+        enabled: Boolean(stopsReportID) && report?.status !== 'Analyzing',
+        staleTime: 0,
     });
 
     const reanalyze = useMutation({
@@ -300,6 +312,11 @@ export function EightDDetailPage() {
                 </div>
             )}
 
+            {/* ── AI dừng ở đâu, ai phải trả lời ── */}
+            {!running && (
+                <StopsPanel reportID={report.ID} stops={stopsQuery.data ?? []} isError={stopsQuery.isError} />
+            )}
+
             {/* ── Main Content ── */}
             <CaseProvenanceProvider caseContext={report.caseContext} precedentsJson={report.precedentsJson} reportID={id}>
                 <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as MainTab)} className="w-full space-y-6">
@@ -340,6 +357,7 @@ export function EightDDetailPage() {
                                             <div key={selected.ID} className="min-w-0 space-y-4">
                                                 <DisciplineReviewBox
                                                     reportID={report.ID}
+                                                    stops={(stopsQuery.data ?? []).filter((s) => s.step === selected.code)}
                                                     discipline={selected}
                                                     siblings={disciplines}
                                                     liveFormSchemaJson={stepPrompts.byCode[selected.code]?.formSchemaJson ?? null}

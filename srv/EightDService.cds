@@ -301,6 +301,15 @@ service EightDService {
     function getReviewTrail(reportID : String) returns String;
 
     /**
+     * Các lần AI dừng của một case (dữ kiện chưa xác minh / ngoài phạm vi / vượt
+     * thẩm quyền), kèm trạng thái gỡ. Luật ở `srv/src/domain/eightd/stops.ts`.
+     */
+    function getCaseStops(reportID : String) returns String;
+
+    /** Người gỡ một lần dừng — `note` bắt buộc, ghi một dòng `stop-resolved` vào vết. */
+    action resolveStop(reportID : String, stopId : String, note : String) returns String;
+
+    /**
      * Danh sách toàn bộ bằng chứng hoàn thành của một report (không kèm content).
      * Phục vụ hiển thị trên tab Evidence của panel lưu trữ.
      */

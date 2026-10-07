@@ -1,3 +1,5 @@
+import type { JudgeStop, JudgeStopType } from '../../../../../shared/judge-evaluation';
+
 export interface TestCaseResult {
     id: string;
     title: string;
@@ -10,6 +12,9 @@ export interface TestCaseResult {
     details: Record<string, any>;
     reportId?: string;
     notificationId?: string;
+    /** Loại dừng chính theo luật `stops.ts`; null = AI được đi tiếp. */
+    stopType?: JudgeStopType | null;
+    stops?: JudgeStop[];
 }
 
 export interface VerifyHarnessReport {
@@ -451,7 +456,7 @@ export const QUADRANT_TIPS = [
     { id: 'TC-01', title: 'Happy path', hint: 'WC-MILL-07 + MAT-10247 + burr 0.26mm matches a strong precedent.' },
     { id: 'TC-02', title: 'Dirty data', hint: 'German text, comma decimals ("0,32 mm") and padded IDs.' },
     { id: 'TC-03', title: 'Bias hunter', hint: 'Record blames "Man" while telemetry shows machine drift.' },
-    { id: 'TC-04', title: 'Safe refusal', hint: 'Unknown welding defect, similarity under 60% → escalate.' },
+    { id: 'TC-04', title: 'Safe refusal', hint: 'Defect with no matching closed case → no precedent cited, escalate.' },
 ] as const;
 
 // ── Tab 4: Evaluation ───────────────────────────────────────────────────────
@@ -463,7 +468,8 @@ export const TEST_CASES = [
         quadrant: 'Happy path',
         notificationId: '8D-10048412',
         summary: 'Internal defect on WC-MILL-07, burr 0.26mm vs max 0.10mm.',
-        expected: 'Matches precedent 8D-10048412 and drafts D1 – D8 with Machine as root cause.',
+        expected: 'Matches precedent 8D-10048412, inputs complete for a D1 – D8 draft, no stop raised.',
+        stopType: null,
         jsonPath: 'mock-data/sprint1-test-cases/tc-01-happy-path.json',
     },
     {
@@ -472,7 +478,8 @@ export const TEST_CASES = [
         quadrant: 'Messy real-world data',
         notificationId: '8D-90048412',
         summary: 'German text, comma decimal "0,32 mm", padded material ID, missing fields.',
-        expected: 'No crash, values normalized, missing fields reported as data gaps.',
+        expected: 'No crash, values normalized, gaps reported — and stops (unverified facts) until a QE confirms the parsed 0.32 mm.',
+        stopType: 'unverified-facts',
         jsonPath: 'mock-data/sprint1-test-cases/tc-02-dirty-sap.json',
     },
     {
@@ -481,7 +488,8 @@ export const TEST_CASES = [
         quadrant: 'Confirmation bias',
         notificationId: '8D-10048880',
         summary: 'Engineer blamed the operator; telemetry shows 0.9mm tool changer drift.',
-        expected: 'Blind diagnosis overrides "Man" with "Machine" and flags it for review.',
+        expected: 'Stops at D4 (unverified facts): "Man" has no evidence while "Machine" has a measured drift. The QE decides.',
+        stopType: 'unverified-facts',
         jsonPath: 'mock-data/sprint1-test-cases/tc-03-bias-hunter.json',
     },
     {
@@ -489,8 +497,9 @@ export const TEST_CASES = [
         title: 'Welding defect on milling cell',
         quadrant: 'Safe refusal',
         notificationId: '8D-10049003',
-        summary: 'Out-of-domain welding defect, similarity 28% under the 60% cutoff.',
-        expected: 'Refuses to invent precedents and escalates to a welding SME.',
+        summary: 'Welding defect code on a milling cell — no closed case shares the work center and defect code.',
+        expected: 'Stops (outside scope): 0 matching closed cases, so no precedent is cited; escalates to a welding SME.',
+        stopType: 'outside-scope',
         jsonPath: 'mock-data/sprint1-test-cases/tc-04-graceful-refusal.json',
     },
 ] as const;
@@ -519,6 +528,8 @@ export function buildReferenceReport(): VerifyHarnessReport {
         durationMs: durations[tc.id],
         details: {},
         notificationId: tc.notificationId,
+        stopType: tc.stopType,
+        stops: [],
     }));
     return {
         suite: 'Sprint 1 Verify Suite',

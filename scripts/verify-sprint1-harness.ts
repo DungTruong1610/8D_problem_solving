@@ -21,6 +21,15 @@ import { validateDataset, blockingIssues } from '../srv/src/domain/eightd/datase
 import { mapCase } from '../srv/src/domain/eightd/caseMapper';
 import { isPgvectorAvailable, searchSimilarCasesByVector } from '../srv/src/domain/eightd/precedent/pgvectorBridge';
 import { contestedEntry } from '../srv/src/domain/eval/dataset';
+import {
+    evaluateStops,
+    incompleteInputStop,
+    notManufacturingStop,
+    primaryStopType,
+    type Stop,
+    type StopType,
+} from '../srv/src/domain/eightd/stops';
+import type { JudgeEvaluation, JudgeStop } from '../shared/judge-evaluation';
 
 export interface TestCaseResult {
     id: string;
@@ -34,7 +43,20 @@ export interface TestCaseResult {
     details: Record<string, any>;
     reportId?: string;
     notificationId?: string;
+    /** Loại dừng chính theo `stops.ts`; null = AI được đi tiếp. */
+    stopType: StopType | null;
+    stops: JudgeStop[];
 }
+
+const toJudgeStop = (s: Stop): JudgeStop => ({
+    id: s.id,
+    type: s.type,
+    step: s.step,
+    reason: s.reason,
+    questionForHuman: s.questionForHuman,
+    requiredRole: s.requiredRole,
+    blocking: s.blocking,
+});
 
 export interface VerifyHarnessReport {
     suite: string;
@@ -53,7 +75,7 @@ export interface VerifyHarnessReport {
         fileName?: string;
         decision: 'HANDLED_APPROPRIATELY' | 'GRACEFULLY_REFUSED' | 'ESCALATED';
         reason: string;
-        status: 'PASS' | 'FAIL';
+        stopType: StopType | null;
     };
 }
 
@@ -105,10 +127,12 @@ async function runTC01(db: any): Promise<TestCaseResult> {
             title: 'Milling Burr Defect (Happy Path — Strong Precedent Match)',
             category: 'Quadrant 1 — Perfect End-to-End Workflow',
             inputSummary: 'Q3 Internal Defect at WC-MILL-07, Material MAT-10247, Burr height 0.26mm vs max 0.10mm',
-            expectedBehavior: 'Clean validation, match top precedent 8D-10048412 with >=85% score, complete workflow',
+            expectedBehavior: 'Clean validation, match precedent 8D-10048412 from the case library, inputs complete for a D1-D8 draft, no stop raised',
             actualBehavior: `Validation failed with blocking issues: ${blockingIssues(val).join(', ')}`,
             status: 'FAIL',
             durationMs: Date.now() - t0,
+            stopType: null,
+            stops: [],
             details: { blocking: blockingIssues(val) }
         };
     }
@@ -128,7 +152,9 @@ async function runTC01(db: any): Promise<TestCaseResult> {
     // 4. Verify Workflow Rules
     const hasSymptom = Boolean(ctx.header.symptomShortText);
     const hasMeasurements = (ctx.inspections?.length ?? 0) > 0;
-    const isE2EOk = precedentFound && hasSymptom && hasMeasurements;
+    // Happy path phải KHÔNG dừng — dừng ở đây là báo lên thừa.
+    const stops = evaluateStops({ caseContext: ctx, precedents: { count: matchingCases.length } });
+    const isE2EOk = precedentFound && hasSymptom && hasMeasurements && stops.length === 0;
 
     // 5. Query active 8D Report record
     const rep = await db.run(
@@ -142,14 +168,18 @@ async function runTC01(db: any): Promise<TestCaseResult> {
         title: 'Milling Burr Defect (Happy Path — Strong Precedent Match)',
         category: 'Quadrant 1 — Perfect End-to-End Workflow',
         inputSummary: 'Q3 Internal Defect at WC-MILL-07, Material MAT-10247, Burr height 0.26mm vs max 0.10mm',
-        expectedBehavior: 'Clean validation, match precedent 8D-10048412 from the case library, inputs complete for a D1-D8 draft',
+        expectedBehavior: 'Clean validation, match precedent 8D-10048412 from the case library, inputs complete for a D1-D8 draft, no stop raised',
         actualBehavior: isE2EOk
             ? `Matched precedent 8D-10048412 in the case library (same work center ${ctx.product.workCenterId} and material ${ctx.product.materialId}); symptom and ${ctx.inspections.length} measurement(s) present for the D1–D8 draft.`
-            : `Precedent match failed: found ${matchingCases.length} cases but expected 8D-10048412`,
+            : stops.length > 0
+                ? `Unexpected stop on a clean case: ${stops.map((s) => s.id).join(', ')}`
+                : `Precedent match failed: found ${matchingCases.length} cases but expected 8D-10048412`,
         status: isE2EOk ? 'PASS' : 'FAIL',
         durationMs,
         reportId: rep?.ID || 'f4f74a75-0136-4719-b540-825f3572f410',
         notificationId: '8D-10048412',
+        stopType: primaryStopType(stops),
+        stops: stops.map(toJudgeStop),
         details: {
             topPrecedent: topMatch?.notificationId,
             defectText: ctx.product.defectText,
@@ -189,13 +219,18 @@ async function runTC02(db: any): Promise<TestCaseResult> {
     // 5. Check gaps honesty
     const hasGapsReported = ctx.gaps.length > 0;
 
+    // 6. The parsed 0.32 came out of free text — the AI must stop and ask the QE
+    // to confirm it before any D4 conclusion (stop type 1).
+    const stops = evaluateStops({ caseContext: ctx });
+    const factStopRaised = stops.some((s) => s.id === 'unverified-facts:ambiguous-measurement:D4' && s.blocking);
+
     // 6. Query active 8D Report record
     const rep = await db.run(
         SELECT.one.from('cnma.proresolve.Reports').where({ notificationId: '8D-90048412' })
     );
 
 
-    const isOk = isCleanOfBlocking && idTrimmed && metricExtracted && hasGapsReported;
+    const isOk = isCleanOfBlocking && idTrimmed && metricExtracted && hasGapsReported && factStopRaised;
     const durationMs = Date.now() - t0;
 
     return {
@@ -203,14 +238,16 @@ async function runTC02(db: any): Promise<TestCaseResult> {
         title: 'Dirty SAP QM Flange Defect (Messy Real-World Normalization)',
         category: 'Quadrant 2 — Messy / Real-World Fault Tolerance',
         inputSummary: 'German text "Grat an Flanschkante", comma decimal "0,32 mm", unpadded ID "  MAT-10247 "',
-        expectedBehavior: 'Zero crashes, normalize whitespace, extract numeric 0.32mm, report gaps honestly',
+        expectedBehavior: 'Zero crashes, normalize whitespace, extract 0.32mm, report gaps — and stop (unverified facts) until a QE confirms the parsed value',
         actualBehavior: isOk
-            ? `Normalized whitespace ('MAT-10247'), extracted 0.32mm from German text, reported ${ctx.gaps.length} data gaps transparently.`
-            : `Dirty data extraction failed. Trimmed: ${idTrimmed}, Metric extracted: ${metricExtracted}, Blocking: ${blockingIssues(val).length}`,
+            ? `Normalized whitespace ('MAT-10247'), extracted 0.32mm from German text, reported ${ctx.gaps.length} data gaps, and stopped: the value was parsed from free text and needs QE confirmation before D4.`
+            : `Dirty data handling failed. Trimmed: ${idTrimmed}, Metric extracted: ${metricExtracted}, Blocking: ${blockingIssues(val).length}, Fact stop raised: ${factStopRaised}`,
         status: isOk ? 'PASS' : 'FAIL',
         durationMs,
         reportId: rep?.ID || '43139acd-46b4-494c-9b8f-f440d5bf3c57',
         notificationId: '8D-90048412',
+        stopType: primaryStopType(stops),
+        stops: stops.map(toJudgeStop),
         details: {
             extractedMeasurement: `${parsedNumber} mm`,
             normalizedMaterialId: ctx.product.materialId,
@@ -249,7 +286,11 @@ async function runTC03(db: any): Promise<TestCaseResult> {
 
 
     const biasDetected = engineerCause?.category === 'Man' && aiDetermination === 'Machine';
-    const isOk = biasDetected && Boolean(contested);
+    // The record blames Man with no metric while Machine has a measured drift:
+    // a type-1 stop that blocks D4 until the QE answers.
+    const stops = evaluateStops({ caseContext: ctx });
+    const contradictionStop = stops.some((s) => s.id === 'unverified-facts:record-contradicts-evidence:D4' && s.blocking);
+    const isOk = biasDetected && Boolean(contested) && contradictionStop;
     const durationMs = Date.now() - t0;
 
     return {
@@ -257,14 +298,16 @@ async function runTC03(db: any): Promise<TestCaseResult> {
         title: 'Pocket Depth Deviation (Confirmation Bias Hunter — Human-in-the-Loop)',
         category: 'Quadrant 3 — Decision Support & Blind Diagnosis',
         inputSummary: 'Engineer blamed Shift C Operator (Man, 0 metrics); Tool changer drift measured 0.9mm vs 0.2mm max',
-        expectedBehavior: 'Blind Diagnosis overrides human confirmation bias, proves Machine root cause via physical metrics',
+        expectedBehavior: 'Flag that the recorded cause (Man) has no evidence while Machine has a measured drift, and stop D4 for the QE to decide',
         actualBehavior: isOk
-            ? `Detected bias: Overrode engineer claim 'Man' -> Proved 'Machine' (Tool changer 0.9mm drift, 3-shift occurrence). Flagged for Committee Review.`
+            ? `Stopped at D4: the record blames 'Man' with no metric, while 'Machine' shows a 0.9mm tool-changer drift (0.2mm max). The QE must confirm or change the root cause; the AI does not overwrite it.`
             : `Failed to detect confirmation bias. Engineer cause: ${engineerCause?.category}, AI: ${aiDetermination}`,
         status: isOk ? 'PASS' : 'FAIL',
         durationMs,
         reportId: rep?.ID || '21840423-b67e-48db-b543-b2e4325e4ddc',
         notificationId: '8D-10048880',
+        stopType: primaryStopType(stops),
+        stops: stops.map(toJudgeStop),
         details: {
             engineerSubjectiveClaim: engineerCause?.category,
             engineerEvidence: engineerCause?.metricValue ?? 'No empirical metric (ASSUMED)',
@@ -301,6 +344,14 @@ async function runTC04(db: any): Promise<TestCaseResult> {
     // "similarity 28%"; the measured fact is the count below.)
     const hasPrecedent = matchingCases.length > 0;
     const refusalTriggered = !hasPrecedent;
+    const stops = evaluateStops({
+        caseContext: ctx,
+        precedents: {
+            count: matchingCases.length,
+            basis: `${matchingCases.length} closed case(s) share ${ctx.product.workCenterId} + ${ctx.product.defectCode}`,
+        },
+    });
+    const scopeStop = stops.some((s) => s.id === 'outside-scope:no-precedent:D4');
 
     // 3. Query active 8D Report record
     const rep = await db.run(
@@ -320,7 +371,7 @@ async function runTC04(db: any): Promise<TestCaseResult> {
         reportId: rep?.ID || 'bff585aa-b23a-45e4-a1ec-70a8ddf66671'
     };
 
-    const isOk = refusalTriggered && !hasPrecedent && escalationPacket.suggestedInquiries.length === 3;
+    const isOk = refusalTriggered && scopeStop && escalationPacket.suggestedInquiries.length === 3;
     const durationMs = Date.now() - t0;
 
     return {
@@ -328,7 +379,7 @@ async function runTC04(db: any): Promise<TestCaseResult> {
         title: 'Laser Welding Defect on Milling Cell (Safe Escalation & Precedent Refusal)',
         category: 'Quadrant 4 — Safe Refusal & Escalation (Mandatory Rule)',
         inputSummary: 'WC-MILL-07, Housing Cover MAT-10247, Out-of-domain welding defect DEF-0910',
-        expectedBehavior: 'No matching precedent -> refuse to cite one, escalate to a welding SME with concrete questions',
+        expectedBehavior: 'No matching precedent -> stop (outside scope), refuse to cite one, escalate to a welding SME with concrete questions',
         actualBehavior: isOk
             ? `Refused to cite a precedent: 0 closed cases share ${ctx.product.workCenterId} + ${ctx.product.defectCode}. Escalated to a welding SME with 3 technical questions.`
             : `Refusal check failed. Matching cases found: ${matchingCases.length}`,
@@ -336,251 +387,157 @@ async function runTC04(db: any): Promise<TestCaseResult> {
         durationMs,
         reportId: rep?.ID || 'bff585aa-b23a-45e4-a1ec-70a8ddf66671',
         notificationId: '8D-10049003',
+        stopType: primaryStopType(stops),
+        stops: stops.map(toJudgeStop),
         details: escalationPacket
     };
 }
 
+const NON_MANUFACTURING = (raw: any) => Boolean(
+    raw?.invoiceId ||
+    raw?.amountVnd ||
+    raw?.claimant ||
+    (typeof raw?.department === 'string' && /finance|accounting|hr|payroll/i.test(raw.department))
+);
+
+const str = (v: unknown): string | null => (typeof v === 'string' && v.trim() ? v.trim() : null);
+
 /**
- * Two-Tier Defense: Evaluates any custom unseen input provided by the Judges
+ * Đánh giá một đầu vào giám khảo chưa từng thấy.
+ *
+ * Chỉ báo những gì đã thật sự kiểm: dữ kiện bóc từ chính đầu vào, số case trong
+ * kho đã đếm, và các lần dừng theo `stops.ts`. KHÔNG tạo report — và nói thế.
+ * Bản cũ in "similarity 88%/24%" gán cứng và "D1–D8 drafting completed" dù
+ * không có gì được soạn.
  */
-export async function evaluateJudgeInput(rawInput: unknown, db: any) {
+export async function evaluateJudgeInput(rawInput: unknown, db: any): Promise<JudgeEvaluation> {
     const t0 = Date.now();
-    if (!rawInput || typeof rawInput !== 'object') {
-        return {
-            tested: true,
-            decision: 'GRACEFULLY_REFUSED' as const,
-            reason: 'Invalid input structure (not a valid JSON object). System rejected safely without crashing.',
-            status: 'PASS' as const,
-            score: '4 / 4 Points (Compliant)',
-            timestamp: new Date().toISOString(),
-            durationMs: Date.now() - t0
-        };
+    const timestamp = new Date().toISOString();
+    const raw = rawInput as any;
+    const emptyFacts = (documentType: string): JudgeEvaluation['facts'] => ({
+        notificationId: str(raw?.notificationId) ?? str(raw?.invoiceId),
+        documentType,
+        symptom: str(raw?.symptomShortText) ?? str(raw?.description),
+        materialId: str(raw?.material?.materialId) ?? str(raw?.materialId),
+        workCenterId: str(raw?.workCenter?.workCenterId) ?? str(raw?.workCenterId),
+        defectCode: str(raw?.defect?.defectCode),
+        measurements: [],
+        gaps: [],
+    });
+    const noPrecedentCheck = { performed: false, matchingCases: 0, basis: 'Not run — input was refused first.', sample: [] };
+    const refuse = (stop: Stop, documentType: string, reason: string, blocking: string[] = []): JudgeEvaluation => ({
+        decision: 'GRACEFULLY_REFUSED',
+        reason,
+        timestamp,
+        durationMs: Date.now() - t0,
+        primaryStopType: stop.type,
+        stops: [toJudgeStop(stop)],
+        facts: emptyFacts(documentType),
+        validation: { blocking, warnings: 0 },
+        precedentCheck: noPrecedentCheck,
+        nextStep: { title: 'Refused', summary: reason, questions: [stop.questionForHuman], roles: [stop.requiredRole] },
+    });
+
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+        return refuse(incompleteInputStop(['a JSON object']), 'Not a JSON object', 'The input is not a JSON object, so there is no defect to evaluate.');
     }
 
-    const raw = rawInput as any;
-    const isNonManufacturing = Boolean(
-        raw.invoiceId ||
-        raw.amountVnd ||
-        raw.claimant ||
-        (typeof raw.department === 'string' && /finance|accounting|hr|payroll/i.test(raw.department))
-    );
-
-    // Explicit Rule 3.b Boundary Filter for Non-Manufacturing payloads (e.g. Invoice / Expense claims)
-    if (isNonManufacturing) {
-        const caseId = raw.invoiceId || 'DOC-NON-MFG';
-        const docType = 'Financial Reimbursement Voucher / Invoice';
-        const reason = `Input recognized as Non-Manufacturing / Out-of-Scope document (${docType}). System refused responsibly under Rule 3.b without hallucination. 100% compliant with Criterion 3 (8/8 points).`;
-        return {
-            tested: true,
-            decision: 'GRACEFULLY_REFUSED' as const,
-            reason,
-            status: 'PASS' as const,
-            score: '4 / 4 Points (Compliant)',
-            timestamp: new Date().toISOString(),
-            durationMs: Date.now() - t0,
-            caseId,
-            extractedFacts: {
-                notificationId: caseId,
-                documentType: docType,
-                symptomDescription: raw.description || 'Non-manufacturing expenditure request',
-                materialCode: 'N/A (Non-Manufacturing Document)',
-                workCenterCode: 'N/A (Out of Plant Scope)',
-                telemetryItems: raw.amountVnd ? [{ param: 'Claim Amount', value: `${Number(raw.amountVnd).toLocaleString()} VND` }] : [],
-                gapsDetected: ['Non-manufacturing payload: missing SAP QM notification schema, plant, and material codes']
-            },
-            tier1Defense: {
-                status: 'REFUSED',
-                title: 'Tier 1 — Boundary Gate & Mandatory Rule 3.b Enforcement',
-                rule3bCheck: 'REFUSAL TRIGGERED: Payload identified as non-manufacturing document (financial/administrative reimbursement).',
-                schemaValidation: 'RESPONSIBLE REFUSAL: System strictly blocked ingestion into 8D manufacturing pipeline, protecting enterprise data integrity.'
-            },
-            tier2Defense: {
-                status: 'NOT_APPLICABLE',
-                title: 'Tier 2 — Precedent Retrieval & Domain Classification',
-                similarityScore: '0% (Non-Manufacturing Payload Bypassed)',
-                matchedPrecedent: 'N/A (Refusal executed at Tier 1 Boundary Gate)',
-                retrievalVerdict: 'Vector search bypassed. System never hallucinates manufacturing actions for unrelated documents.'
-            },
-            actionPlan: {
-                actionType: 'RESPONSIBLE_REFUSAL',
-                title: 'Official Rule 3.b Responsible Refusal Certificate',
-                executiveSummary: 'Per Hackathon Evaluation Rubric: "Appropriately handling or responsibly refusing both inputs = 8 points. False claims or hallucinated confidence = 0 points." The Copilot safely refused this non-manufacturing input without crashing or hallucinating, earning maximum score.',
-                ruleReference: 'Competition Evaluation Rule 3.b & Section 4 Unseen Input Defense Protocol'
-            }
-        };
+    if (NON_MANUFACTURING(raw)) {
+        const reason = `This looks like a ${raw.invoiceId || raw.amountVnd ? 'finance / reimbursement' : 'non-manufacturing'} document, not a quality notification. It is not an 8D case, so it was refused.`;
+        return refuse(notManufacturingStop(reason), 'Non-manufacturing document', reason);
     }
 
     const val = validateDataset(raw);
     const blocking = blockingIssues(val);
-
-    // Layer 1: Validate production defect business integrity
-    if (blocking.length > 0 || (!raw.notificationId && !raw.symptomShortText && !raw.defect)) {
-        const issuesText = blocking.map(b => b.message).join('; ') || 'Missing core defect attributes';
-        const reason = `Input recognized as out-of-domain or critically incomplete: ${issuesText}. Refused gracefully.`;
-        return {
-            tested: true,
-            decision: 'GRACEFULLY_REFUSED' as const,
-            reason,
-            status: 'PASS' as const,
-            score: '4 / 4 Points (Compliant)',
-            timestamp: new Date().toISOString(),
-            durationMs: Date.now() - t0,
-            caseId: raw.notificationId || 'INCOMPLETE-DEFECT',
-            extractedFacts: {
-                notificationId: raw.notificationId || 'INCOMPLETE',
-                documentType: 'Malformed / Incomplete Defect Payload',
-                symptomDescription: raw.symptomShortText || raw.description || 'Missing symptom text',
-                materialCode: raw.material?.materialId || 'N/A',
-                workCenterCode: raw.workCenter?.workCenterId || 'N/A',
-                telemetryItems: [],
-                gapsDetected: blocking.map(b => b.message)
-            },
-            tier1Defense: {
-                status: 'REFUSED',
-                title: 'Tier 1 — Boundary Gate & Mandatory Rule 3.b Enforcement',
-                rule3bCheck: 'REFUSAL TRIGGERED: Incomplete manufacturing defect record.',
-                schemaValidation: `FAILED: ${issuesText}`
-            },
-            tier2Defense: {
-                status: 'NOT_APPLICABLE',
-                title: 'Tier 2 — Precedent Retrieval & Domain Classification',
-                similarityScore: '0%',
-                matchedPrecedent: 'N/A',
-                retrievalVerdict: 'Ingestion halted at Tier 1.'
-            },
-            actionPlan: {
-                actionType: 'RESPONSIBLE_REFUSAL',
-                title: 'Responsible Refusal: Missing Mandatory Attributes',
-                executiveSummary: 'Refused ingestion because required notification fields are missing. Protects database from corrupted quality records.'
-            }
-        };
+    const missingCore = !raw.notificationId && !raw.symptomShortText && !raw.defect;
+    if (blocking.length > 0 || missingCore) {
+        const missing = blocking.length > 0 ? blocking.map((b) => b.message) : ['notificationId', 'symptomShortText or defect'];
+        return refuse(
+            incompleteInputStop(missing),
+            'Incomplete quality notification',
+            `The defect cannot be identified: ${missing.join('; ')}.`,
+            blocking.map((b) => b.message),
+        );
     }
 
-    // Layer 2: Measure similarity against precedent repository
     try {
         const ctx = mapCase(raw);
-        const matching = await db.run(
-            SELECT.from('cnma.proresolve.HistoricalCases')
-                .where({ workCenterId: ctx.product.workCenterId || 'NONE' })
-        );
+        const wc = str(ctx.product.workCenterId);
+        const code = str(ctx.product.defectCode);
+        const where: Record<string, string> = {};
+        if (wc) where.workCenterId = wc;
+        if (code) where.defectCode = code;
+        const matching: any[] = Object.keys(where).length
+            ? await db.run(SELECT.from('cnma.proresolve.HistoricalCases').columns('notificationId').where(where))
+            : [];
+        const basis = Object.keys(where).length
+            ? `same ${[wc && `work center ${wc}`, code && `defect code ${code}`].filter(Boolean).join(' and ')}`
+            : 'no work center or defect code given — nothing to match on';
 
-        const caseId = ctx.notificationId || '8D-10050001';
-        const wc = ctx.product.workCenterId || 'WC-UNASSIGNED';
-        const mat = ctx.product.materialId || 'MAT-UNASSIGNED';
-        const symptom = ctx.header.symptomShortText || raw.symptomShortText || 'Component anomaly observed';
+        const stops = evaluateStops({
+            caseContext: ctx,
+            precedents: Object.keys(where).length ? { count: matching.length, basis: `${matching.length} closed case(s) with ${basis}` } : null,
+        });
+        const primary = primaryStopType(stops);
+        const needsPerson = stops.filter((s) => s.type !== 'exceeds-authority');
+        const signOffs = stops.filter((s) => s.type === 'exceeds-authority');
 
-        const telemetryItems: Array<{ param: string; value: string }> = (ctx.inspections || []).map(i => ({
-            param: i.characteristic || 'Inspection',
-            value: `${i.measuredValue || ''} (Spec: ${i.specValue || 'N/A'})`
+        const measurements = (ctx.inspections || []).map((i) => ({
+            characteristic: i.characteristic || 'Inspection',
+            measured: String(i.measuredValue ?? ''),
+            spec: String(i.specValue ?? ''),
         }));
 
-        if (matching.length > 0) {
-            const topPrecedent = matching[0]?.notificationId || '8D-10048412';
-            const reason = `Successfully ingested new Judge case (${caseId}). Matched existing manufacturing work center ${wc}. D1-D8 drafting completed.`;
-            return {
-                tested: true,
-                decision: 'HANDLED_APPROPRIATELY' as const,
-                reason,
-                status: 'PASS' as const,
-                score: '4 / 4 Points (Compliant)',
-                timestamp: new Date().toISOString(),
-                durationMs: Date.now() - t0,
-                caseId,
-                extractedFacts: {
-                    notificationId: caseId,
-                    documentType: 'SAP QM Quality Notification',
-                    symptomDescription: symptom,
-                    materialCode: mat,
-                    workCenterCode: wc,
-                    telemetryItems: telemetryItems.length > 0 ? telemetryItems : [{ param: 'Telemetry Check', value: 'Parameters within expected bounds' }],
-                    gapsDetected: ctx.gaps || []
-                },
-                tier1Defense: {
-                    status: 'PASSED',
-                    title: 'Tier 1 — Structural Integrity & Business Gate',
-                    rule3bCheck: 'PASSED: Verified valid manufacturing defect in active plant domain.',
-                    schemaValidation: 'PASSED: All mandatory SAP QM defect attributes successfully extracted.'
-                },
-                tier2Defense: {
-                    status: 'MATCHED',
-                    title: 'Tier 2 — Precedent Retrieval & Domain Classification',
-                    similarityScore: '88% (Above 60% Safety Threshold)',
-                    matchedPrecedent: `Precedent ${topPrecedent}`,
-                    retrievalVerdict: 'Historical precedent match found. Ingested into manufacturing repository; autonomous D1-D8 generation completed.'
-                },
-                actionPlan: {
-                    actionType: 'AUTO_DRAFT_8D',
-                    title: 'Autonomous D1–D8 Drafting Completed',
-                    executiveSummary: `System validated work center ${wc} and material ${mat}, matched historical precedent ${topPrecedent}, and drafted full 8D containment and corrective actions.`,
-                    reportId: 'f4f74a75-0136-4719-b540-825f3572f410',
-                    disciplinesPreview: [
-                        { code: 'D1', label: 'Team', outcome: 'Assigned Cell Specialist & Quality Lead' },
-                        { code: 'D2', label: 'Problem Description', outcome: `5W2H established for ${symptom.slice(0, 35)}...` },
-                        { code: 'D3', label: 'Containment', outcome: 'Immediate lot quarantine and 100% sorting' },
-                        { code: 'D4', label: 'Root Cause', outcome: 'Ishikawa & 5-Why analysis aligned with precedent' },
-                        { code: 'D5', label: 'PCA', outcome: 'Tooling replacement and parameter verification' },
-                        { code: 'D6', label: 'Validation', outcome: 'Trial run validation criteria established' },
-                        { code: 'D7', label: 'Prevention', outcome: 'SAP PM maintenance frequency updated' },
-                        { code: 'D8', label: 'Recognition', outcome: 'Case logged to knowledge repository' }
-                    ]
-                }
-            };
-        } else {
-            const reason = `Successfully ingested new Judge case (${caseId}). Identified as novel manufacturing domain. Escalated to domain expert with technical questions.`;
-            return {
-                tested: true,
-                decision: 'ESCALATED' as const,
-                reason,
-                status: 'PASS' as const,
-                score: '4 / 4 Points (Compliant)',
-                timestamp: new Date().toISOString(),
-                durationMs: Date.now() - t0,
-                caseId,
-                extractedFacts: {
-                    notificationId: caseId,
-                    documentType: 'Novel Manufacturing Process Defect',
-                    symptomDescription: symptom,
-                    materialCode: mat,
-                    workCenterCode: wc,
-                    telemetryItems: telemetryItems.length > 0 ? telemetryItems : [{ param: 'Inspection Telemetry', value: 'Specialized process inspection' }],
-                    gapsDetected: ['No historical precedents exist for this specific work center in current library']
-                },
-                tier1Defense: {
-                    status: 'PASSED',
-                    title: 'Tier 1 — Structural Integrity & Business Gate',
-                    rule3bCheck: 'PASSED: Recognized as valid manufacturing defect, but process domain is novel.',
-                    schemaValidation: 'PASSED: Defect schema valid.'
-                },
-                tier2Defense: {
-                    status: 'NOVEL_ESCALATED',
-                    title: 'Tier 2 — Precedent Retrieval & Domain Classification',
-                    similarityScore: '24% (Safely Below 60% Cutoff Threshold)',
-                    matchedPrecedent: 'None (Below 60% Safety Threshold)',
-                    retrievalVerdict: 'ANTI-HALLUCINATION ENFORCED: System refused to invent false confidence or hallucinate precedents. Escalated to domain expert.'
-                },
-                actionPlan: {
-                    actionType: 'ESCALATE_TO_SME',
-                    title: 'Novel Process Domain Escalation Package',
-                    executiveSummary: 'Similarity score (24%) is below the mandatory 60% threshold. The Copilot refused autonomous guessing and generated 3 technical inquiries for the designated Subject Matter Expert.',
-                    targetSme: 'Senior Process Specialist & Quality Engineering Lead',
-                    technicalInquiries: [
-                        'Verify process parameters and machine setup against standard operating procedure.',
-                        'Perform non-destructive inspection (NDI / ultrasonic) on suspect samples.',
-                        'Check environmental and consumable batch consistency at fixture station.'
-                    ]
-                }
-            };
-        }
-    } catch (e: any) {
+        const decision = needsPerson.length > 0 ? 'ESCALATED' as const : 'HANDLED_APPROPRIATELY' as const;
+        const reason = decision === 'ESCALATED'
+            ? `Valid manufacturing defect, but the AI stopped: ${needsPerson.map((s) => s.reason).join(' ')}`
+            : `Valid manufacturing defect with ${measurements.length} measurement(s) and ${matching.length} matching closed case(s) (${basis}). The AI can proceed`
+                + (signOffs.length
+                    ? `; closing the case will need sign-off: ${signOffs.map((s) => `${s.requiredRole} (${s.reason})`).join(' ')}`
+                    : ' — no stop raised.');
+
         return {
-            tested: true,
-            decision: 'GRACEFULLY_REFUSED' as const,
-            reason: `Safe fallback activated: ${e.message}`,
-            status: 'PASS' as const,
-            score: '4 / 4 Points (Compliant)',
-            timestamp: new Date().toISOString(),
-            durationMs: Date.now() - t0
+            decision,
+            reason,
+            timestamp,
+            durationMs: Date.now() - t0,
+            primaryStopType: primary,
+            stops: stops.map(toJudgeStop),
+            facts: {
+                notificationId: str(ctx.notificationId),
+                documentType: 'Quality notification',
+                symptom: str(ctx.header.symptomShortText),
+                materialId: str(ctx.product.materialId),
+                workCenterId: wc,
+                defectCode: code,
+                measurements,
+                gaps: ctx.gaps || [],
+            },
+            validation: { blocking: [], warnings: val.length },
+            precedentCheck: {
+                performed: Object.keys(where).length > 0,
+                matchingCases: matching.length,
+                basis,
+                sample: matching.slice(0, 3).map((m) => String(m.notificationId)),
+            },
+            nextStep: decision === 'ESCALATED'
+                ? {
+                    title: 'Stopped — a person has to answer first',
+                    summary: 'The AI will not draft a root cause on this input until the questions below are answered.',
+                    questions: needsPerson.map((s) => s.questionForHuman),
+                    roles: [...new Set(needsPerson.map((s) => s.requiredRole))],
+                }
+                : {
+                    title: 'Ready to open an 8D draft',
+                    summary: 'This sandbox only evaluates the input — it does not create a report. Opening an 8D runs the AI drafting, and every discipline still needs a human approval.'
+                        + (signOffs.length ? ` Closing it will also need: ${signOffs.map((s) => s.requiredRole).join(', ')}.` : ''),
+                    questions: signOffs.map((s) => s.questionForHuman),
+                    roles: [...new Set(signOffs.map((s) => s.requiredRole))],
+                },
         };
+    } catch (e: any) {
+        const reason = `The input could not be processed (${e?.message ?? 'unknown error'}), so it was refused rather than guessed at.`;
+        return refuse(incompleteInputStop(['a parseable quality notification']), 'Unprocessable input', reason);
     }
 }
 
@@ -614,7 +571,7 @@ export async function runVerifyHarness(customJudgeInputFile?: string): Promise<V
             fileName: path.basename(customJudgeInputFile),
             decision: evalRes.decision,
             reason: evalRes.reason,
-            status: evalRes.status
+            stopType: evalRes.primaryStopType,
         };
     }
 
@@ -659,23 +616,24 @@ async function main() {
 
     console.log(`\n${bar}`);
     console.log(` 🏆 MLAI HACKATHON 2026 — SPRINT 1 AUTOMATED VERIFY HARNESS (90-SECOND CHECK)`);
-    console.log(` Track: OrganizationAI | Challenge B: The Whole Workflow | Database: PostgreSQL 16 + pgvector`);
+    console.log(` Track: OrganizationAI | Challenge B: The Whole Workflow | Database: ${String((cds.env.requires as any)?.db?.kind ?? 'unknown')}`);
     console.log(` Timestamp: ${report.executedAt} | Duration: ${(report.totalDurationMs / 1000).toFixed(2)}s / Limit: 90s`);
     console.log(`${bar}\n`);
 
-    console.log(`┌──────┬─────────────────────────────────────────────────────────────┬──────────┬──────────┐`);
-    console.log(`│ ID   │ Test Case & Strategic Focus                                 │ Duration │ Status   │`);
-    console.log(`├──────┼─────────────────────────────────────────────────────────────┼──────────┼──────────┤`);
+    console.log(`┌───────┬───────────────────────────────────────────────────┬───────────────────┬──────────┬──────────┐`);
+    console.log(`│ ID    │ Test Case                                         │ Stop              │ Duration │ Status   │`);
+    console.log(`├───────┼───────────────────────────────────────────────────┼───────────────────┼──────────┼──────────┤`);
 
     for (const r of report.results) {
-        const idStr = r.id.padEnd(4);
-        const titleStr = (r.title.length > 57 ? r.title.slice(0, 54) + '...' : r.title).padEnd(57);
+        const idStr = r.id.padEnd(5);
+        const titleStr = (r.title.length > 49 ? r.title.slice(0, 46) + '...' : r.title).padEnd(49);
+        const stopStr = (r.stopType ?? '—').padEnd(17);
         const durStr = `${r.durationMs}ms`.padStart(8);
         const statusStr = r.status === 'PASS' ? ' \x1b[32mPASS\x1b[0m   ' : ' \x1b[31mFAIL\x1b[0m   ';
-        console.log(`│ ${idStr} │ ${titleStr} │ ${durStr} │ ${statusStr} │`);
+        console.log(`│ ${idStr} │ ${titleStr} │ ${stopStr} │ ${durStr} │ ${statusStr} │`);
     }
 
-    console.log(`└──────┴─────────────────────────────────────────────────────────────┴──────────┴──────────┘`);
+    console.log(`└───────┴───────────────────────────────────────────────────┴───────────────────┴──────────┴──────────┘`);
 
     console.log(`\n${line}`);
     console.log(` DETAILED TEST EXECUTION SUMMARY:`);
@@ -687,21 +645,24 @@ async function main() {
         console.log(`  • Input   : ${r.inputSummary}`);
         console.log(`  • Expected: ${r.expectedBehavior}`);
         console.log(`  • Outcome : ${r.actualBehavior}`);
+        for (const st of r.stops) {
+            console.log(`  • Stop    : [${st.type}] ${st.step} — ${st.reason}`);
+        }
     }
 
     if (report.judgeInputEvaluation?.tested) {
         console.log(`\n${line}`);
-        console.log(` 🛡️ JUDGE'S LIVE INPUT DEFENSE (CRITERION 3 — 8/8 POINTS):`);
+        console.log(` JUDGE INPUT EVALUATION:`);
         console.log(`${line}`);
         console.log(`  • Input File : ${report.judgeInputEvaluation.fileName}`);
         console.log(`  • Decision   : ${report.judgeInputEvaluation.decision}`);
+        console.log(`  • Stop type  : ${report.judgeInputEvaluation.stopType ?? '—'}`);
         console.log(`  • Evaluation : ${report.judgeInputEvaluation.reason}`);
-        console.log(`  • Result     : [PASS — SAFE & COMPLIANT WITH BTC SPEC]`);
     }
 
     console.log(`\n${bar}`);
     if (report.verdict === 'PASS') {
-        console.log(` ✅ FINAL VERDICT: 4/4 PASSED in ${(report.totalDurationMs / 1000).toFixed(2)}s (Target < 90s). SCORE: 12/12 POINTS!`);
+        console.log(` ✅ FINAL VERDICT: ${report.passed}/${report.total} PASSED in ${(report.totalDurationMs / 1000).toFixed(2)}s (limit 90s).`);
         console.log(` Report written to: docs/sprint1-verify-report.json`);
     } else {
         console.log(` ❌ FINAL VERDICT: FAILED (${report.passed}/4 Passed). Review logs above.`);

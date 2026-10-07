@@ -9,7 +9,7 @@ import {
     SelectValue,
     cn,
 } from '@cnma/react-ui';
-import { CheckCircle2, CircleAlert, Lock, LockOpen, MessageSquareWarning, RotateCcw } from 'lucide-react';
+import { CheckCircle2, CircleAlert, Lock, LockOpen, MessageSquareWarning, OctagonPause, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import {
     listTaskEvidence,
@@ -19,6 +19,7 @@ import {
     STEP_CODES,
     saveDisciplineField,
     setDisciplineWorkState,
+    type CaseStop,
     type Discipline8D,
     type ReviewDecision,
     type ReviewStatus,
@@ -120,12 +121,15 @@ function parseJsonSafe(val: unknown): Record<string, any> | null {
 /** Ô quyết định và trạng thái nằm dưới nội dung của một bước. */
 export function DisciplineReviewBox({
     reportID,
+    stops = [],
     discipline,
     siblings,
     caseContext,
     precedentsJson,
 }: {
     reportID: string;
+    /** Các lần AI dừng thuộc về bước này (lọc sẵn theo `step`). */
+    stops?: CaseStop[];
     discipline: Discipline8D;
     siblings?: Discipline8D[];
     liveFormSchemaJson?: string | null;
@@ -184,6 +188,9 @@ export function DisciplineReviewBox({
 
     const busy = submit.isPending;
     const reviewStatus = reviewStatusOf(discipline);
+    // AI đã dừng ở bước này và chưa ai gỡ: không duyệt được (backend cũng chặn).
+    const openStops = stops.filter((s) => s.blocking && s.status === 'open');
+    const canApprove = completion.canApprove && openStops.length === 0;
 
     /**
      * Dropdown chỉ còn đổi TRẠNG THÁI LÀM VIỆC (chưa bắt đầu / đang làm). Duyệt,
@@ -227,9 +234,12 @@ export function DisciplineReviewBox({
         // Duyệt KHÔNG đổi trạng thái task nào. Từng task phải được người phụ trách
         // hoàn tất riêng (bằng chứng / ghi chú thực thi); ở đây chỉ kiểm tra rằng
         // điều đó đã xảy ra. Backend kiểm lại đúng luật này trước khi ghi.
-        if (!completion.canApprove) {
+        if (!canApprove) {
             toast.error(`Cannot complete ${discipline.code} yet`, {
-                description: completion.blockers.map((b) => b.message).join('\n'),
+                description: [
+                    ...openStops.map((s) => `AI stopped here: ${s.reason}`),
+                    ...completion.blockers.map((b) => b.message),
+                ].join('\n'),
             });
             return;
         }
@@ -328,9 +338,9 @@ export function DisciplineReviewBox({
                                 type="button"
                                 size="sm"
                                 className="gap-1.5"
-                                disabled={busy || !unlocked || !completion.canApprove}
+                                disabled={busy || !unlocked || !canApprove}
                                 onClick={approve}
-                                title={completion.canApprove ? `Approve ${discipline.code}` : 'Resolve the open items below first'}
+                                title={canApprove ? `Approve ${discipline.code}` : 'Resolve the open items first'}
                             >
                                 <CheckCircle2 className="h-3.5 w-3.5" />
                                 Approve step
@@ -347,6 +357,17 @@ export function DisciplineReviewBox({
                         {discipline.reviewedAt ? <span className="font-normal text-muted-foreground"> · {formatReviewedAt(discipline.reviewedAt)}</span> : null}
                     </p>
                     <p className="mt-0.5 whitespace-pre-line text-muted-foreground">{discipline.reviewNote}</p>
+                </div>
+            )}
+
+            {!isApproved && openStops.length > 0 && (
+                <div className="mt-3 flex items-start gap-1.5 rounded-md border border-warning/40 bg-warning/[0.06] px-3 py-2.5 text-sm">
+                    <OctagonPause className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
+                    <span className="text-foreground">
+                        The AI stopped at {discipline.code} and is waiting for a person:{' '}
+                        <span className="text-muted-foreground">{openStops.map((s) => s.questionForHuman).join(' ')}</span>{' '}
+                        Resolve it in <strong className="font-medium">AI stopped here</strong> at the top of the page to enable approval.
+                    </span>
                 </div>
             )}
 
