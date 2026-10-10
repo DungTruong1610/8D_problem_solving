@@ -79,7 +79,7 @@ export function PrecedentPanel({ reportID, precedentsJson }: {
     const engine = data.engine;
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4" data-tour="case-precedents">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <GitBranch className="h-4 w-4 text-destructive" />

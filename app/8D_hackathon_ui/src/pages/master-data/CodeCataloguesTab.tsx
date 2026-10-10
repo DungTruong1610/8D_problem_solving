@@ -257,7 +257,10 @@ export function CodeCataloguesTab() {
         <div className="space-y-4">
             {/* Phân nhóm chọn danh mục */}
             <div className="flex flex-col gap-3">
-                <div className="flex flex-wrap items-center gap-1.5 p-1 bg-muted/60 rounded-xl border border-border/80 w-fit">
+                <div
+                    data-tour="master-catalogues"
+                    className="flex flex-wrap items-center gap-1.5 p-1 bg-muted/60 rounded-xl border border-border/80 w-fit"
+                >
                     {(Object.keys(CATALOGUES) as CatalogueKey[]).map((key) => {
                         const item = CATALOGUES[key];
                         const isSelected = catalogue === key;

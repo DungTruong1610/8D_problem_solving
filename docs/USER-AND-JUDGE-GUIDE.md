@@ -35,6 +35,18 @@ From the Web UI (`/#/guide`), click **"Start WalkMe Tour (5 Min)"** to launch an
 * **Station 4: AI Workflow Configuration (`/#/workflow`)** — Switch LLM providers, edit prompt templates, and adjust multi-factor retrieval weights.
 * **Station 5: Test Authoring & 90s Verify Suite** — Download schema templates, validate custom JSON, and trigger the automated 90-second verify harness.
 
+### 🧭 Guided Tour (in-app spotlight walkthrough)
+*Added 2026-10-10.* Click **Guided Tour** in the left sidebar, directly below **User & Judge Guide**. Unlike the dialog tour above, it dims the screen and highlights the real controls one at a time, opening each screen, tab and dialog for you. The 51 steps run in this order:
+
+1. **8D Reports**: the worklist with its compact (core) columns, the quick-filter chips, More/Fewer columns, Export Excel and Refresh. It then opens the **Create 8D Report** dialog and covers both entry paths: picking a recorded defect, and importing JSON (Upload file, sample issues, paste).
+2. **Master Data**: Inspection History, Defect Records (Record Defect, Start 8D / Open 8D), Closed Case Library (Import JSON) and the Value Help catalogues.
+3. **AI Configuration**: Where AI enters the chain, the Precedent Retrieval Engine, Model per processing step, Graph Retrieval Weights and Model Registry. The *8D Disciplines Configuration* tab is intentionally skipped.
+4. **Working a case**: the tour opens the reference case `8D-10048412` (or the first open case when that one is missing) and covers the header actions (Export Excel, AI Stops, Audit Log, Source JSON, Re-analyze). It then shows the D1–D8 stepper, the first step not yet complete (work status and Approve step), D4 root cause with the AI Referee, the Evidence tab with precedents, and the Case Overview.
+
+**Controls:** **Next** / **→**, **Back** / **←**, and **Esc** or **Skip tour** to leave. The tour only opens screens; it never saves anything. The page underneath cannot be clicked while the tour runs, but the mouse wheel still scrolls it. The tour expands a collapsed sidebar, and it positions itself from live measurements, so it lines up at any browser zoom (designed and checked at **90 %**).
+
+**For developers:** the script lives in `app/8D_hackathon_ui/src/components/walkthrough/walkthrough-steps.ts`. Each highlighted element carries a `data-tour="…"` attribute in its page, and a page lets the tour switch its tabs or dialogs through `useTourControl(...)`. If you rename a `data-tour` id, rename it in both places.
+
 ---
 
 ## 2. Module Purpose & Standard Operating Procedures

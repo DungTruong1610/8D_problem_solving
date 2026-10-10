@@ -131,6 +131,10 @@ export function DefectsTab() {
 
     const rows = data?.value ?? [];
 
+    // Dòng mà Guided Tour chỉ vào: dòng đầu tiên còn nút "Start 8D" — đó là nút
+    // tour giới thiệu. Không dòng nào còn mở được 8D thì lấy dòng đầu.
+    const tourRowID = (rows.find((r) => !reportByDefect.get(r.defectId) && r.status !== 'Completed') ?? rows[0])?.ID;
+
     const invalidate = () => {
         void queryClient.invalidateQueries({ queryKey: ['master-data', 'defects'] });
         void queryClient.invalidateQueries({ queryKey: ['master-data', 'defect-links'] });
@@ -209,6 +213,7 @@ export function DefectsTab() {
                     </Button>
                     <Button
                         size="sm"
+                        data-tour="master-defects-record"
                         onClick={() => {
                             setCreateDialogKey((k) => k + 1);
                             setCreateOpen(true);
@@ -221,7 +226,7 @@ export function DefectsTab() {
                 </div>
             </div>
 
-            <Card className="overflow-hidden border border-border/80 shadow-xs">
+            <Card data-tour="master-defects-table" className="overflow-hidden border border-border/80 shadow-xs">
                 {isLoading ? (
                     <div className="flex items-center justify-center gap-2 py-20 text-sm text-muted-foreground">
                         <Spinner className="w-4 h-4" /> Loading defects…
@@ -298,7 +303,10 @@ export function DefectsTab() {
                                                 {row.foundDate || '—'}
                                             </td>
                                             <td className="py-3 px-4 text-right">
-                                                <div className="flex items-center justify-end gap-1">
+                                                <div
+                                                    className="flex items-center justify-end gap-1"
+                                                    data-tour={row.ID === tourRowID ? 'master-defects-row-actions' : undefined}
+                                                >
                                                     {/*
                                                       * Ba trạng thái, ba giao diện khác nhau — KHÔNG phải một
                                                       * nút bị làm mờ. "Đã có 8D" và "lỗi đã đóng" là hai lý do

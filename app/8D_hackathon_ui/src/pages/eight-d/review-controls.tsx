@@ -256,7 +256,7 @@ export function DisciplineReviewBox({
     };
 
     return (
-        <div className="mt-4 rounded-lg border bg-muted/20 px-4 py-3">
+        <div className="mt-4 rounded-lg border bg-muted/20 px-4 py-3" data-tour="case-review">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
@@ -313,7 +313,11 @@ export function DisciplineReviewBox({
                                 disabled={busy || !unlocked}
                                 onValueChange={(val) => handleStatusChange(val as 'NotStarted' | 'InProgress')}
                             >
-                                <SelectTrigger className="h-9 w-[140px] px-3 text-sm font-medium bg-background" aria-label="Work status">
+                                <SelectTrigger
+                                    data-tour="case-status"
+                                    className="h-9 w-[140px] px-3 text-sm font-medium bg-background"
+                                    aria-label="Work status"
+                                >
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -336,6 +340,7 @@ export function DisciplineReviewBox({
                                 size="sm"
                                 className="gap-1.5"
                                 disabled={busy || !unlocked}
+                                data-tour="case-approve"
                                 onClick={approve}
                                 title={unlocked ? `Approve ${discipline.code}` : `Complete ${prevCode} first`}
                             >

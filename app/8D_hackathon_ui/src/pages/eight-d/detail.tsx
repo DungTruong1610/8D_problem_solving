@@ -27,6 +27,7 @@ import {
     eightDService,
     getCaseStops,
     isCustomerComplaint,
+    reviewStatusOf,
     type Report8D,
 } from '@/services/eightd-service';
 import { DisciplineCard } from './discipline-card';
@@ -42,6 +43,7 @@ import { AuditTrailPanel } from './audit-trail-panel';
 import { StopsButton } from './stops-panel';
 import { export8DToExcel } from './export-8d-excel';
 import { CaseProvenanceProvider } from './ai-provenance-info';
+import { useTourControl } from '@/components/walkthrough';
 
 /**
  * Chi tiết một báo cáo 8D.
@@ -95,6 +97,7 @@ export function EightDDetailPage() {
     const [exporting, setExporting] = useState(false);
     const [activeDiscipline, setActiveDiscipline] = useState('D1');
     const [mainTab, setMainTab] = useState<MainTab>('disciplines');
+    useTourControl('caseDetail.tab', setMainTab);
     /*
      * Bước mà tab Evidence phải mở sẵn khi người dùng bấm badge từ tab bên kia.
      * Giữ ở đây chứ không trong EvidenceTab vì badge nằm ở cây component khác.
@@ -130,6 +133,23 @@ export function EightDDetailPage() {
         // spinner cũ. Cho chạy tiếp cả khi tab ở nền.
         refetchIntervalInBackground: true,
     });
+
+    // Guided Tour mở một bước cụ thể, hoặc `current` — bước đầu tiên chưa hoàn
+    // tất, cùng luật đếm với cột Completeness. Phải chờ report về mới biết.
+    useTourControl(
+        'caseDetail.step',
+        (code) => {
+            if (code !== 'current') {
+                setActiveDiscipline(code);
+                return;
+            }
+            const next = [...(report?.disciplines ?? [])]
+                .sort((a, b) => a.sequence - b.sequence)
+                .find((d) => reviewStatusOf(d) !== 'Approved' && d.workState !== 'Completed');
+            setActiveDiscipline(next?.code ?? 'D1');
+        },
+        { ready: Boolean(report) },
+    );
 
     // Các lần AI dừng: tính lại trên server mỗi lần đọc. Cùng tiền tố ['8d'] nên
     // duyệt / gỡ dừng / sửa dữ kiện ở đâu thì danh sách cũng được làm mới.
@@ -217,7 +237,7 @@ export function EightDDetailPage() {
 
             {/* ── Header ── */}
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                <div className="min-w-0">
+                <div className="min-w-0" data-tour="case-header">
                     <Button variant="ghost" size="sm" className="-ml-2 mb-1" onClick={() => {
                         void queryClient.invalidateQueries({ queryKey: ['8d'] });
                         navigate('/8d');
@@ -258,6 +278,7 @@ export function EightDDetailPage() {
                         variant="outline"
                         size="sm"
                         disabled={exporting}
+                        data-tour="case-export"
                         onClick={handleExportExcel}
                         title="Export 8D Report to Excel (multi-sheet workbook)"
                         className="gap-1.5 font-semibold text-emerald-700 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10 hover:border-emerald-500/50 shadow-2xs"
@@ -278,12 +299,13 @@ export function EightDDetailPage() {
                         variant="outline"
                         size="sm"
                         onClick={() => setShowAudit(true)}
+                        data-tour="case-audit"
                         title="Audit Log"
                     >
                         <History className="w-4 h-4 text-primary" />
                         Audit Log
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => setShowPayload(true)}>
+                    <Button variant="outline" size="sm" data-tour="case-source" onClick={() => setShowPayload(true)}>
                         <Braces className="w-4 h-4" />
                         Source JSON
                     </Button>
@@ -291,6 +313,7 @@ export function EightDDetailPage() {
                         variant="outline"
                         size="sm"
                         disabled={running || reanalyze.isPending}
+                        data-tour="case-reanalyze"
                         onClick={() => reanalyze.mutate()}
                     >
                         <RefreshCw className={cn('w-4 h-4', reanalyze.isPending && 'animate-spin')} />
@@ -324,7 +347,7 @@ export function EightDDetailPage() {
             {/* ── Main Content ── */}
             <CaseProvenanceProvider caseContext={report.caseContext} precedentsJson={report.precedentsJson} reportID={id}>
                 <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as MainTab)} className="w-full space-y-6">
-                    <TabsList className="h-10 w-full max-w-lg gap-1 rounded-xl border border-border/80 bg-muted/60 p-1">
+                    <TabsList data-tour="case-tabs" className="h-10 w-full max-w-lg gap-1 rounded-xl border border-border/80 bg-muted/60 p-1">
                         {MAIN_TABS.map(({ value, label, icon: Icon }) => (
                             <TabsTrigger
                                 key={value}
@@ -342,7 +365,7 @@ export function EightDDetailPage() {
 
                             {/* ── Cot trai: tien do + dieu huong ── */}
                             <aside className="min-w-0 lg:sticky lg:top-4 lg:self-start">
-                                <Card className="overflow-hidden py-3">
+                                <Card className="overflow-hidden py-3" data-tour="case-stepper">
                                     <CaseStepper
                                         disciplines={disciplines}
                                         active={activeDiscipline}
@@ -369,34 +392,36 @@ export function EightDDetailPage() {
                                                     precedentsJson={report.precedentsJson}
                                                 />
 
-                                                {selected.code !== 'D6' && (
-                                                    (selected.formSchemaJson || stepPrompts.byCode[selected.code]?.formSchemaJson)
-                                                        ? <SchemaDisciplineCard
-                                                            discipline={selected}
-                                                            caseContext={report.caseContext}
-                                                            liveFormSchemaJson={stepPrompts.byCode[selected.code]?.formSchemaJson ?? null}
-                                                            siblings={disciplines}
-                                                            reportID={id}
-                                                            aiFinding={report.aiFinding}
-                                                            reportStatus={report.status}
-                                                            precedentsJson={report.precedentsJson}
-                                                        />
-                                                        : <DisciplineCard discipline={selected} />
-                                                )}
+                                                <div className="min-w-0 space-y-4" data-tour="case-content">
+                                                    {selected.code !== 'D6' && (
+                                                        (selected.formSchemaJson || stepPrompts.byCode[selected.code]?.formSchemaJson)
+                                                            ? <SchemaDisciplineCard
+                                                                discipline={selected}
+                                                                caseContext={report.caseContext}
+                                                                liveFormSchemaJson={stepPrompts.byCode[selected.code]?.formSchemaJson ?? null}
+                                                                siblings={disciplines}
+                                                                reportID={id}
+                                                                aiFinding={report.aiFinding}
+                                                                reportStatus={report.status}
+                                                                precedentsJson={report.precedentsJson}
+                                                            />
+                                                            : <DisciplineCard discipline={selected} />
+                                                    )}
 
-                                                {selected.code === 'D6' && (() => {
-                                                    const d4 = disciplines.find((d) => d.code === 'D4');
-                                                    const d4RootCause = resolveD4RootCause(d4, report.caseContext);
-                                                    return (
-                                                        <ActionChecklist
-                                                            actions={caseActions}
-                                                            disciplines={disciplines}
-                                                            caseContext={report.caseContext}
-                                                            reportID={id}
-                                                            rootCause={d4RootCause !== '—' ? d4RootCause : (report.rootCauseCategory ?? '')}
-                                                        />
-                                                    );
-                                                })()}
+                                                    {selected.code === 'D6' && (() => {
+                                                        const d4 = disciplines.find((d) => d.code === 'D4');
+                                                        const d4RootCause = resolveD4RootCause(d4, report.caseContext);
+                                                        return (
+                                                            <ActionChecklist
+                                                                actions={caseActions}
+                                                                disciplines={disciplines}
+                                                                caseContext={report.caseContext}
+                                                                reportID={id}
+                                                                rootCause={d4RootCause !== '—' ? d4RootCause : (report.rootCauseCategory ?? '')}
+                                                            />
+                                                        );
+                                                    })()}
+                                                </div>
 
                                             </div>
                                         );
@@ -425,12 +450,12 @@ export function EightDDetailPage() {
                     </TabsContent>
 
                 {/* ── Tab 2: Bằng chứng ── */}
-                <TabsContent value="evidence" className="mt-0 outline-none">
+                <TabsContent value="evidence" className="mt-0 outline-none" data-tour="case-tab-panel">
                     <EvidenceTab report={report} disciplines={disciplines} focus={evidenceFocus} />
                 </TabsContent>
 
                 {/* ── Tab 3: Case Overview & AI Insights ── */}
-                <TabsContent value="summary" className="mt-0 space-y-6 outline-none">
+                <TabsContent value="summary" className="mt-0 space-y-6 outline-none" data-tour="case-tab-panel">
                     {/* ── Thông tin case ── */}
                     <Card className="p-5">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

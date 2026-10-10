@@ -21,6 +21,7 @@ import { ValueHelpInput } from '@/components/ui/ValueHelpInput';
 import { useValueHelp } from '@/hooks/use-value-help';
 import { VALUE_HELP_IDS } from '@/services/value-help-service';
 import { ORIGIN_CUSTOMER } from '@/pages/create-defect';
+import { useTourControl } from '@/components/walkthrough';
 
 /**
  * Mở một báo cáo 8D.
@@ -354,6 +355,19 @@ export function AnalyzeDialog({ open, onOpenChange, onScheduled }: Props) {
         setCoordinator('');
     };
 
+    // Guided Tour: mở đúng màn hình đang được giới thiệu (danh sách lỗi hay nhập
+    // JSON), và dọn sạch khi tour rời dialog — lần mở sau là của người dùng.
+    useTourControl(
+        'worklist.createDialog',
+        (mode) => {
+            setSelected(null);
+            setDetail(null);
+            setError(null);
+            setShowImport(mode === 'import');
+        },
+        { release: reset },
+    );
+
     async function handleFile(file: File) {
         setError(null);
         const content = await file.text();
@@ -409,12 +423,17 @@ export function AnalyzeDialog({ open, onOpenChange, onScheduled }: Props) {
                 }
             }}
         >
-            <DialogContent className="w-[calc(100%-2rem)] max-w-2xl overflow-hidden">
+            <DialogContent className="w-[calc(100%-2rem)] max-w-2xl overflow-hidden" data-tour="create-dialog">
                 <DialogHeader>
                     <div className="flex min-w-0 items-start justify-between gap-3">
                         <div className="min-w-0">
                             <DialogTitle>Create 8D Report</DialogTitle>
-                            <DialogDescription className="whitespace-normal sm:whitespace-nowrap">
+                            {/*
+                              * Cho xuống dòng: câu của chế độ nhập JSON dài hơn bề rộng
+                              * dialog, và một dòng không ngắt được sẽ kéo cả cột grid
+                              * rộng ra — ô dán JSON và nút Create & Analyze bị cắt mép.
+                              */}
+                            <DialogDescription>
                                 {showImport
                                     ? 'Import a defect case from another system as JSON, or pick a sample issue.'
                                     : 'Pick the defect this 8D will investigate. A defect can have only one 8D.'}
@@ -432,6 +451,7 @@ export function AnalyzeDialog({ open, onOpenChange, onScheduled }: Props) {
                             variant={showImport ? 'secondary' : 'ghost'}
                             size="icon"
                             disabled={busy}
+                            data-tour="create-import-toggle"
                             aria-label={showImport ? 'Back to defect list' : 'Import a case as JSON'}
                             title={showImport ? 'Back to defect list' : 'Import a case as JSON'}
                             onClick={() => { setShowImport((v) => !v); setError(null); }}
@@ -462,6 +482,7 @@ export function AnalyzeDialog({ open, onOpenChange, onScheduled }: Props) {
                                     variant="outline"
                                     size="sm"
                                     disabled={busy}
+                                    data-tour="create-upload"
                                     onClick={() => fileRef.current?.click()}
                                 >
                                     <Upload className="w-4 h-4" />
@@ -482,7 +503,7 @@ export function AnalyzeDialog({ open, onOpenChange, onScheduled }: Props) {
                             </div>
 
                             {samples.length > 0 && (
-                                <div className="min-w-0 rounded-lg border border-dashed p-3">
+                                <div className="min-w-0 rounded-lg border border-dashed p-3" data-tour="create-samples">
                                     <p className="text-sm font-semibold">Or start from an incoming issue</p>
                                     <p className="mt-0.5 text-sm text-muted-foreground">
                                         Freshly logged cases — symptom and context only, no root cause, no
@@ -516,6 +537,7 @@ export function AnalyzeDialog({ open, onOpenChange, onScheduled }: Props) {
                             )}
 
                             <Textarea
+                                data-tour="create-paste"
                                 value={text}
                                 onChange={(e) => { setText(e.target.value); setError(null); }}
                                 disabled={busy}
@@ -531,7 +553,7 @@ export function AnalyzeDialog({ open, onOpenChange, onScheduled }: Props) {
 
                     {/* ── Đường chính, nhịp 1: chọn lỗi ────────────────────── */}
                     {!showImport && !selected && (
-                        <div className="min-w-0 space-y-2.5">
+                        <div className="min-w-0 space-y-2.5" data-tour="create-picker">
                             {/* Search Input */}
                             <div className="relative w-full">
                                 <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -849,7 +871,7 @@ export function AnalyzeDialog({ open, onOpenChange, onScheduled }: Props) {
                         Cancel
                     </Button>
                     {showImport ? (
-                        <Button onClick={submit} disabled={busy || !check?.ok}>
+                        <Button onClick={submit} disabled={busy || !check?.ok} data-tour="create-submit">
                             {busy && <Spinner className="w-4 h-4" />}
                             {busy ? 'Creating…' : 'Create & Analyze'}
                         </Button>
@@ -857,6 +879,7 @@ export function AnalyzeDialog({ open, onOpenChange, onScheduled }: Props) {
                         <Button
                             onClick={() => selected && void startFromDefect(selected)}
                             disabled={busy || !selected}
+                            data-tour="create-submit"
                         >
                             {busy && <Spinner className="w-4 h-4" />}
                             {busy ? 'Creating…' : 'Create & Analyze'}

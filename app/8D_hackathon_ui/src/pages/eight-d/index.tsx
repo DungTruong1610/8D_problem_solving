@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Card, Spinner, cn } from '@cnma/react-ui';
@@ -23,6 +23,7 @@ import {
 import { useValueHelp } from '@/hooks/use-value-help';
 import { useUserInfo } from '@/hooks/use-user-info';
 import { VALUE_HELP_IDS } from '@/services/value-help-service';
+import { useTourControl, useWalkthrough } from '@/components/walkthrough';
 import { AnalyzeDialog } from './analyze-dialog';
 import { GettingStartedBanner } from './getting-started-banner';
 
@@ -412,6 +413,13 @@ export function EightDListPage() {
     const [filter, setFilter] = useState<WorklistFilter>('all');
     const [showOptional, setShowOptional] = useState(false);
     const { userInfo } = useUserInfo();
+    const tour = useWalkthrough();
+
+    // Guided Tour giới thiệu bảng ở bộ cột gọn, và tự mở dialog Create 8D Report.
+    useEffect(() => {
+        if (tour.active) setShowOptional(false);
+    }, [tour.active]);
+    useTourControl('worklist.createDialog', () => setAnalyzeOpen(true), { release: () => setAnalyzeOpen(false) });
 
     /**
      * Report vừa được xếp lịch: BỎ cache của bảng trước khi rời trang.
@@ -534,6 +542,7 @@ export function EightDListPage() {
                     <Button
                         variant="outline"
                         size="sm"
+                        data-tour="worklist-export"
                         onClick={() => {
                             try {
                                 exportWorklistToExcel(visibleRows);
@@ -551,17 +560,18 @@ export function EightDListPage() {
                     <Button
                         variant="outline"
                         size="sm"
+                        data-tour="worklist-columns-toggle"
                         onClick={() => setShowOptional((v) => !v)}
                         title="Root cause, response lag, CoPQ, work centre, plant, created by"
                     >
                         <Columns3 className="w-4 h-4" />
                         {showOptional ? 'Fewer columns' : 'More columns'}
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
+                    <Button variant="outline" size="sm" data-tour="worklist-refresh" onClick={() => refetch()} disabled={isFetching}>
                         <RefreshCw className={cn('w-4 h-4', isFetching && 'animate-spin')} />
                         Refresh
                     </Button>
-                    <Button size="sm" onClick={() => setAnalyzeOpen(true)}>
+                    <Button size="sm" data-tour="worklist-create" onClick={() => setAnalyzeOpen(true)}>
                         <Sparkles className="w-4 h-4" />
                         Create 8D Report
                     </Button>
@@ -584,7 +594,7 @@ export function EightDListPage() {
               ý: một chip rỗng phải nhìn ra được là rỗng THẬT, chứ không giống một
               bộ lọc hỏng.
             */}
-            <div className="flex flex-wrap items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5" data-tour="worklist-filters">
                 {FILTER_ORDER.map((key) => {
                     const active = filter === key;
                     const count = counts[key] ?? 0;
@@ -638,19 +648,21 @@ export function EightDListPage() {
                 </div>
             )}
 
-            <DataTable<WorklistRow>
-                data={visibleRows}
-                columns={columns}
-                isLoading={isLoading}
-                error={isError ? (error as Error) : null}
-                onRowClick={(row) => navigate(`/8d/${row.ID}`)}
-                emptyMessageKey={
-                    filter === 'all'
-                        ? 'No 8D reports yet. Click Create 8D Report to start an analysis.'
-                        : `No cases match "${WORKLIST_FILTER_LABEL[filter]}".`
-                }
-                errorMessageKey="Failed to load reports."
-            />
+            <div data-tour="worklist-table">
+                <DataTable<WorklistRow>
+                    data={visibleRows}
+                    columns={columns}
+                    isLoading={isLoading}
+                    error={isError ? (error as Error) : null}
+                    onRowClick={(row) => navigate(`/8d/${row.ID}`)}
+                    emptyMessageKey={
+                        filter === 'all'
+                            ? 'No 8D reports yet. Click Create 8D Report to start an analysis.'
+                            : `No cases match "${WORKLIST_FILTER_LABEL[filter]}".`
+                    }
+                    errorMessageKey="Failed to load reports."
+                />
+            </div>
 
             <AnalyzeDialog
                 open={analyzeOpen}

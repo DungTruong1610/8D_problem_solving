@@ -171,7 +171,7 @@ export function InspectionLotsTab() {
                     </Select>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2" data-tour="master-inspection-actions">
                     <Button
                         variant="outline"
                         size="sm"
@@ -206,7 +206,7 @@ export function InspectionLotsTab() {
             </div>
 
             {/* Table Card */}
-            <Card className="overflow-hidden border border-border/80 shadow-xs">
+            <Card data-tour="master-inspection-table" className="overflow-hidden border border-border/80 shadow-xs">
                 {isLoading ? (
                     <div className="flex items-center justify-center gap-2 py-20 text-sm text-muted-foreground">
                         <Spinner className="w-4 h-4" /> Loading inspection lots…

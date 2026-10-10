@@ -126,6 +126,7 @@ export function StopsButton({ reportID, stops, isError, isLoading }: {
                 size="sm"
                 onClick={() => setOpen(true)}
                 disabled={isLoading}
+                data-tour="case-stops"
                 title="Where the AI stopped and handed over to a person"
             >
                 <OctagonPause className={cn('w-4 h-4', openCount ? 'text-warning' : 'text-primary')} />

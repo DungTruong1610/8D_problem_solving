@@ -754,7 +754,14 @@ function AiRefereeButton({ analysis, reportStatus, precedent }: {
     return (
         <>
             <div className="flex flex-wrap items-center gap-2">
-                <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={() => setOpen(true)}>
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5"
+                    data-tour="ai-referee"
+                    onClick={() => setOpen(true)}
+                >
                     <Cpu className="h-3.5 w-3.5 text-primary" />
                     AI Referee
                 </Button>

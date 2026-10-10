@@ -37,7 +37,10 @@ export function GettingStartedBanner() {
     };
 
     return (
-        <div className="flex flex-col gap-3 rounded-xl border border-primary/25 bg-primary/5 px-4 py-3 md:flex-row md:items-center">
+        <div
+            data-tour="getting-started"
+            className="flex flex-col gap-3 rounded-xl border border-primary/25 bg-primary/5 px-4 py-3 md:flex-row md:items-center"
+        >
             <div className="flex min-w-0 flex-1 items-start gap-3">
                 <Compass className="mt-0.5 size-4 shrink-0 text-primary" />
                 <p className="text-sm text-foreground">

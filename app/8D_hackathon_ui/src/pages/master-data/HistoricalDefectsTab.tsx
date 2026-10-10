@@ -126,6 +126,7 @@ export function HistoricalDefectsTab() {
                     </Button>
                     <Button
                         size="sm"
+                        data-tour="master-library-import"
                         onClick={() => setJsonImportOpen(true)}
                         className="h-9 gap-1.5 text-sm bg-primary text-primary-foreground font-semibold"
                     >
@@ -136,7 +137,7 @@ export function HistoricalDefectsTab() {
             </div>
 
             {/* Content Table Card */}
-            <Card className="overflow-hidden border border-border/80 shadow-xs">
+            <Card data-tour="master-library-table" className="overflow-hidden border border-border/80 shadow-xs">
                 {isLoading ? (
                     <div className="flex items-center justify-center gap-2 py-20 text-sm text-muted-foreground">
                         <Spinner className="w-4 h-4" /> Loading historical cases…

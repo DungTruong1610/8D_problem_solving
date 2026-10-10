@@ -1,0 +1,672 @@
+import type { TourChapterId, TourStep } from './walkthrough-types';
+
+/**
+ * Kịch bản Guided Tour.
+ *
+ * Thứ tự là thứ tự người dùng mới cần hiểu app: danh sách 8D → dữ liệu gốc mà AI
+ * suy luận trên đó → cấu hình AI → một case 8D thật từ D1 tới D8.
+ *
+ * Mỗi phần tử được chiếu sáng mang thuộc tính `data-tour="…"` ngay trong trang
+ * của nó; đổi tên một id ở đây thì phải đổi ở trang tương ứng (tìm `data-tour`).
+ * Tab "8D Disciplines Configuration" của AI Configuration cố ý không có trong tour.
+ */
+
+/** `[data-tour="x"]` — selector của một điểm neo. */
+export const tourTarget = (id: string) => `[data-tour="${id}"]`;
+
+export const TOUR_CHAPTERS: Record<TourChapterId, string> = {
+    intro: 'Welcome',
+    reports: '8D Reports',
+    masterData: 'Master Data',
+    aiConfig: 'AI Configuration',
+    case: 'Working a case',
+    outro: 'Done',
+};
+
+export const TOUR_STEPS: TourStep[] = [
+    // ── Mở đầu ────────────────────────────────────────────────────────────────
+    {
+        id: 'welcome',
+        chapter: 'intro',
+        page: 'worklist',
+        title: 'Welcome to 8D Copilot',
+        body:
+            'This tour walks you through the whole app in four stops: the **8D Reports** worklist, '
+            + '**Master Data**, **AI Configuration**, and finally a live 8D case from D1 to D8.',
+        bullets: [
+            '**Next** or → moves on, **Back** or ← goes back, **Esc** leaves the tour.',
+            'The tour only opens screens and dialogs for you — it never saves or changes anything.',
+        ],
+    },
+
+    // ── 8D Reports ────────────────────────────────────────────────────────────
+    {
+        id: 'nav-reports',
+        chapter: 'reports',
+        page: 'worklist',
+        target: tourTarget('nav-reports'),
+        side: 'right',
+        padding: 3,
+        title: '8D Reports',
+        body: 'Your starting point. Every 8D case in the system lives here, whatever stage it has reached.',
+    },
+    {
+        id: 'worklist-table',
+        chapter: 'reports',
+        page: 'worklist',
+        target: tourTarget('worklist-table'),
+        side: 'top',
+        padding: 4,
+        title: 'The 8D worklist',
+        body:
+            'One row per 8D case. Open cases come first and the most urgent sit at the top — ranked by '
+            + 'severity, customer commitment, then age. **Click any row** to open that case.',
+    },
+    {
+        id: 'worklist-columns',
+        chapter: 'reports',
+        page: 'worklist',
+        target: `${tourTarget('worklist-table')} thead`,
+        side: 'top',
+        padding: 2,
+        wide: true,
+        title: 'What each column tells you',
+        body: 'The list shows the trimmed core columns — the ones that answer "which case needs me today".',
+        bullets: [
+            '**Origin** — Customer Complaint (with the customer reference) or Internal Defect.',
+            '**Completeness** — how many of the eight steps a person has approved.',
+            '**Days open** — counted from when the 8D was opened; red once closure is overdue.',
+            '**Due date** — only a committed date: the customer SLA, or a date the team set. Empty means nobody committed yet.',
+            '**Last updated** — who touched the case last, and when.',
+        ],
+    },
+    {
+        id: 'worklist-filters',
+        chapter: 'reports',
+        page: 'worklist',
+        target: tourTarget('worklist-filters'),
+        side: 'bottom',
+        title: 'Quick filters',
+        body:
+            'Slice the list by what needs you: My cases, Overdue, Critical, Awaiting approval, Changes requested, '
+            + 'In process, Customer complaints or Signed off. The number on each chip is its count — a chip at 0 is '
+            + 'genuinely empty, not broken.',
+    },
+    {
+        id: 'worklist-columns-toggle',
+        chapter: 'reports',
+        page: 'worklist',
+        target: tourTarget('worklist-columns-toggle'),
+        side: 'bottom',
+        title: 'More columns / Fewer columns',
+        body:
+            '**More columns** adds Root cause, Response lag (defect found → 8D opened), CoPQ in EUR, Work centre, '
+            + 'Plant and Created by. **Fewer columns** returns to the compact view you see now.',
+    },
+    {
+        id: 'worklist-export',
+        chapter: 'reports',
+        page: 'worklist',
+        target: tourTarget('worklist-export'),
+        side: 'bottom',
+        title: 'Export Excel',
+        body: 'Downloads the cases currently shown — respecting the active filter — as an Excel workbook.',
+    },
+    {
+        id: 'worklist-refresh',
+        chapter: 'reports',
+        page: 'worklist',
+        target: tourTarget('worklist-refresh'),
+        side: 'bottom',
+        title: 'Refresh',
+        body:
+            'Reloads the list on demand. You rarely need it: the page refreshes itself every few seconds, '
+            + 'and faster while an analysis is running.',
+    },
+    {
+        id: 'worklist-getting-started',
+        chapter: 'reports',
+        page: 'worklist',
+        target: tourTarget('getting-started'),
+        side: 'bottom',
+        optional: true,
+        title: 'First-time shortcuts',
+        body:
+            '**Open sample case** jumps straight to the reference case; **Run Verify** checks the four reference '
+            + 'test cases. Hide this tip with ✕ once you no longer need it.',
+    },
+    {
+        id: 'worklist-create',
+        chapter: 'reports',
+        page: 'worklist',
+        target: tourTarget('worklist-create'),
+        side: 'bottom',
+        title: 'Create 8D Report',
+        body:
+            'This is where a new 8D starts. It opens a dialog in which you choose what the 8D will investigate — '
+            + "let's open it.",
+    },
+    {
+        id: 'create-pick',
+        chapter: 'reports',
+        page: 'worklist',
+        target: tourTarget('create-picker'),
+        side: 'right',
+        anchor: tourTarget('create-dialog'),
+        controls: { 'worklist.createDialog': 'pick' },
+        title: 'Start from a recorded defect',
+        body:
+            'The main path: pick an open defect recorded in Master Data. Search by ID or description and filter by '
+            + 'origin — **Q1** customer, **Q2** supplier, **Q3** internal. Only defects without an 8D are listed, '
+            + 'because a defect can carry at most one.',
+    },
+    {
+        id: 'create-submit',
+        chapter: 'reports',
+        page: 'worklist',
+        target: tourTarget('create-submit'),
+        side: 'right',
+        anchor: tourTarget('create-dialog'),
+        controls: { 'worklist.createDialog': 'pick' },
+        title: 'Preview, then Create & Analyze',
+        body:
+            'Picking a defect shows a read-only preview of what the 8D will analyse, plus two fields you own: '
+            + '**Required completion date** and **Coordinator**. **Create & Analyze** then starts the AI — it '
+            + 'extracts the facts and drafts D1 – D8 in the background (about 3 minutes). The worklist updates on its own.',
+    },
+    {
+        id: 'create-import-toggle',
+        chapter: 'reports',
+        page: 'worklist',
+        target: tourTarget('create-import-toggle'),
+        side: 'right',
+        anchor: tourTarget('create-dialog'),
+        padding: 4,
+        controls: { 'worklist.createDialog': 'pick' },
+        title: 'Import a case as JSON',
+        body: 'Case data coming from another system? This **{ }** button switches the dialog to JSON import.',
+    },
+    {
+        id: 'create-upload',
+        chapter: 'reports',
+        page: 'worklist',
+        target: tourTarget('create-upload'),
+        side: 'right',
+        anchor: tourTarget('create-dialog'),
+        controls: { 'worklist.createDialog': 'import' },
+        title: 'Upload JSON input',
+        body:
+            '**Upload file** reads a .json case file from your computer. It is checked in the browser first — it '
+            + 'must describe one defect case with a notificationId — and validated again by the server.',
+    },
+    {
+        id: 'create-samples',
+        chapter: 'reports',
+        page: 'worklist',
+        target: tourTarget('create-samples'),
+        side: 'right',
+        anchor: tourTarget('create-dialog'),
+        optional: true,
+        controls: { 'worklist.createDialog': 'import' },
+        title: 'Or start from a sample issue',
+        body:
+            'Freshly logged sample cases — symptom and context only, with no root cause, actions or team. '
+            + 'One click loads a sample into the editor.',
+    },
+    {
+        id: 'create-paste',
+        chapter: 'reports',
+        page: 'worklist',
+        target: tourTarget('create-paste'),
+        side: 'right',
+        anchor: tourTarget('create-dialog'),
+        controls: { 'worklist.createDialog': 'import' },
+        title: 'Paste JSON directly',
+        body:
+            'Or paste the JSON here. Once it is valid, **Create & Analyze** imports the case and starts the analysis. '
+            + 'A case created this way says "Imported as JSON" on its page, because no defect record stands behind it.',
+    },
+
+    // ── Master Data ───────────────────────────────────────────────────────────
+    {
+        id: 'nav-master-data',
+        chapter: 'masterData',
+        page: 'masterData',
+        target: tourTarget('nav-master-data'),
+        side: 'right',
+        padding: 3,
+        controls: { 'masterData.tab': 'inspection-lots' },
+        title: 'Master Data',
+        body:
+            'The reference data the AI reasons over: inspection results, defects, closed cases and code catalogues. '
+            + 'Nothing here is AI-generated — it is the ground truth the AI cites.',
+    },
+    {
+        id: 'master-tabs',
+        chapter: 'masterData',
+        page: 'masterData',
+        target: tourTarget('master-tabs'),
+        side: 'bottom',
+        controls: { 'masterData.tab': 'inspection-lots' },
+        title: 'Four data sets, in chain order',
+        body:
+            '**Inspection History → Defect Records → Closed Case Library → Value Help.** The line under the tabs '
+            + 'always says what the open tab is for.',
+    },
+    {
+        id: 'master-inspection',
+        chapter: 'masterData',
+        page: 'masterData',
+        target: tourTarget('master-inspection-table'),
+        side: 'top',
+        controls: { 'masterData.tab': 'inspection-lots' },
+        title: 'Inspection History',
+        body:
+            'One row is one characteristic measured on one lot — measured value, spec limits and pass / fail. '
+            + "It is the comparison population behind D2's **Is / Is-Not** analysis: the AI contrasts the lots "
+            + 'that failed with the lots that passed.',
+    },
+    {
+        id: 'master-inspection-actions',
+        chapter: 'masterData',
+        page: 'masterData',
+        target: tourTarget('master-inspection-actions'),
+        side: 'bottom',
+        controls: { 'masterData.tab': 'inspection-lots' },
+        title: 'Add or import inspection results',
+        body:
+            '**Import JSON** loads inspection results in bulk; **Add Inspection Lot** records one lot by hand, '
+            + 'with its characteristic results and usage decision. The filters narrow the list by material or by pass / fail.',
+    },
+    {
+        id: 'master-defects',
+        chapter: 'masterData',
+        page: 'masterData',
+        target: tourTarget('master-defects-table'),
+        side: 'top',
+        controls: { 'masterData.tab': 'defects' },
+        title: 'Defect Records',
+        body:
+            'Every quality defect recorded, whether or not it warrants an 8D. Most defects are closed right here, '
+            + 'without one.',
+    },
+    {
+        id: 'master-defects-record',
+        chapter: 'masterData',
+        page: 'masterData',
+        target: tourTarget('master-defects-record'),
+        side: 'bottom',
+        controls: { 'masterData.tab': 'defects' },
+        title: 'Record Defect',
+        body:
+            'Records a new defect — defect code, material, batch, work centre, quantity — picked from the value '
+            + 'helps, so every value matches the catalogues the AI scores precedents against.',
+    },
+    {
+        id: 'master-defects-start',
+        chapter: 'masterData',
+        page: 'masterData',
+        target: tourTarget('master-defects-row-actions'),
+        side: 'left',
+        optional: true,
+        controls: { 'masterData.tab': 'defects' },
+        title: 'Start 8D — a deliberate decision',
+        body:
+            'Opening an 8D is a separate step from recording the defect. **Start 8D** creates the 8D for that defect '
+            + 'and starts the analysis; once it exists the button becomes **Open 8D**. A defect closed without one '
+            + 'says so instead.',
+    },
+    {
+        id: 'master-library',
+        chapter: 'masterData',
+        page: 'masterData',
+        target: tourTarget('master-library-table'),
+        side: 'top',
+        controls: { 'masterData.tab': 'historical-cases' },
+        title: 'Closed Case Library',
+        body:
+            'The precedent store the AI retrieves from. Completed and closed cases only — an open case has no proven '
+            + 'lesson to reuse yet. The better this library, the better every D1 – D8 draft.',
+    },
+    {
+        id: 'master-library-import',
+        chapter: 'masterData',
+        page: 'masterData',
+        target: tourTarget('master-library-import'),
+        side: 'bottom',
+        controls: { 'masterData.tab': 'historical-cases' },
+        title: 'Import closed cases',
+        body: '**Import JSON** brings closed cases from another system into the library in bulk; imported rows are marked as such.',
+    },
+    {
+        id: 'master-value-help',
+        chapter: 'masterData',
+        page: 'masterData',
+        target: tourTarget('master-catalogues'),
+        side: 'bottom',
+        controls: { 'masterData.tab': 'code-catalogues' },
+        wide: true,
+        title: 'Value Help catalogues',
+        body: 'The coded vocabulary behind every dropdown in the app, with a count of how often each entry is used.',
+        bullets: [
+            '**Defect Codes** — what went wrong. An off-catalogue code scores zero in precedent retrieval.',
+            '**Task Codes** — the vocabulary behind every D3 / D5 / D7 action.',
+            '**Inspection Characteristics** — measurements and spec limits used as D2 evidence.',
+            '**Batches, Materials, Work Centers, Plants** — production and traceability.',
+            '**Departments, Coordinators** — who investigates and who leads.',
+        ],
+    },
+
+    // ── AI Configuration ──────────────────────────────────────────────────────
+    {
+        id: 'nav-ai-config',
+        chapter: 'aiConfig',
+        page: 'aiConfig',
+        target: tourTarget('nav-ai-config'),
+        side: 'right',
+        padding: 3,
+        controls: { 'aiConfig.tab': 'global' },
+        title: 'AI Configuration',
+        body: 'Where you decide how the AI finds precedents and which model does which job.',
+    },
+    {
+        id: 'ai-chain',
+        chapter: 'aiConfig',
+        page: 'aiConfig',
+        target: tourTarget('ai-chain'),
+        side: 'bottom',
+        controls: { 'aiConfig.tab': 'global' },
+        title: 'Where AI enters the chain',
+        body:
+            'Steps 1 – 3 are records and human decisions — no AI. The AI starts at **4, retrieving precedents**, and '
+            + '**5, drafting D1 – D8**. Everything on this page configures those highlighted steps only.',
+    },
+    {
+        id: 'ai-tabs',
+        chapter: 'aiConfig',
+        page: 'aiConfig',
+        target: tourTarget('ai-tabs'),
+        side: 'bottom',
+        controls: { 'aiConfig.tab': 'global' },
+        title: 'Configuration areas',
+        body:
+            'Switch between the areas here. We will look at **Global AI & Retrieval Engine**, '
+            + '**Graph Retrieval Weights** and **Model Registry**.',
+    },
+    {
+        id: 'ai-retrieval-engine',
+        chapter: 'aiConfig',
+        page: 'aiConfig',
+        target: tourTarget('ai-retrieval-engine'),
+        side: 'top',
+        controls: { 'aiConfig.tab': 'global' },
+        wide: true,
+        title: 'Precedent Retrieval Engine',
+        body: 'Chooses how the Copilot finds similar closed cases for all eight steps.',
+        bullets: [
+            '**Knowledge Graph** (default) — walks verified links between defects, materials, work centres, FMEA and actions: exact, auditable evidence paths.',
+            '**Vector Search & Scoring** (legacy) — text-embedding similarity plus attribute scores.',
+            'Cap the keywords per query, and fall back to Scoring automatically when the graph is unavailable.',
+        ],
+    },
+    {
+        id: 'ai-model-bindings',
+        chapter: 'aiConfig',
+        page: 'aiConfig',
+        target: tourTarget('ai-model-bindings'),
+        side: 'top',
+        controls: { 'aiConfig.tab': 'global' },
+        title: 'Model per processing step',
+        body:
+            'Pick which LLM parses the data, analyses the defect and reviews quality — each step can run on a '
+            + 'different model, and an empty step inherits the first row. **Raw configuration (JSON)** edits the '
+            + 'same settings for advanced keys.',
+    },
+    {
+        id: 'ai-graph-weights',
+        chapter: 'aiConfig',
+        page: 'aiConfig',
+        target: tourTarget('ai-graph-weights'),
+        side: 'top',
+        controls: { 'aiConfig.tab': 'graph' },
+        title: 'Graph Retrieval Weights',
+        body:
+            'How much each kind of shared evidence counts when the graph engine looks for precedents, set per step '
+            + 'D1 – D8. The dot beside each step shows whether its numbers are **in force**, on **built-in defaults**, '
+            + 'or **rejected** by the server — so what you see is what actually runs.',
+    },
+    {
+        id: 'ai-model-registry',
+        chapter: 'aiConfig',
+        page: 'aiConfig',
+        target: tourTarget('ai-model-registry'),
+        side: 'top',
+        controls: { 'aiConfig.tab': 'models' },
+        title: 'Model Registry',
+        body:
+            'Synchronise the LLMs deployed in SAP AI Core, choose which are available, and set rate limits. '
+            + 'The models enabled here are the ones offered in the model pickers.',
+    },
+
+    // ── Một case 8D ───────────────────────────────────────────────────────────
+    {
+        id: 'case-header',
+        chapter: 'case',
+        page: 'caseDetail',
+        target: tourTarget('case-header'),
+        side: 'bottom',
+        controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
+        title: 'Inside an 8D case',
+        body:
+            'We opened **{case}** for you. The header shows the 8D number, its status, the symptom, and where the '
+            + 'case came from — the defect it was opened from, or "Imported as JSON".',
+    },
+    {
+        id: 'case-export',
+        chapter: 'case',
+        page: 'caseDetail',
+        target: tourTarget('case-export'),
+        side: 'bottom',
+        controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
+        title: 'Export Excel',
+        body: 'Exports the full 8D report as a multi-sheet Excel workbook — ready to share or attach to an audit.',
+    },
+    {
+        id: 'case-stops',
+        chapter: 'case',
+        page: 'caseDetail',
+        target: tourTarget('case-stops'),
+        side: 'bottom',
+        optional: true,
+        controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
+        title: 'AI Stops',
+        body:
+            'Where the AI deliberately stopped and handed over to a person: **unverified facts**, **outside scope** '
+            + 'of the process and case library, or a decision that **exceeds its authority**. A blocking stop locks '
+            + "that step's approval until someone resolves it with a note. The badge counts open stops.",
+    },
+    {
+        id: 'case-audit',
+        chapter: 'case',
+        page: 'caseDetail',
+        target: tourTarget('case-audit'),
+        side: 'bottom',
+        controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
+        title: 'Audit Log',
+        body:
+            'Every human decision on this case — approvals, change requests, reopenings, resolved stops — with '
+            + 'when it happened, on which data, and why.',
+    },
+    {
+        id: 'case-source',
+        chapter: 'case',
+        page: 'caseDetail',
+        target: tourTarget('case-source'),
+        side: 'bottom',
+        controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
+        title: 'Source JSON',
+        body: 'The exact dataset the analysis started from, as captured when the case was created.',
+    },
+    {
+        id: 'case-reanalyze',
+        chapter: 'case',
+        page: 'caseDetail',
+        target: tourTarget('case-reanalyze'),
+        side: 'bottom',
+        controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
+        title: 'Re-analyze',
+        body:
+            'Runs the whole AI analysis again — about 3 minutes — for example after master data was corrected. '
+            + 'The page keeps itself up to date while it runs.',
+    },
+    {
+        id: 'case-tabs',
+        chapter: 'case',
+        page: 'caseDetail',
+        target: tourTarget('case-tabs'),
+        side: 'bottom',
+        controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
+        title: 'Three views of one case',
+        body:
+            '**8D Disciplines** is where the work happens. **Evidence** lists every record the AI cited. '
+            + '**Case Overview** holds the case facts and the summaries.',
+    },
+    {
+        id: 'case-stepper',
+        chapter: 'case',
+        page: 'caseDetail',
+        target: tourTarget('case-stepper'),
+        side: 'right',
+        controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
+        title: 'The eight disciplines',
+        body:
+            'Overall completeness, then D1 – D8 with their status: Not started, In process, Changes requested or '
+            + 'Complete. Click a step to open it. Steps unlock in order — each needs the one before it completed. '
+            + 'We opened the first step that is not complete yet.',
+    },
+    {
+        id: 'case-review',
+        chapter: 'case',
+        page: 'caseDetail',
+        target: tourTarget('case-review'),
+        side: 'bottom',
+        controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
+        title: 'The step you are working on',
+        body:
+            'Its name and where it stands. The **ⓘ** icon beside the name shows how the AI produced this draft — '
+            + 'its reasoning and the source records it relied on.',
+    },
+    {
+        id: 'case-status',
+        chapter: 'case',
+        page: 'caseDetail',
+        target: tourTarget('case-status'),
+        side: 'bottom',
+        optional: true,
+        controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
+        title: 'Work status',
+        body:
+            'Every step starts **Not started** and stays read-only. Switch it to **In process** to edit the draft. '
+            + 'No step advances on its own — a person always moves it.',
+    },
+    {
+        id: 'case-approve',
+        chapter: 'case',
+        page: 'caseDetail',
+        target: tourTarget('case-approve'),
+        side: 'bottom',
+        optional: true,
+        controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
+        title: 'Approve step',
+        body:
+            'Signs the step off as Complete. If anything is still missing — an open AI stop, a required field, task '
+            + 'evidence — you are told exactly what before anything is saved. An approved step can be reopened later, '
+            + 'with a reason.',
+    },
+    {
+        id: 'case-content',
+        chapter: 'case',
+        page: 'caseDetail',
+        target: tourTarget('case-content'),
+        side: 'top',
+        controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
+        title: "The AI's draft",
+        body:
+            "Below the header is the step's content, drafted by the AI in the layout configured for this step — "
+            + 'tables, task lists and text fields. Once the step is **In process** you can correct any of it before '
+            + 'approving.',
+    },
+    {
+        id: 'case-d4',
+        chapter: 'case',
+        page: 'caseDetail',
+        target: tourTarget('case-content'),
+        side: 'top',
+        controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'D4' },
+        title: 'D4 — Root cause',
+        body:
+            'Each step has its own layout. D4 brings the root-cause analysis together: the Ishikawa (fishbone) '
+            + "categories, the 5-Why chain and the AI's root-cause statement, each finding traceable to its evidence.",
+    },
+    {
+        id: 'case-referee',
+        chapter: 'case',
+        page: 'caseDetail',
+        target: tourTarget('ai-referee'),
+        side: 'top',
+        optional: true,
+        controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'D4' },
+        title: 'AI Referee',
+        body:
+            'An independent second opinion: the AI forms its own root-cause hypothesis from the evidence without '
+            + 'seeing the recorded cause. Use it to challenge the conclusion — it decides nothing.',
+    },
+    {
+        id: 'case-evidence',
+        chapter: 'case',
+        page: 'caseDetail',
+        target: tourTarget('case-tab-panel'),
+        side: 'top',
+        controls: { 'caseDetail.tab': 'evidence' },
+        title: 'Evidence',
+        body:
+            'Every record the AI cited, grouped by step and tagged **Verified Fact**, **External / Assumed** or '
+            + '**Worked out**. A step with nothing behind it is flagged "Suggested by AI".',
+    },
+    {
+        id: 'case-precedents',
+        chapter: 'case',
+        page: 'caseDetail',
+        target: tourTarget('case-precedents'),
+        side: 'top',
+        optional: true,
+        controls: { 'caseDetail.tab': 'evidence' },
+        title: 'Case Library & Precedents',
+        body:
+            'The closed cases the retrieval engine matched to this one, with their match score — and which engine '
+            + 'actually ran. Click a precedent to open it.',
+    },
+    {
+        id: 'case-overview',
+        chapter: 'case',
+        page: 'caseDetail',
+        target: tourTarget('case-tab-panel'),
+        side: 'top',
+        controls: { 'caseDetail.tab': 'summary' },
+        title: 'Case Overview',
+        body:
+            'The case facts in one place — origin, material, batch, defect, work centre, cost of poor quality — '
+            + 'plus the two commitments you can edit: **Due date** and **Coordinator**. Below them: '
+            + "the AI's internal summary (and a customer-safe version for complaints) and the models that produced the draft.",
+    },
+
+    // ── Kết ───────────────────────────────────────────────────────────────────
+    {
+        id: 'finish',
+        chapter: 'outro',
+        title: "You're all set",
+        body:
+            'That is the whole loop: start an 8D from 8D Reports or Defect Records, review each AI draft, and approve '
+            + 'it step by step until D8. Replay this tour any time from **Guided Tour** in the sidebar.',
+    },
+];

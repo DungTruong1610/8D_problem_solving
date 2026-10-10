@@ -11,6 +11,7 @@ import { GeneralSettingsTab } from '../ai-settings/general-settings-tab';
 import { DisciplineSection } from './discipline-section';
 import { RetrievalEngineSection } from './retrieval-engine-section';
 import { GraphStepParamsSection } from './graph-step-params-section';
+import { useTourControl } from '@/components/walkthrough';
 
 const DISCIPLINES = [
     { code: 'D1', title: 'Establish Team', engine: 'Rules + Precedents' },
@@ -27,6 +28,7 @@ export function WorkflowPage() {
     const prompts = useStepPrompts();
 
     const [activeTab, setActiveTab] = useState<'global' | 'graph' | 'disciplines' | 'models'>('global');
+    useTourControl('aiConfig.tab', setActiveTab);
     const [selectedDiscipline, setSelectedDiscipline] = useState<string>('D1');
 
     return (
@@ -64,7 +66,7 @@ export function WorkflowPage() {
               * thẳng một 8D, nên người đọc trang này tưởng mọi lỗi đều chạy qua
               * những gì bên dưới. Không phải. Phần lớn lỗi dừng ở bước ②.
               */}
-            <div className="rounded-xl border border-border/80 bg-muted/30 p-4 space-y-2">
+            <div data-tour="ai-chain" className="rounded-xl border border-border/80 bg-muted/30 p-4 space-y-2">
                 <h2 className="text-base font-semibold tracking-tight">Where AI enters the chain</h2>
                 <ol className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">
                     {[
@@ -101,7 +103,7 @@ export function WorkflowPage() {
             </div>
 
             {/* ── Top Level Category Switcher (Ordered from High-Level to Detailed) ── */}
-            <div className="flex flex-wrap items-center gap-2 p-1.5 bg-muted/60 rounded-xl border">
+            <div data-tour="ai-tabs" className="flex flex-wrap items-center gap-2 p-1.5 bg-muted/60 rounded-xl border">
                 {/* Tab 1: Global AI & Retrieval Engine */}
                 <Button
                     variant={activeTab === 'global' ? 'default' : 'ghost'}
@@ -151,9 +153,11 @@ export function WorkflowPage() {
             {activeTab === 'global' && (
                 <div className="space-y-6">
                     {/* Precedent Retrieval Engine (HANA Graph vs Vector Search) */}
-                    <RetrievalEngineSection />
+                    <div data-tour="ai-retrieval-engine">
+                        <RetrievalEngineSection />
+                    </div>
 
-                    <div className="space-y-4 rounded-xl border bg-card p-6 shadow-sm">
+                    <div data-tour="ai-model-bindings" className="space-y-4 rounded-xl border bg-card p-6 shadow-sm">
                         <div>
                             <h2 className="text-lg font-semibold tracking-tight">Global AI Activity Bindings</h2>
                             <p className="text-sm text-muted-foreground">
@@ -167,7 +171,11 @@ export function WorkflowPage() {
             )}
 
             {/* ─── TAB 2: GRAPH RETRIEVAL WEIGHTS (D1 to D8) ─── */}
-            {activeTab === 'graph' && <GraphStepParamsSection />}
+            {activeTab === 'graph' && (
+                <div data-tour="ai-graph-weights">
+                    <GraphStepParamsSection />
+                </div>
+            )}
 
             {/* ─── TAB 3: 8D DISCIPLINE CONFIGURATION (D1 to D8) ─── */}
             {activeTab === 'disciplines' && (
@@ -217,7 +225,7 @@ export function WorkflowPage() {
 
             {/* ─── TAB 3: MODEL REGISTRY ─── */}
             {activeTab === 'models' && (
-                <div className="space-y-4 rounded-xl border bg-card p-6 shadow-sm">
+                <div data-tour="ai-model-registry" className="space-y-4 rounded-xl border bg-card p-6 shadow-sm">
                     <div>
                         <h2 className="text-lg font-semibold tracking-tight">AI Core Model Registry</h2>
                         <p className="text-sm text-muted-foreground">

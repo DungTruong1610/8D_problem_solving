@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { Toaster } from 'sonner';
 import { MainLayout } from '@/components/layouts';
 import { ErrorBoundary } from '@/components/common';
+import { WalkthroughProvider } from '@/components/walkthrough';
 import { useFLPSyncDirect, getInitialFLPRoute } from '@/hooks/use-flpsync';
 
 import {
@@ -43,20 +44,22 @@ export default function App() {
             <InitialRouteNavigator />
             <div className="min-h-screen bg-background">
                 <ErrorBoundary>
-                    <Routes>
-                        <Route element={<MainLayout />}>
-                            {/* ─── Application Routes ─── */}
-                            <Route path="/" element={<Navigate to="/8d" replace />} />
-                            <Route path="/8d" element={<EightDListPage />} />
-                            <Route path="/8d/:id" element={<EightDDetailPage />} />
-                            <Route path="/master-data" element={<MasterDataPage />} />
-                            <Route path="/workflow" element={<WorkflowPage />} />
-                            <Route path="/guide" element={<GuidePage />} />
-                            <Route path="/verify" element={<Navigate to="/guide" replace />} />
+                    <WalkthroughProvider>
+                        <Routes>
+                            <Route element={<MainLayout />}>
+                                {/* ─── Application Routes ─── */}
+                                <Route path="/" element={<Navigate to="/8d" replace />} />
+                                <Route path="/8d" element={<EightDListPage />} />
+                                <Route path="/8d/:id" element={<EightDDetailPage />} />
+                                <Route path="/master-data" element={<MasterDataPage />} />
+                                <Route path="/workflow" element={<WorkflowPage />} />
+                                <Route path="/guide" element={<GuidePage />} />
+                                <Route path="/verify" element={<Navigate to="/guide" replace />} />
 
-                            <Route path="*" element={<Navigate to="/8d" replace />} />
-                        </Route>
-                    </Routes>
+                                <Route path="*" element={<Navigate to="/8d" replace />} />
+                            </Route>
+                        </Routes>
+                    </WalkthroughProvider>
                 </ErrorBoundary>
                 <Toaster richColors closeButton />
             </div>

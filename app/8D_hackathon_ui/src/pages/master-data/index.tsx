@@ -11,6 +11,7 @@ import { CodeCataloguesTab } from './CodeCataloguesTab';
 import { DefectsTab } from './DefectsTab';
 import { HistoricalDefectsTab } from './HistoricalDefectsTab';
 import { InspectionLotsTab } from './InspectionLotsTab';
+import { useTourControl } from '@/components/walkthrough';
 
 /**
  * Mỗi tab nói rõ nó LÀ CÁI GÌ, ngay dưới thanh tab.
@@ -34,6 +35,7 @@ export function MasterDataPage() {
     // dạy chuỗi đó chứ không mâu thuẫn với nó. Tab "Defects" đã chen vào giữa ở
     // Phase 2 — nó là mắt xích ④, đứng sau kết quả kiểm tra và trước case đã đóng.
     const [activeTab, setActiveTab] = useState<MasterDataTab>('inspection-lots');
+    useTourControl('masterData.tab', setActiveTab);
 
     return (
         <div className="p-6 md:p-8 w-full min-w-0 space-y-6">
@@ -58,7 +60,7 @@ export function MasterDataPage() {
                 onValueChange={(v) => setActiveTab(v as MasterDataTab)}
                 className="w-full space-y-4"
             >
-                <TabsList className="grid w-full grid-cols-4 max-w-3xl bg-muted/60 p-1 rounded-xl border border-border/80 h-11 shadow-xs">
+                <TabsList data-tour="master-tabs" className="grid w-full grid-cols-4 max-w-3xl bg-muted/60 p-1 rounded-xl border border-border/80 h-11 shadow-xs">
                     <TabsTrigger
                         value="inspection-lots"
                         className={cn(
