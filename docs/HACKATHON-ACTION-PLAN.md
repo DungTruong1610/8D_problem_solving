@@ -4,6 +4,9 @@
 **Đơn vị chủ trì:** HCMUT × HUTECH × VNG
 **Mục tiêu tài liệu:** Định hướng chiến lược, phân tích bài toán, làm rõ các điểm nghẽn kỹ thuật trong mã nguồn hiện tại và phân công nhiệm vụ cụ thể để đưa dự án ra thi đấu bên ngoài công ty với **chi phí 0 đồng**.
 
+> [!NOTE]
+> **Cập nhật 21/09/2026:** Tài liệu này là kế hoạch chiến lược ban đầu và vẫn đúng về định hướng. Riêng phần **cổng AI đã thay đổi**: thay vì Google Gemini, bản deploy dùng **DeepSeek V4.1 Flash** cho chat và **Jina AI** cho vector embedding (DeepSeek không có API embedding). Chi tiết cấu hình mới nhất nằm ở [KE_HOACH_CHUYEN_DOI_CONG_NGHE_FREE.md](file:///d:/GitHub/8D_Hackathon/docs/KE_HOACH_CHUYEN_DOI_CONG_NGHE_FREE.md), Hạng Mục 4.
+
 ---
 
 ## 1. PHÂN TÍCH ĐỀ BÀI CỦA BAN TỔ CHỨC & LỰA CHỌN CHIẾN LƯỢC
@@ -46,7 +49,7 @@ Ban tổ chức cho chọn 1 trong 3 đề bài (A, B, C). Chúng ta chọn **Đ
 
 ### 2.2. Proresolve (8D Copilot) giải quyết thế nào?
 
-Hệ thống tiếp nhận hồ sơ sự cố chất lượng (chuẩn QM `QMEL`) dưới dạng JSON sâu (gồm mã lỗi, vật tư, lô hàng, trạm máy, kết quả đo kiểm, chi phí chất lượng COPQ):
+Hệ thống tiếp nhận hồ sơ sự cố chất lượng (chuẩn SAP QM `QMEL`) dưới dạng JSON sâu (gồm mã lỗi, vật tư, lô hàng, trạm máy, kết quả đo kiểm, chi phí chất lượng COPQ):
 
 1. **Enrich Context:** Tự động bóc tách thông số kỹ thuật, phát hiện lỗ hổng dữ liệu.
 2. **Blind Diagnosis (Chẩn đoán mù độc lập — Điểm nhấn sáng tạo):** Hệ thống **cắt bỏ toàn bộ nhận định của kỹ sư** (chuỗi 5-Why, Ishikawa), yêu cầu AI tự tư duy độc lập để tìm nguyên nhân gốc. Sau đó so sánh xem nhận định của AI và Kỹ sư có đồng thuận hay không $\rightarrow$ Giúp kỹ sư tránh thiên kiến xác nhận (Confirmation Bias).
@@ -59,7 +62,7 @@ Hệ thống tiếp nhận hồ sơ sự cố chất lượng (chuẩn QM `QMEL`
 
 ## 3. CÁC ĐIỂM NGHẼN (PAIN POINTS) TRONG SOURCE CODE HIỆN TẠI
 
-Source code ban đầu được phát triển cho môi trường nội bộ doanh nghiệp trên nền tảng Cloud đóng kín, dẫn đến các rào cản nghiêm trọng khi mang ra thi đấu bên ngoài:
+Source code hiện tại được phát triển cho môi trường nội bộ doanh nghiệp trên nền tảng **SAP BTP**, dẫn đến các rào cản nghiêm trọng khi mang ra thi đấu bên ngoài:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -67,17 +70,17 @@ Source code ban đầu được phát triển cho môi trường nội bộ doan
 ├───────────────────────┬─────────────────────────────────────────────────────────┤
 │ Thành phần            │ Vấn đề khi mang ra Hackathon                            │
 ├───────────────────────┼─────────────────────────────────────────────────────────┤
-│ 1. Cloud Cockpit      │ Hạ tầng cloud nội bộ, yêu cầu tài khoản doanh nghiệp.   │
-│ 2. Enterprise DB      │ CSDL trả phí đắt đỏ, không thể cấp quyền ngoài.         │
-│ 3. AI Gateway cũ      │ Tiêu tốn credit công ty, cấu hình binding phức tạp.     │
-│ 4. Enterprise Auth    │ Bắt đăng nhập tài khoản riêng ➔ Vi phạm luật "No Login". │
+│ 1. SAP BTP Cockpit    │ Hạ tầng cloud nội bộ, yêu cầu tài khoản doanh nghiệp.   │
+│ 2. SAP HANA Cloud     │ CSDL trả phí đắt đỏ của SAP, không thể cấp quyền ngoài. │
+│ 3. SAP AI Core        │ Tiêu tốn BTP credit công ty, cấu hình binding phức tạp. │
+│ 4. SAP XSUAA Auth     │ Bắt đăng nhập SAP ID ➔ Vi phạm luật "No Login" của BTC.  │
 │ 5. Gói `@cnma/*`      │ Lưu trên Azure Artifacts riêng ➔ Người ngoài clone repo  │
 │                       │ về sẽ bị lỗi E401/npm install thất bại.                 │
 └───────────────────────┴─────────────────────────────────────────────────────────┘
 ```
 
 👉 **Mục tiêu Rework Backend:**
-Decouple (tách rời) toàn bộ các phụ thuộc vào hạ tầng cloud nội bộ đóng kín. Chuyển đổi thành một hệ thống **độc lập (Standalone), 100% mã nguồn mở/miễn phí**, người ngoài clone về có thể chạy ngay bằng 1 lệnh mà không cần tài khoản nội bộ hay tốn bất kỳ chi phí nào.
+Decouple (tách rời) toàn bộ các phụ thuộc vào SAP BTP và tài nguyên công ty. Chuyển đổi thành một hệ thống **độc lập (Standalone), 100% mã nguồn mở/miễn phí**, người ngoài clone về có thể chạy ngay bằng 1 lệnh mà không cần tài khoản nội bộ hay tốn bất kỳ chi phí nào.
 
 ---
 
@@ -85,63 +88,55 @@ Decouple (tách rời) toàn bộ các phụ thuộc vào hạ tầng cloud nộ
 
 Chúng ta **tuyệt đối không dùng công nghệ trả phí**. Bảng kiến trúc thay thế tối ưu:
 
-| Thành phần             | Công nghệ cũ (Nội bộ)      | Công nghệ mới (Hackathon)                    | Chi phí      | Lý do lựa chọn                                                                                                                                                            |
+| Thành phần             | Công nghệ cũ (Nội bộ) | Công nghệ mới (Hackathon)                    | Chi phí      | Lý do lựa chọn                                                                                                                                                            |
 | :----------------------- | :------------------------- | :---------------------------------------------- | :------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Frontend Host**  | Private App Repo           | **Vercel** (Hobby Plan)                   | **0đ** | Deploy trong 1 phút từ GitHub, CDN toàn cầu siêu nhanh, uptime 99.9%.                                                                                                   |
-| **Backend Host**   | Cloud Foundry              | **Render.com** hoặc **Railway**    | **0đ** | Chạy Node.js persistent server.**Không dùng Vercel cho Backend** vì Vercel Serverless bị timeout 10–15s (trong khi AI reasoning chạy 20–40s sẽ bị lỗi 504). |
-| **Database**       | Enterprise Cloud DB        | **SQLite (`db.sqlite`)**                | **0đ** | Đóng gói sẵn file`db.sqlite` kèm source code. Chạy in-memory, query siêu tốc, 0 cấu hình, không tốn tiền server DB.                                           |
-| **Authentication** | Enterprise Auth (OAuth2)   | **Public Access (Mock Auth)**             | **0đ** | Bỏ cơ chế login, cho phép giám khảo vào thẳng URL theo đúng tiêu chuẩn đề bài (10 điểm vận hành).                                                         |
-| **AI LLM Gateway** | Enterprise AI Gateway      | **Google Gemini API** (`@google/genai`) | **0đ** | Gói Free Tier miễn phí 15 RPM, hỗ trợ suy luận Thinking Budget, tốc độ cực nhanh.                                                                                  |
-| **Vector Search**  | Cloud Vector Engine        | **In-memory Cosine Similarity**           | **0đ** | Tính khoảng cách vector trực tiếp bằng TypeScript trong RAM của Node.js (tốc độ < 10ms cho vài trăm case).                                                       |
+| **Frontend Host**  | BTP HTML5 App Repo         | **Vercel** (Hobby Plan)                   | **0đ** | Deploy trong 1 phút từ GitHub, CDN toàn cầu siêu nhanh, uptime 99.9%.                                                                                                   |
+| **Backend Host**   | BTP Cloud Foundry          | **Render.com** hoặc **Railway**    | **0đ** | Chạy Node.js persistent server.**Không dùng Vercel cho Backend** vì Vercel Serverless bị timeout 10–15s (trong khi AI reasoning chạy 20–40s sẽ bị lỗi 504). |
+| **Database**       | SAP HANA Cloud             | **SQLite (`db.sqlite`)**                | **0đ** | Đóng gói sẵn file`db.sqlite` kèm source code. Chạy in-memory, query siêu tốc, 0 cấu hình, không tốn tiền server DB.                                           |
+| **Authentication** | SAP XSUAA (OAuth2)         | **Public Access (Mock Auth)**             | **0đ** | Bỏ cơ chế login, cho phép giám khảo vào thẳng URL theo đúng tiêu chuẩn đề bài (10 điểm vận hành).                                                         |
+| **AI LLM Gateway** | SAP AI Core (GenAI Hub)    | **DeepSeek V4.1 Flash** (chuẩn OpenAI) | Trả theo token | Bỏ 2 tầng proxy BTP, hỗ trợ thinking mode / tool calls / JSON output. Chạy được qua OpenCode Go, OpenCode Zen hoặc DeepSeek Platform — xem Hạng Mục 4 của kế hoạch chuyển đổi. |
+| **Vector Embedding** | HANA Vector + embedding của AI Core | **Jina AI Embeddings** (`jina-embeddings-v5-text-small`) | **0đ** (free tier) | DeepSeek không có API embedding; Jina là nguồn vector thay thế, endpoint chuẩn OpenAI. |
+| **Vector Search**  | HANA Vector Engine         | **In-memory Cosine Similarity**           | **0đ** | Tính khoảng cách vector trực tiếp bằng TypeScript trong RAM của Node.js (tốc độ < 10ms cho vài trăm case).                                                       |
 
 ---
 
 ## 5. PHƯƠNG ÁN REWORK PHẦN AI ENGINE & ĐÁNH GIÁ HIỆU QUẢ
 
-### 5.1. Bản chất của các Gateway AI doanh nghiệp và cơ hội của chúng ta
+### 5.1. Bản chất của SAP AI Core và cơ hội của chúng ta
 
-Các Gateway AI doanh nghiệp thực chất **không tự tạo model riêng**; nó chỉ là cổng proxy bọc ngoài các model của Google (Gemini) và OpenAI (GPT-4o).
-Do đó, khi gọi trực tiếp vào Google Gemini API, chúng ta **vẫn dùng chính xác những "bộ não" AI đó**, không hề bị giảm chất lượng!
+SAP AI Core thực chất **không tự tạo model riêng**; nó chỉ là cổng proxy bọc ngoài model của nhiều nhà cung cấp (Google, Anthropic, OpenAI…).
+Do đó, khi bỏ SAP AI Core để gọi trực tiếp nhà cung cấp model, chúng ta **vẫn dùng chính xác những "bộ não" AI đó**, không hề bị giảm chất lượng!
 
 ### 5.2. Rework code phần AI như thế nào?
 
-May mắn là kiến trúc codebase hiện tại ở file `srv/src/core/ai/llmClient.ts` đã được thiết kế sẵn mẫu **Provider Pattern** với hàm `setLlmProvider(...)`:
+Kiến trúc codebase hiện tại ở file `srv/src/core/ai/llmClient.ts` đã được thiết kế sẵn mẫu **Provider Pattern** với hàm `setLlmProvider(...)`. Bản deploy hiện tại đã có sẵn ba provider:
 
 ```typescript
-// Chỉ cần viết 1 file adapter mới: standaloneLlmProvider.ts (~60 dòng code)
-import { GoogleGenAI } from '@google/genai';
-
-export function initStandaloneAI() {
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
-  setLlmProvider({
-    name: 'gemini-standalone',
-    async complete(messages, config) {
-      // Gọi gemini-2.5-flash hoặc gemini-2.5-pro kèm thinkingBudget
-    },
-    async completeWithTools(messages, tools, config) { ... },
-    async embed(text) {
-      // Gọi text-embedding-004 của Google
-    },
-    async batchEmbed(texts) { ... }
-  });
-}
+// srv/src/core/ai/providerFactory.ts — chọn provider theo biến môi trường
+ensureLlmProvider()
+  ├── chat      : DeepSeek  →  Gemini  →  LLM local  →  SAP AI Core (mặc định của CDK)
+  └── embedding : Jina / EMBEDDING_*  →  Gemini  →  (không có)
 ```
 
-* **Các bước triển khai:**
-  1. Thêm gói thư viện chuẩn: `npm install @google/genai dotenv`.
-  2. Tạo adapter `standaloneLlmProvider.ts` cắm vào `setLlmProvider` khi khởi động server.
-  3. Gỡ bỏ việc import các package phụ thuộc gateway nội bộ.
-  4. Đưa `GEMINI_API_KEY` vào file `.env`.
+* `deepseekProvider.ts` — chat qua endpoint chuẩn OpenAI (`/chat/completions`), hỗ trợ JSON output, tool calls và thinking mode.
+* `openAiEmbeddingProvider.ts` — vector nhúng qua Jina AI (hoặc mọi API `EMBEDDING_*` chuẩn OpenAI).
+* `compositeLlmProvider.ts` — ghép hai nửa khi chat và embedding khác nhà cung cấp.
+
+**Các bước triển khai thực tế:**
+
+1. Không cần cài SDK mới — DeepSeek và Jina đều nói HTTP chuẩn OpenAI.
+2. Điền `DEEPSEEK_API_KEY`, `DEEPSEEK_BASE_URL`, `DEEPSEEK_MODEL`, `JINA_API_KEY` vào `.env`.
+3. Chạy `npx tsx scripts/probe-ai.ts` để xác nhận trước khi deploy.
 
 ### 5.3. Có đạt hiệu quả 100% như bây giờ không?
 
 **ĐẠT 100%, THẬM CHÍ CÒN TỐT HƠN VÀ ỔN ĐỊNH HƠN:**
 
 1. **Giữ nguyên 100% Logic nghiệp vụ:** Toàn bộ prompt kỹ thuật D1–D8, Chain-of-thought, bảng so sánh Blind Diagnosis, phân tích Is/Is-Not đều giữ nguyên vẹn.
-2. **Thinking Budget được bảo toàn:** Gemini 2.5 Flash và Pro hỗ trợ nguyên bản cơ chế Extended Thinking (suy luận sâu), y hệt cấu hình hiện tại.
-3. **Tốc độ nhanh gấp đôi:** Gọi trực tiếp Google API bỏ qua 2 tầng trung gian của BTP, giúp thời gian phản hồi giảm từ ~40s xuống ~15–20s.
-4. **Không lo sập do hết Quota công ty:** Hoàn toàn chủ động với API key độc lập, đồng thời sẵn sàng cắm OpenAI Credit do BTC tài trợ ở Sprint 2.
+2. **Thinking Budget được bảo toàn:** DeepSeek V4.1 Flash hỗ trợ thinking mode (`reasoning_effort: low/high/max`), ánh xạ từ `thinkingBudget` của app; mặc định tắt để giữ tốc độ cho pipeline 8 bước.
+3. **Tốc độ nhanh hơn:** Gọi trực tiếp nhà cung cấp, bỏ qua 2 tầng trung gian của BTP.
+4. **Không lo sập do hết Quota công ty:** Hoàn toàn chủ động với API key độc lập.
+5. **Một điểm cần lưu ý:** DeepSeek không có API embedding, nên vector ngữ nghĩa phải đi qua Jina AI — thiếu key embedding thì app vẫn chạy nhưng tiêu chí "Similar description" im lặng cho 0 điểm.
 
 ---
 
@@ -160,6 +155,6 @@ Mục tiêu Sprint 1: Hoàn tất 6 hạng mục bắt buộc của BTC (Live UR
 
 ## 7. KẾT LUẬN
 
-Chúng ta đang sở hữu một sản phẩm có **chiều sâu kỹ thuật và giá trị thực tế hàng đầu cuộc thi**. Việc tách rời khỏi hạ tầng cloud nội bộ trước đây để chuyển sang kiến trúc Standalone mã nguồn mở + SQLite + Gemini API miễn phí là bước đi bắt buộc và đúng đắn nhất: vừa bảo vệ tuyệt đối dữ liệu doanh nghiệp, vừa tối ưu hóa 100% cho tiêu chí chấm thi của Ban tổ chức.
+Chúng ta đang sở hữu một sản phẩm có **chiều sâu kỹ thuật và giá trị thực tế hàng đầu cuộc thi**. Việc tách rời khỏi hạ tầng SAP BTP nội bộ để chuyển sang kiến trúc Standalone mã nguồn mở + SQLite + Gemini API miễn phí là bước đi bắt buộc và đúng đắn nhất: vừa bảo vệ tuyệt đối dữ liệu doanh nghiệp, vừa tối ưu hóa 100% cho tiêu chí chấm thi của Ban tổ chức.
 
 Cả team cùng bám sát kế hoạch này để triển khai Sprint 1! 🚀

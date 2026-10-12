@@ -62,7 +62,7 @@ app/cnma_proresolve_ui/public/samples/
 # Playwright MCP artifacts
 .playwright-mcp/
 
-
+.claude
 ./venv
 
 # Kế hoạch nội bộ — giữ ở máy, không đưa lên GitHub.

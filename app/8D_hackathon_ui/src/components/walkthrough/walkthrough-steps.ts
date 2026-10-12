@@ -34,8 +34,8 @@ export const TOUR_STEPS: TourStep[] = [
             'This tour walks you through the whole app in four stops: the **8D Reports** worklist, '
             + '**Master Data**, **AI Configuration**, and finally a live 8D case from D1 to D8.',
         bullets: [
-            '**Next** or → moves on, **Back** or ← goes back, **Esc** leaves the tour.',
-            'The tour only opens screens and dialogs for you — it never saves or changes anything.',
+            "**Next** or → moves on, **Back** or ← goes back, **Esc** leaves the tour.",
+            "The tour only opens screens and dialogs. It never saves or changes anything.",
         ],
     },
 
@@ -58,9 +58,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'top',
         padding: 4,
         title: 'The 8D worklist',
-        body:
-            'One row per 8D case. Open cases come first and the most urgent sit at the top — ranked by '
-            + 'severity, customer commitment, then age. **Click any row** to open that case.',
+        body: "One row per 8D case. Open cases come first, with the most urgent at the top: ranked by severity, then customer commitment, then age. Click any row to open that case.",
     },
     {
         id: 'worklist-columns',
@@ -71,13 +69,13 @@ export const TOUR_STEPS: TourStep[] = [
         padding: 2,
         wide: true,
         title: 'What each column tells you',
-        body: 'The list shows the trimmed core columns — the ones that answer "which case needs me today".',
+        body: "The list shows the trimmed core columns, the ones that answer \"which case needs me today\".",
         bullets: [
-            '**Origin** — Customer Complaint (with the customer reference) or Internal Defect.',
-            '**Completeness** — how many of the eight steps a person has approved.',
-            '**Days open** — counted from when the 8D was opened; red once closure is overdue.',
-            '**Due date** — only a committed date: the customer SLA, or a date the team set. Empty means nobody committed yet.',
-            '**Last updated** — who touched the case last, and when.',
+            "Origin: Customer Complaint (with the customer reference) or Internal Defect.",
+            "Completeness: how many of the eight steps a person has approved.",
+            "Days open: counted from when the 8D was opened. It turns red once closure is overdue.",
+            "Due date: only a date someone committed to, either the customer SLA or a date the team set. Empty means nobody has committed yet.",
+            "Last updated: who touched the case last, and when.",
         ],
     },
     {
@@ -87,10 +85,7 @@ export const TOUR_STEPS: TourStep[] = [
         target: tourTarget('worklist-filters'),
         side: 'bottom',
         title: 'Quick filters',
-        body:
-            'Slice the list by what needs you: My cases, Overdue, Critical, Awaiting approval, Changes requested, '
-            + 'In process, Customer complaints or Signed off. The number on each chip is its count — a chip at 0 is '
-            + 'genuinely empty, not broken.',
+        body: "Slice the list by what needs you: My cases, Overdue, Critical, Awaiting approval, Changes requested, In process, Customer complaints or Signed off. The number on each chip is its count, so a chip at 0 is genuinely empty, not broken.",
     },
     {
         id: 'worklist-columns-toggle',
@@ -110,7 +105,7 @@ export const TOUR_STEPS: TourStep[] = [
         target: tourTarget('worklist-export'),
         side: 'bottom',
         title: 'Export Excel',
-        body: 'Downloads the cases currently shown — respecting the active filter — as an Excel workbook.',
+        body: "Downloads the cases currently shown as an Excel workbook. The active filter applies.",
     },
     {
         id: 'worklist-refresh',
@@ -142,9 +137,7 @@ export const TOUR_STEPS: TourStep[] = [
         target: tourTarget('worklist-create'),
         side: 'bottom',
         title: 'Create 8D Report',
-        body:
-            'This is where a new 8D starts. It opens a dialog in which you choose what the 8D will investigate — '
-            + "let's open it.",
+        body: "This is where a new 8D starts. It opens a dialog where you choose what the 8D will investigate. Let's open it.",
     },
     {
         id: 'create-pick',
@@ -155,10 +148,7 @@ export const TOUR_STEPS: TourStep[] = [
         anchor: tourTarget('create-dialog'),
         controls: { 'worklist.createDialog': 'pick' },
         title: 'Start from a recorded defect',
-        body:
-            'The main path: pick an open defect recorded in Master Data. Search by ID or description and filter by '
-            + 'origin — **Q1** customer, **Q2** supplier, **Q3** internal. Only defects without an 8D are listed, '
-            + 'because a defect can carry at most one.',
+        body: "The main path: pick an open defect recorded in Master Data. Search by ID or description, and filter by origin (Q1 customer, Q2 supplier, Q3 internal). Only defects without an 8D are listed, because a defect can carry at most one.",
     },
     {
         id: 'create-submit',
@@ -169,10 +159,7 @@ export const TOUR_STEPS: TourStep[] = [
         anchor: tourTarget('create-dialog'),
         controls: { 'worklist.createDialog': 'pick' },
         title: 'Preview, then Create & Analyze',
-        body:
-            'Picking a defect shows a read-only preview of what the 8D will analyse, plus two fields you own: '
-            + '**Required completion date** and **Coordinator**. **Create & Analyze** then starts the AI — it '
-            + 'extracts the facts and drafts D1 – D8 in the background (about 3 minutes). The worklist updates on its own.',
+        body: "Picking a defect shows a read-only preview of what the 8D will analyse, plus two fields you own: **Required completion date** and **Coordinator**. **Create & Analyze** then starts the AI. It extracts the facts and drafts D1–D8 in the background (about 3 minutes), and the worklist updates on its own.",
     },
     {
         id: 'create-import-toggle',
@@ -195,9 +182,7 @@ export const TOUR_STEPS: TourStep[] = [
         anchor: tourTarget('create-dialog'),
         controls: { 'worklist.createDialog': 'import' },
         title: 'Upload JSON input',
-        body:
-            '**Upload file** reads a .json case file from your computer. It is checked in the browser first — it '
-            + 'must describe one defect case with a notificationId — and validated again by the server.',
+        body: "**Upload file** reads a .json case file from your computer. The browser checks it first (it must describe one defect case with a notificationId), and the server validates it again.",
     },
     {
         id: 'create-samples',
@@ -209,9 +194,7 @@ export const TOUR_STEPS: TourStep[] = [
         optional: true,
         controls: { 'worklist.createDialog': 'import' },
         title: 'Or start from a sample issue',
-        body:
-            'Freshly logged sample cases — symptom and context only, with no root cause, actions or team. '
-            + 'One click loads a sample into the editor.',
+        body: "Freshly logged sample cases with only the symptom and context: no root cause, actions or team. One click loads a sample into the editor.",
     },
     {
         id: 'create-paste',
@@ -237,9 +220,7 @@ export const TOUR_STEPS: TourStep[] = [
         padding: 3,
         controls: { 'masterData.tab': 'inspection-lots' },
         title: 'Master Data',
-        body:
-            'The reference data the AI reasons over: inspection results, defects, closed cases and code catalogues. '
-            + 'Nothing here is AI-generated — it is the ground truth the AI cites.',
+        body: "The reference data the AI reasons over: inspection results, defects, closed cases and code catalogues. Nothing here is AI-generated. It is the ground truth the AI cites.",
     },
     {
         id: 'master-tabs',
@@ -261,10 +242,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'top',
         controls: { 'masterData.tab': 'inspection-lots' },
         title: 'Inspection History',
-        body:
-            'One row is one characteristic measured on one lot — measured value, spec limits and pass / fail. '
-            + "It is the comparison population behind D2's **Is / Is-Not** analysis: the AI contrasts the lots "
-            + 'that failed with the lots that passed.',
+        body: "One row is one characteristic measured on one lot: measured value, spec limits and pass/fail. These rows are the comparison population behind D2's **Is / Is-Not** analysis, where the AI contrasts the lots that failed with the lots that passed.",
     },
     {
         id: 'master-inspection-actions',
@@ -298,9 +276,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'bottom',
         controls: { 'masterData.tab': 'defects' },
         title: 'Record Defect',
-        body:
-            'Records a new defect — defect code, material, batch, work centre, quantity — picked from the value '
-            + 'helps, so every value matches the catalogues the AI scores precedents against.',
+        body: "Records a new defect (defect code, material, batch, work centre, quantity) picked from the value helps, so every value matches the catalogues the AI scores precedents against.",
     },
     {
         id: 'master-defects-start',
@@ -310,11 +286,8 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'left',
         optional: true,
         controls: { 'masterData.tab': 'defects' },
-        title: 'Start 8D — a deliberate decision',
-        body:
-            'Opening an 8D is a separate step from recording the defect. **Start 8D** creates the 8D for that defect '
-            + 'and starts the analysis; once it exists the button becomes **Open 8D**. A defect closed without one '
-            + 'says so instead.',
+        title: "Start 8D: a deliberate decision",
+        body: "Opening an 8D is a separate step from recording the defect. **Start 8D** creates the 8D for that defect and starts the analysis. Once the 8D exists, the button becomes **Open 8D**. A defect closed without one says so instead.",
     },
     {
         id: 'master-library',
@@ -324,9 +297,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'top',
         controls: { 'masterData.tab': 'historical-cases' },
         title: 'Closed Case Library',
-        body:
-            'The precedent store the AI retrieves from. Completed and closed cases only — an open case has no proven '
-            + 'lesson to reuse yet. The better this library, the better every D1 – D8 draft.',
+        body: "The precedent store the AI retrieves from. It holds completed and closed cases only, because an open case has no proven lesson to reuse yet. The better this library, the better every D1–D8 draft.",
     },
     {
         id: 'master-library-import',
@@ -349,11 +320,11 @@ export const TOUR_STEPS: TourStep[] = [
         title: 'Value Help catalogues',
         body: 'The coded vocabulary behind every dropdown in the app, with a count of how often each entry is used.',
         bullets: [
-            '**Defect Codes** — what went wrong. An off-catalogue code scores zero in precedent retrieval.',
-            '**Task Codes** — the vocabulary behind every D3 / D5 / D7 action.',
-            '**Inspection Characteristics** — measurements and spec limits used as D2 evidence.',
-            '**Batches, Materials, Work Centers, Plants** — production and traceability.',
-            '**Departments, Coordinators** — who investigates and who leads.',
+            "Defect Codes: what went wrong. An off-catalogue code scores zero in precedent retrieval.",
+            "Task Codes: the vocabulary behind every D3 / D5 / D7 action.",
+            "Inspection Characteristics: measurements and spec limits used as D2 evidence.",
+            "Batches, Materials, Work Centers, Plants: production and traceability.",
+            "Departments, Coordinators: who investigates and who leads.",
         ],
     },
 
@@ -377,9 +348,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'bottom',
         controls: { 'aiConfig.tab': 'global' },
         title: 'Where AI enters the chain',
-        body:
-            'Steps 1 – 3 are records and human decisions — no AI. The AI starts at **4, retrieving precedents**, and '
-            + '**5, drafting D1 – D8**. Everything on this page configures those highlighted steps only.',
+        body: "Steps 1–3 are records and human decisions, with no AI involved. The AI starts at step 4, retrieving precedents, and step 5, drafting D1–D8. Everything on this page configures those two highlighted steps.",
     },
     {
         id: 'ai-tabs',
@@ -404,9 +373,9 @@ export const TOUR_STEPS: TourStep[] = [
         title: 'Precedent Retrieval Engine',
         body: 'Chooses how the Copilot finds similar closed cases for all eight steps.',
         bullets: [
-            '**Knowledge Graph** (default) — walks verified links between defects, materials, work centres, FMEA and actions: exact, auditable evidence paths.',
-            '**Vector Search & Scoring** (legacy) — text-embedding similarity plus attribute scores.',
-            'Cap the keywords per query, and fall back to Scoring automatically when the graph is unavailable.',
+            "Knowledge Graph (default) follows verified links between defects, materials, work centres, FMEA and actions, so every evidence path is exact and auditable.",
+            "Vector Search & Scoring (legacy) uses text-embedding similarity plus attribute scores.",
+            "Cap the keywords per query, and fall back to Scoring automatically when the graph is unavailable.",
         ],
     },
     {
@@ -417,10 +386,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'top',
         controls: { 'aiConfig.tab': 'global' },
         title: 'Model per processing step',
-        body:
-            'Pick which LLM parses the data, analyses the defect and reviews quality — each step can run on a '
-            + 'different model, and an empty step inherits the first row. **Raw configuration (JSON)** edits the '
-            + 'same settings for advanced keys.',
+        body: "Pick which LLM parses the data, analyses the defect and reviews quality. Each step can run on a different model, and an empty step inherits the first row. **Raw configuration (JSON)** edits the same settings for advanced keys.",
     },
     {
         id: 'ai-graph-weights',
@@ -430,10 +396,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'top',
         controls: { 'aiConfig.tab': 'graph' },
         title: 'Graph Retrieval Weights',
-        body:
-            'How much each kind of shared evidence counts when the graph engine looks for precedents, set per step '
-            + 'D1 – D8. The dot beside each step shows whether its numbers are **in force**, on **built-in defaults**, '
-            + 'or **rejected** by the server — so what you see is what actually runs.',
+        body: "How much each kind of shared evidence counts when the graph engine looks for precedents, set per step D1–D8. The dot beside each step shows whether its numbers are in force, on built-in defaults, or rejected by the server, so what you see is what actually runs.",
     },
     {
         id: 'ai-model-registry',
@@ -457,9 +420,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'bottom',
         controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
         title: 'Inside an 8D case',
-        body:
-            'We opened **{case}** for you. The header shows the 8D number, its status, the symptom, and where the '
-            + 'case came from — the defect it was opened from, or "Imported as JSON".',
+        body: "We opened **{case}** for you. The header shows the 8D number, its status, the symptom, and where the case came from: the defect it was opened from, or \"Imported as JSON\".",
     },
     {
         id: 'case-export',
@@ -469,7 +430,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'bottom',
         controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
         title: 'Export Excel',
-        body: 'Exports the full 8D report as a multi-sheet Excel workbook — ready to share or attach to an audit.',
+        body: "Exports the full 8D report as a multi-sheet Excel workbook, ready to share or attach to an audit.",
     },
     {
         id: 'case-stops',
@@ -480,10 +441,7 @@ export const TOUR_STEPS: TourStep[] = [
         optional: true,
         controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
         title: 'AI Stops',
-        body:
-            'Where the AI deliberately stopped and handed over to a person: **unverified facts**, **outside scope** '
-            + 'of the process and case library, or a decision that **exceeds its authority**. A blocking stop locks '
-            + "that step's approval until someone resolves it with a note. The badge counts open stops.",
+        body: "Where the AI deliberately stopped and handed over to a person: unverified facts, a case outside the scope of the process and case library, or a decision that exceeds its authority. A blocking stop locks that step's approval until someone resolves it with a note. The badge counts open stops.",
     },
     {
         id: 'case-audit',
@@ -493,9 +451,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'bottom',
         controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
         title: 'Audit Log',
-        body:
-            'Every human decision on this case — approvals, change requests, reopenings, resolved stops — with '
-            + 'when it happened, on which data, and why.',
+        body: "Every human decision on this case (approvals, change requests, reopenings, resolved stops), with when it happened, on which data, and why.",
     },
     {
         id: 'case-source',
@@ -515,9 +471,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'bottom',
         controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
         title: 'Re-analyze',
-        body:
-            'Runs the whole AI analysis again — about 3 minutes — for example after master data was corrected. '
-            + 'The page keeps itself up to date while it runs.',
+        body: "Runs the whole AI analysis again, which takes about 3 minutes. Use it, for example, after master data was corrected. The page keeps itself up to date while it runs.",
     },
     {
         id: 'case-tabs',
@@ -539,10 +493,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'right',
         controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
         title: 'The eight disciplines',
-        body:
-            'Overall completeness, then D1 – D8 with their status: Not started, In process, Changes requested or '
-            + 'Complete. Click a step to open it. Steps unlock in order — each needs the one before it completed. '
-            + 'We opened the first step that is not complete yet.',
+        body: "Overall completeness, then D1–D8 with their status: Not started, In process, Changes requested or Complete. Click a step to open it. Steps unlock in order, and each needs the one before it completed. We opened the first step that is not complete yet.",
     },
     {
         id: 'case-review',
@@ -552,9 +503,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'bottom',
         controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
         title: 'The step you are working on',
-        body:
-            'Its name and where it stands. The **ⓘ** icon beside the name shows how the AI produced this draft — '
-            + 'its reasoning and the source records it relied on.',
+        body: "Its name and where it stands. The **ⓘ** icon beside the name shows how the AI produced this draft: its reasoning and the source records it relied on.",
     },
     {
         id: 'case-status',
@@ -565,9 +514,7 @@ export const TOUR_STEPS: TourStep[] = [
         optional: true,
         controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
         title: 'Work status',
-        body:
-            'Every step starts **Not started** and stays read-only. Switch it to **In process** to edit the draft. '
-            + 'No step advances on its own — a person always moves it.',
+        body: "Every step starts **Not started** and stays read-only. Switch it to **In process** to edit the draft. No step advances on its own; a person always moves it.",
     },
     {
         id: 'case-approve',
@@ -578,10 +525,7 @@ export const TOUR_STEPS: TourStep[] = [
         optional: true,
         controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
         title: 'Approve step',
-        body:
-            'Signs the step off as Complete. If anything is still missing — an open AI stop, a required field, task '
-            + 'evidence — you are told exactly what before anything is saved. An approved step can be reopened later, '
-            + 'with a reason.',
+        body: "Signs the step off as Complete. If anything is still missing (an open AI stop, a required field, task evidence), you are told exactly what before anything is saved. An approved step can be reopened later, with a reason.",
     },
     {
         id: 'case-content',
@@ -591,10 +535,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'top',
         controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
         title: "The AI's draft",
-        body:
-            "Below the header is the step's content, drafted by the AI in the layout configured for this step — "
-            + 'tables, task lists and text fields. Once the step is **In process** you can correct any of it before '
-            + 'approving.',
+        body: "Below the header is the step's content, drafted by the AI in the layout configured for this step: tables, task lists and text fields. Once the step is **In process** you can correct any of it before approving.",
     },
     {
         id: 'case-d4',
@@ -603,7 +544,7 @@ export const TOUR_STEPS: TourStep[] = [
         target: tourTarget('case-content'),
         side: 'top',
         controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'D4' },
-        title: 'D4 — Root cause',
+        title: "D4: root cause",
         body:
             'Each step has its own layout. D4 brings the root-cause analysis together: the Ishikawa (fishbone) '
             + "categories, the 5-Why chain and the AI's root-cause statement, each finding traceable to its evidence.",
@@ -617,9 +558,7 @@ export const TOUR_STEPS: TourStep[] = [
         optional: true,
         controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'D4' },
         title: 'AI Referee',
-        body:
-            'An independent second opinion: the AI forms its own root-cause hypothesis from the evidence without '
-            + 'seeing the recorded cause. Use it to challenge the conclusion — it decides nothing.',
+        body: "An independent second opinion: the AI forms its own root-cause hypothesis from the evidence without seeing the recorded cause. Use it to challenge the conclusion. It decides nothing.",
     },
     {
         id: 'case-evidence',
@@ -642,9 +581,7 @@ export const TOUR_STEPS: TourStep[] = [
         optional: true,
         controls: { 'caseDetail.tab': 'evidence' },
         title: 'Case Library & Precedents',
-        body:
-            'The closed cases the retrieval engine matched to this one, with their match score — and which engine '
-            + 'actually ran. Click a precedent to open it.',
+        body: "The closed cases the retrieval engine matched to this one, with their match score, and which engine actually ran. Click a precedent to open it.",
     },
     {
         id: 'case-overview',
@@ -654,10 +591,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'top',
         controls: { 'caseDetail.tab': 'summary' },
         title: 'Case Overview',
-        body:
-            'The case facts in one place — origin, material, batch, defect, work centre, cost of poor quality — '
-            + 'plus the two commitments you can edit: **Due date** and **Coordinator**. Below them: '
-            + "the AI's internal summary (and a customer-safe version for complaints) and the models that produced the draft.",
+        body: "The case facts in one place (origin, material, batch, defect, work centre, cost of poor quality) plus the two commitments you can edit: **Due date** and **Coordinator**. Below them are the AI's internal summary, a customer-safe version for complaints, and the models that produced the draft.",
     },
 
     // ── Kết ───────────────────────────────────────────────────────────────────

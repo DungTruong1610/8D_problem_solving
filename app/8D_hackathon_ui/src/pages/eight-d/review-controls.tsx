@@ -118,6 +118,18 @@ function parseJsonSafe(val: unknown): Record<string, any> | null {
     }
 }
 
+/**
+ * Tiêu đề bước, ví dụ "D1 — Team Roster".
+ *
+ * Một số case lưu sẵn mã bước trong `title` ("D1 — Team Roster"); ghép thêm mã
+ * vào trước sẽ thành "D1 — D1 — Team Roster". Tiêu đề đã có mã thì dùng nguyên.
+ */
+function stepHeading(code: string, title: string | null | undefined): string {
+    const text = (title ?? '').trim();
+    if (!text) return code;
+    return new RegExp(`^${code}\\b`, 'i').test(text) ? text : `${code} — ${text}`;
+}
+
 /** Ô quyết định và trạng thái nằm dưới nội dung của một bước. */
 export function DisciplineReviewBox({
     reportID,
@@ -261,12 +273,12 @@ export function DisciplineReviewBox({
                 <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                         <span className="text-base font-semibold tracking-tight text-foreground">
-                            {discipline.code} — {discipline.title}
+                            {stepHeading(discipline.code, discipline.title)}
                         </span>
                         {['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7'].includes(discipline.code) && (
                             <AiProvenanceInfo
                                 discipline={discipline}
-                                label={`${discipline.code} — ${discipline.title}`}
+                                label={stepHeading(discipline.code, discipline.title)}
                                 caseContext={caseContext}
                                 precedentsJson={precedentsJson}
                             />

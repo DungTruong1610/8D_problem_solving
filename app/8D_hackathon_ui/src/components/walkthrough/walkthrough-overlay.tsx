@@ -342,7 +342,7 @@ export function WalkthroughOverlay({
                     )}
                     {phase === 'missing' && (
                         <p className="text-xs text-warning">
-                            This part of the screen isn't showing right now — the description still applies.
+                            This part of the screen isn't showing right now. The description still applies.
                         </p>
                     )}
                 </div>
