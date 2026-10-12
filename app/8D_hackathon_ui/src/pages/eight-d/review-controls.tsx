@@ -2,14 +2,15 @@ import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
     Button,
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
     cn,
 } from '@cnma/react-ui';
-import { CheckCircle2, Lock, LockOpen, RotateCcw } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Lock, LockOpen, Play, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import {
     listTaskEvidence,
@@ -181,6 +182,9 @@ export function DisciplineReviewBox({
     // Mở lại một bước đã duyệt cần lý do (backend bắt buộc) — hỏi trong popup,
     // chỉ khi người dùng bấm Reopen.
     const [reopenOpen, setReopenOpen] = useState(false);
+    // Lý do không duyệt được — hiện trong cửa sổ báo lỗi thay vì toast.
+    const [approveErrors, setApproveErrors] = useState<string[] | null>(null);
+    const [starting, setStarting] = useState(false);
 
     const submit = useMutation({
         mutationFn: ({ decision, text }: { decision: ReviewDecision; text?: string }) =>
@@ -191,14 +195,22 @@ export function DisciplineReviewBox({
             });
             void queryClient.invalidateQueries({ queryKey: ['8d'] });
         },
-        onError: (e: any) => {
-            toast.error(e?.response?.data?.error?.message ?? e?.message ?? 'Could not save the review.');
+        onError: (e: any, { decision }) => {
+            const message = e?.response?.data?.error?.message ?? e?.message ?? 'Could not save the review.';
+            if (decision === 'approve') setApproveErrors([message]);
+            else toast.error(message);
         },
     });
 
-    const busy = submit.isPending;
+    const busy = submit.isPending || starting;
     // AI đã dừng ở bước này và chưa ai gỡ: không duyệt được (backend cũng chặn).
     const openStops = stops.filter((s) => s.blocking && s.status === 'open');
+    // Tính sẵn để nút Approve nhạt đi khi chưa đủ điều kiện.
+    const approveBlockers = [
+        ...openStops.map((s) => `AI stopped here — ${s.questionForHuman} (open "AI stops" at the top to resolve it)`),
+        ...completion.blockers.map((b) => b.message),
+    ];
+    const canApprove = approveBlockers.length === 0;
 
     /** Đổi trạng thái làm việc của một bước CHƯA duyệt. */
     const changeWorkState = async (value: 'NotStarted' | 'InProgress') => {
@@ -223,38 +235,31 @@ export function DisciplineReviewBox({
 
     /**
      * Duyệt KHÔNG đổi trạng thái task nào: từng task phải được người phụ trách
-     * hoàn tất riêng. Chưa đủ điều kiện thì nói lý do NGAY khi người dùng chọn
-     * Complete — không treo checklist cố định trên màn hình. Backend kiểm lại.
+     * hoàn tất riêng. Chưa đủ điều kiện thì chặn và liệt kê lý do trong cửa sổ
+     * báo lỗi — không treo checklist cố định trên màn hình. Backend kiểm lại.
      */
     const approve = () => {
-        if (!unlocked) {
-            toast.error(`Cannot complete ${discipline.code}: complete the previous step (${prevCode}) first.`);
-            return;
-        }
-        const reasons = [
-            ...openStops.map((s) => `AI stopped here — ${s.questionForHuman} (open "AI stops" at the top to resolve it)`),
-            ...completion.blockers.map((b) => b.message),
-        ];
-        if (reasons.length > 0) {
-            toast.error(`Cannot complete ${discipline.code} yet`, { description: reasons.join('\n') });
+        if (!canApprove) {
+            setApproveErrors(approveBlockers);
             return;
         }
         submit.mutate({ decision: 'approve' });
     };
 
     /**
-     * Dropdown chỉ đổi trạng thái làm việc (Not started / In process). Không bước
-     * nào tự chuyển sang "In process": bước trước xong chỉ MỞ KHOÁ quyền đổi
-     * trạng thái của bước sau — bắt đầu hay chưa là do người dùng chọn.
+     * Không bước nào tự chuyển sang "In process": bước trước xong chỉ MỞ KHOÁ
+     * nút Start của bước sau — bắt đầu hay chưa là do người dùng bấm.
      */
-    const handleStatusChange = async (value: 'NotStarted' | 'InProgress') => {
-        if (value === currentStatus) return;
+    const startProcess = async () => {
+        setStarting(true);
         try {
-            await changeWorkState(value);
-            toast.success(value === 'InProgress' ? 'Status: In process' : 'Status: Not started');
-            void queryClient.invalidateQueries({ queryKey: ['8d'] });
+            await changeWorkState('InProgress');
+            toast.success(`${discipline.code} — In process`);
+            await queryClient.invalidateQueries({ queryKey: ['8d'] });
         } catch (err: any) {
-            toast.error(err?.response?.data?.error?.message ?? err?.message ?? 'Could not update status.');
+            toast.error(err?.response?.data?.error?.message ?? err?.message ?? 'Could not start the step.');
+        } finally {
+            setStarting(false);
         }
     };
 
@@ -300,13 +305,14 @@ export function DisciplineReviewBox({
                                 ? 'In process — editing and confirmation enabled'
                                 : !unlocked
                                     ? `Not started (locked) — complete previous step (${prevCode}) to unlock`
-                                    : 'Not started (read-only) — switch status to "In process" to edit'}
+                                    : 'Not started (read-only) — click "Start the process" to edit'}
                         </p>
                     )}
                 </div>
 
-                <div className="flex shrink-0 flex-wrap items-center gap-2">
-                    {isApproved ? (
+                {/* Một nút duy nhất chỉ bước tiếp theo: Start → Approve → Reopen. */}
+                <div className="flex shrink-0 items-center" data-tour="case-action">
+                    {currentStatus === 'Completed' ? (
                         <Button
                             type="button"
                             variant="outline"
@@ -318,51 +324,59 @@ export function DisciplineReviewBox({
                             <RotateCcw className="h-3.5 w-3.5" />
                             Reopen
                         </Button>
+                    ) : currentStatus === 'InProgress' ? (
+                        <Button
+                            type="button"
+                            size="sm"
+                            // Chưa đủ điều kiện: nhạt đi nhưng vẫn bấm được để xem lý do.
+                            className={cn('gap-1.5', !canApprove && 'opacity-50 hover:opacity-60')}
+                            disabled={busy}
+                            aria-disabled={!canApprove}
+                            onClick={approve}
+                            title={canApprove ? `Approve ${discipline.code}` : `${discipline.code} is not ready to approve yet`}
+                        >
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            Approve
+                        </Button>
                     ) : (
-                        <>
-                            <Select
-                                value={currentStatus}
-                                disabled={busy || !unlocked}
-                                onValueChange={(val) => handleStatusChange(val as 'NotStarted' | 'InProgress')}
-                            >
-                                <SelectTrigger
-                                    data-tour="case-status"
-                                    className="h-9 w-[140px] px-3 text-sm font-medium bg-background"
-                                    aria-label="Work status"
-                                >
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="NotStarted">
-                                        <div className="flex items-center gap-1.5">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50" />
-                                            <span>Not started</span>
-                                        </div>
-                                    </SelectItem>
-                                    <SelectItem value="InProgress">
-                                        <div className="flex items-center gap-1.5">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                                            <span>In process</span>
-                                        </div>
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Button
-                                type="button"
-                                size="sm"
-                                className="gap-1.5"
-                                disabled={busy || !unlocked}
-                                data-tour="case-approve"
-                                onClick={approve}
-                                title={unlocked ? `Approve ${discipline.code}` : `Complete ${prevCode} first`}
-                            >
-                                <CheckCircle2 className="h-3.5 w-3.5" />
-                                Approve step
-                            </Button>
-                        </>
+                        <Button
+                            type="button"
+                            size="sm"
+                            className="gap-1.5"
+                            disabled={busy || !unlocked}
+                            onClick={startProcess}
+                            title={unlocked ? `Start working on ${discipline.code}` : `Complete ${prevCode} first`}
+                        >
+                            <Play className="h-3.5 w-3.5" />
+                            {starting ? 'Starting…' : 'Start the process'}
+                        </Button>
                     )}
                 </div>
             </div>
+
+            <Dialog open={approveErrors !== null} onOpenChange={(next) => !next && setApproveErrors(null)}>
+                <DialogContent className="sm:max-w-lg">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <AlertTriangle className="h-5 w-5 shrink-0 text-destructive" />
+                            Cannot approve {discipline.code} yet
+                        </DialogTitle>
+                        <DialogDescription>
+                            Resolve the following before approving this step:
+                        </DialogDescription>
+                    </DialogHeader>
+                    <ul className="list-disc space-y-1.5 pl-5 text-sm text-foreground">
+                        {(approveErrors ?? []).map((reason, i) => (
+                            <li key={i}>{reason}</li>
+                        ))}
+                    </ul>
+                    <DialogFooter>
+                        <Button type="button" onClick={() => setApproveErrors(null)}>
+                            OK
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             <ReasonDialog
                 open={reopenOpen}

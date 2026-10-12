@@ -41,7 +41,7 @@ From the Web UI (`/#/guide`), click **"Start WalkMe Tour (5 Min)"** to launch an
 1. **8D Reports**: the worklist with its compact (core) columns, the quick-filter chips, More/Fewer columns, Export Excel and Refresh. It then opens the **Create 8D Report** dialog and covers both entry paths: picking a recorded defect, and importing JSON (Upload file, sample issues, paste).
 2. **Master Data**: Inspection History, Defect Records (Record Defect, Start 8D / Open 8D), Closed Case Library (Import JSON) and the Value Help catalogues.
 3. **AI Configuration**: Where AI enters the chain, the Precedent Retrieval Engine, Model per processing step, Graph Retrieval Weights and Model Registry. The *8D Disciplines Configuration* tab is intentionally skipped.
-4. **Working a case**: the tour opens the reference case `8D-10048412` (or the first open case when that one is missing) and covers the header actions (Export Excel, AI Stops, Audit Log, Source JSON, Re-analyze). It then shows the D1–D8 stepper, the first step not yet complete (work status and Approve step), D4 root cause with the AI Referee, the Evidence tab with precedents, and the Case Overview.
+4. **Working a case**: the tour opens the reference case `8D-10048412` (or the first open case when that one is missing) and covers the header actions (Export Excel, AI Stops, Audit Log, Source JSON, Re-analyze). It then shows the D1–D8 stepper, the first step not yet complete (its single next-action button), D4 root cause with the AI Referee, the Evidence tab with precedents, and the Case Overview.
 
 **Controls:** **Next** / **→**, **Back** / **←**, and **Esc** or **Skip tour** to leave. The tour only opens screens; it never saves anything. The page underneath cannot be clicked while the tour runs, but the mouse wheel still scrolls it. The tour expands a collapsed sidebar, and it positions itself from live measurements, so it lines up at any browser zoom (designed and checked at **90 %**).
 
@@ -69,7 +69,10 @@ Running Benchmark Scenario: *Flange edge burr defect on CNC Milling Line 7 (`WC-
 * **Standard 3-Step Procedure:**
   1. Review top historical precedent matches in the right sidebar.
   2. Step through D1 to D8, clicking AI suggestions to inspect, accept, or refine them.
-  3. Click *"Approve Step"* to lock the current discipline and unlock the subsequent step.
+  3. Use the single action button in the step header, which always shows the next move:
+     * *"Start the process"*: the step is read-only until you click it. It stays disabled until the previous step is complete.
+     * *"Approve"*: signs the step off and unlocks the next one. It looks faded while something is still missing (an open AI stop, a required field, task status or evidence). Clicking it then opens an error dialog listing exactly what to fix, and nothing is saved.
+     * *"Reopen"*: withdraws a completed step's approval. A reason is required and is stored in the audit log.
 
 ### 3. Master Data Registry (`/#/master-data`)
 * **Purpose:** Search and verify industrial plant master registries: Work Centers (lines/machines), Materials (part numbers), Subject Matter Experts (SMEs), and Defect Catalogues.
