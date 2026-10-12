@@ -36,6 +36,7 @@
     "export:prompts": "node --import ./node_modules/tsx/dist/loader.mjs scripts/export-step-prompts.mjs",
     "push:prompts": "node scripts/push-step-config.mjs",
     "bundle:library": "node scripts/bundle-library.mjs",
+    "export:seed": "node scripts/export-seed-snapshot.mjs",
     "compile:srv": "node scripts/compile-srv.mjs",
     "engine:status": "cds bind --exec --profile graph -- node scripts/toggle-graph-engine.mjs status",
     "engine:graph": "cds bind --exec --profile graph -- node scripts/toggle-graph-engine.mjs graph",

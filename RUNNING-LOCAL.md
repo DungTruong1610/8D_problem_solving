@@ -192,6 +192,16 @@ import data from './mockdata.json';
 
 Cách 2 hợp khi dữ liệu mock có cấu trúc lồng nhau, thứ CSV diễn đạt vụng.
 
+### Đưa các case đang làm ở local lên bản deploy
+
+Bản deploy (Render free) dựng DB mới từ `db/data/*.csv` ở mỗi lần build, nên dữ liệu nhập trên deploy không được giữ lại. Muốn deploy có đúng các case 8D đang có ở local (bản nháp AI, trạng thái từng D-step, nhật ký duyệt):
+
+```bash
+npm run export:seed
+```
+
+Lệnh này ghi đè `cnma.proresolve-Reports.csv`, `-Disciplines.csv` và `-ReviewEvents.csv` từ `db.sqlite` local. Commit và push để lần deploy sau có dữ liệu đó. Lúc khởi động, case đã đóng trong app được ghi bù vào kho tiền lệ. Bằng chứng upload (`TaskEvidences`) **không** được chở theo, vì là file nhị phân.
+
 ---
 
 ## 6. Sự cố hay gặp

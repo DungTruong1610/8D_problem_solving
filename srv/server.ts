@@ -20,6 +20,7 @@ import {
     embedLibraryInBackground,
     seedLibraryFromBundle,
 } from './src/domain/eightd/precedent/librarySeeder';
+import { backfillClosedCasesToLibrary } from './src/domain/eightd/precedent/closedCaseWriteBack';
 import {
     seedValueHelps,
     verifyDefectCatalogueCoverage,
@@ -297,6 +298,15 @@ async function startupTasks(): Promise<void> {
         // Kho thiếu làm hỏng gợi ý tiền lệ, nhưng không được làm app chết:
         // `findPrecedents` đã báo rõ lý do thay vì đoán bừa.
         logger.error('Không bù được kho case từ dữ liệu đóng gói:', e?.message ?? e);
+    }
+
+    // Case đóng trong app (chở lên bằng snapshot CSV) chưa có dòng kho — ghi bù,
+    // để chúng được gợi ý làm tiền lệ như ở local.
+    try {
+        const written = await backfillClosedCasesToLibrary();
+        if (written) logger.info(`Đã ghi bù ${written} case đóng trong app vào kho tiền lệ.`);
+    } catch (e: any) {
+        logger.error('Không ghi bù được case đã đóng vào kho:', e?.message ?? e);
     }
 
     // Định nghĩa F4 cho form ghi nhận lỗi, rồi kiểm tra catalogue phủ đủ kho case.

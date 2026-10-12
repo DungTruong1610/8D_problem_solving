@@ -40,6 +40,7 @@ const LOG = cds.log('closed-case-writeback');
 
 const REPORTS = 'cnma.proresolve.Reports';
 const DISCIPLINES = 'cnma.proresolve.Disciplines';
+const HISTORICAL_CASES = 'cnma.proresolve.HistoricalCases';
 
 /** Chỉ cần hai cột này để dựng lại kết luận — cố ý không nhận cả hàng. */
 export interface DisciplineResultRow {
@@ -368,4 +369,34 @@ export async function writeClosedCaseToLibrary(reportID: string): Promise<WriteB
     );
 
     return { historicalCaseID: ID, notificationId, replaced };
+}
+
+/**
+ * Ghi vào kho những report đã đóng mà kho chưa có, chạy lúc boot.
+ *
+ * Report đóng trong app ở local được chở lên deploy bằng snapshot CSV, nhưng
+ * dòng kho của nó thì không — `seedLibraryFromBundle` chỉ biết case trong
+ * `mock-data/clean/`. Thiếu bước này thì case đó có mặt ở danh sách mà không bao
+ * giờ được gợi ý làm tiền lệ. Idempotent: case đã có trong kho thì bỏ qua.
+ */
+export async function backfillClosedCasesToLibrary(): Promise<number> {
+    const closed = await SELECT.from(REPORTS).columns('ID', 'notificationId').where({ status: 'Closed' });
+    const inLibrary = new Set(
+        (await SELECT.from(HISTORICAL_CASES).columns('notificationId'))
+            .map((r: { notificationId?: string }) => text(r.notificationId)),
+    );
+
+    let written = 0;
+    for (const r of closed as { ID: string; notificationId?: string }[]) {
+        const nid = text(r.notificationId);
+        if (!nid || inLibrary.has(nid)) continue;
+        const result = await writeClosedCaseToLibrary(r.ID);
+        if (result.historicalCaseID) {
+            inLibrary.add(nid);
+            written++;
+        } else {
+            LOG.warn(`Không ghi được ${nid} vào kho: ${result.skippedReason}`);
+        }
+    }
+    return written;
 }

@@ -291,16 +291,10 @@ async function ensureReportRecord(db: any, notificationId: string, ctx: any, raw
         SELECT.one.from('cnma.proresolve.Reports').columns('ID').where({ notificationId }),
     );
     if (existing) {
-        if (isClosed) {
-            try {
-                await db.run(
-                    `UPDATE cnma_proresolve_Disciplines SET workState = 'Completed', reviewStatus = 'Approved', reviewedBy = 'AI Lead / Quality Manager', reviewedAt = CURRENT_TIMESTAMP WHERE report_ID = ?`,
-                    [existing.ID],
-                );
-            } catch {
-                // Table might be in different dialect/profile
-            }
-        }
+        // KHÔNG ép trạng thái các bước của report đã có: report trong
+        // `db/data/*.csv` là snapshot đúng trạng thái đang làm (xem
+        // scripts/export-seed-snapshot.mjs). Ép "Completed" ở mỗi lần boot sẽ xoá
+        // mất những bước còn dở trong snapshot.
         const allTeam = [
             ...(ctx.team?.leader ? [ctx.team.leader] : []),
             ...(ctx.team?.members || []),
