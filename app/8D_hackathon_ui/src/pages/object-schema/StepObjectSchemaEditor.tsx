@@ -79,7 +79,7 @@ export function StepObjectSchemaEditor({
                 <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b bg-card px-4 py-3">
                     <div className="min-w-0">
                         <h3 className="text-base font-bold text-foreground">
-                            Similarity Schema — what {stepCode} compares
+                            Similarity Schema - what {stepCode} compares
                         </h3>
                         <p className="mt-0.5 text-sm text-muted-foreground">
                             Profile <span className="font-medium text-foreground">{draft.label}</span> decides

@@ -685,7 +685,7 @@ export function registerAiAdminHandlers(srv: any): void {
       req.reject(400, `fallbackMatch phải là một trong: ${[...MATCH_TYPES].join(', ')}`);
     }
     if (matchType === 'cosine' && sourceField != null && String(sourceField) !== 'embedding') {
-      req.reject(400, 'Tiêu chí cosine phải so trên trường "embedding" — không trường nào khác có vector.');
+      req.reject(400, 'Tiêu chí cosine phải so trên trường "embedding" - không trường nào khác có vector.');
     }
     for (const [name, value] of [['weight', weight], ['fallbackWeight', fallbackWeight]] as const) {
       if (value == null) continue;
@@ -694,7 +694,7 @@ export function registerAiAdminHandlers(srv: any): void {
     }
     if (minSimilarity != null) {
       const n = Number(minSimilarity);
-      if (!Number.isFinite(n) || n < 0 || n > 1) req.reject(400, 'minSimilarity phải nằm trong khoảng 0–1.');
+      if (!Number.isFinite(n) || n < 0 || n > 1) req.reject(400, 'minSimilarity phải nằm trong khoảng 0-1.');
     }
   });
 

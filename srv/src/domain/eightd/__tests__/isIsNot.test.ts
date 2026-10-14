@@ -25,13 +25,13 @@ describe('computeIsIsNot', () => {
     it('trả về applicable=false khi không có đặc tính đo lường', () => {
         const res = computeIsIsNot(sampleLots, '');
         expect(res.applicable).toBe(false);
-        expect(res.reason).toContain('Not applicable — this defect has no measurable characteristic.');
+        expect(res.reason).toContain('Not applicable - this defect has no measurable characteristic.');
     });
 
     it('trả về applicable=false khi không có dữ liệu lô lịch sử', () => {
         const res = computeIsIsNot([], 'Flange burr height');
         expect(res.applicable).toBe(false);
-        expect(res.reason).toContain('Cannot compare — there is no measurement history for this part.');
+        expect(res.reason).toContain('Cannot compare - there is no measurement history for this part.');
     });
 
     it('trả về applicable=false khi chỉ có 1 nhóm thiết bị', () => {

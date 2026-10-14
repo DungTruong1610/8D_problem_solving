@@ -105,7 +105,7 @@ export function ClosureSummaryWidget({
         <div className="min-w-0 space-y-4">
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                 <StatTile icon={<Coins className="size-[18px]" />} label="Cost of poor quality" value={copq} empty="Not recorded" />
-                <StatTile icon={<Crosshair className="size-[18px]" />} label="Root cause" value={rootCause && rootCause !== '—' ? rootCause : null} empty="Not concluded in D4" />
+                <StatTile icon={<Crosshair className="size-[18px]" />} label="Root cause" value={rootCause && rootCause !== '-' ? rootCause : null} empty="Not concluded in D4" />
                 <StatTile icon={<Users className="size-[18px]" />} label="8D team" value={teamValue} empty="No team saved in D1" />
             </div>
 

@@ -194,11 +194,11 @@ export function HistoricalDefectsTab() {
                                             )}
                                         </td>
                                         <td className="py-3 px-4">
-                                            <div className="font-mono text-foreground font-semibold">{row.workCenterId || '—'}</div>
+                                            <div className="font-mono text-foreground font-semibold">{row.workCenterId || '-'}</div>
                                             <div className="text-sm text-muted-foreground">{row.workCenterDesc || ''}</div>
                                         </td>
                                         <td className="py-3 px-4">
-                                            <div className="font-medium text-foreground line-clamp-1">{row.symptomShortText || '—'}</div>
+                                            <div className="font-medium text-foreground line-clamp-1">{row.symptomShortText || '-'}</div>
                                             <div className="text-sm text-muted-foreground line-clamp-1">
                                                 {row.defectCode ? `[${row.defectCode}] ` : ''}{row.defectText || ''}
                                             </div>
@@ -208,7 +208,7 @@ export function HistoricalDefectsTab() {
                                                 <Badge variant="secondary" className="text-sm font-semibold px-2.5 py-0.5">
                                                     {row.rootCauseCategory}
                                                 </Badge>
-                                            ) : '—'}
+                                            ) : '-'}
                                         </td>
                                         <td className="py-3 px-4">
                                             {(() => {
@@ -312,7 +312,7 @@ export function HistoricalDefectsTab() {
                 <CaseFormDialog
                     open={Boolean(editItem)}
                     onOpenChange={(open) => !open && setEditItem(null)}
-                    title={`Edit Case — ${editItem.notificationId}`}
+                    title={`Edit Case - ${editItem.notificationId}`}
                     initialValues={editItem}
                     isPending={updateMutation.isPending}
                     onSubmit={(values) => updateMutation.mutate({ id: editItem.ID, item: values })}
@@ -724,7 +724,7 @@ function CaseFormDialog({
                                         entries={materialVh.entries}
                                         loading={materialVh.loading}
                                         catalogLabel="the material master"
-                                        scoringNote="Precedent search matches this code exactly — a new material is fine, a typo is not."
+                                        scoringNote="Precedent search matches this code exactly - a new material is fine, a typo is not."
                                         placeholder="e.g. MAT-10247"
                                     />
                                 </div>
@@ -770,7 +770,7 @@ function CaseFormDialog({
                                         entries={workCenterVh.entries}
                                         loading={workCenterVh.loading}
                                         catalogLabel="the work centre list"
-                                        scoringNote="Precedent search matches this code exactly — a new work centre is fine, a typo is not."
+                                        scoringNote="Precedent search matches this code exactly - a new work centre is fine, a typo is not."
                                         placeholder="e.g. WC-MILL-07"
                                     />
                                 </div>
@@ -821,7 +821,7 @@ function CaseFormDialog({
                                     <Input
                                         value={defectCodeGroup}
                                         readOnly
-                                        placeholder="— from Defect Code —"
+                                        placeholder="- from Defect Code -"
                                         className="text-sm h-9 font-mono bg-muted/40"
                                     />
                                 </div>

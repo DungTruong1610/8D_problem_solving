@@ -94,7 +94,7 @@ export function resolveEvidencePath(root: unknown, path: string): ResolvedEviden
                 return {
                     path,
                     found: false,
-                    reason: `#${position} is out of range — "${name}" has ${current.length} entr${current.length === 1 ? 'y' : 'ies'}.`,
+                    reason: `#${position} is out of range - "${name}" has ${current.length} entr${current.length === 1 ? 'y' : 'ies'}.`,
                 };
             }
             current = current[position - 1];

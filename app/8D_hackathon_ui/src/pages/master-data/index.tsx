@@ -22,10 +22,10 @@ import { useTourControl } from '@/components/walkthrough';
  * chỗ ghi nhận lỗi; nó là kho tiền lệ, chỉ chứa case đã đóng.
  */
 const TAB_CAPTIONS = {
-    'inspection-lots': 'Inspection History — the comparison population behind D2\'s Is / Is-Not analysis. One row is one characteristic measured on one lot, not the full inspection lot object.',
-    'defects': 'Defect Records — every quality defect recorded, whether or not it warrants an 8D. Most defects are closed here; opening an 8D is a separate, deliberate decision made on this list.',
-    'historical-cases': 'Closed Case Library — the precedent store the AI retrieves from. Completed and closed cases only; an open case has no proven lesson to reuse.',
-    'code-catalogues': 'Master Data & Catalogues — centralized reference catalogs and value helps: defect codes, quality tasks, material batches, departments, coordinators, plants, and master data.',
+    'inspection-lots': 'Inspection History - the comparison population behind D2\'s Is / Is-Not analysis. One row is one characteristic measured on one lot, not the full inspection lot object.',
+    'defects': 'Defect Records - every quality defect recorded, whether or not it warrants an 8D. Most defects are closed here; opening an 8D is a separate, deliberate decision made on this list.',
+    'historical-cases': 'Closed Case Library - the precedent store the AI retrieves from. Completed and closed cases only; an open case has no proven lesson to reuse.',
+    'code-catalogues': 'Master Data & Catalogues - centralized reference catalogs and value helps: defect codes, quality tasks, material batches, departments, coordinators, plants, and master data.',
 } as const;
 
 type MasterDataTab = keyof typeof TAB_CAPTIONS;

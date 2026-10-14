@@ -186,7 +186,7 @@ describe('điều vector làm được mà luật không', () => {
         const r = scoreCase(open, other(0.726), CRITERIA);
         expect(r.score).toBeCloseTo(3.6, 5);
         expect(r.score).toBeGreaterThanOrEqual(3);
-        expect(explainScore(r)).toBe('3.6/16 — Similar description cosine 0.726');
+        expect(explainScore(r)).toBe('3.6/16 - Similar description cosine 0.726');
     });
 
     it('tắt tiêu chí ngữ nghĩa thì case này biến mất khỏi kết quả', () => {

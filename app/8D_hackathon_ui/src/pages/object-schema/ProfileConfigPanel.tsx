@@ -38,7 +38,7 @@ const STEP_METADATA: Record<string, { title: string; subtitle: string }> = {
 const METHODS = [
     { value: 'exact', label: 'Exact Match', className: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30', hint: 'Values must be equal, ignoring case and surrounding spaces. For array fields, sharing any one value counts as a match.' },
     { value: 'keyword', label: 'Keyword Match', className: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30', hint: 'Matches when the two texts share at least one keyword, after dropping filler and short words.' },
-    { value: 'family', label: 'Family Group', className: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/30', hint: 'Equality on a grouping field — used for "same material family".' },
+    { value: 'family', label: 'Family Group', className: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/30', hint: 'Equality on a grouping field - used for "same material family".' },
     { value: 'cosine', label: 'Vector (Cosine)', className: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30', hint: 'Semantic closeness between two case narratives. Score = weight × cosine similarity.' },
     { value: 'rerank', label: 'LLM Re-rank', className: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30', hint: 'A second-stage pass: an LLM reads the open case and each top candidate together and scores them against the instruction below. Score = weight × (model score / 100). Costs one model call per search.' },
 ] as const;
@@ -116,7 +116,7 @@ function FieldCard({
                                         <Zap className="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
                                     </TooltipTrigger>
                                     <TooltipContent side="bottom" className="text-sm">
-                                        Indexed column — filtered in SQL before scoring.
+                                        Indexed column - filtered in SQL before scoring.
                                     </TooltipContent>
                                 </Tooltip>
                             )}
@@ -248,14 +248,14 @@ function FieldCard({
                                 <Info className="h-3.5 w-3.5 cursor-help text-muted-foreground/60" />
                             </TooltipTrigger>
                             <TooltipContent side="bottom" className="max-w-72 text-sm">
-                                On the model's 0–1 scale: 0.5 means a candidate scoring below 50/100
+                                On the model's 0-1 scale: 0.5 means a candidate scoring below 50/100
                                 gets zero points from this criterion.
                             </TooltipContent>
                         </Tooltip>
                     </div>
                     <div className="space-y-1">
                         <Label className="text-xs font-semibold text-muted-foreground">
-                            Rerank instruction — the question the model ranks by
+                            Rerank instruction - the question the model ranks by
                         </Label>
                         <textarea
                             value={c.description ?? ''}
@@ -271,7 +271,7 @@ function FieldCard({
             {!field && methodKey !== 'rerank' && (
                 <div className="mt-2 rounded-md border border-destructive/30 bg-destructive/5 p-2 text-xs text-destructive">
                     Field <span className="font-mono font-semibold">{c.sourceField}</span> is not in the
-                    catalog — this criterion can never score.
+                    catalog - this criterion can never score.
                 </div>
             )}
         </div>
@@ -332,7 +332,7 @@ export function ProfileConfigPanel({
                         </div>
                         <span className="truncate text-sm">
                             {lockedStepCode
-                                ? `${lockedStepCode} · ${STEP_METADATA[lockedStepCode]?.title ?? ''} — Similarity Schema`
+                                ? `${lockedStepCode} · ${STEP_METADATA[lockedStepCode]?.title ?? ''} - Similarity Schema`
                                 : 'Profile Configuration'}
                         </span>
                     </div>
@@ -427,7 +427,7 @@ export function ProfileConfigPanel({
                             <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
                                 <Setting
                                     label="Min Score"
-                                    hint="Below this score nothing is surfaced at all — the step is told there is no precedent rather than handed a weak one."
+                                    hint="Below this score nothing is surfaced at all - the step is told there is no precedent rather than handed a weak one."
                                 >
                                     <Input
                                         type="number" min={0} step={0.5}

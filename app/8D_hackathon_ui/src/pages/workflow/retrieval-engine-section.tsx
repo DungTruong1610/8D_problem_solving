@@ -98,7 +98,7 @@ export function RetrievalEngineSection() {
                         </div>
                         <div>
                             <CardTitle className="text-base font-semibold">
-                                Precedent Retrieval Engine (D1 – D8)
+                                Precedent Retrieval Engine (D1 - D8)
                             </CardTitle>
                             <CardDescription className="text-sm">
                                 Choose how the 8D Copilot searches and surfaces past closed cases across all eight disciplines.
@@ -161,7 +161,7 @@ export function RetrievalEngineSection() {
                                 </li>
                                 <li className="flex items-center gap-1.5">
                                     <Sparkles className="h-3.5 w-3.5 text-primary shrink-0" />
-                                    <span>Specific relation weights tailored per discipline (D1 – D8)</span>
+                                    <span>Specific relation weights tailored per discipline (D1 - D8)</span>
                                 </li>
                             </ul>
                         </div>
@@ -194,7 +194,7 @@ export function RetrievalEngineSection() {
                             </div>
                             <p className="text-sm text-muted-foreground leading-relaxed">
                                 Uses <strong>Cosine similarity on text embeddings</strong> combined with multi-attribute
-                                scoring tables (0–16 scale) configured in Retrieval Profiles.
+                                scoring tables (0-16 scale) configured in Retrieval Profiles.
                             </p>
                             <ul className="text-sm text-muted-foreground/90 space-y-1.5 pt-1.5 border-t border-border/50">
                                 <li className="flex items-center gap-1.5">
@@ -237,7 +237,7 @@ export function RetrievalEngineSection() {
                         />
                     </div>
                     <p className="max-w-md pb-1.5 text-[11px] text-muted-foreground">
-                        Caps how many keywords from the open case are carried into the graph query —
+                        Caps how many keywords from the open case are carried into the graph query -
                         and with them, the number of bind parameters.
                     </p>
                 </div>

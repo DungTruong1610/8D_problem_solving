@@ -1086,7 +1086,7 @@ export const EXPRESSION_LANGUAGE: {
     constants: string[];
 } = {
     functions: [
-        { name: 'lookup', signature: "lookup('refSet', key)", description: 'Find a row in a Reference Data set by its key; returns the row — read a column with .column.', example: "lookup('confirmationControlProfiles', confirmationControlKey).tol2EarlyDays" },
+        { name: 'lookup', signature: "lookup('refSet', key)", description: 'Find a row in a Reference Data set by its key; returns the row - read a column with .column.', example: "lookup('confirmationControlProfiles', confirmationControlKey).tol2EarlyDays" },
         { name: 'coalesce', signature: 'coalesce(a, b, …)', description: 'First value that is not null, undefined, or empty.', example: 'coalesce(confirmedPrice, netPriceAmount, 0)' },
         { name: 'daysBetween', signature: 'daysBetween(d1, d2)', description: 'Whole days from d2 to d1 (d1 − d2); negative when d1 is earlier.', example: 'daysBetween(confirmedDate, requestedDate)' },
         { name: 'dateDiffDays', signature: 'dateDiffDays(d1, d2)', description: 'Same as daysBetween.', example: 'dateDiffDays(confirmedDate, requestedDate)' },
@@ -1103,7 +1103,7 @@ export const EXPRESSION_LANGUAGE: {
         { symbol: '+  -  *  /  %', description: 'Arithmetic (% = remainder)' },
         { symbol: '==  !=  <  <=  >  >=', description: 'Comparison. == / != coerce numbers vs numeric text (e.g. amount == 0 works even when the field is text "0"); two text values compare as text.' },
         { symbol: '&&   ||   not', description: 'Logical and / or / not' },
-        { symbol: 'a ? b : c', description: 'Conditional — if a then b else c. Nestable for switch-case: a ? x : b ? y : z' },
+        { symbol: 'a ? b : c', description: 'Conditional - if a then b else c. Nestable for switch-case: a ? x : b ? y : z' },
         { symbol: '(  )', description: 'Grouping' },
     ],
     constants: ['null', 'true', 'false', 'Infinity'],

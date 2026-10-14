@@ -57,7 +57,7 @@ export const EIGHTD_ACTIVITIES: AiActivity[] = [
         key: 'analyzeDefect',
         label: 'Analyse defect',
         description:
-            'Reason over the parsed data to find the cause. This is the step that needs the strongest model — get it wrong and everything downstream is worthless.',
+            'Reason over the parsed data to find the cause. This is the step that needs the strongest model - get it wrong and everything downstream is worthless.',
         budgetKey: 'analyzeDefectThinkingBudget',
     },
     {
@@ -87,7 +87,7 @@ export const EIGHTD_ACTIVITIES: AiActivity[] = [
          * cần ngữ cảnh dài, re-rank đọc mươi đoạn ngắn.
          */
         description:
-            'Grade a finished 8D report on writing quality: grounded, coherent, honest about gaps, specific, methodologically disciplined, actionable. Reads the whole report, so it needs a long context. Keep temperature at 0 — the same report must always get the same score, or two evaluation runs cannot be compared.',
+            'Grade a finished 8D report on writing quality: grounded, coherent, honest about gaps, specific, methodologically disciplined, actionable. Reads the whole report, so it needs a long context. Keep temperature at 0 - the same report must always get the same score, or two evaluation runs cannot be compared.',
         budgetKey: 'evaluateQualityThinkingBudget',
     },
 ];

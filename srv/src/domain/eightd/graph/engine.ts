@@ -140,7 +140,7 @@ function reasonFor(
     libraryCount: number,
 ): string {
     if (libraryCount === 0) {
-        return 'The case library is empty — no historical cases have been loaded yet. '
+        return 'The case library is empty - no historical cases have been loaded yet. '
             + 'Run the library seed before expecting precedent-based suggestions.';
     }
     if (evidenceCount === 0) {
@@ -212,7 +212,7 @@ async function rerankStep(
     } catch (e: any) {
         // Cùng triết lý với embedding hỏng ở `embedQuery`: giữ xếp hạng tầng 1
         // thay vì đổi cả lượt tìm lấy một sự cố tạm thời của model.
-        LOG.warn(`Re-rank ${profile.label} hỏng (${e.message}) — giữ xếp hạng tầng 1.`);
+        LOG.warn(`Re-rank ${profile.label} hỏng (${e.message}) - giữ xếp hạng tầng 1.`);
         return [...pool];
     }
 }
@@ -247,7 +247,7 @@ export async function findPrecedentsByStepGraph(
         try {
             queryText = buildQueryText(context);
         } catch (e: any) {
-            LOG.warn(`Không dựng được văn bản truy vấn cho re-rank (${e.message}) — bỏ tầng 2.`);
+            LOG.warn(`Không dựng được văn bản truy vấn cho re-rank (${e.message}) - bỏ tầng 2.`);
         }
     }
 
@@ -278,7 +278,7 @@ export async function findPrecedentsByStepGraph(
 
     LOG.info(
         `Case ${context.notificationId} · graph: ${union.length} tiền lệ hợp nhất từ `
-        + `${evidence.length} chặng bằng chứng — `
+        + `${evidence.length} chặng bằng chứng - `
         + STEP_CODES.map((code) => `${code}:${byStep[code].precedents.length}`).join(' '),
     );
 
@@ -321,7 +321,7 @@ export async function findPrecedents(context: CaseContext, raw?: unknown): Promi
             LOG.error(`Truy hồi bằng graph hỏng và fallback đang TẮT: ${e.message}`);
             throw e;
         }
-        LOG.warn(`Truy hồi bằng graph hỏng (${e.message}) — rơi về engine chấm điểm.`);
+        LOG.warn(`Truy hồi bằng graph hỏng (${e.message}) - rơi về engine chấm điểm.`);
         try {
             return asGraphFallback(await findPrecedentsByScoring(context, raw), `Graph retrieval failed: ${e.message}.`);
         } catch (fallbackError: any) {

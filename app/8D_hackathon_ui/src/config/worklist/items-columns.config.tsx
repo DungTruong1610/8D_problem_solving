@@ -64,8 +64,8 @@ export const itemsColumns: any[] = [
             const row = info.row?.original || {};
             return (
                 <div className="min-w-0">
-                    <div className="text-xs font-medium text-foreground">{row.createdBy || String(info.getValue?.() ?? '') || '—'}</div>
-                    <div className="text-[11px] text-muted-foreground tabular-nums">{row.createdAt ? new Date(row.createdAt).toLocaleString('en-GB') : '—'}</div>
+                    <div className="text-xs font-medium text-foreground">{row.createdBy || String(info.getValue?.() ?? '') || '-'}</div>
+                    <div className="text-[11px] text-muted-foreground tabular-nums">{row.createdAt ? new Date(row.createdAt).toLocaleString('en-GB') : '-'}</div>
                 </div>
             );
         },
@@ -77,8 +77,8 @@ export const itemsColumns: any[] = [
             const row = info.row?.original || {};
             return (
                 <div className="min-w-0">
-                    <div className="text-xs font-medium text-foreground">{row.modifiedBy || row.createdBy || '—'}</div>
-                    <div className="text-[11px] text-muted-foreground tabular-nums">{row.modifiedAt ? new Date(row.modifiedAt).toLocaleString('en-GB') : (row.createdAt ? new Date(row.createdAt).toLocaleString('en-GB') : '—')}</div>
+                    <div className="text-xs font-medium text-foreground">{row.modifiedBy || row.createdBy || '-'}</div>
+                    <div className="text-[11px] text-muted-foreground tabular-nums">{row.modifiedAt ? new Date(row.modifiedAt).toLocaleString('en-GB') : (row.createdAt ? new Date(row.createdAt).toLocaleString('en-GB') : '-')}</div>
                 </div>
             );
         },

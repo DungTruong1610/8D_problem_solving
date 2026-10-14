@@ -379,8 +379,8 @@ function backfillD2IsIsNot(
         problem.is = [];
         problem.isNot = [];
         problem.isIsNotStatus = primaryChar
-            ? 'Cannot compare — there is no measurement history for this part.'
-            : 'Not applicable — this defect has no measurable characteristic.';
+            ? 'Cannot compare - there is no measurement history for this part.'
+            : 'Not applicable - this defect has no measurable characteristic.';
         problem.isIsNotBasis = '';
     }
 }

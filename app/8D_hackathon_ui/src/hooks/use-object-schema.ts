@@ -203,22 +203,22 @@ export function useObjectSchema(stepCode?: string): ObjectSchemaState {
             return 'Each profile can only be assigned to a single 8D step.';
         }
         if (draft.steps.length && !draft.fields.length) {
-            return `Profile is assigned to ${draft.steps.join(', ')} but contains no fields — that step would never match any precedent.`;
+            return `Profile is assigned to ${draft.steps.join(', ')} but contains no fields - that step would never match any precedent.`;
         }
         const maxScore = draft.fields
             .filter((f) => f.enabled)
             .reduce((sum, f) => sum + (f.weight ?? 0), 0);
         if (draft.steps.length && maxScore === 0) {
-            return 'No field is enabled — the reachable score is 0, so nothing can pass the threshold.';
+            return 'No field is enabled - the reachable score is 0, so nothing can pass the threshold.';
         }
         if (maxScore > 0 && draft.minScore > maxScore) {
-            return `Threshold ${draft.minScore} is above the reachable score ${maxScore} — no case can ever qualify.`;
+            return `Threshold ${draft.minScore} is above the reachable score ${maxScore} - no case can ever qualify.`;
         }
         const cosineOnWrongField = draft.fields.find(
             (f) => f.matchType === 'cosine' && f.sourceField !== 'embedding',
         );
         if (cosineOnWrongField) {
-            return `"${cosineOnWrongField.label}" uses Vector matching on "${cosineOnWrongField.sourceField}" — only the embedding field carries a vector.`;
+            return `"${cosineOnWrongField.label}" uses Vector matching on "${cosineOnWrongField.sourceField}" - only the embedding field carries a vector.`;
         }
         return null;
     }, [draft]);

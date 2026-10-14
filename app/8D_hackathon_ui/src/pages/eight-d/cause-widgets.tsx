@@ -204,7 +204,7 @@ export function WhyChainWidget({ value, disciplineID, fieldKey, readOnly = false
                                     <div className="min-w-0 flex-1 space-y-1">
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <p className="break-words text-sm font-semibold text-foreground">
-                                                {row.question ?? row.why ?? '—'}
+                                                {row.question ?? row.why ?? '-'}
                                             </p>
                                             {isRoot && (
                                                 <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2.5 py-0.5 text-sm font-bold uppercase tracking-wider text-destructive border border-destructive/20">
@@ -214,7 +214,7 @@ export function WhyChainWidget({ value, disciplineID, fieldKey, readOnly = false
                                             )}
                                         </div>
                                         <p className="break-words text-sm text-muted-foreground leading-relaxed">
-                                            {row.answer ?? '—'}
+                                            {row.answer ?? '-'}
                                         </p>
                                     </div>
                                 </div>
@@ -557,11 +557,11 @@ export interface ActionRow {
 
 function cleanActionText(rawText: string | undefined): string {
     let text = String(rawText ?? '').trim();
-    if (!text) return '—';
+    if (!text) return '-';
     text = text.replace(/^(Proposed|Recorded)\s+containment\s+action(\s+based\s+on\s+precedent\s+[A-Z0-9-]+)?:?\s*/i, '');
     text = text.replace(/^(Proposed|Recorded)\s+action:?\s*/i, '');
     text = text.replace(/^(Precedent\s+proposed\s+action|Precedent\s+action):?\s*/i, '');
-    return text.trim() || '—';
+    return text.trim() || '-';
 }
 
 export function ActionCardsWidget({
@@ -767,7 +767,7 @@ function AiRefereeButton({ analysis, reportStatus, precedent }: {
                 </Button>
                 <span className="text-sm text-muted-foreground">
                     {category
-                        ? <>Independent root-cause check points to <strong className="font-medium text-foreground">{category}</strong>{disagrees ? ' — differs from the recorded cause' : ''}.</>
+                        ? <>Independent root-cause check points to <strong className="font-medium text-foreground">{category}</strong>{disagrees ? ' - differs from the recorded cause' : ''}.</>
                         : 'Independent root-cause check'}
                 </span>
             </div>
@@ -776,7 +776,7 @@ function AiRefereeButton({ analysis, reportStatus, precedent }: {
                     <DialogHeader>
                         <DialogTitle>AI Referee</DialogTitle>
                         <DialogDescription>
-                            The AI forms its own root-cause hypothesis from the evidence, without seeing the recorded cause. Use it to challenge the conclusion — it decides nothing.
+                            The AI forms its own root-cause hypothesis from the evidence, without seeing the recorded cause. Use it to challenge the conclusion - it decides nothing.
                         </DialogDescription>
                     </DialogHeader>
                     <ReasoningPanel analysis={analysis} reportStatus={reportStatus} precedent={precedent} readOnly />

@@ -362,7 +362,7 @@ export function ValueHelpInput(props: ValueHelpInputProps) {
             {!quiet && !query && !loading && entries.length > 0 && (
                 <p className="mt-1 flex items-start gap-1 text-xs leading-normal text-muted-foreground">
                     <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                    <span>{entries.length} in {catalogLabel} — start typing to pick one.</span>
+                    <span>{entries.length} in {catalogLabel} - start typing to pick one.</span>
                 </p>
             )}
         </div>

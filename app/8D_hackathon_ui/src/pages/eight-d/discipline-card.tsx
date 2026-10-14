@@ -102,7 +102,7 @@ export function DisciplineCard({ discipline }: { discipline: Discipline8D }) {
 
                     {inferred && (
                         <p className="mt-1.5 break-words text-sm font-normal text-warning">
-                            Proposed by AI — the dataset holds no evidence for this discipline.
+                            Proposed by AI - the dataset holds no evidence for this discipline.
                         </p>
                     )}
                 </div>

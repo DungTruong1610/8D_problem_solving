@@ -45,7 +45,7 @@ export function GettingStartedBanner() {
                 <Compass className="mt-0.5 size-4 shrink-0 text-primary" />
                 <p className="text-sm text-foreground">
                     <span className="font-semibold">First time here?</span>{' '}
-                    Open the sample case to walk one defect from D1 to D8 — the AI drafts each step and you approve or send it back — then run Verify to check the four reference test cases.
+                    Open the sample case to walk one defect from D1 to D8 - the AI drafts each step and you approve or send it back - then run Verify to check the four reference test cases.
                 </p>
             </div>
             <div className="flex shrink-0 items-center gap-2 pl-7 md:pl-0">

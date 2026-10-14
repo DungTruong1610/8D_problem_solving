@@ -578,7 +578,7 @@ export function CreateDefectDialog({ open, onOpenChange, onCreated, defect }: Cr
             if (!name || name === currentUserName) continue;
             const cleanId = String(entry.key ?? '').replace(/^BP-/i, '');
             const title = entry.functionTitle ? ` (${String(entry.functionTitle)})` : '';
-            list.push({ value: name, label: `${cleanId} — ${name}${title}` });
+            list.push({ value: name, label: `${cleanId} - ${name}${title}` });
         }
         return list;
     }, [currentUserName, partnerVh.entries, isLocal, userInfo.isAdmin]);
@@ -634,7 +634,7 @@ export function CreateDefectDialog({ open, onOpenChange, onCreated, defect }: Cr
         const list: string[] = [];
         if (origin === ORIGIN_CUSTOMER && !complaintReference.trim()) {
             list.push(
-                'A customer complaint (Q1) needs its Complaint Reference — it is the only link back to '
+                'A customer complaint (Q1) needs its Complaint Reference - it is the only link back to '
                 + "the customer's own record.",
             );
         }
@@ -1322,8 +1322,8 @@ function numberOrNull(val?: string | null): number | null {
                             </DialogTitle>
                             <DialogDescription className="text-sm text-muted-foreground">
                                 {isEditing
-                                    ? 'Corrections to the defect record. The defect number and its status do not change here — status follows the 8D, and the number is issued once.'
-                                    : 'Simulate creating a Quality Notification. The defect is recorded on its own — starting an 8D is a separate, explicit step from the Defects list.'}
+                                    ? 'Corrections to the defect record. The defect number and its status do not change here - status follows the 8D, and the number is issued once.'
+                                    : 'Simulate creating a Quality Notification. The defect is recorded on its own - starting an 8D is a separate, explicit step from the Defects list.'}
                             </DialogDescription>
                         </div>
 
@@ -1527,7 +1527,7 @@ function numberOrNull(val?: string | null): number | null {
                             />
                             <p className="text-sm text-muted-foreground">
                                 {isEditing
-                                    ? 'Issued once, when the defect was recorded. It cannot change — the 8D and the audit trail refer to it.'
+                                    ? 'Issued once, when the defect was recorded. It cannot change - the 8D and the audit trail refer to it.'
                                     : 'Auto-assigned by system number sequence on save.'}
                             </p>
                         </div>
@@ -1773,7 +1773,7 @@ function numberOrNull(val?: string | null): number | null {
                             <Input
                                 value={materialGroup}
                                 readOnly
-                                placeholder="— from Material ID —"
+                                placeholder="- from Material ID -"
                                 className="font-mono h-9 text-sm bg-muted/60 text-muted-foreground"
                             />
                         </div>
@@ -1819,7 +1819,7 @@ function numberOrNull(val?: string | null): number | null {
                             <Input
                                 value={workCenterDesc}
                                 readOnly
-                                placeholder="— from Work Center ID —"
+                                placeholder="- from Work Center ID -"
                                 className="h-9 text-sm bg-muted/60 text-muted-foreground"
                             />
                         </div>
@@ -1896,7 +1896,7 @@ function numberOrNull(val?: string | null): number | null {
                                 <Input
                                     value={defectClass}
                                     readOnly
-                                    placeholder="— from Defect Code —"
+                                    placeholder="- from Defect Code -"
                                     className="h-9 text-sm bg-muted/60 text-muted-foreground"
                                 />
                             </div>
@@ -1922,7 +1922,7 @@ function numberOrNull(val?: string | null): number | null {
                                         Tip: If this material has historical inspection lots across multiple equipments/fixtures, the system will automatically compute the Is / Is-Not comparison in D2.
                                     </p>
                                     <p className="text-sm text-muted-foreground">
-                                        A row counts as evidence only once it can be judged — set the
+                                        A row counts as evidence only once it can be judged - set the
                                         valuation, or give a limit for the measured value to be checked against.
                                     </p>
                                 </div>
@@ -2014,10 +2014,10 @@ function numberOrNull(val?: string | null): number | null {
                                                 updateInspection(idx, 'valuation', val === 'none' ? '' : val)}
                                         >
                                             <SelectTrigger className="h-9 w-32 shrink-0 text-sm">
-                                                <SelectValue placeholder="—" />
+                                                <SelectValue placeholder="-" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="none">— not judged</SelectItem>
+                                                <SelectItem value="none">- not judged</SelectItem>
                                                 <SelectItem value="Accepted">Accepted</SelectItem>
                                                 <SelectItem value="Rejected">Rejected</SelectItem>
                                             </SelectContent>
@@ -2053,7 +2053,7 @@ function numberOrNull(val?: string | null): number | null {
                                     <p className="flex items-start gap-1 pt-1 text-sm leading-snug text-warning">
                                         <TriangleAlert className="mt-px h-3.5 w-3.5 shrink-0" />
                                         <span>
-                                            {unjudgedRows.join(', ')} — no valuation and no limit, so D2 cannot
+                                            {unjudgedRows.join(', ')} - no valuation and no limit, so D2 cannot
                                             judge {unjudgedRows.length > 1 ? 'these rows' : 'this row'}.
                                         </span>
                                     </p>
@@ -2071,7 +2071,7 @@ function numberOrNull(val?: string | null): number | null {
                             <CardTitle className="text-base font-bold">4. Responsibility</CardTitle>
                         </div>
                         <CardDescription className="text-sm">
-                            Who found it and who coordinates the notification. The 8D team itself is not decided here — D1 proposes it from the people who solved comparable defects.
+                            Who found it and who coordinates the notification. The 8D team itself is not decided here - D1 proposes it from the people who solved comparable defects.
                         </CardDescription>
                     </CardHeader>
 
@@ -2088,7 +2088,7 @@ function numberOrNull(val?: string | null): number | null {
                             </div>
                             <Select value={reportedBy || currentUserName} onValueChange={setReportedBy}>
                                 <SelectTrigger className="h-9 text-sm w-full">
-                                    <SelectValue placeholder="— select reporter —" />
+                                    <SelectValue placeholder="- select reporter -" />
                                 </SelectTrigger>
                                 <SelectContent className="max-h-60">
                                     {reportedByOptions.map((opt) => (
@@ -2167,7 +2167,7 @@ function numberOrNull(val?: string | null): number | null {
                                     để người dùng bấm Save rồi mới biết. */}
                                 {!complaintReference.trim() && (
                                     <p className="text-sm leading-snug text-destructive">
-                                        Required — the customer's own reference number. Leave the case
+                                        Required - the customer's own reference number. Leave the case
                                         unsaved rather than inventing one.
                                     </p>
                                 )}

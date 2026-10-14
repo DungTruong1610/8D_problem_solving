@@ -21,12 +21,12 @@ describe('engineLabel', () => {
 
     it('không nhúng được thì nói rõ là dự phòng, semantic không có', () => {
         expect(engineLabel({ engine: 'scoring', semantic: 'unavailable', fallbackReason: 'no JINA_API_KEY' }))
-            .toBe('Scoring fallback — semantic search unavailable');
+            .toBe('Scoring fallback - semantic search unavailable');
     });
 
     it('graph không chạy được thì nói rõ là dự phòng từ graph', () => {
         expect(engineLabel({ engine: 'scoring', semantic: 'used', fallbackReason: 'Graph retrieval failed: x.' }))
-            .toBe('Scoring fallback — graph unavailable');
+            .toBe('Scoring fallback - graph unavailable');
     });
 
     it('không chạy gì', () => {

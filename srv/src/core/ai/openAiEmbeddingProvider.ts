@@ -133,7 +133,7 @@ export class OpenAiEmbeddingLlmProvider implements LlmProvider {
       if (payload.task && status === 400 && !this.taskRejected) {
         this.taskRejected = true;
         console.warn(
-          `[Embedding] Nhà cung cấp từ chối tham số "task" (${detail}) — `
+          `[Embedding] Nhà cung cấp từ chối tham số "task" (${detail}) - `
             + 'thử lại không kèm tham số này; chất lượng truy hồi có thể giảm nhẹ.',
         );
         const retryPayload = { model: this.model, input: inputs };

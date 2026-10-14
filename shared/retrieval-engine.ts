@@ -34,8 +34,8 @@ export function engineLabel(info: Omit<RetrievalEngineInfo, 'label'>): string {
     if (info.engine === 'none') return 'Precedent search did not run';
     if (info.engine === 'graph') return 'Graph retrieval';
     const fellBackFromGraph = Boolean(info.fallbackReason) && info.semantic !== 'unavailable';
-    if (info.semantic === 'unavailable') return 'Scoring fallback — semantic search unavailable';
-    if (fellBackFromGraph) return 'Scoring fallback — graph unavailable';
+    if (info.semantic === 'unavailable') return 'Scoring fallback - semantic search unavailable';
+    if (fellBackFromGraph) return 'Scoring fallback - graph unavailable';
     if (info.semantic === 'used') return 'Attribute + semantic scoring';
     return 'Attribute scoring';
 }

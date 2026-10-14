@@ -98,7 +98,7 @@ export const DISCIPLINE_ITEM_PROPERTIES = {
     content: {
         type: 'string',
         maxLength: 1_600,
-        description: 'Markdown bullets. Only what the reader needs to act — see the STYLE rules.',
+        description: 'Markdown bullets. Only what the reader needs to act - see the STYLE rules.',
     },
     actionItems: { type: 'array', maxItems: 8, items: { type: 'string', maxLength: 220 } },
     sources: {

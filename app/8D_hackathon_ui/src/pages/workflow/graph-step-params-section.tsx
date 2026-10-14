@@ -77,7 +77,7 @@ function NumberField({
             <Input
                 type="number"
                 value={value ?? ''}
-                placeholder="—"
+                placeholder="-"
                 onChange={(e) => onChange(parseNumberInput(e.target.value))}
                 className={cn(NUMBER_INPUT, error && 'border-destructive focus-visible:ring-destructive/30')}
             />
@@ -107,7 +107,7 @@ function FrameField({
             <Textarea
                 rows={3}
                 value={value ?? ''}
-                placeholder="Empty — the step's built-in frame is used"
+                placeholder="Empty - the step's built-in frame is used"
                 onChange={(e) => onChange(e.target.value.trim() === '' ? null : e.target.value)}
                 className="text-xs leading-relaxed"
             />
@@ -195,7 +195,7 @@ export function GraphStepParamsSection() {
                     </div>
                     <div>
                         <h2 className="text-lg font-semibold tracking-tight">
-                            Graph Retrieval Weights (D1 – D8)
+                            Graph Retrieval Weights (D1 - D8)
                         </h2>
                         <p className="max-w-2xl text-xs text-muted-foreground">
                             How much each kind of shared evidence counts when the graph engine looks
@@ -262,7 +262,7 @@ export function GraphStepParamsSection() {
                 {/* ── Cột phải: dòng đang chọn ── */}
                 {!draft ? (
                     <p className="py-8 text-center text-sm text-muted-foreground">
-                        No stored row for {selected}. The server seeds all eight steps on startup —
+                        No stored row for {selected}. The server seeds all eight steps on startup -
                         restart the service if this persists.
                     </p>
                 ) : (
@@ -274,7 +274,7 @@ export function GraphStepParamsSection() {
                                 <AlertTriangle className="mt-px h-4 w-4 shrink-0 text-destructive" />
                                 <p>
                                     <strong className="font-semibold">
-                                        Rejected — the built-in defaults are running instead.
+                                        Rejected - the built-in defaults are running instead.
                                     </strong>
                                     <br />
                                     {diag.violation}
@@ -346,7 +346,7 @@ export function GraphStepParamsSection() {
                             </div>
                             <p className="text-[10.5px] leading-snug text-muted-foreground">
                                 An empty box differs from a zero: a kind that is not weighted never
-                                appears in the evidence path. D7 leaves work centre empty on purpose —
+                                appears in the evidence path. D7 leaves work centre empty on purpose -
                                 prevention has to reach beyond the station that failed.
                             </p>
 
@@ -410,7 +410,7 @@ export function GraphStepParamsSection() {
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="__none__">None — no action probe</SelectItem>
+                                            <SelectItem value="__none__">None - no action probe</SelectItem>
                                             {ACTION_TYPES.map((t) => (
                                                 <SelectItem key={t} value={t}>{t}</SelectItem>
                                             ))}
@@ -456,7 +456,7 @@ export function GraphStepParamsSection() {
                                     onChange={(v) => setDraft({ ...draft, wRerank: v })}
                                 />
                                 <NumberField
-                                    label="Re-rank floor (0–1)"
+                                    label="Re-rank floor (0-1)"
                                     hint="Empty = step default, 0 = no floor"
                                     value={draft.rerankFloor}
                                     error={issueFor(issues, 'rerankFloor')}
@@ -490,7 +490,7 @@ export function GraphStepParamsSection() {
                         <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-4">
                             <p className="text-[11px] text-muted-foreground">
                                 {issues.length > 0
-                                    ? 'Fix the highlighted values — the server would reject this row and keep running the defaults.'
+                                    ? 'Fix the highlighted values - the server would reject this row and keep running the defaults.'
                                     : dirty
                                         ? 'Unsaved changes. Effective within 30 seconds of saving.'
                                         : 'No unsaved changes.'}

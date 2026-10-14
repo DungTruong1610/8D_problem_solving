@@ -49,7 +49,7 @@ export function PrecedentPanel({ reportID, precedentsJson }: {
                 // Trước đây nhánh này mở report ĐẦU TIÊN trong danh sách — tức là một
                 // case khác hẳn, trong khi toast nói là đang mở tiền lệ. Tiền lệ sống
                 // trong kho case đã đóng; không có 8D report tương ứng thì nói thẳng.
-                toast.info(`${notificationId} is a closed case in the case library — it has no 8D report in this system.`, {
+                toast.info(`${notificationId} is a closed case in the case library - it has no 8D report in this system.`, {
                     description: 'Its details are shown on this card and under Master Data → Closed Case Library.',
                 });
             }

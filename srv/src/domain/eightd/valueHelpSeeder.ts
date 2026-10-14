@@ -71,10 +71,10 @@ export const VALUE_HELP_IDS = {
  * không phải ngược lại.
  */
 const PLACEHOLDER_PLANTS = [
-    { key: '1000', text: '1000 — Main Manufacturing' },
-    { key: '2000', text: '2000 — Machining Centre' },
-    { key: '3000', text: '3000 — Assembly' },
-    { key: '4000', text: '4000 — Spare Parts' },
+    { key: '1000', text: '1000 - Main Manufacturing' },
+    { key: '2000', text: '2000 - Machining Centre' },
+    { key: '3000', text: '3000 - Assembly' },
+    { key: '4000', text: '4000 - Spare Parts' },
 ];
 
 /**
@@ -305,7 +305,7 @@ interface ValueHelpSeed {
 const SEEDS: ValueHelpSeed[] = [
     {
         valueHelpID: VALUE_HELP_IDS.plant,
-        description: 'Plants available for quality notifications. Placeholder list — replace staticEntries, or switch sourceType to external once S/4 is connected.',
+        description: 'Plants available for quality notifications. Placeholder list - replace staticEntries, or switch sourceType to external once S/4 is connected.',
         sourceType: 'static',
         staticEntries: JSON.stringify(PLACEHOLDER_PLANTS),
         displayFormat: 'textOnly',
@@ -363,7 +363,7 @@ const SEEDS: ValueHelpSeed[] = [
          * Khi S/4 được nối, đổi `sourceType` sang 'external' là xong.
          */
         valueHelpID: VALUE_HELP_IDS.partner,
-        description: 'Business partners seen on closed 8D cases. Email and phone come from HistoricalTeamMembers — maintain them there, or switch sourceType to external once S/4 is connected.',
+        description: 'Business partners seen on closed 8D cases. Email and phone come from HistoricalTeamMembers - maintain them there, or switch sourceType to external once S/4 is connected.',
         sourceType: 'reference',
         referenceTable: 'HistoricalTeamMembers',
         keyColumn: 'partnerId',
@@ -401,7 +401,7 @@ const SEEDS: ValueHelpSeed[] = [
          * đến thật là `sourceType: 'external'` trỏ vào S/4.
          */
         valueHelpID: VALUE_HELP_IDS.defectCode,
-        description: 'Defect catalogue codes with their code group and defect class. Selecting one fills the description and the severity — derived from catalog type 9.',
+        description: 'Defect catalogue codes with their code group and defect class. Selecting one fills the description and the severity - derived from catalog type 9.',
         sourceType: 'static',
         staticEntries: JSON.stringify(DEFECT_CODES),
         dependsOn: 'codeGroup',
@@ -639,7 +639,7 @@ async function reconcileStaticCatalogues(db: any): Promise<void> {
         } catch (e: any) {
             // Nội dung hỏng thì bỏ qua chứ không ghi đè: đè lên là xoá mất bản
             // admin đã sửa, và mất im lặng. Báo to để có người đi sửa tay.
-            LOG.error(`staticEntries của ${seed.valueHelpID} không đọc được (${e.message}) — bỏ qua reconcile, cần sửa tay.`);
+            LOG.error(`staticEntries của ${seed.valueHelpID} không đọc được (${e.message}) - bỏ qua reconcile, cần sửa tay.`);
             continue;
         }
 
@@ -693,7 +693,7 @@ export async function verifyDefectCatalogueCoverage(): Promise<string[]> {
                 .where({ valueHelpID: VALUE_HELP_IDS.defectCode, objectType: DEFECT_OBJECT_TYPE }),
         );
         if (!row) {
-            LOG.error('Chưa có định nghĩa F4 DEFECT_CODE — không kiểm tra được độ phủ catalogue.');
+            LOG.error('Chưa có định nghĩa F4 DEFECT_CODE - không kiểm tra được độ phủ catalogue.');
             return [];
         }
 
@@ -760,7 +760,7 @@ export async function verifyTaskCatalogueCoverage(): Promise<string[]> {
                 .where({ valueHelpID: VALUE_HELP_IDS.taskCode, objectType: DEFECT_OBJECT_TYPE }),
         );
         if (!row) {
-            LOG.error('Chưa có định nghĩa F4 TASK_CODE — không kiểm tra được độ phủ danh mục nhiệm vụ.');
+            LOG.error('Chưa có định nghĩa F4 TASK_CODE - không kiểm tra được độ phủ danh mục nhiệm vụ.');
             return [];
         }
 
@@ -792,7 +792,7 @@ export async function verifyTaskCatalogueCoverage(): Promise<string[]> {
         if (uncoded) {
             LOG.warn(
                 `${uncoded}/${rows.length} hành động trong kho chưa mã hoá được. ` +
-                'Không phải lỗi — nhưng nếu con số này tăng thì bộ luật trong shared/task-catalogue.ts cần bổ sung.',
+                'Không phải lỗi - nhưng nếu con số này tăng thì bộ luật trong shared/task-catalogue.ts cần bổ sung.',
             );
         }
         return orphans;

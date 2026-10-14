@@ -17,7 +17,7 @@ export function AiConfigTab() {
         <div className="space-y-5">
             <TabIntro
                 title="AI configuration"
-                description="Everything below is changed on the AI Configuration page — no code or redeploy needed."
+                description="Everything below is changed on the AI Configuration page - no code or redeploy needed."
                 action={
                     <Button type="button" size="sm" className="gap-1.5" onClick={() => navigate('/workflow')}>
                         Open AI Configuration

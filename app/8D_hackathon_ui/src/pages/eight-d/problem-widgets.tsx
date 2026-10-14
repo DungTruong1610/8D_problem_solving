@@ -431,7 +431,7 @@ function IsIsNotBox({ heading, value, disciplineID, fieldKey, tone, readOnly = f
                         'text-base font-semibold truncate',
                         isTone ? 'text-emerald-700 dark:text-emerald-400' : 'text-foreground/90',
                     )}>
-                        {heading || (isTone ? 'Is' : 'Is Not')} — {isTone ? 'Affected Scope & Condition' : 'Excluded Scope & Condition'}
+                        {heading || (isTone ? 'Is' : 'Is Not')} - {isTone ? 'Affected Scope & Condition' : 'Excluded Scope & Condition'}
                     </h4>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">

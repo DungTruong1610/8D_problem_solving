@@ -75,7 +75,7 @@ function disciplineStatus(code: string) {
             return {
                 text: 'No configuration row',
                 ready: false,
-                warn: `${code} has no row in the configuration table — restore defaults to create it.`,
+                warn: `${code} has no row in the configuration table - restore defaults to create it.`,
             };
         }
 
@@ -96,7 +96,7 @@ function disciplineStatus(code: string) {
             text: `${inputs} inputs · ${fields} output fields · ${rules} rules`,
             ready: inputs > 0 && fields > 0,
             warn: rules === 0
-                ? 'No constraints on this discipline — nothing is checked after the model answers.'
+                ? 'No constraints on this discipline - nothing is checked after the model answers.'
                 : undefined,
         };
     };
@@ -112,12 +112,12 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
         short: 'Validate and normalise recorded case facts',
         engine: 'rules',
         does: 'Read the notification exactly as recorded, normalise dates and IDs written in '
-            + 'different locales, and write down every gap the case has — no 5-Why yet, no team yet, '
+            + 'different locales, and write down every gap the case has - no 5-Why yet, no team yet, '
             + 'no actions yet. Those gaps are passed to the model later so it lowers its confidence '
             + 'in the right places instead of writing a confident report over missing data.',
         why: 'Validation and normalisation have exact rules. A model here would add a non-zero chance '
             + 'of being wrong at the one place everything downstream depends on being right.',
-        noConfig: 'Nothing to configure. The rules live in the code and are covered by tests — '
+        noConfig: 'Nothing to configure. The rules live in the code and are covered by tests - '
             + 'a defect case either parses or it is rejected with a reason.',
     },
     {
@@ -138,7 +138,7 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
             text: `${c.cases.length} closed cases in the library`,
             ready: c.cases.length > 0,
             warn: c.cases.length === 0
-                ? 'Empty library — the tool can only say "no precedent" until cases are loaded'
+                ? 'Empty library - the tool can only say "no precedent" until cases are loaded'
                 : undefined,
         }),
     },
@@ -151,7 +151,7 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
         short: 'So cases match by meaning, not just by code',
         engine: 'ai',
         does: 'Build one paragraph per case from the defect, the investigation findings and the causal '
-            + 'chain, then embed it. Numbers, dates and raw codes are deliberately left out — an '
+            + 'chain, then embed it. Numbers, dates and raw codes are deliberately left out - an '
             + 'embedding cannot tell 10cm from 10m, so anything measurable stays in a database column '
             + 'where it can be compared exactly.',
         why: 'Only an embedding model can tell that "raised metal ridge at bore mouth" and "flange edge '
@@ -178,7 +178,7 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
             + 'one field with one method and contributes its weight; a step can fall back to a weaker '
             + 'match rather than scoring nothing.',
         why: 'A fixed formula, so the number can be recomputed by hand and defended in a review. This '
-            + 'is the one stage that must never be a black box — it decides which past case gets '
+            + 'is the one stage that must never be a black box - it decides which past case gets '
             + 'quoted in an 8D report.',
         status: ({ retrieval: c }) => ({
             text: `${c.enabledCount}/${c.criteria.length} steps on · maximum score ${c.maxScore}`,
@@ -199,7 +199,7 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
             + 'something, and nobody downstream can tell it apart from a strong one. Being allowed to '
             + 'say "I do not know" is what makes the other answers worth trusting.',
         status: ({ retrieval: c }) => ({
-            text: `threshold ${c.settings?.minScore ?? '—'} of ${c.maxScore} · top ${c.settings?.topN ?? '—'}`
+            text: `threshold ${c.settings?.minScore ?? '-'} of ${c.maxScore} · top ${c.settings?.topN ?? '-'}`
                 + (c.settings?.closedOnly ? ' · closed cases only' : ' · open cases included'),
             ready: true,
         }),
@@ -215,7 +215,7 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
         does: 'Group the teams of the matched cases by function and by person, and rank people by how '
             + 'often they worked a comparable defect. The model later writes the justification, but it '
             + 'is given this exact list and may not add a name to it.',
-        why: 'Counting, not judgement — which also means a name can never be invented. Every person '
+        why: 'Counting, not judgement - which also means a name can never be invented. Every person '
             + 'proposed is on a real past team, traceable to a case number.',
         noConfig: 'Derived from the matched cases in step 4. Change the weights there and this list '
             + 'changes with them.',
@@ -247,7 +247,7 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
         title: 'D1 · Establish the team',
         short: 'Who should work this defect, and on what evidence',
         engine: 'ai',
-        does: 'The candidate list is already fixed by step 6 — counted, never generated. This step '
+        does: 'The candidate list is already fixed by step 6 - counted, never generated. This step '
             + 'decides what the model is handed to justify it: the official team from record, the size of '
             + 'that team, and the teams of the matched precedents. Its answer lands in named fields, and '
             + 'a grounding rule rejects any name that does not trace back to one of those inputs.',
@@ -268,7 +268,7 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
         does: 'Turn the case header, the material, the defect record and the inspection results into a '
             + 'problem statement with a 5W2H grid. The Is / Is-Not boundaries come from manual input '
             + 'where they exist; a citation rule then requires a source behind every measured value.',
-        why: 'The facts are already in the database — this step is about expressing them, which is what '
+        why: 'The facts are already in the database - this step is about expressing them, which is what '
             + 'a model does well. Restricting its inputs to the recorded fields is what keeps the prose '
             + 'from drifting past what the case actually contains.',
         status: disciplineStatus('D2'),
@@ -283,7 +283,7 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
         short: 'Recorded actions, and precedent actions as proposals',
         engine: 'ai',
         does: 'List the containment actions already recorded with owner and status. Where a fresh case '
-            + 'has none, the actions taken in matched precedents are offered — explicitly as proposals, '
+            + 'has none, the actions taken in matched precedents are offered - explicitly as proposals, '
             + 'each carrying its precedent number.',
         why: 'The distinction between "this was done" and "this was done once, elsewhere, for a similar '
             + 'defect" is the whole point of the step. A constraint rule enforces it, because a proposal '
@@ -312,16 +312,16 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
         n: 12,
         phase: 'drafting',
         icon: MoreHorizontal,
-        title: 'D5 – D8 · The remaining disciplines',
+        title: 'D5 - D8 · The remaining disciplines',
         short: 'Guidance only, for now',
         engine: 'ai',
         does: 'Corrective actions, effectiveness verification, prevention and closure are drafted from '
             + 'the same report call, guided by a written brief per discipline. They do not yet have the '
-            + 'four-layer contract that D1 – D4 have.',
-        why: 'The four disciplines that consume precedent data were worth pinning down first — they are '
+            + 'four-layer contract that D1 - D4 have.',
+        why: 'The four disciplines that consume precedent data were worth pinning down first - they are '
             + 'the ones where an invented fact reaches a customer. The rest keep their current runtime '
             + 'configuration until the same treatment is worth its cost.',
-        noConfig: 'Open a card below to edit a discipline. D5 – D8 show as Planned: their guidance is '
+        noConfig: 'Open a card below to edit a discipline. D5 - D8 show as Planned: their guidance is '
             + 'editable, their input, output and constraint layers are not yet.',
         status: ({ prompts }) => ({
             text: `${prompts.prompts.length} disciplines defined`,

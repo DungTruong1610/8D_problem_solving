@@ -220,12 +220,12 @@ describe('explainScore', () => {
             materialId: 'MAT-10247',
         }), CRITERIA);
 
-        expect(explainScore(r)).toBe('7/11 — Work center WC-MILL-07, Material MAT-10247');
+        expect(explainScore(r)).toBe('7/11 - Work center WC-MILL-07, Material MAT-10247');
     });
 
     it('nói thẳng khi không có gì khớp', () => {
         expect(explainScore(scoreCase(CURRENT, candidate({}), CRITERIA)))
-            .toBe('0/11 — no matching criteria');
+            .toBe('0/11 - no matching criteria');
     });
 });
 

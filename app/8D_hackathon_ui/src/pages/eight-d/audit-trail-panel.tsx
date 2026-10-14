@@ -74,7 +74,7 @@ function snapshotLines(snapshot: Record<string, any>): { label: string; value: s
     if (snapshot.aiIndependentRootCause || snapshot.recordedRootCauseCategory) {
         lines.push({
             label: 'Category',
-            value: `recorded ${snapshot.recordedRootCauseCategory ?? '—'} · AI independent check ${snapshot.aiIndependentRootCause ?? '—'}`,
+            value: `recorded ${snapshot.recordedRootCauseCategory ?? '-'} · AI independent check ${snapshot.aiIndependentRootCause ?? '-'}`,
         });
     }
     if (Array.isArray(snapshot.measurements) && snapshot.measurements.length) {
@@ -102,14 +102,14 @@ function snapshotLines(snapshot: Record<string, any>): { label: string; value: s
         });
     }
     if (snapshot.taskId) {
-        lines.push({ label: 'Task', value: [snapshot.taskId, snapshot.task].filter(Boolean).join(' — ') });
+        lines.push({ label: 'Task', value: [snapshot.taskId, snapshot.task].filter(Boolean).join(' - ') });
         lines.push({ label: 'Completed via', value: snapshot.via === 'evidence-upload' ? 'evidence upload' : 'execution note' });
         if (Array.isArray(snapshot.evidenceIds) && snapshot.evidenceIds.length) {
             lines.push({ label: 'Evidence', value: snapshot.evidenceIds.join(', ') });
         }
     }
     if (snapshot.stopType) {
-        lines.push({ label: 'Stop', value: `${snapshot.stopType}${snapshot.stopReason ? ` — ${snapshot.stopReason}` : ''}` });
+        lines.push({ label: 'Stop', value: `${snapshot.stopType}${snapshot.stopReason ? ` - ${snapshot.stopReason}` : ''}` });
     }
     if (lines.length === 0 && snapshot.stepSummary) {
         lines.push({ label: 'Step summary', value: snapshot.stepSummary });
@@ -173,7 +173,7 @@ function EventCard({ event, latest }: { event: ReviewEvent; latest: boolean }) {
                 <div className="grid grid-cols-[108px_1fr] gap-x-3">
                     <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground pt-0.5">Reason</dt>
                     <dd className="min-w-0 whitespace-pre-line break-words text-foreground/90">
-                        {reason || <span className="italic text-muted-foreground">{event.eventType === 'approve' || event.toStatus === 'Approved' ? 'No note — the step evidence above is the basis.' : 'No reason recorded.'}</span>}
+                        {reason || <span className="italic text-muted-foreground">{event.eventType === 'approve' || event.toStatus === 'Approved' ? 'No note - the step evidence above is the basis.' : 'No reason recorded.'}</span>}
                     </dd>
                 </div>
 
@@ -185,9 +185,9 @@ function EventCard({ event, latest }: { event: ReviewEvent; latest: boolean }) {
                             {changeList.map(([field, value]) => (
                                 <span key={field} className="inline-flex items-center gap-1 rounded border bg-muted/40 px-1.5 py-0.5 text-xs">
                                     <span className="text-muted-foreground">{LABEL[field] ?? field}</span>
-                                    <span>{String(value?.before ?? '—')}</span>
+                                    <span>{String(value?.before ?? '-')}</span>
                                     <ArrowRight className="h-3 w-3 text-muted-foreground" />
-                                    <span className="font-medium text-foreground">{String(value?.after ?? '—')}</span>
+                                    <span className="font-medium text-foreground">{String(value?.after ?? '-')}</span>
                                 </span>
                             ))}
                         </dd>
@@ -257,7 +257,7 @@ export function AuditTrailPanel({ reportID }: { reportID: string }) {
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
                 <div className="min-w-0">
                     <p className="font-medium text-foreground">Could not load the audit trail.</p>
-                    <p className="break-words text-muted-foreground">{(error as Error)?.message ?? 'Unknown error'} — this is a loading error, not an empty trail.</p>
+                    <p className="break-words text-muted-foreground">{(error as Error)?.message ?? 'Unknown error'} - this is a loading error, not an empty trail.</p>
                     <button
                         type="button"
                         onClick={() => refetch()}
@@ -274,7 +274,7 @@ export function AuditTrailPanel({ reportID }: { reportID: string }) {
     if (trail.length === 0) {
         return (
             <p className="px-3 py-6 text-sm text-muted-foreground">
-                No decisions recorded yet. Approving, sending back or reopening a step — or completing a task — adds an entry here.
+                No decisions recorded yet. Approving, sending back or reopening a step - or completing a task - adds an entry here.
             </p>
         );
     }

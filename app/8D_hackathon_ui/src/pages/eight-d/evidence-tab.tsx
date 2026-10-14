@@ -83,7 +83,7 @@ function EvidenceRow({ fact }: { fact: EvidenceFact }) {
                         className="inline-flex min-w-0 items-center gap-1.5 text-sm text-warning"
                     >
                         <TriangleAlert className="h-3.5 w-3.5 shrink-0" />
-                        Cannot be shown — the record is missing from the saved case
+                        Cannot be shown - the record is missing from the saved case
                     </span>
                 )}
 
@@ -214,7 +214,7 @@ export function EvidenceTab({
                         <div className="px-3 py-1">
                             {group.facts.length === 0 ? (
                                 <p className="px-1 py-3 text-xs italic text-muted-foreground">
-                                    Nothing in the case backs this step — it is a suggestion, not
+                                    Nothing in the case backs this step - it is a suggestion, not
                                     something the records show happened.
                                 </p>
                             ) : (

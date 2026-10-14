@@ -94,7 +94,7 @@ export async function openRun(opts: {
         configSnapshot: JSON.stringify(opts.snapshot, null, 2),
     }));
 
-    LOG.info(`Mở lượt đánh giá ${ID} — ${opts.mode}, ${opts.caseCount} case.`);
+    LOG.info(`Mở lượt đánh giá ${ID} - ${opts.mode}, ${opts.caseCount} case.`);
     return ID;
 }
 

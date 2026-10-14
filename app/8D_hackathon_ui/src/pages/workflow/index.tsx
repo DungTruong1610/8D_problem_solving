@@ -42,7 +42,7 @@ export function WorkflowPage() {
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">AI Configuration</h1>
                         <p className="text-sm text-muted-foreground">
-                            Configure global LLM models, precedent retrieval thresholds, and prompts for each 8D Discipline (D1 – D8).
+                            Configure global LLM models, precedent retrieval thresholds, and prompts for each 8D Discipline (D1 - D8).
                         </p>
                     </div>
                 </div>
@@ -72,9 +72,9 @@ export function WorkflowPage() {
                     {[
                         { n: '1', label: 'Inspection result', hint: 'Recorded in Master Data', ai: false },
                         { n: '2', label: 'Defect recorded', hint: 'Master Data → Defect Records. No AI.', ai: false },
-                        { n: '3', label: '8D opened', hint: 'A separate, deliberate decision — one 8D per defect, at most', ai: false },
+                        { n: '3', label: '8D opened', hint: 'A separate, deliberate decision - one 8D per defect, at most', ai: false },
                         { n: '4', label: 'Precedents retrieved', hint: 'Knowledge Graph / Scoring', ai: true },
-                        { n: '5', label: 'D1 – D8 drafted', hint: 'Configured below', ai: true },
+                        { n: '5', label: 'D1 - D8 drafted', hint: 'Configured below', ai: true },
                         { n: '6', label: 'Case closed', hint: 'Joins the Closed Case Library', ai: false },
                     ].map((s, i, arr) => (
                         <li key={s.n} className="flex items-center gap-2">
@@ -95,7 +95,7 @@ export function WorkflowPage() {
                 </ol>
                 <p className="text-sm text-muted-foreground leading-relaxed max-w-4xl">
                     <strong className="font-semibold text-foreground">Steps ② and ③ are two separate acts.</strong>{' '}
-                    Recording a defect does not open an 8D — most defects are closed without one. An 8D is
+                    Recording a defect does not open an 8D - most defects are closed without one. An 8D is
                     opened explicitly from <Link to="/master-data" className="underline underline-offset-2">Defect Records</Link>,
                     or from an open defect in the Create 8D Report dialog, and a defect can carry at most one.
                     Only the highlighted steps are configured on this page.
@@ -134,7 +134,7 @@ export function WorkflowPage() {
                     className="h-9 text-sm rounded-lg font-medium"
                 >
                     <FileText className="h-4 w-4 mr-1.5" />
-                    8D Disciplines Configuration (D1 – D8)
+                    8D Disciplines Configuration (D1 - D8)
                 </Button>
 
                 {/* Tab 3: Model Registry */}

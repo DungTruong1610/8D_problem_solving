@@ -258,7 +258,7 @@ export function resolveD4RootCause(
     d4: Discipline8D | undefined,
     caseContext?: unknown,
 ): string {
-    if (!d4) return '—';
+    if (!d4) return '-';
 
     let d4Data: Record<string, unknown> | null = null;
     try {
@@ -298,10 +298,10 @@ export function resolveD4RootCause(
     // - Khi D4 chưa Complete:
     //   Hiển thị aiRoot! (Người dùng có click chọn khác ở D4 nhưng chưa bấm Complete thì D5 vẫn giữ nguyên aiRoot).
     if (isD4Completed) {
-        return userSelected || aiRoot || '—';
+        return userSelected || aiRoot || '-';
     }
 
-    return aiRoot || userSelected || '—';
+    return aiRoot || userSelected || '-';
 }
 
 function ObjectTable({ rows }: { rows: Array<Record<string, unknown>> }) {
@@ -418,7 +418,7 @@ function FieldValue({ field, value, context, disciplineID, data, siblings, readO
     }
     if (field.widget === 'action-cards') {
         const d4 = siblings?.find((d) => d.code === 'D4');
-        const d4RootCause = disciplineCode === 'D5' ? resolveD4RootCause(d4, context) : '—';
+        const d4RootCause = disciplineCode === 'D5' ? resolveD4RootCause(d4, context) : '-';
         return (
             <ActionCardsWidget
                 value={value}

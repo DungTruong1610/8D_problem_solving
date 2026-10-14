@@ -18,7 +18,7 @@ export function TeamPreviewSection({ cfg }: { cfg: RetrievalConfigState }) {
                     How the team is derived
                 </CardTitle>
                 <CardDescription>
-                    Open any 8D report to see the result — the suggestion appears on the report page,
+                    Open any 8D report to see the result - the suggestion appears on the report page,
                     next to the cases it came from.
                 </CardDescription>
             </CardHeader>
@@ -27,12 +27,12 @@ export function TeamPreviewSection({ cfg }: { cfg: RetrievalConfigState }) {
                     <li className="flex gap-2">
                         <span className="font-mono text-sm font-semibold text-foreground">1</span>
                         Take the cases that scored at least{' '}
-                        <span className="font-mono text-foreground">{cfg.settings?.minScore ?? '—'}</span>{' '}
+                        <span className="font-mono text-foreground">{cfg.settings?.minScore ?? '-'}</span>{' '}
                         out of <span className="font-mono text-foreground">{cfg.maxScore}</span>.
                     </li>
                     <li className="flex gap-2">
                         <span className="font-mono text-sm font-semibold text-foreground">2</span>
-                        Group their teams by function — that gives the roles this kind of defect has
+                        Group their teams by function - that gives the roles this kind of defect has
                         needed before.
                     </li>
                     <li className="flex gap-2">
@@ -42,7 +42,7 @@ export function TeamPreviewSection({ cfg }: { cfg: RetrievalConfigState }) {
                     <li className="flex gap-2">
                         <span className="font-mono text-sm font-semibold text-foreground">4</span>
                         Hand that exact list to the model, which writes the justification and proposes a
-                        lead — but may not add a name to it.
+                        lead - but may not add a name to it.
                     </li>
                 </ol>
 

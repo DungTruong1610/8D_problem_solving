@@ -105,7 +105,7 @@ export function ReleaseCheckPanel({
                 <p className="text-sm">
                     <span className="font-semibold text-success">Consistency check passed.</span>{' '}
                     <span className="text-muted-foreground">
-                        Every rule configured for D1–D8 is satisfied.
+                        Every rule configured for D1-D8 is satisfied.
                     </span>
                 </p>
             </div>
@@ -122,11 +122,11 @@ export function ReleaseCheckPanel({
                     ? <AlertCircle className="h-4 w-4 shrink-0 text-destructive" />
                     : <AlertTriangle className="h-4 w-4 shrink-0 text-warning" />}
                 <span className="text-base font-semibold">
-                    Consistency check — {errorCount} error{errorCount === 1 ? '' : 's'},{' '}
+                    Consistency check - {errorCount} error{errorCount === 1 ? '' : 's'},{' '}
                     {warningCount} warning{warningCount === 1 ? '' : 's'}
                 </span>
                 <span className="text-sm text-muted-foreground">
-                    Rules configured per discipline in the Training Center. These do not block closure —
+                    Rules configured per discipline in the Training Center. These do not block closure -
                     approving a step is a human decision.
                 </span>
             </div>
@@ -136,7 +136,7 @@ export function ReleaseCheckPanel({
                     <strong className="font-semibold">
                         {signedWithErrors.map((f) => f.code).join(', ')} approved with unresolved errors.
                     </strong>{' '}
-                    A signature was placed on a step the rules flag as wrong — worth a second look before closing.
+                    A signature was placed on a step the rules flag as wrong - worth a second look before closing.
                 </p>
             )}
 

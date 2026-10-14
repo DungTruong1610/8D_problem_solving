@@ -249,10 +249,10 @@ export function InspectionLotsTab() {
                                             {row.characteristic}
                                         </td>
                                         <td className="py-3 px-4 font-mono text-muted-foreground">
-                                            {row.equipment || '—'}
+                                            {row.equipment || '-'}
                                         </td>
                                         <td className="py-3 px-4 font-mono font-semibold text-foreground">
-                                            {row.measuredValue != null ? `${row.measuredValue} ${row.unit || ''}` : '—'}
+                                            {row.measuredValue != null ? `${row.measuredValue} ${row.unit || ''}` : '-'}
                                         </td>
                                         <td className="py-3 px-4">
                                             {row.conforming ? (
@@ -272,7 +272,7 @@ export function InspectionLotsTab() {
                                             )}
                                         </td>
                                         <td className="py-3 px-4 tabular-nums text-muted-foreground">
-                                            {row.lotDate || '—'}
+                                            {row.lotDate || '-'}
                                         </td>
                                         <td className="py-3 px-4 text-right">
                                             <div className="flex items-center justify-end gap-1">
@@ -327,7 +327,7 @@ export function InspectionLotsTab() {
                 <InspectionLotFormDialog
                     open={Boolean(editItem)}
                     onOpenChange={(open) => !open && setEditItem(null)}
-                    title={`Edit Inspection Lot — ${editItem.lotId}`}
+                    title={`Edit Inspection Lot - ${editItem.lotId}`}
                     initialValues={editItem}
                     isPending={updateMutation.isPending}
                     onSubmit={(values) => updateMutation.mutate({ id: editItem.ID, item: values })}
@@ -486,7 +486,7 @@ function InspectionLotFormDialog({
                                  </Badge>
                             </div>
                             <p className="text-sm text-muted-foreground mt-0.5">
-                                Quality Management — Record Characteristic Inspection Results & Usage Decision
+                                Quality Management - Record Characteristic Inspection Results & Usage Decision
                             </p>
                         </div>
                     </div>
@@ -545,10 +545,10 @@ function InspectionLotFormDialog({
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="03">03 — In-Process Production</SelectItem>
-                                            <SelectItem value="01">01 — Goods Receipt (Vendor)</SelectItem>
-                                            <SelectItem value="04">04 — Goods Receipt from Production</SelectItem>
-                                            <SelectItem value="89">89 — Other Manual Inspection</SelectItem>
+                                            <SelectItem value="03">03 - In-Process Production</SelectItem>
+                                            <SelectItem value="01">01 - Goods Receipt (Vendor)</SelectItem>
+                                            <SelectItem value="04">04 - Goods Receipt from Production</SelectItem>
+                                            <SelectItem value="89">89 - Other Manual Inspection</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -579,7 +579,7 @@ function InspectionLotFormDialog({
                                         entries={materialVh.entries}
                                         loading={materialVh.loading}
                                         catalogLabel="the material master"
-                                        scoringNote="D2 matches this code exactly when it pulls inspection history — a new material is fine, a typo is not."
+                                        scoringNote="D2 matches this code exactly when it pulls inspection history - a new material is fine, a typo is not."
                                         placeholder="e.g. MAT-10247"
                                         className="[&_input]:font-semibold [&_input]:text-primary"
                                     />
@@ -641,7 +641,7 @@ function InspectionLotFormDialog({
                                             onClick={() => setWorkCenterId(derivedWorkCenter)}
                                             className="text-sm leading-snug text-primary underline-offset-2 hover:underline"
                                         >
-                                            Use {derivedWorkCenter} — from the equipment code
+                                            Use {derivedWorkCenter} - from the equipment code
                                         </button>
                                     )}
                                 </div>
@@ -721,7 +721,7 @@ function InspectionLotFormDialog({
                                         </div>
                                         <div className="min-w-0 flex-1">
                                             <div className="font-semibold text-sm text-foreground flex items-center justify-between gap-2">
-                                                <span>Accepted (A) — Conforming</span>
+                                                <span>Accepted (A) - Conforming</span>
                                                 <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-medium">Pass / In-Spec</span>
                                             </div>
                                             <p className="text-sm text-muted-foreground mt-0.5">
@@ -748,7 +748,7 @@ function InspectionLotFormDialog({
                                         </div>
                                         <div className="min-w-0 flex-1">
                                             <div className="font-semibold text-sm text-foreground flex items-center justify-between gap-2">
-                                                <span>Rejected (R) — Non-Conforming</span>
+                                                <span>Rejected (R) - Non-Conforming</span>
                                                 <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-700 dark:text-rose-300 font-medium">Fail / Out-of-Spec</span>
                                             </div>
                                             <p className="text-sm text-muted-foreground mt-0.5">

@@ -283,10 +283,10 @@ export function DefectsTab() {
                                                 </Badge>
                                             </td>
                                             <td className="py-3 px-4 font-medium text-foreground">
-                                                {row.symptomShortText || '—'}
+                                                {row.symptomShortText || '-'}
                                             </td>
                                             <td className="py-3 px-4">
-                                                <div className="text-foreground">{row.materialDesc || row.materialId || '—'}</div>
+                                                <div className="text-foreground">{row.materialDesc || row.materialId || '-'}</div>
                                                 {row.materialDesc && row.materialId && (
                                                     <div className="font-mono text-sm text-muted-foreground">
                                                         {row.materialId}
@@ -294,13 +294,13 @@ export function DefectsTab() {
                                                 )}
                                             </td>
                                             <td className="py-3 px-4 font-mono text-muted-foreground">
-                                                {row.workCenterId || '—'}
+                                                {row.workCenterId || '-'}
                                             </td>
                                             <td className="py-3 px-4 text-muted-foreground">
-                                                {row.defectClass || '—'}
+                                                {row.defectClass || '-'}
                                             </td>
                                             <td className="py-3 px-4 tabular-nums text-muted-foreground">
-                                                {row.foundDate || '—'}
+                                                {row.foundDate || '-'}
                                             </td>
                                             <td className="py-3 px-4 text-right">
                                                 <div

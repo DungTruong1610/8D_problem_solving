@@ -200,7 +200,7 @@ export function StepScorePanel({
                                 >
                                     {qualifies
                                         ? <><CheckCircle2 className="h-3.5 w-3.5" /> {stepCode} would see this case</>
-                                        : <><XCircle className="h-3.5 w-3.5" /> Below threshold {minScore} — {stepCode} would not</>}
+                                        : <><XCircle className="h-3.5 w-3.5" /> Below threshold {minScore} - {stepCode} would not</>}
                                 </div>
                             </div>
 
@@ -217,7 +217,7 @@ export function StepScorePanel({
                                                 người xem tưởng tiêu chí hỏng. */}
                                             {b.criterionKey === 'rerank' && (
                                                 <span className="ml-1.5 font-normal text-xs italic text-muted-foreground">
-                                                    (LLM pass — not simulated in preview)
+                                                    (LLM pass - not simulated in preview)
                                                 </span>
                                             )}
                                         </span>

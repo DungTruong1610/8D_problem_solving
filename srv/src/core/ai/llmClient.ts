@@ -114,7 +114,7 @@ export function ensureLlmProvider(): void {
     if (chatHalf.name !== 'orchestration') {
       console.warn(
         '[ai/llmClient] Chưa cấu hình model chat (DEEPSEEK_API_KEY / GEMINI_API_KEY / LOCAL_LLM_URL) '
-          + '— phần chat chạy Mock, chỉ có embedding là thật.',
+          + '- phần chat chạy Mock, chỉ có embedding là thật.',
       );
     }
     providerInitialized = true;
@@ -124,12 +124,12 @@ export function ensureLlmProvider(): void {
   if (!hasAiCoreCredentials()) {
     installMockProvider('Chưa cấu hình DEEPSEEK_API_KEY, GEMINI_API_KEY hay LOCAL_LLM_URL trong .env');
     console.warn(
-      '[ai/llmClient] Chưa cấu hình nhà cung cấp AI nào trong .env — hệ thống tự động chạy Mock Mode '
+      '[ai/llmClient] Chưa cấu hình nhà cung cấp AI nào trong .env - hệ thống tự động chạy Mock Mode '
         + 'để web vẫn hoạt động trơn tru mà không lỗi.',
     );
   } else {
     console.log(
-      '[ai/llmClient] Không có provider standalone nào — dùng SAP AI Core mặc định của CDK.',
+      '[ai/llmClient] Không có provider standalone nào - dùng SAP AI Core mặc định của CDK.',
     );
   }
   providerInitialized = true;
@@ -138,7 +138,7 @@ export function ensureLlmProvider(): void {
 /** Một dòng log nói rõ ai đang lo việc gì — thứ đầu tiên cần khi AI trả lời sai. */
 function logActiveProviders(chatName: string, embeddingName: string | null): void {
   const embedding = embeddingName ?? 'KHÔNG CÓ (tiêu chí ngữ nghĩa sẽ bị bỏ qua)';
-  console.log(`[ai/llmClient] Chat: ${chatName} — Embedding: ${embedding}`);
+  console.log(`[ai/llmClient] Chat: ${chatName} - Embedding: ${embedding}`);
   if (!embeddingName) {
     console.warn(
       '[ai/llmClient] Không có nhà cung cấp embedding. Tiêu chí "Similar description" '

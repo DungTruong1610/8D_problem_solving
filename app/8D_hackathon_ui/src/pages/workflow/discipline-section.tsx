@@ -164,7 +164,7 @@ const FALLBACK_STEP_PROMPTS: Record<string, Partial<StepPrompt>> = {
         enabled: true, version: 1,
     },
     D8: {
-        stepCode: 'D8', label: 'Closure and Recognition', description: 'Lessons learned and the completeness gate over D1–D7.',
+        stepCode: 'D8', label: 'Closure and Recognition', description: 'Lessons learned and the completeness gate over D1-D7.',
         systemPrompt: `Summarise lessons learned, both what worked and what did not. Recognise the team by name. State what remains open if the case is not yet closed.`,
         combinedPrompt: `Summarise lessons learned and acknowledge team members by name.\nCheck case closure prerequisites.`,
         inputSchemaJson: JSON.stringify({ type: 'object', properties: { lessonsLearned: { type: 'object', title: 'Lessons learned', 'x-source': 'sap_qm' } } }, null, 2),

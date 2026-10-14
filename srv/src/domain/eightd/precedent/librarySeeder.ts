@@ -373,7 +373,7 @@ async function ensureReportRecord(db: any, notificationId: string, ctx: any, raw
             fmeaId: ctx.fmea?.fmeaId ?? null,
             sourcePayload: JSON.stringify(raw),
             caseContext: JSON.stringify(ctx),
-            internalSummary: `${ctx.header?.symptomShortText} — Root cause: ${ctx.rootCause?.category ?? 'Investigated'}. Work center: ${ctx.product?.workCenterDesc}.`,
+            internalSummary: `${ctx.header?.symptomShortText} - Root cause: ${ctx.rootCause?.category ?? 'Investigated'}. Work center: ${ctx.product?.workCenterDesc}.`,
             customerSummary: `Defect on ${ctx.product?.materialDesc} resolved under 8D methodology.`,
             analyzedAt: new Date().toISOString(),
         }),
@@ -386,7 +386,7 @@ async function ensureReportRecord(db: any, notificationId: string, ctx: any, raw
 
     const disciplines = [
         {
-            code: 'D1', sequence: 1, title: 'D1 — Team Roster',
+            code: 'D1', sequence: 1, title: 'D1 - Team Roster',
             summary: 'Formed cross-functional 8D team.',
             resultJson: JSON.stringify({
                 team: {
@@ -402,7 +402,7 @@ async function ensureReportRecord(db: any, notificationId: string, ctx: any, raw
             }),
         },
         {
-            code: 'D2', sequence: 2, title: 'D2 — Problem Description',
+            code: 'D2', sequence: 2, title: 'D2 - Problem Description',
             summary: ctx.header?.symptomShortText,
             resultJson: JSON.stringify({
                 problem: {
@@ -413,14 +413,14 @@ async function ensureReportRecord(db: any, notificationId: string, ctx: any, raw
             }),
         },
         {
-            code: 'D3', sequence: 3, title: 'D3 — Containment Actions',
+            code: 'D3', sequence: 3, title: 'D3 - Containment Actions',
             summary: 'Containment actions established.',
             resultJson: JSON.stringify({
                 containment: { actions: ctx.actions?.containment || [] },
             }),
         },
         {
-            code: 'D4', sequence: 4, title: 'D4 — Root Cause Analysis',
+            code: 'D4', sequence: 4, title: 'D4 - Root Cause Analysis',
             summary: `Root cause identified as ${ctx.rootCause?.category ?? 'Investigated'}.`,
             resultJson: JSON.stringify({
                 rootCause: {
@@ -431,28 +431,28 @@ async function ensureReportRecord(db: any, notificationId: string, ctx: any, raw
             }),
         },
         {
-            code: 'D5', sequence: 5, title: 'D5 — Corrective Actions',
+            code: 'D5', sequence: 5, title: 'D5 - Corrective Actions',
             summary: 'Permanent corrective actions defined.',
             resultJson: JSON.stringify({
                 corrective: { actions: ctx.actions?.corrective || [] },
             }),
         },
         {
-            code: 'D6', sequence: 6, title: 'D6 — Verification of Effectiveness',
+            code: 'D6', sequence: 6, title: 'D6 - Verification of Effectiveness',
             summary: 'Verification plan executed.',
             resultJson: JSON.stringify({
                 verification: { status: 'Verified', notes: 'Corrective actions verified on line.' },
             }),
         },
         {
-            code: 'D7', sequence: 7, title: 'D7 — Preventive Actions',
+            code: 'D7', sequence: 7, title: 'D7 - Preventive Actions',
             summary: 'Preventive measures implemented.',
             resultJson: JSON.stringify({
                 preventive: { actions: ctx.actions?.preventive || [] },
             }),
         },
         {
-            code: 'D8', sequence: 8, title: 'D8 — Closure & Team Recognition',
+            code: 'D8', sequence: 8, title: 'D8 - Closure & Team Recognition',
             summary: '8D report closed.',
             resultJson: JSON.stringify({
                 closure: { gate: { status: isClosed ? 'Closed' : 'Open', readyForClosure: isClosed } },
@@ -529,7 +529,7 @@ export async function seedLibraryFromBundle(): Promise<SeedReport | null> {
     }
 
     if (!fs.existsSync(bundleDir)) {
-        LOG.info('Không có dữ liệu đóng gói — bỏ qua. Nạp bằng action seedCaseLibrary.');
+        LOG.info('Không có dữ liệu đóng gói - bỏ qua. Nạp bằng action seedCaseLibrary.');
         return null;
     }
 
@@ -590,7 +590,7 @@ export async function seedLibraryFromBundle(): Promise<SeedReport | null> {
     }
 
     if (!payloads.length) {
-        LOG.info(`Kho đã có đủ ${complete.size} case của bộ đóng gói — không cần bù.`);
+        LOG.info(`Kho đã có đủ ${complete.size} case của bộ đóng gói - không cần bù.`);
         return null;
     }
 
@@ -618,7 +618,7 @@ export function embedLibraryInBackground(): void {
             }
         } catch (e: any) {
             LOG.warn(
-                `Không nhúng được kho lúc khởi động (${e.message}) — `
+                `Không nhúng được kho lúc khởi động (${e.message}) - `
                 + 'tiêu chí ngữ nghĩa sẽ im lặng cho tới khi chạy lại action embedCaseLibrary.',
             );
         }

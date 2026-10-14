@@ -456,7 +456,7 @@ async function generateReport(
         // Đo thực tế: lượt gọi này tốn ~85s trong tổng 317s — 27% thời gian cho
         // một thao tác vô hiệu. `postProcess` phía sau mới là chỗ thật sự chữa
         // được, và phần còn lại đi thẳng vào `validationJson` cho UI hiển thị.
-        LOG.warn(`Cấu hình còn ${errors.length} vi phạm — chuyển cho postProcess và báo lên UI: ${errors.map((e) => `${e.code}.${e.path}`).join(', ')}`);
+        LOG.warn(`Cấu hình còn ${errors.length} vi phạm - chuyển cho postProcess và báo lên UI: ${errors.map((e) => `${e.code}.${e.path}`).join(', ')}`);
     }
     return {
         result: value,
@@ -714,7 +714,7 @@ async function generateReportProgressive(
             const currentModel = await resolveModel(ACTIVITY_ANALYZE);
             if (currentModel !== ANALYZE_FALLBACK_MODEL) {
                 LOG.warn(
-                    `${code}: sau retry vẫn thiếu trường bắt buộc (${unresolved}) — `
+                    `${code}: sau retry vẫn thiếu trường bắt buộc (${unresolved}) - `
                     + `leo thang một lượt lên ${ANALYZE_FALLBACK_MODEL}.`,
                 );
                 try {
@@ -1041,7 +1041,7 @@ export async function analyze(
     }
     const warnings = qualityIssues(issues);
     if (warnings.length) {
-        LOG.info(`Dataset có ${warnings.length} vấn đề chất lượng — chuyển cho model làm ngữ cảnh.`);
+        LOG.info(`Dataset có ${warnings.length} vấn đề chất lượng - chuyển cho model làm ngữ cảnh.`);
     }
 
     // ── Facts ──
@@ -1052,7 +1052,7 @@ export async function analyze(
     await enrichFromDatabase(context);
 
     LOG.info(
-        `Case ${context.notificationId} (${context.origin}) — ` +
+        `Case ${context.notificationId} (${context.origin}) - ` +
         `${context.fiveWhy.length} bước 5-Why, ${context.gaps.length} lỗ hổng dữ liệu`,
     );
 

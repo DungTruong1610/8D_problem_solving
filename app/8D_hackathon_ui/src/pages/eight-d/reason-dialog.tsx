@@ -68,7 +68,7 @@ export function ReasonDialog({
                     />
                     <p className={tooLong ? 'text-xs text-destructive' : 'text-xs text-muted-foreground'}>
                         {tooLong
-                            ? `${trimmed.length} / ${REASON_MAX} characters — please shorten it.`
+                            ? `${trimmed.length} / ${REASON_MAX} characters - please shorten it.`
                             : 'Required. This reason is stored in the audit log.'}
                     </p>
                 </div>

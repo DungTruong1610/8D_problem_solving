@@ -17,8 +17,8 @@ import {
  */
 
 const DECISION: Record<JudgeDecision, { label: string; icon: typeof CheckCircle2; tone: string }> = {
-    HANDLED_APPROPRIATELY: { label: 'Handled — no stop', icon: CheckCircle2, tone: 'text-success' },
-    ESCALATED: { label: 'Stopped — handed to a person', icon: OctagonPause, tone: 'text-warning' },
+    HANDLED_APPROPRIATELY: { label: 'Handled - no stop', icon: CheckCircle2, tone: 'text-success' },
+    ESCALATED: { label: 'Stopped - handed to a person', icon: OctagonPause, tone: 'text-warning' },
     GRACEFULLY_REFUSED: { label: 'Refused', icon: CircleSlash, tone: 'text-muted-foreground' },
 };
 
@@ -51,7 +51,7 @@ export function JudgeReportModal({
 }) {
     if (!report) return null;
     const decision = report.decision === 'HANDLED_APPROPRIATELY' && report.stops.length > 0
-        ? { ...DECISION.HANDLED_APPROPRIATELY, label: 'Handled — sign-off needed at closure' }
+        ? { ...DECISION.HANDLED_APPROPRIATELY, label: 'Handled - sign-off needed at closure' }
         : DECISION[report.decision];
     const Icon = decision.icon;
 
@@ -70,7 +70,7 @@ export function JudgeReportModal({
 
                 {report.simulated && (
                     <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
-                        The backend could not be reached. This is the browser's simplified rule check, not the server evaluation — no case library was searched.
+                        The backend could not be reached. This is the browser's simplified rule check, not the server evaluation - no case library was searched.
                     </div>
                 )}
 
@@ -79,7 +79,7 @@ export function JudgeReportModal({
 
                     <Section title="Where the AI stopped">
                         {report.stops.length === 0 ? (
-                            <p className="text-sm text-muted-foreground">No stop — the input has measured facts, a precedent to compare with, and nothing above the AI's authority.</p>
+                            <p className="text-sm text-muted-foreground">No stop - the input has measured facts, a precedent to compare with, and nothing above the AI's authority.</p>
                         ) : (
                             <ul className="divide-y rounded-lg border">
                                 {report.stops.map((s) => (
@@ -108,7 +108,7 @@ export function JudgeReportModal({
                         {report.facts.measurements.length > 0 ? (
                             <ul className="space-y-0.5 text-sm">
                                 {report.facts.measurements.map((m, i) => (
-                                    <li key={i}><span className="text-muted-foreground">{m.characteristic}:</span> {m.measured || '—'} <span className="text-muted-foreground">vs spec</span> {m.spec || '—'}</li>
+                                    <li key={i}><span className="text-muted-foreground">{m.characteristic}:</span> {m.measured || '-'} <span className="text-muted-foreground">vs spec</span> {m.spec || '-'}</li>
                                 ))}
                             </ul>
                         ) : (

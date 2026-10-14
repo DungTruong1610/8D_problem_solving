@@ -242,7 +242,7 @@ export function ReasoningPanel({
                 ) : (
                     <p className="text-sm text-muted-foreground">No evidence snippets were returned. Review the source records before relying on this finding.</p>
                 )}
-                <p className="mt-1.5 text-xs text-muted-foreground">Generated from the submitted investigation — verify against the source records.</p>
+                <p className="mt-1.5 text-xs text-muted-foreground">Generated from the submitted investigation - verify against the source records.</p>
             </div>
 
             {agrees === false && !compromised && (
@@ -380,7 +380,7 @@ export function ReasoningPanel({
                     <Button type="button" size="sm" variant="outline" onClick={onUseAsDraft}>
                         Use AI wording as D4 draft
                     </Button>
-                    <span className="text-xs text-muted-foreground">Fills the editor only — saving and approval stay separate.</span>
+                    <span className="text-xs text-muted-foreground">Fills the editor only - saving and approval stay separate.</span>
                 </div>
             )}
         </div>

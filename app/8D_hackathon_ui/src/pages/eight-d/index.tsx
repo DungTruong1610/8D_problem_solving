@@ -88,7 +88,7 @@ function CompletenessCell({ report }: { report: Report8D }) {
 }
 
 function formatDateTime(value?: string | null): string {
-    if (!value) return '—';
+    if (!value) return '-';
     const d = new Date(value);
     if (Number.isNaN(d.getTime())) return String(value);
     return d.toLocaleString('en-GB', {
@@ -101,7 +101,7 @@ function formatDateTime(value?: string | null): string {
 }
 
 function formatDate(value?: string | null): string {
-    if (!value) return '—';
+    if (!value) return '-';
     const d = new Date(value);
     if (Number.isNaN(d.getTime())) return String(value);
     return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -215,7 +215,7 @@ const CORE_COLUMNS: DataTableColumn<WorklistRow>[] = [
         renderType: 'custom',
         render: (_v, row) => {
             const { ageDays, closed, closureOverdue } = row.work;
-            if (ageDays === null) return <span className="text-sm text-muted-foreground">—</span>;
+            if (ageDays === null) return <span className="text-sm text-muted-foreground">-</span>;
             return (
                 <span
                     className={cn(
@@ -253,9 +253,9 @@ const CORE_COLUMNS: DataTableColumn<WorklistRow>[] = [
                 return (
                     <span
                         className="text-sm text-muted-foreground"
-                        title="No due date committed — set one on the case overview"
+                        title="No due date committed - set one on the case overview"
                     >
-                        —
+                        -
                     </span>
                 );
             }
@@ -308,7 +308,7 @@ const OPTIONAL_COLUMNS: DataTableColumn<WorklistRow>[] = [
         renderType: 'custom',
         // Vô nghĩa trước D4 và dài sau D4 — hai lý do để nó không nằm ở bộ mặc định.
         render: (_v, row) => (
-            <span className="text-sm text-muted-foreground">{row.rootCauseCategory || '—'}</span>
+            <span className="text-sm text-muted-foreground">{row.rootCauseCategory || '-'}</span>
         ),
     },
     {
@@ -325,7 +325,7 @@ const OPTIONAL_COLUMNS: DataTableColumn<WorklistRow>[] = [
         renderType: 'custom',
         render: (_v, row) => {
             const lag = row.work.responseLagDays;
-            if (lag === null) return <span className="text-sm text-muted-foreground">—</span>;
+            if (lag === null) return <span className="text-sm text-muted-foreground">-</span>;
             return (
                 <span
                     className={cn('text-sm tabular-nums', lag > 7 ? 'text-warning' : 'text-muted-foreground')}
@@ -347,7 +347,7 @@ const OPTIONAL_COLUMNS: DataTableColumn<WorklistRow>[] = [
             return (
                 <span className="text-sm tabular-nums">
                     {value === null || Number.isNaN(value)
-                        ? '—'
+                        ? '-'
                         : value.toLocaleString('en-GB', { maximumFractionDigits: 0 })}
                 </span>
             );
@@ -361,7 +361,7 @@ const OPTIONAL_COLUMNS: DataTableColumn<WorklistRow>[] = [
         renderType: 'custom',
         render: (_v, row) => (
             <div className="min-w-0">
-                <div className="text-sm truncate">{row.workCenterDesc || row.workCenterId || '—'}</div>
+                <div className="text-sm truncate">{row.workCenterDesc || row.workCenterId || '-'}</div>
                 {row.workCenterDesc && row.workCenterId && (
                     <div className="font-mono text-sm text-muted-foreground">{row.workCenterId}</div>
                 )}
@@ -374,7 +374,7 @@ const OPTIONAL_COLUMNS: DataTableColumn<WorklistRow>[] = [
         width: 90,
         minWidth: 80,
         renderType: 'custom',
-        render: (_v, row) => <span className="font-mono text-sm">{row.plant || '—'}</span>,
+        render: (_v, row) => <span className="font-mono text-sm">{row.plant || '-'}</span>,
     },
     {
         key: 'createdBy',
@@ -533,7 +533,7 @@ export function EightDListPage() {
                     <div>
                         <h1 className="text-xl font-bold text-foreground">8D Reports</h1>
                         <p className="text-sm text-muted-foreground mt-0.5">
-                            Open cases first, most urgent at the top — by severity, customer commitment, then age
+                            Open cases first, most urgent at the top - by severity, customer commitment, then age
                         </p>
                     </div>
                 </div>
@@ -583,7 +583,7 @@ export function EightDListPage() {
             {running > 0 && (
                 <div className="flex items-center gap-2 text-sm text-info bg-info/5 border border-info/20 rounded-lg px-3.5 py-2.5">
                     <Spinner className="w-3.5 h-3.5" />
-                    {running} analysis running — this page refreshes automatically. Each run takes about 3 minutes.
+                    {running} analysis running - this page refreshes automatically. Each run takes about 3 minutes.
                 </div>
             )}
 
@@ -626,10 +626,10 @@ export function EightDListPage() {
                     <div>
                         <span className="font-semibold text-foreground">Reading this list:</span>{' '}
                         <span className="font-medium text-foreground">Days open</span> counts from when the 8D was
-                        opened, not from when the defect was found — that delay is its own column,{' '}
+                        opened, not from when the defect was found - that delay is its own column,{' '}
                         <span className="font-medium text-foreground">Response lag</span>, under More columns.{' '}
                         <span className="font-medium text-foreground">Due date</span> is a commitment somebody made:
-                        the customer SLA on a complaint, or a date the team set for itself. It is never invented —
+                        the customer SLA on a complaint, or a date the team set for itself. It is never invented -
                         an empty cell means nobody has committed to one yet.
                     </div>
                 </div>

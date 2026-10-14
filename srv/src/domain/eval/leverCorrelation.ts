@@ -109,7 +109,7 @@ export function rankLevers(input: LeverInput): CandidateLever[] {
             fromDimension: null,
             evidence:
                 `Trung bình ${abstainPerCase.toFixed(1)} chiều bị abstain mỗi case. Báo cáo quá mỏng `
-                + 'để chấm — vấn đề nằm ở lượt sinh báo cáo, không ở thang chấm hay cấu hình truy hồi.',
+                + 'để chấm - vấn đề nằm ở lượt sinh báo cáo, không ở thang chấm hay cấu hình truy hồi.',
             rank: 90,
         });
     }
@@ -131,7 +131,7 @@ export function rankLevers(input: LeverInput): CandidateLever[] {
             evidence:
                 `${count}/${totalViolations} vi phạm (${Math.round(share * 100)}%) đến từ ${ruleId}. `
                 + 'Một ràng buộc nổ nhiều thường là bằng chứng MODEL đang sai, không phải bằng chứng '
-                + 'luật quá chặt — nên hướng mặc định là siết prompt của bước đó, không phải nới luật.',
+                + 'luật quá chặt - nên hướng mặc định là siết prompt của bước đó, không phải nới luật.',
             rank: 80 + Math.round(share * 10),
         });
     }
@@ -151,7 +151,7 @@ export function rankLevers(input: LeverInput): CandidateLever[] {
                 evidence:
                     `grounding ở ${Math.round(grounding * 100)}% VÀ ${input.emptyPrecedentCount}/`
                     + `${input.caseCount} case không có tiền lệ nào vượt ngưỡng. Model không neo được vì `
-                    + 'không có gì để neo — hạ ngưỡng hoặc nới topN, đừng siết prompt.',
+                    + 'không có gì để neo - hạ ngưỡng hoặc nới topN, đừng siết prompt.',
                 rank: 75,
             });
         } else {
@@ -162,7 +162,7 @@ export function rankLevers(input: LeverInput): CandidateLever[] {
                 evidence:
                     `grounding ở ${Math.round(grounding * 100)}% nhưng tiền lệ VẪN tìm được `
                     + `(chỉ ${input.emptyPrecedentCount}/${input.caseCount} case rỗng). Có dữ liệu để neo `
-                    + 'mà model không neo — đây là chuyện của prompt.',
+                    + 'mà model không neo - đây là chuyện của prompt.',
                 rank: 70,
             });
         }

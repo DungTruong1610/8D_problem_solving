@@ -73,6 +73,10 @@ Running Benchmark Scenario: *Flange edge burr defect on CNC Milling Line 7 (`WC-
      * *"Start the process"*: the step is read-only until you click it. It stays disabled until the previous step is complete.
      * *"Approve"*: signs the step off and unlocks the next one. It looks faded while something is still missing (an open AI stop, a required field, task status or evidence). Clicking it then opens an error dialog listing exactly what to fix, and nothing is saved.
      * *"Reopen"*: withdraws a completed step's approval. A reason is required and is stored in the audit log.
+  4. **Task popups (D3, D5/D6, D7).** The **eye** icon opens a task in two columns. On the left are the description, execution notes and completion evidence, with a callout saying exactly what the task still needs to become Done. On the right are the details (assignee, duration, dates, root cause or task code) and a Planned → Open → Done progress tracker. The **pencil** icon opens the edit form in four sections: Task, Assignment, Schedule, and Root cause / Coding. Required fields show their error inline, and **Publish** explains that it sends the task to its assignee.
+  5. **D5 and D6 run side by side.** Both unlock as soon as D4 is complete, and D7 waits for both.
+     * **D5 (Permanent Corrective Actions)** only assigns work. It can be approved as soon as at least one corrective task has an owner.
+     * **D6 (Verify Effectiveness)** manages execution of those same tasks. Each D5 task is set to Done there, with its evidence uploaded when required. D6 can only be approved when every D5 task is Done and has its evidence. Tasks in D6 are editable once D6 is *In process*, even after D5 has been approved.
 
 ### 3. Master Data Registry (`/#/master-data`)
 * **Purpose:** Search and verify industrial plant master registries: Work Centers (lines/machines), Materials (part numbers), Subject Matter Experts (SMEs), and Defect Catalogues.
@@ -152,19 +156,25 @@ Each discipline from D1 to D8 features independent System and User prompts. Prom
 *(On the Web UI, click **"Download .json"** to save `test-case-template-8D.json` directly to disk).*
 
 ### 4-Quadrant Test Strategy:
-1. **Happy Path (TC-01):** Uses machine `WC-MILL-07`, material `MAT-10247`, burr measurement `0.26mm`. The retrieval engine matches 100% with historical precedent `8D-10048412`.
-2. **Dirty Data (TC-02):** Injects raw German input `"Grat an Flanschkante"`, European decimal comma `"0,32 mm"`, and padded whitespace `" MAT-10247 "`. The pipeline normalizes dirty input and flags missing fields cleanly.
-3. **Bias Hunter (TC-03):** Initial engineer feedback attributes defect to `Man`, but inspection records prove spindle runout of `0.9mm` (tolerance 0.2mm) across 3 shifts. The AI overrides human bias to conclude `Machine`.
-4. **Safe Refusal (TC-04):** Novel fiber-laser welding cell `WC-WELD-11` and experimental material `MAT-12800`. Similarity < 60% safely triggers refusal with 3 structured handover questions for welding SMEs.
+Each test runs the **same code path the app runs for a real case**: `validateDataset` / `mapCase`, the D4 precedent engine (`findPrecedentsByStep`, the same source that decides the "no precedent" stop), and the stop rules (`evaluateStops`). The expected answer is not written in the harness. It is the `$expectedOutcome` block of each file in `mock-data/sprint1-test-cases/`, and the harness only compares what it measured against it. No LLM drafting is called, so a run takes a few seconds at most.
+
+1. **Happy Path (TC-01):** New defect `8D-10049001` on `WC-MILL-07` / `MAT-10247`, burr `0.26mm` vs max `0.10mm`. Passes when the D4 precedent search returns the closed case `8D-10048412` and no blocking stop is raised.
+2. **Dirty Data (TC-02):** Free-text German measurement `"gemessen 0,32mm"` and padded material ID `"  MAT-10247 "`. Passes when the app's own parser reads `0.32`, the ID is trimmed, gaps are reported, and the AI stops at D4 until a QE confirms the parsed value.
+3. **Bias Hunter (TC-03):** The record blames `Man` with no metric, while `Machine` shows a `0.9mm` drift (max `0.2mm`). Passes when the app's contradiction rule flags exactly that and stops D4 for the QE to decide.
+4. **Safe Refusal (TC-04):** Welding defect `DEF-0910` on the milling cell `WC-MILL-07`. Only the work center and material match past cases (7/16), which is below the D4 threshold of 8. Passes when no precedent qualifies, the AI stops (outside scope), and the stop hands a question to a person.
+
+The D4 retrieval profile (`diagnosis`) requires **8 points** (Configuration → retrieval profiles): a matching work center and material alone is not enough to cite a root-cause precedent; the defect code or a semantically similar description must also match.
 
 ---
 
 ## 5. Sprint 1 Evaluation Suite & Defense Sandbox
 
 ### Scoring Rubric & Sprint 1 Criteria:
-* **Criterion 2 (12 Points):** Automated execution of the 4 strategic test cases in < 90 seconds (Actual runtime: **~0.8s**, PASS 4/4).
-* **Criterion 3 (8 Points):** Two-Tier Defense pipeline appropriately processes or safely refuses both Judge benchmark cases.
-* **Mandatory Rule 3.b:** Hallucination firewall blocks false positives when similarity < 60%, generating 3 structured handover questions for SMEs.
+* **Criterion 2 (12 Points):** Automated execution of the 4 strategic test cases in < 90 seconds (typical runtime: a few seconds).
+* **Criterion 3 (8 Points):** The judge sandbox evaluates any pasted JSON with the same validation, precedent engine and stop rules, and either processes it, stops for a person, or refuses it.
+* **Mandatory Rule 3.b:** When no closed case qualifies as a precedent, no precedent is cited and the case is escalated to a person.
+
+If the backend cannot be reached, the Evaluation tab shows an error and **no results**. It never falls back to pre-written PASS rows. The **Summary** button opens a summary of the run that just happened: expected vs actual, every stop, and what was measured.
 
 ### 90-Second Verify Harness Execution (1-Click Run):
 * **On Web UI:** Navigate to `/#/guide` $\to$ scroll to **"4. Sprint 1 Evaluation Suite"** $\to$ click **"Run 90s Verify Suite"**.

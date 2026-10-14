@@ -149,10 +149,10 @@ export function extractAiProvenance({
         methodType = 'vector';
         const scorePct = Math.round(scoreVal * 100);
         method = `Similarity Search (${scorePct}% match with ${topPrecedent.notificationId})`;
-        bullets.push(`Citing past case: ${topPrecedent.notificationId} (${scorePct}% similarity) — "${topPrecedent.symptomShortText || topPrecedent.defectText || 'Similar completed 8D case'}"`);
+        bullets.push(`Citing past case: ${topPrecedent.notificationId} (${scorePct}% similarity) - "${topPrecedent.symptomShortText || topPrecedent.defectText || 'Similar completed 8D case'}"`);
 
         if (topPrecedent.materialDesc || topPrecedent.materialId) {
-            bullets.push(`Precedent material: ${topPrecedent.materialId || 'MAT-QM'} — ${topPrecedent.materialDesc || 'Similar material'} (Work Center: ${topPrecedent.workCenterDesc || topPrecedent.workCenterId || 'Machining'})`);
+            bullets.push(`Precedent material: ${topPrecedent.materialId || 'MAT-QM'} - ${topPrecedent.materialDesc || 'Similar material'} (Work Center: ${topPrecedent.workCenterDesc || topPrecedent.workCenterId || 'Machining'})`);
         }
 
         if (precedents.length > 1) {
@@ -165,7 +165,7 @@ export function extractAiProvenance({
     } else if (!isDataBacked) {
         methodType = 'ai';
         method = 'AI Generative Synthesis';
-        bullets.push(`Evidence basis: Notification ${notifId} — Synthesized from technical symptoms; no direct source record in current dataset.`);
+        bullets.push(`Evidence basis: Notification ${notifId} - Synthesized from technical symptoms; no direct source record in current dataset.`);
     } else {
         methodType = 'sap';
         method = 'Direct QM Extraction';
@@ -173,7 +173,7 @@ export function extractAiProvenance({
     }
 
     // 2. Defect & Current Scope Info
-    bullets.push(`Associated defect: ${defectCode} — "${defectText}".`);
+    bullets.push(`Associated defect: ${defectCode} - "${defectText}".`);
     bullets.push(`Scope & asset: ${material} at ${workCenter} (Extent: ${quantity}).`);
 
     // 3. Telemetry & Inspection Measurements

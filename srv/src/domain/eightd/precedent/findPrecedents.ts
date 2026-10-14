@@ -156,7 +156,7 @@ async function embedQuery(
         return { embedding, embeddingModel: currentEmbeddingModel() };
     } catch (e: any) {
         LOG.warn(
-            `Không nhúng được case ${context.notificationId} (${e.message}) — `
+            `Không nhúng được case ${context.notificationId} (${e.message}) - `
             + 'bỏ tiêu chí ngữ nghĩa, vẫn chấm theo các tiêu chí còn lại.',
         );
         return { failed: `the embedding call failed: ${e.message}` };
@@ -207,7 +207,7 @@ async function scoreWithProfile(
             precedents: [],
             candidatesScored: 0,
             reason:
-                'The case library is empty — no historical cases have been loaded yet. '
+                'The case library is empty - no historical cases have been loaded yet. '
                 + 'Run the library seed before expecting precedent-based suggestions.',
         };
     }
@@ -260,7 +260,7 @@ async function scoreWithProfile(
             } catch (e: any) {
                 // Re-rank hỏng thì xếp hạng tầng 1 vẫn đứng — cùng triết lý với
                 // embedding hỏng: không đổi cả tính năng lấy một sự cố tạm thời.
-                LOG.warn(`Re-rank hỏng (${e.message}) — giữ xếp hạng tầng 1.`);
+                LOG.warn(`Re-rank hỏng (${e.message}) - giữ xếp hạng tầng 1.`);
             }
         }
         applyRerank(
@@ -369,7 +369,7 @@ export async function findPrecedents(
         result.precedents.length
             ? `Case ${context.notificationId} · ${profile.label}: `
               + result.precedents.map((p) => `${p.notificationId} ${p.score}/${p.maxScore}`).join(', ')
-            : `Case ${context.notificationId} · ${profile.label}: không có tiền lệ — ${result.reason}`,
+            : `Case ${context.notificationId} · ${profile.label}: không có tiền lệ - ${result.reason}`,
     );
     return result;
 }
@@ -532,7 +532,7 @@ export async function findPrecedentsByStep(
 
     LOG.info(
         `Case ${context.notificationId}: ${union.length} tiền lệ hợp nhất từ `
-        + `${usedProfiles.length} profile (${usedKeys.join(', ')}) — `
+        + `${usedProfiles.length} profile (${usedKeys.join(', ')}) - `
         + STEP_CODES.map((code) => `${code}→${bindings[code]}:${byStep[code].precedents.length}`).join(' '),
     );
 

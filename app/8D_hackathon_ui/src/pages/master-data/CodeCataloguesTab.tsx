@@ -69,9 +69,9 @@ const CATALOGUES: Record<CatalogueKey, CatalogueMeta> = {
     defect: {
         label: 'Defect Codes',
         category: 'QM Codes',
-        catalogType: 'Catalog type 9 — defects (FECOD)',
+        catalogType: 'Catalog type 9 - defects (FECOD)',
         caption:
-            'The coded vocabulary for what went wrong. Recording a defect requires one of these — '
+            'The coded vocabulary for what went wrong. Recording a defect requires one of these - '
             + 'an off-catalogue code scores zero on precedent retrieval without ever showing an error.',
         codeId: VALUE_HELP_IDS.defectCode,
         groupId: VALUE_HELP_IDS.defectCodeGroup,
@@ -82,7 +82,7 @@ const CATALOGUES: Record<CatalogueKey, CatalogueMeta> = {
     task: {
         label: 'Task Codes',
         category: 'QM Codes',
-        catalogType: 'Catalog type 2 — quality tasks (QM-TASK)',
+        catalogType: 'Catalog type 2 - quality tasks (QM-TASK)',
         caption:
             'The coded vocabulary behind every D3 / D5 / D7 action. A task keeps its own sentence; '
             + 'the code is what makes "what did we do last time this happened" a count instead of a read.',
@@ -317,7 +317,7 @@ export function CodeCataloguesTab() {
                                     <SelectItem value={ALL_GROUPS}>All code groups</SelectItem>
                                     {groupsVh.entries.map((entry) => (
                                         <SelectItem key={String(entry.key)} value={String(entry.key)}>
-                                            {String(entry.key)} — {String(entry.text ?? '')}
+                                            {String(entry.key)} - {String(entry.text ?? '')}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -440,10 +440,10 @@ export function CodeCataloguesTab() {
                                                         <span className="text-muted-foreground italic">General (All Materials)</span>
                                                     )}
                                                 </td>
-                                                <td className="py-3 px-4 font-mono text-right text-foreground">{String(entry.specLowerLimit ?? '—')}</td>
-                                                <td className="py-3 px-4 font-mono text-right text-foreground">{String(entry.specUpperLimit ?? '—')}</td>
-                                                <td className="py-3 px-4 font-mono text-muted-foreground">{String(entry.specUom ?? '—')}</td>
-                                                <td className="py-3 px-4 font-mono text-sm text-foreground">{String(entry.defaultEquipment ?? '—')}</td>
+                                                <td className="py-3 px-4 font-mono text-right text-foreground">{String(entry.specLowerLimit ?? '-')}</td>
+                                                <td className="py-3 px-4 font-mono text-right text-foreground">{String(entry.specUpperLimit ?? '-')}</td>
+                                                <td className="py-3 px-4 font-mono text-muted-foreground">{String(entry.specUom ?? '-')}</td>
+                                                <td className="py-3 px-4 font-mono text-sm text-foreground">{String(entry.defaultEquipment ?? '-')}</td>
                                                 <td className="py-3 px-4">
                                                     <Badge
                                                         variant="outline"
@@ -475,7 +475,7 @@ export function CodeCataloguesTab() {
                                                             )}
                                                         </div>
                                                     ) : (
-                                                        <span className="text-muted-foreground">—</span>
+                                                        <span className="text-muted-foreground">-</span>
                                                     )}
                                                 </td>
                                                 <td className="py-3 px-4 font-mono text-muted-foreground">{String(entry.plant ?? '1000')}</td>
@@ -492,7 +492,7 @@ export function CodeCataloguesTab() {
                                                         {String(entry.status ?? 'Unrestricted')}
                                                     </Badge>
                                                 </td>
-                                                <td className="py-3 px-4 font-mono text-muted-foreground">{String(entry.batchDate ?? '—')}</td>
+                                                <td className="py-3 px-4 font-mono text-muted-foreground">{String(entry.batchDate ?? '-')}</td>
                                                 <td className="py-3 px-4 text-right">
                                                     {usage.isLoading ? (
                                                         <span className="text-muted-foreground">…</span>
@@ -513,10 +513,10 @@ export function CodeCataloguesTab() {
                                             <tr key={code} className="hover:bg-muted/30 transition-colors">
                                                 <td className="py-3 px-4 font-mono font-bold text-foreground">{code}</td>
                                                 <td className="py-3 px-4 font-semibold text-foreground">{String(entry.text ?? '')}</td>
-                                                <td className="py-3 px-4 text-foreground">{String(entry.department ?? '—')}</td>
-                                                <td className="py-3 px-4 text-muted-foreground">{String(entry.functionTitle ?? '—')}</td>
+                                                <td className="py-3 px-4 text-foreground">{String(entry.department ?? '-')}</td>
+                                                <td className="py-3 px-4 text-muted-foreground">{String(entry.functionTitle ?? '-')}</td>
                                                 <td className="py-3 px-4 text-sm">
-                                                    <div className="text-foreground">{String(entry.email ?? '—')}</div>
+                                                    <div className="text-foreground">{String(entry.email ?? '-')}</div>
                                                     <div className="text-muted-foreground font-mono">{String(entry.phone ?? '')}</div>
                                                 </td>
                                                 <td className="py-3 px-4 text-right">
@@ -540,7 +540,7 @@ export function CodeCataloguesTab() {
                                                 <td className="py-3 px-4 font-mono font-bold text-foreground">{code}</td>
                                                 <td className="py-3 px-4 font-semibold text-foreground">{String(entry.text ?? '')}</td>
                                                 <td className="py-3 px-4 font-mono text-muted-foreground">{String(entry.plant ?? '1000')}</td>
-                                                <td className="py-3 px-4 text-foreground">{String(entry.lead ?? '—')}</td>
+                                                <td className="py-3 px-4 text-foreground">{String(entry.lead ?? '-')}</td>
                                                 <td className="py-3 px-4 text-right">
                                                     {usage.isLoading ? (
                                                         <span className="text-muted-foreground">…</span>
@@ -561,7 +561,7 @@ export function CodeCataloguesTab() {
                                             <tr key={code} className="hover:bg-muted/30 transition-colors">
                                                 <td className="py-3 px-4 font-mono font-bold text-foreground">{code}</td>
                                                 <td className="py-3 px-4 text-foreground">{String(entry.text ?? entry.materialDesc ?? '')}</td>
-                                                <td className="py-3 px-4 font-mono text-muted-foreground">{String(entry.materialFamily ?? entry.materialGroup ?? '—')}</td>
+                                                <td className="py-3 px-4 font-mono text-muted-foreground">{String(entry.materialFamily ?? entry.materialGroup ?? '-')}</td>
                                                 <td className="py-3 px-4 text-right">
                                                     {usage.isLoading ? (
                                                         <span className="text-muted-foreground">…</span>
@@ -623,12 +623,12 @@ export function CodeCataloguesTab() {
                                                         )}
                                                     </>
                                                 ) : (
-                                                    <span className="text-muted-foreground">—</span>
+                                                    <span className="text-muted-foreground">-</span>
                                                 )}
                                             </td>
                                             {catalogue === 'defect' && (
                                                 <td className="py-3 px-4 text-muted-foreground">
-                                                    {String(entry.defectClass ?? '—')}
+                                                    {String(entry.defectClass ?? '-')}
                                                 </td>
                                             )}
                                             <td className="py-3 px-4 text-right">

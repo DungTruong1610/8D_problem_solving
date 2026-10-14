@@ -87,7 +87,7 @@ export async function allocateNumber(
     }
 
     throw new Error(
-        `Could not allocate a number for '${object}' after ${MAX_ATTEMPTS} attempts — `
+        `Could not allocate a number for '${object}' after ${MAX_ATTEMPTS} attempts - `
         + 'the range may be exhausted or heavily contended.',
     );
 }

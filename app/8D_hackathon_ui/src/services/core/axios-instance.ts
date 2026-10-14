@@ -86,7 +86,7 @@ axiosInstance.interceptors.response.use(
         // ── 401: session expired → reload to re-authenticate via AppRouter ──
         if (status === 401 && !isHandling401) {
             isHandling401 = true;
-            console.warn('[Session] Token expired — reloading for re-authentication.');
+            console.warn('[Session] Token expired - reloading for re-authentication.');
             window.location.reload();
             // Never resolve — prevents stale UI errors from appearing
             return new Promise(() => { });

@@ -80,7 +80,7 @@ function inspect(text: string): { ok: true; caseId: string } | { ok: false; reas
     try {
         parsed = JSON.parse(text);
     } catch (e: any) {
-        return { ok: false, reason: `Not valid JSON — ${e.message}` };
+        return { ok: false, reason: `Not valid JSON - ${e.message}` };
     }
 
     const obj = unwrapOData(parsed);
@@ -105,7 +105,7 @@ function inspect(text: string): { ok: true; caseId: string } | { ok: false; reas
     return {
         ok: false,
         reason:
-            'This is valid JSON but not a defect case — expected a top-level "notificationId", ' +
+            'This is valid JSON but not a defect case - expected a top-level "notificationId", ' +
             'or a "data.notifications" block.',
     };
 }
@@ -506,7 +506,7 @@ export function AnalyzeDialog({ open, onOpenChange, onScheduled }: Props) {
                                 <div className="min-w-0 rounded-lg border border-dashed p-3" data-tour="create-samples">
                                     <p className="text-sm font-semibold">Or start from an incoming issue</p>
                                     <p className="mt-0.5 text-sm text-muted-foreground">
-                                        Freshly logged cases — symptom and context only, no root cause, no
+                                        Freshly logged cases - symptom and context only, no root cause, no
                                         actions, no team. That is what the Copilot is for.
                                     </p>
                                     <div className="mt-2 space-y-1">
@@ -738,20 +738,20 @@ export function AnalyzeDialog({ open, onOpenChange, onScheduled }: Props) {
                                     <div className="py-1">
                                         <PreviewRow
                                             label="Material"
-                                            value={preview.materialId ? `${preview.materialId}${preview.materialDesc ? ` — ${preview.materialDesc}` : ''}` : null}
+                                            value={preview.materialId ? `${preview.materialId}${preview.materialDesc ? ` - ${preview.materialDesc}` : ''}` : null}
                                         />
                                         <PreviewRow label="Batch" value={preview.batchId} />
                                         <PreviewRow label="Plant" value={preview.plant} />
                                         <PreviewRow
                                             label="Work centre"
-                                            value={preview.workCenterId ? `${preview.workCenterId}${preview.workCenterDesc ? ` — ${preview.workCenterDesc}` : ''}` : null}
+                                            value={preview.workCenterId ? `${preview.workCenterId}${preview.workCenterDesc ? ` - ${preview.workCenterDesc}` : ''}` : null}
                                         />
                                     </div>
 
                                     <div className="py-1">
                                         <PreviewRow
                                             label="Defect code"
-                                            value={preview.defectCode ? `${preview.defectCodeGroup ? `${preview.defectCodeGroup} / ` : ''}${preview.defectCode}${preview.defectText ? ` — ${preview.defectText}` : ''}` : null}
+                                            value={preview.defectCode ? `${preview.defectCodeGroup ? `${preview.defectCodeGroup} / ` : ''}${preview.defectCode}${preview.defectText ? ` - ${preview.defectText}` : ''}` : null}
                                         />
                                         {/* S7: một khái niệm, một tên. Nhãn là Severity. */}
                                         <PreviewRow label="Severity" value={preview.defectClass} />
@@ -781,7 +781,7 @@ export function AnalyzeDialog({ open, onOpenChange, onScheduled }: Props) {
                                                         {c.characteristic}
                                                     </span>
                                                     <span className="min-w-0 flex-1 break-words text-sm font-medium">
-                                                        {c.measuredValue || '—'}
+                                                        {c.measuredValue || '-'}
                                                         {c.specUom ? ` ${c.specUom}` : ''}
                                                         {(c.specLowerLimit != null || c.specUpperLimit != null)
                                                             && ` (spec ${c.specLowerLimit ?? '−∞'} … ${c.specUpperLimit ?? '+∞'})`}
@@ -816,7 +816,7 @@ export function AnalyzeDialog({ open, onOpenChange, onScheduled }: Props) {
                                     <p className="text-sm leading-relaxed text-muted-foreground">
                                         {preview.origin === ORIGIN_CUSTOMER
                                             ? 'Defaults to the customer SLA on this complaint.'
-                                            : 'Optional. Internal defects carry no SLA, so nothing is filled in — set a date only if the team commits to one.'}
+                                            : 'Optional. Internal defects carry no SLA, so nothing is filled in - set a date only if the team commits to one.'}
                                     </p>
                                 </div>
 

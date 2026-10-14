@@ -590,7 +590,7 @@ export function AiSuggestWidget({
                             </span>
                         )}
                         {row.caseResponsibility && (
-                            <span className="text-muted-foreground"> — {row.caseResponsibility}</span>
+                            <span className="text-muted-foreground"> - {row.caseResponsibility}</span>
                         )}
                         {ctx.onTeam(partnerId) ? (
                             <span className="ml-2 inline-flex items-center gap-1 text-sm font-semibold text-success">
@@ -708,15 +708,15 @@ export function DecisionTableWidget({
                                             })}
                                         >
                                             <SelectTrigger className={cn('h-9 max-w-[240px] text-sm', isLocked && 'cursor-not-allowed opacity-75 bg-muted/40')}>
-                                                <SelectValue placeholder="— select partner —" />
+                                                <SelectValue placeholder="- select partner -" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value={UNASSIGNED}>— select partner —</SelectItem>
+                                                <SelectItem value={UNASSIGNED}>- select partner -</SelectItem>
                                                 {ctx.directory.map((entry) => {
                                                     const cleanId = entry.partnerId.replace(/^BP-/i, '');
                                                     return (
                                                         <SelectItem key={entry.partnerId} value={cleanId} className="text-sm">
-                                                            {cleanId} — {entry.partnerName}
+                                                            {cleanId} - {entry.partnerName}
                                                             {entry.functionTitle ? ` (${entry.functionTitle})` : ''}
                                                         </SelectItem>
                                                     );
@@ -739,10 +739,10 @@ export function DecisionTableWidget({
                                         </Select>
                                     </td>
                                     <td className="border-b px-2.5 py-2 align-middle text-sm text-muted-foreground">
-                                        {partner?.email || '—'}
+                                        {partner?.email || '-'}
                                     </td>
                                     <td className="border-b px-2.5 py-2 align-middle text-sm text-muted-foreground">
-                                        {partner?.phone || '—'}
+                                        {partner?.phone || '-'}
                                     </td>
                                     <td className="border-b px-2.5 py-2 text-right align-middle">
                                         {!isLocked && (
@@ -770,15 +770,15 @@ export function DecisionTableWidget({
             )}
             <p className={cn('border-t pt-3 text-sm leading-relaxed', ctx.dirty ? 'text-warning' : 'text-muted-foreground')}>
                 {ctx.dirty
-                    ? 'Unsaved changes — click Save to store this team on the report.'
+                    ? 'Unsaved changes - click Save to store this team on the report.'
                     : ctx.savedLabel
                         ? `Team saved to the report (${ctx.savedLabel}). It will still be here after a reload.`
-                        : 'Partner and role are assigned manually, matching the Business Partner (BP) assignment in the Resolve Internal Problems app. E-mail and telephone are queried automatically from the BP master record — never typed by hand.'}
+                        : 'Partner and role are assigned manually, matching the Business Partner (BP) assignment in the Resolve Internal Problems app. E-mail and telephone are queried automatically from the BP master record - never typed by hand.'}
             </p>
             {ctx.directoryError && (
                 <p className="flex items-start gap-1.5 text-sm text-warning">
                     <TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                    Partner directory could not be loaded ({ctx.directoryError}) — only people already on this case are selectable.
+                    Partner directory could not be loaded ({ctx.directoryError}) - only people already on this case are selectable.
                 </p>
             )}
         </div>

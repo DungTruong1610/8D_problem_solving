@@ -82,7 +82,7 @@ function classify(raw: string): EvidenceSource {
      * nhất trong danh sách.
      */
     if (SAP_OBJECTS.test(trimmed)) {
-        return { label: trimmed, kind: 'sap', detail: `Read from record — ${trimmed}.` };
+        return { label: trimmed, kind: 'sap', detail: `Read from record - ${trimmed}.` };
     }
 
     if (/backfilled/i.test(trimmed)) {

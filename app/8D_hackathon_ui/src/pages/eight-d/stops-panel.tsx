@@ -17,13 +17,13 @@ import { ReasonDialog } from './reason-dialog';
 export const STOP_TYPE_META: Record<StopType, { label: string; hint: string; dot: string; border: string }> = {
     'unverified-facts': {
         label: 'Unverified facts',
-        hint: 'Input data is missing, ambiguous or contradictory — the AI will not assert a conclusion on it.',
+        hint: 'Input data is missing, ambiguous or contradictory - the AI will not assert a conclusion on it.',
         dot: 'bg-warning',
         border: 'border-l-warning',
     },
     'outside-scope': {
         label: 'Outside scope',
-        hint: 'Nothing in the process or case library covers this — the AI will not invent a precedent.',
+        hint: 'Nothing in the process or case library covers this - the AI will not invent a precedent.',
         dot: 'bg-info',
         border: 'border-l-info',
     },
@@ -75,7 +75,7 @@ function StopRow({ stop, onResolve }: { stop: CaseStop; onResolve: (stop: CaseSt
                     {stop.status === 'step-approved' && (
                         <p className="mt-1.5 flex items-start gap-1.5 text-sm text-muted-foreground">
                             <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                            <span>{stop.step} was approved{stop.resolvedBy ? ` by ${stop.resolvedBy}` : ''} before this check existed — no separate resolution note.</span>
+                            <span>{stop.step} was approved{stop.resolvedBy ? ` by ${stop.resolvedBy}` : ''} before this check existed - no separate resolution note.</span>
                         </p>
                     )}
                 </div>
@@ -155,7 +155,7 @@ export function StopsButton({ reportID, stops, isError, isLoading }: {
                             Could not load the stops for this case. Approvals are still checked on the server.
                         </p>
                     ) : stops.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">No stops — the AI could proceed on every step of this case.</p>
+                        <p className="text-sm text-muted-foreground">No stops - the AI could proceed on every step of this case.</p>
                     ) : (
                         <ul className="divide-y">
                             {stops.map((stop) => (

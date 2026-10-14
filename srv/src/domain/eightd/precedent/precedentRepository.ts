@@ -150,7 +150,7 @@ export async function fetchCandidates(
         // Trường hợp BÌNH THƯỜNG khi tiêu chí ngữ nghĩa đang bật, không phải sự cố.
         LOG.info(
             `Điểm đạt được không cần trùng khoá là ${reach} ≥ ngưỡng ${opts.minScore} `
-            + '— quét toàn bộ kho thay vì lọc trước, để không bỏ sót case chỉ giống về ngữ nghĩa.',
+            + '- quét toàn bộ kho thay vì lọc trước, để không bỏ sót case chỉ giống về ngữ nghĩa.',
         );
         return run(`all:${opts.closedOnly}`, () => q);
     }

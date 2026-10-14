@@ -91,7 +91,7 @@ export function CaseCommitments({
                             <Pencil className="h-3.5 w-3.5" />
                         </Button>
                     </div>
-                    <div className="mt-0.5 text-sm font-medium">{report.slaResponseDue ?? '—'}</div>
+                    <div className="mt-0.5 text-sm font-medium">{report.slaResponseDue ?? '-'}</div>
                     <div className="text-sm leading-relaxed text-muted-foreground">{dueHint}</div>
                 </div>
 
@@ -99,7 +99,7 @@ export function CaseCommitments({
                     <div className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                         Coordinator
                     </div>
-                    <div className="mt-0.5 text-sm font-medium">{report.coordinator ?? '—'}</div>
+                    <div className="mt-0.5 text-sm font-medium">{report.coordinator ?? '-'}</div>
                 </div>
             </>
         );

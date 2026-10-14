@@ -20,8 +20,8 @@ export function CaseLibrarySection({ cfg }: { cfg: RetrievalConfigState }) {
             <CardHeader>
                 <CardTitle>Case library</CardTitle>
                 <CardDescription>
-                    Read-only here. Cases are loaded through the seed action so the derived columns —
-                    the tokenised defect text and the material group — are always computed the same
+                    Read-only here. Cases are loaded through the seed action so the derived columns -
+                    the tokenised defect text and the material group - are always computed the same
                     way. A row typed in by hand would silently never score.
                 </CardDescription>
             </CardHeader>

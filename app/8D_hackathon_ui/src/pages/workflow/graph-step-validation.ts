@@ -55,7 +55,7 @@ export function validateStepParams(draft: GraphStepParams): FieldIssue[] {
     if (!weights.length) {
         issues.push({
             field: 'weights',
-            message: 'No weight above zero — this step could never find a precedent.',
+            message: 'No weight above zero - this step could never find a precedent.',
         });
     }
 
@@ -69,7 +69,7 @@ export function validateStepParams(draft: GraphStepParams): FieldIssue[] {
     if (minScore !== null && keywords !== null && keywords >= minScore) {
         issues.push({
             field: 'wKeywords',
-            message: `Keyword weight (${keywords}) must be below the minimum score (${minScore}) — `
+            message: `Keyword weight (${keywords}) must be below the minimum score (${minScore}) - `
                 + 'otherwise a single shared keyword is enough to make any case a precedent.',
         });
     }
@@ -79,7 +79,7 @@ export function validateStepParams(draft: GraphStepParams): FieldIssue[] {
     if (minScore !== null && rerank !== null && rerank > 0 && rerank >= minScore) {
         issues.push({
             field: 'wRerank',
-            message: `Re-rank weight (${rerank}) must be below the minimum score (${minScore}) — `
+            message: `Re-rank weight (${rerank}) must be below the minimum score (${minScore}) - `
                 + 'otherwise the model alone decides, even for a case sharing no relation in the graph.',
         });
     }

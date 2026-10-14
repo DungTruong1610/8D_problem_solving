@@ -53,29 +53,29 @@ export async function export8DToExcel(report: Report8D): Promise<void> {
         ['Notification / Case ID:', report.notificationId],
         ['Report Status:', `${report.sapStatus} (AI: ${report.status})`],
         ['Origin:', report.origin],
-        ['Reference Number:', report.referenceNumber || '—'],
-        ['Found Date:', report.foundDate || '—'],
-        ['Completion Date:', report.completionDate || '—'],
-        ['SLA Response Due:', report.slaResponseDue || '—'],
-        ['Coordinator:', report.coordinator || '—'],
-        ['Team Leader:', report.teamLeader || '—'],
+        ['Reference Number:', report.referenceNumber || '-'],
+        ['Found Date:', report.foundDate || '-'],
+        ['Completion Date:', report.completionDate || '-'],
+        ['SLA Response Due:', report.slaResponseDue || '-'],
+        ['Coordinator:', report.coordinator || '-'],
+        ['Team Leader:', report.teamLeader || '-'],
         ['', ''],
         ['PRODUCT & PROCESS DETAILS', ''],
-        ['Material ID:', report.materialId || '—'],
-        ['Material Description:', report.materialDesc || '—'],
-        ['Plant:', report.plant || '—'],
-        ['Batch ID:', report.batchId || '—'],
-        ['Work Center:', `${report.workCenterId || '—'} - ${report.workCenterDesc || ''}`],
-        ['Defect Code & Group:', `${report.defectCodeGroup ? `${report.defectCodeGroup} / ` : ''}${report.defectCode || '—'}`],
-        ['Defect Description:', report.defectText || '—'],
-        ['Defect Class / Severity:', report.defectClass || '—'],
-        ['Quantity Affected:', report.defectQuantity != null ? `${report.defectQuantity} ${report.defectQuantityUom || ''}` : report.quantityExtent || '—'],
-        ['Cost of Poor Quality (COPQ):', report.copqEur != null ? `€${report.copqEur.toLocaleString()}` : '—'],
-        ['Root Cause Category:', report.rootCauseCategory || '—'],
-        ['FMEA Reference ID:', report.fmeaId || '—'],
+        ['Material ID:', report.materialId || '-'],
+        ['Material Description:', report.materialDesc || '-'],
+        ['Plant:', report.plant || '-'],
+        ['Batch ID:', report.batchId || '-'],
+        ['Work Center:', `${report.workCenterId || '-'} - ${report.workCenterDesc || ''}`],
+        ['Defect Code & Group:', `${report.defectCodeGroup ? `${report.defectCodeGroup} / ` : ''}${report.defectCode || '-'}`],
+        ['Defect Description:', report.defectText || '-'],
+        ['Defect Class / Severity:', report.defectClass || '-'],
+        ['Quantity Affected:', report.defectQuantity != null ? `${report.defectQuantity} ${report.defectQuantityUom || ''}` : report.quantityExtent || '-'],
+        ['Cost of Poor Quality (COPQ):', report.copqEur != null ? `€${report.copqEur.toLocaleString()}` : '-'],
+        ['Root Cause Category:', report.rootCauseCategory || '-'],
+        ['FMEA Reference ID:', report.fmeaId || '-'],
         ['', ''],
         ['AI EXECUTIVE SUMMARY', ''],
-        ['Internal Summary:', report.internalSummary || '—'],
+        ['Internal Summary:', report.internalSummary || '-'],
     ];
 
     if (isCustomerComplaint(report.origin) && report.customerSummary) {
@@ -93,8 +93,8 @@ export async function export8DToExcel(report: Report8D): Promise<void> {
             d.code,
             d.title,
             d.reviewStatus || 'Draft',
-            d.reviewedBy || '—',
-            d.summary || '—',
+            d.reviewedBy || '-',
+            d.summary || '-',
         ]);
     }
 
@@ -105,7 +105,7 @@ export async function export8DToExcel(report: Report8D): Promise<void> {
     // ── SHEET 2: D1 - Team Roster ──
     const d1 = dMap.get('D1');
     const teamRows: (string | number | null | undefined)[][] = [
-        ['D1: ESTABLISH THE TEAM — ROSTER', '', '', ''],
+        ['D1: ESTABLISH THE TEAM - ROSTER', '', '', ''],
         ['Member Name', 'Assigned 8D Role', 'Organizational Role', 'Case Responsibility'],
     ];
 
@@ -381,14 +381,14 @@ export function exportWorklistToExcel(rows: any[]): void {
         const work = r.work ?? {};
         dataRows.push([
             safeStr(r.notificationId),
-            safeStr(r.sourceDefectId || '—'),
+            safeStr(r.sourceDefectId || '-'),
             safeStr(r.origin),
-            safeStr(work.severity || r.defectClass || '—'),
+            safeStr(work.severity || r.defectClass || '-'),
             safeStr(r.status),
-            safeStr(work.currentStep || '—'),
-            work.ageInDays ?? '—',
-            safeStr(work.dueDate || r.slaResponseDue || '—'),
-            safeStr(work.owner || r.teamLeader || r.coordinator || '—'),
+            safeStr(work.currentStep || '-'),
+            work.ageInDays ?? '-',
+            safeStr(work.dueDate || r.slaResponseDue || '-'),
+            safeStr(work.owner || r.teamLeader || r.coordinator || '-'),
             safeStr(r.symptomShortText),
             safeStr(r.materialId),
             safeStr(r.materialDesc),
@@ -396,9 +396,9 @@ export function exportWorklistToExcel(rows: any[]): void {
             safeStr(r.workCenterId),
             safeStr(r.defectCode),
             safeStr(r.defectText),
-            safeStr(r.rootCauseCategory || '—'),
-            r.copqEur != null ? Number(r.copqEur) : '—',
-            r.analyzedAt ? new Date(r.analyzedAt).toLocaleString('en-GB') : '—',
+            safeStr(r.rootCauseCategory || '-'),
+            r.copqEur != null ? Number(r.copqEur) : '-',
+            r.analyzedAt ? new Date(r.analyzedAt).toLocaleString('en-GB') : '-',
         ]);
     }
 

@@ -95,7 +95,7 @@ export function validateDataset(raw: any): ValidationIssue[] {
 
     const notifications = rows(data, 'notifications');
     if (notifications.length === 0) {
-        fatal('SHAPE', 'Không tìm thấy thông tin case notification — không xác định được case.');
+        fatal('SHAPE', 'Không tìm thấy thông tin case notification - không xác định được case.');
         return issues;
     }
     if (notifications.length > 1) {
@@ -106,7 +106,7 @@ export function validateDataset(raw: any): ValidationIssue[] {
     const note = notifications[0];
     const nid = note.notification_id;
     if (!nid) {
-        fatal('SHAPE', 'Case notification thiếu notification_id — không có khoá định danh.');
+        fatal('SHAPE', 'Case notification thiếu notification_id - không có khoá định danh.');
         return issues;
     }
 
@@ -156,7 +156,7 @@ export function validateDataset(raw: any): ValidationIssue[] {
     // Ishikawa — thiếu nhánh là chuyện bình thường ngoài đời, không phải lỗi.
     const ishikawa = rows(data, 'causes_ishikawa');
     if (ishikawa.length === 0) {
-        quality('ISHIKAWA-COVERAGE', 'Không có dòng điều tra Ishikawa nào — D4 không có bằng chứng để dựa.');
+        quality('ISHIKAWA-COVERAGE', 'Không có dòng điều tra Ishikawa nào - D4 không có bằng chứng để dựa.');
     } else {
         const cats = ishikawa.map((r) => r.category);
         const missing = ISHIKAWA_CATEGORIES.filter((c) => !cats.includes(c));
@@ -180,9 +180,9 @@ export function validateDataset(raw: any): ValidationIssue[] {
     // 5-Why — chuỗi cụt hoặc rỗng rất hay gặp.
     const fiveWhy = [...rows(data, 'five_why_chain')].sort((a, b) => a.step_no - b.step_no);
     if (fiveWhy.length === 0) {
-        quality('FIVE-WHY-DEPTH', 'Không có chuỗi 5-Why — D4 không có lập luận nhân quả nào được ghi lại.');
+        quality('FIVE-WHY-DEPTH', 'Không có chuỗi 5-Why - D4 không có lập luận nhân quả nào được ghi lại.');
     } else if (fiveWhy.length < 2) {
-        quality('FIVE-WHY-DEPTH', `Chuỗi 5-Why chỉ có ${fiveWhy.length} bước — quá nông để đến nguyên nhân hệ thống.`);
+        quality('FIVE-WHY-DEPTH', `Chuỗi 5-Why chỉ có ${fiveWhy.length} bước - quá nông để đến nguyên nhân hệ thống.`);
     }
     if (fiveWhy.length && !fiveWhy.some((r) => String(r.question ?? '').toLowerCase().includes('(root cause)'))) {
         quality('ROOT-CAUSE-CONSISTENCY', "Không bước 5-Why nào được đánh dấu '(root cause)'.");
@@ -191,7 +191,7 @@ export function validateDataset(raw: any): ValidationIssue[] {
     // Team
     const team = rows(data, 'team_assignments');
     if (team.length === 0) {
-        quality('TEAM-MISSING', 'Không có thành viên nhóm 8D nào — D1 không có dữ liệu.');
+        quality('TEAM-MISSING', 'Không có thành viên nhóm 8D nào - D1 không có dữ liệu.');
     }
     const leaders = team.filter((r) => r.partner_role === '8D Team Leader');
     if (team.length && leaders.length !== 1) {
@@ -252,7 +252,7 @@ export function validateDataset(raw: any): ValidationIssue[] {
     }
 
     if (rows(data, 'spc_process_data').length > 0) {
-        quality('SPC-NOT-PER-CASE', 'spc_process_data có dữ liệu — sheet này là placeholder chưa chốt schema.');
+        quality('SPC-NOT-PER-CASE', 'spc_process_data có dữ liệu - sheet này là placeholder chưa chốt schema.');
     }
 
     return issues.map((i) => ({ ...i, message: `${nid}: ${i.message}` }));

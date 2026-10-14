@@ -141,13 +141,13 @@ export async function getGraphBackend(): Promise<GraphBackend> {
                 LOG.info('SQLite graph backend sẵn sàng; dựng cạnh từ HistoricalCases/HistoricalActions.');
                 return 'sqlite';
             } catch (e: any) {
-                LOG.warn(`Không đọc được kho precedent trên SQLite (${e.message}) — dùng engine chấm điểm.`);
+                LOG.warn(`Không đọc được kho precedent trên SQLite (${e.message}) - dùng engine chấm điểm.`);
                 return null;
             }
         }
 
         if (!kind.startsWith('hana')) {
-            LOG.info(`db.kind = ${kind || '(không rõ)'} — không có graph backend, dùng engine chấm điểm.`);
+            LOG.info(`db.kind = ${kind || '(không rõ)'} - không có graph backend, dùng engine chấm điểm.`);
             return null;
         }
         try {
@@ -162,12 +162,12 @@ export async function getGraphBackend(): Promise<GraphBackend> {
             if (!valid) {
                 LOG.warn(
                     `Graph workspace ${WORKSPACE} ${rows.length ? 'tồn tại nhưng KHÔNG hợp lệ' : 'chưa được deploy'}`
-                    + ' — dùng engine chấm điểm. Chạy `npm run deploy:graph`.',
+                    + ' - dùng engine chấm điểm. Chạy `npm run deploy:graph`.',
                 );
             }
             return valid ? 'hana' : null;
         } catch (e: any) {
-            LOG.warn(`Không kiểm được graph workspace (${e.message}) — dùng engine chấm điểm.`);
+            LOG.warn(`Không kiểm được graph workspace (${e.message}) - dùng engine chấm điểm.`);
             return null;
         }
     })();

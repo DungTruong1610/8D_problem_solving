@@ -68,13 +68,13 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     return (
         <div>
             <div className="text-sm font-medium uppercase tracking-wide text-muted-foreground">{label}</div>
-            <div className="text-sm mt-0.5">{children ?? '—'}</div>
+            <div className="text-sm mt-0.5">{children ?? '-'}</div>
         </div>
     );
 }
 
 function formatEur(v: number | null) {
-    if (v == null) return '—';
+    if (v == null) return '-';
     return new Intl.NumberFormat('en-US', {
         style: 'currency', currency: 'EUR', maximumFractionDigits: 0,
     }).format(v);
@@ -268,7 +268,7 @@ export function EightDDetailPage() {
                                 <span className="font-mono text-foreground">{report.sourceDefectId}</span>
                             </>
                         ) : (
-                            'Imported as JSON — no source defect record'
+                            'Imported as JSON - no source defect record'
                         )}
                     </p>
                 </div>
@@ -326,7 +326,7 @@ export function EightDDetailPage() {
             {running && (
                 <div className="flex items-center gap-2 text-sm text-info bg-info/5 border border-info/20 rounded-lg px-4 py-3">
                     <Spinner className="w-4 h-4" />
-                    Analysis in progress — extracting facts, then drafting the eight disciplines.
+                    Analysis in progress - extracting facts, then drafting the eight disciplines.
                     This page updates automatically.
                 </div>
             )}
@@ -417,7 +417,7 @@ export function EightDDetailPage() {
                                                                 disciplines={disciplines}
                                                                 caseContext={report.caseContext}
                                                                 reportID={id}
-                                                                rootCause={d4RootCause !== '—' ? d4RootCause : (report.rootCauseCategory ?? '')}
+                                                                rootCause={d4RootCause !== '-' ? d4RootCause : (report.rootCauseCategory ?? '')}
                                                             />
                                                         );
                                                     })()}
@@ -461,7 +461,7 @@ export function EightDDetailPage() {
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <Field label="Origin">{report.origin}</Field>
                             <Field label="Defect status">{report.sapStatus}</Field>
-                            <Field label="Found">{report.foundDate ?? '—'}</Field>
+                            <Field label="Found">{report.foundDate ?? '-'}</Field>
                             {/*
                               Ưu tiên số + đơn vị; câu mô tả chỉ là đường lui cho các
                               case tạo trước khi hai cột đó tồn tại.
@@ -469,7 +469,7 @@ export function EightDDetailPage() {
                             <Field label="Extent">
                                 {report.defectQuantity != null
                                     ? `${report.defectQuantity}${report.defectQuantityUom ? ` ${report.defectQuantityUom}` : ''}`
-                                    : (report.quantityExtent || '—')}
+                                    : (report.quantityExtent || '-')}
                             </Field>
 
                             <Field label="Material">
@@ -502,12 +502,12 @@ export function EightDDetailPage() {
                                 <div className="text-sm text-muted-foreground">{report.workCenterDesc}</div>
                             </Field>
 
-                            <Field label="Root cause">{report.rootCauseCategory ?? '—'}</Field>
+                            <Field label="Root cause">{report.rootCauseCategory ?? '-'}</Field>
                             <Field label="Cost of poor quality">{formatEur(report.copqEur)}</Field>
-                            <Field label="FMEA">{report.fmeaId ?? '—'}</Field>
-                            <Field label="Team size">{report.teamSize ?? '—'}</Field>
+                            <Field label="FMEA">{report.fmeaId ?? '-'}</Field>
+                            <Field label="Team size">{report.teamSize ?? '-'}</Field>
                             <Field label="Reference no.">
-                                <span className="font-mono text-sm">{report.referenceNumber || '—'}</span>
+                                <span className="font-mono text-sm">{report.referenceNumber || '-'}</span>
                             </Field>
                             {/*
                               Hai ô CUỐI vì chúng là hai ô duy nhất sửa được, và
@@ -530,16 +530,16 @@ export function EightDDetailPage() {
 
                             <TabsContent value="internal" className="mt-3">
                                 <Card className="p-5 text-sm leading-relaxed">
-                                    {report.internalSummary ?? '—'}
+                                    {report.internalSummary ?? '-'}
                                 </Card>
                             </TabsContent>
 
                             {customerFacing && (
                                 <TabsContent value="customer" className="mt-3">
                                     <Card className="p-5 text-sm leading-relaxed">
-                                        {report.customerSummary ?? '—'}
+                                        {report.customerSummary ?? '-'}
                                         <p className="text-sm text-muted-foreground mt-3 pt-3 border-t">
-                                            Written for the customer — no employee names, equipment IDs or cost figures.
+                                            Written for the customer - no employee names, equipment IDs or cost figures.
                                         </p>
                                     </Card>
                                 </TabsContent>
@@ -594,7 +594,7 @@ export function EightDDetailPage() {
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <History className="w-4 h-4 text-primary" />
-                            Audit Trail — {report.notificationId}
+                            Audit Trail - {report.notificationId}
                         </DialogTitle>
                         <DialogDescription>
                             Every human decision on this case: what was done, when, on which data, and why.
@@ -610,7 +610,7 @@ export function EightDDetailPage() {
             <Dialog open={showPayload} onOpenChange={setShowPayload}>
                 <DialogContent className="max-w-4xl">
                     <DialogHeader>
-                        <DialogTitle>Source dataset — {report.notificationId}</DialogTitle>
+                        <DialogTitle>Source dataset - {report.notificationId}</DialogTitle>
                     </DialogHeader>
                     <PayloadViewer reportID={report.ID} />
                 </DialogContent>

@@ -99,7 +99,7 @@ export function GeneralSettingsTab() {
                     <CardHeader className="pb-3">
                         <CardTitle className="text-base font-semibold">Raw configuration (JSON)</CardTitle>
                         <CardDescription className="text-sm">
-                            For keys that have no dedicated field above — for example{' '}
+                            For keys that have no dedicated field above - for example{' '}
                             <span className="font-mono">maxIterations</span> or{' '}
                             <span className="font-mono">&lt;activity&gt;ThinkingBudget</span>.
                             Editing here and editing above change the same data.

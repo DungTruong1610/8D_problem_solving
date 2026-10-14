@@ -77,7 +77,7 @@ export async function getGraphSettings(): Promise<GraphSettings> {
         const rows = (await db.run(SELECT.from(GRAPH_SETTINGS))) as unknown[];
         if (rows.length) value = normalizeSettings(rows[0]);
     } catch (e: any) {
-        LOG.warn(`Không đọc được GraphRetrievalSettings (${e.message}) — dùng engine graph.`);
+        LOG.warn(`Không đọc được GraphRetrievalSettings (${e.message}) - dùng engine graph.`);
     }
 
     cached = { value, at: Date.now() };
@@ -117,11 +117,11 @@ export async function getStepProfiles(): Promise<Record<StepCode, GraphStepProfi
 
         for (const code of STEP_CODES) {
             const { profile, violation } = normalizeStepParams(code, byCode.get(code));
-            if (violation) LOG.warn(`GraphStepParams bị từ chối — ${violation}`);
+            if (violation) LOG.warn(`GraphStepParams bị từ chối - ${violation}`);
             value[code] = profile;
         }
     } catch (e: any) {
-        LOG.warn(`Không đọc được GraphStepParams (${e.message}) — dùng trọng số mặc định.`);
+        LOG.warn(`Không đọc được GraphStepParams (${e.message}) - dùng trọng số mặc định.`);
     }
 
     cachedProfiles = { value, at: Date.now() };

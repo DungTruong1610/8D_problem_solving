@@ -453,6 +453,6 @@ export function explainScore(result: ScoreResult): string {
     const hits = result.breakdown
         .filter((b) => b.points > 0)
         .map((b) => `${b.label} ${b.matchedOn}`);
-    if (!hits.length) return `${total} — no matching criteria`;
-    return `${total} — ${hits.join(', ')}`;
+    if (!hits.length) return `${total} - no matching criteria`;
+    return `${total} - ${hits.join(', ')}`;
 }

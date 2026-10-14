@@ -129,7 +129,7 @@ export function checkCompliance(input: ComplianceInput): ComplianceReport {
     const unsourced = result.disciplines.filter((d) => d.dataBacked && d.sources.length === 0);
     add('sources-when-data-backed', 'Mọi discipline dataBacked đều có sources',
         unsourced.length === 0 ? 'pass' : 'fail',
-        unsourced.map((d) => d.code).join(',') || '—', true);
+        unsourced.map((d) => d.code).join(',') || '-', true);
 
     // Case KHÔNG có preventive action thì D7 phải tự khai là không có dữ liệu.
     // Đây là phép thử chống bịa quan trọng nhất — xem `mock-data/README.md`.
@@ -145,14 +145,14 @@ export function checkCompliance(input: ComplianceInput): ComplianceReport {
 
     add('blind-no-leak', 'Bằng chứng mù không rò đáp án',
         input.blindLeaks.length === 0 ? 'pass' : 'fail',
-        input.blindLeaks.join(' ') || '—', true);
+        input.blindLeaks.join(' ') || '-', true);
 
     // ── Ràng buộc Q1-only ────────────────────────────────────────────────────
     add('customer-summary-matches-origin', 'customerSummary khớp origin',
         input.isCustomerFacing
             ? (result.customerSummary?.trim() ? 'pass' : 'fail')
             : (result.customerSummary === null ? 'pass' : 'fail'),
-        input.isCustomerFacing ? 'Q1 — cần có' : 'Q3/Q2 — phải null');
+        input.isCustomerFacing ? 'Q1 - cần có' : 'Q3/Q2 - phải null');
 
     // ── Chất lượng lập luận độc lập ──────────────────────────────────────────
     add('derived-five-why', 'AI tự dựng chuỗi 5-Why ≥ 2 bước',
@@ -167,7 +167,7 @@ export function checkCompliance(input: ComplianceInput): ComplianceReport {
 
     add('no-constraint-violations', 'Không vi phạm ràng buộc nào',
         violationCount === 0 ? 'pass' : 'fail',
-        violationCount === 0 ? '—' : `${violationCount} vi phạm: ${topRules(violationsByRule)}`);
+        violationCount === 0 ? '-' : `${violationCount} vi phạm: ${topRules(violationsByRule)}`);
 
     const passed = checks.filter((c) => c.outcome === 'pass').length;
     const failed = checks.filter((c) => c.outcome === 'fail').length;

@@ -55,11 +55,11 @@ export async function probeAiCore(): Promise<void> {
   const embeddings = resolveEmbeddingProvider();
 
   if (chat.provider) {
-    LOG.info(`[AI] Chat: ${chat.label} — ${chat.detail}`);
+    LOG.info(`[AI] Chat: ${chat.label} - ${chat.detail}`);
   }
 
   if (embeddings.provider) {
-    LOG.info(`[AI] Embedding: ${embeddings.label} — ${embeddings.detail}`);
+    LOG.info(`[AI] Embedding: ${embeddings.label} - ${embeddings.detail}`);
   } else {
     LOG.warn(
       '[AI] Không có nhà cung cấp embedding. Tiêu chí ngữ nghĩa trong tìm tiền lệ sẽ không chạy. '
@@ -98,7 +98,7 @@ async function probeAiCoreCredentials(): Promise<void> {
 
     if (destination) {
       LOG.info(
-        `AI Core thông qua destination '${destination.destinationName}' — resource group '${resourceGroup}'.`,
+        `AI Core thông qua destination '${destination.destinationName}' - resource group '${resourceGroup}'.`,
       );
       return;
     }

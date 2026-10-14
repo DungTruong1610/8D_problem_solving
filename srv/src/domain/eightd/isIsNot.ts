@@ -33,14 +33,14 @@ export function computeIsIsNot(
     if (!characteristic || !characteristic.trim()) {
         return {
             applicable: false,
-            reason: 'Not applicable — this defect has no measurable characteristic.',
+            reason: 'Not applicable - this defect has no measurable characteristic.',
         };
     }
 
     if (!lots || lots.length === 0) {
         return {
             applicable: false,
-            reason: 'Cannot compare — there is no measurement history for this part.',
+            reason: 'Cannot compare - there is no measurement history for this part.',
         };
     }
 
@@ -52,7 +52,7 @@ export function computeIsIsNot(
     if (matchingLots.length === 0) {
         return {
             applicable: false,
-            reason: `Cannot compare — no historical inspection lots found for characteristic "${characteristic}".`,
+            reason: `Cannot compare - no historical inspection lots found for characteristic "${characteristic}".`,
         };
     }
 
@@ -83,7 +83,7 @@ export function computeIsIsNot(
     if (qualifying.length < 2) {
         return {
             applicable: false,
-            reason: 'Cannot compare — insufficient inspection lots across different equipment groups.',
+            reason: 'Cannot compare - insufficient inspection lots across different equipment groups.',
         };
     }
 
