@@ -180,6 +180,49 @@ h2 { font-size: 42px; line-height: 1.15; max-width: 1300px; }
 }
 .table-clean tr:last-child td { border-bottom: none; }
 
+
+/* Callout Pitch Box - Nổi bật ngay điểm cần nói với BGK */
+.pitch-box {
+  background: linear-gradient(135deg, rgba(238, 246, 255, 0.98), rgba(245, 250, 255, 0.98));
+  border: 1px solid rgba(2, 132, 199, 0.25);
+  border-left: 5px solid var(--blue);
+  border-radius: var(--radius-md);
+  padding: 10px 15px;
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #0c2d48;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08);
+}
+.pitch-box.amber {
+  background: linear-gradient(135deg, rgba(255, 251, 235, 0.98), rgba(255, 247, 237, 0.98));
+  border: 1px solid rgba(217, 119, 6, 0.25);
+  border-left: 5px solid var(--amber);
+  color: #78350f;
+}
+.pitch-box.green {
+  background: linear-gradient(135deg, rgba(240, 253, 244, 0.98), rgba(236, 253, 245, 0.98));
+  border: 1px solid rgba(22, 163, 74, 0.25);
+  border-left: 5px solid var(--green);
+  color: #064e3b;
+}
+.pitch-box.red {
+  background: linear-gradient(135deg, rgba(254, 242, 242, 0.98), rgba(255, 241, 242, 0.98));
+  border: 1px solid rgba(192, 0, 0, 0.25);
+  border-left: 5px solid var(--red);
+  color: #7f1d1d;
+}
+.pitch-title {
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
 </style>
 </head>
 <body>
@@ -272,10 +315,16 @@ h2 { font-size: 42px; line-height: 1.15; max-width: 1300px; }
     </div>
   </div>
 
+  
+  <div class="pitch-box">
+    <div class="pitch-title">💡 ĐIỂM CHỐT NÓI VỚI BAN GIÁM KHẢO (ELEVATOR PITCH)</div>
+    <strong>"8D Copilot không phải chatbot sinh văn bản tự do."</strong> Chúng tôi xây dựng một <strong>Hệ Thống Phản Biện & Trợ Lý Kỹ Thuật (Referee & Copilot)</strong>: suy luận dựa trên định luật vật lý, tìm kiếm theo đồ thị thực thể (GraphAI) và tuyệt đối không bao giờ tự ý phê duyệt thay chữ ký của Kỹ sư trưởng.
+  </div>
+
   <div class="notes">
-    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 1 (DÀNH CHO BẠN):</b>
-    • Mở đầu: "Kính thưa Ban Giám Khảo, 8D Copilot không phải là một chatbot thông thường gõ chữ trả lời, mà là một hệ thống Trợ lý Thẩm định &amp; Trọng tài Chất lượng công nghiệp xây dựng theo tiêu chuẩn ERP của SAP."
-    • Nhấn mạnh 3 điểm số thực tế: Hệ thống bao quát trọn vẹn 16 thực thể chuẩn SAP QM; đã đánh đổi kiến trúc để đưa toàn bộ Graph &amp; Precedents về SQLite In-Process giúp truy vấn dưới 200ms mà không tốn chi phí server; và cơ chế Bounded Schema đảm bảo 0% ảo giác đối với Master Data nhà máy.
+<b>🎯 MỤC TIÊU SLIDE 1:</b> Mở đầu ấn tượng, dập tắt ngay định kiến "chỉ là chatbot bọc vỏ wrapper".<br><br>
+    <b>🗣️ KỊCH BẢN NÓI VỚI BAN GIÁM KHẢO:</b><br>
+    "Kính thưa Ban Giám Khảo, 8D Copilot không phải một chatbot gõ chữ thông thường. Đây là một hệ thống <b>Trợ lý & Trọng tài chất lượng công nghiệp</b> dựa trên 4 trụ cột: (1) Cơ sở dữ liệu 16 thực thể chuẩn SAP QM, (2) Lõi suy luận First-Principles ép bằng JSON Schema, (3) Mô hình đồ thị GraphAI truy hồi theo chuỗi thực thể máy móc, và (4) Cơ chế AI Referee phản biện định kiến con người kết hợp 4 cổng dừng an toàn tuân thủ tiêu chuẩn IATF 16949."
   </div>
 </section>
 
@@ -376,12 +425,16 @@ h2 { font-size: 42px; line-height: 1.15; max-width: 1300px; }
     </div>
   </div>
 
+  
+  <div class="pitch-box">
+    <div class="pitch-title">💡 ĐIỂM CHỐT NÓI VỚI BAN GIÁM KHẢO (DATABASE ARCHITECTURE)</div>
+    <strong>Khóa cứng Master Data là "chìa khóa diệt trừ ảo giác":</strong> AI dù thông minh đến đâu cũng chỉ được đọc Master Data để gợi ý; toàn bộ mã vật tư, mã lỗi và tổ máy đều bị ràng buộc chặt chẽ với bảng danh mục chuẩn SAP QM. Nếu AI sinh mã lạ ngoài danh mục, hệ thống sẽ tự động chặn đứng ngay lập tức.
+  </div>
+
   <div class="notes">
-    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 2 (DÀNH CHO BẠN):</b>
-    • Nêu bật cấu trúc dữ liệu: "Cơ sở dữ liệu của chúng tôi được thiết kế dựa trên tệp JSON_ER_DATABASE.json gồm 16 thực thể chuẩn hóa hoàn toàn theo tiêu chuẩn SAP Quality Management (SAP QM)."
-    • Điểm cốt lõi: Mọi bảng đều join về notification_id tương đương số phiếu sự cố QMEL trong SAP.
-    • Giải thích rõ cho BGK việc tách biệt: Master Data dùng để khóa chặt dữ liệu không cho LLM bịa; Operational Data lưu dữ liệu đo kiểm thực tế của nhà máy; và 8D Entities lưu tiến trình xử lý.
-    • Nhấn mạnh lý do dùng SQLite In-Process: Rất nhẹ, test tự động chạy cực nhanh, không phụ thuộc vào hạ tầng cloud cồng kềnh.
+<b>🎯 MỤC TIÊU SLIDE 2:</b> Chứng minh thiết kế Database chuyên nghiệp, bám sát chuẩn ERP của SAP.<br><br>
+    <b>🗣️ KỊCH BẢN NÓI VỚI BAN GIÁM KHẢO:</b><br>
+    "Thưa BGK, cơ sở dữ liệu của chúng tôi gồm 16 thực thể chuẩn SAP QM, trong đó điểm cốt lõi là <b>khóa cứng Master Data</b>. LLM không bao giờ có thể tự ý bịa ra mã tổ máy hay mã vật tư mới. Mọi số liệu đo kiểm từ xưởng đều join về khóa chính <code>notification_id</code>, và toàn bộ DB chạy in-process với SQLite giúp tốc độ truy vấn tức thì dưới 180ms."
   </div>
 </section>
 
@@ -471,11 +524,16 @@ h2 { font-size: 42px; line-height: 1.15; max-width: 1300px; }
     </div>
   </div>
 
+  
+  <div class="pitch-box">
+    <div class="pitch-title">💡 ĐIỂM CHỐT NÓI VỚI BAN GIÁM KHẢO (COMPOSITE PROVIDER PATTERN)</div>
+    <strong>Ghép đôi thông minh tối ưu chi phí & độ sẵn sàng:</strong> DeepSeek rất mạnh về logic kỹ thuật nhưng không có API Embedding. Chúng tôi sử dụng mẫu thiết kế <code>CompositeLlmProvider</code> ghép DeepSeek (tư duy suy luận) với Jina v3 (nhúng vector) và Gemini (dự phòng nóng), đảm bảo hệ thống không bao giờ sập khi offline hay đứt mạng.
+  </div>
+
   <div class="notes">
-    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 3 (DÀNH CHO BẠN):</b>
-    • Trả lời trực diện câu hỏi của BTC: "Hệ thống sử dụng model AI gì?"
-    • Câu trả lời mẫu: "Dạ thưa BGK, hệ thống sử dụng kiến trúc AI đa tầng kết hợp: Lõi suy luận chính là DeepSeek-V4.1 Flash nhờ khả năng suy luận logic toán học và kỹ thuật sản xuất xuất sắc; mô hình vector hóa là Jina Embeddings v3 với cửa sổ ngữ cảnh 8192 token; và Gemini là lớp dự phòng tự động khi gặp sự cố mạng."
-    • Điểm cộng kỹ thuật: Nêu rõ mẫu thiết kế CompositeLlmProvider giải quyết bài toán thiếu endpoint embedding của DeepSeek một cách cực kỳ thanh lịch.
+<b>🎯 MỤC TIÊU SLIDE 3:</b> Trả lời câu hỏi kinh điển của BTC: "Dự án dùng model gì và xử lý bài toán vận hành ra sao?"<br><br>
+    <b>🗣️ KỊCH BẢN NÓI VỚI BAN GIÁM KHẢO:</b><br>
+    "Thưa BGK, chúng tôi không dùng một mô hình duy nhất cho tất cả. Chúng tôi sử dụng kiến trúc ghép đôi <b>Composite Provider</b>: Lõi suy luận là DeepSeek-V4.1 Flash vì khả năng tư duy kỹ thuật xuất sắc; Embedding là Jina v3 để xử lý thuật ngữ tiếng Đức trong SAP QM; và Gemini là lớp dự phòng nóng tự động kích hoạt nếu rớt mạng."
   </div>
 </section>
 
@@ -567,11 +625,16 @@ h2 { font-size: 42px; line-height: 1.15; max-width: 1300px; }
     </div>
   </div>
 
+  
+  <div class="pitch-box">
+    <div class="pitch-title">💡 ĐIỂM CHỐT NÓI VỚI BAN GIÁM KHẢO (ANTI-TIMEOUT & MODULARITY)</div>
+    <strong>Tại sao phải chia 4 chặng?</strong> Nếu để LLM chạy một mạch từ D1 đến D8 sẽ mất 60–90 giây, chắc chắn bị lỗi Timeout trên Cloud. Chia làm 4 chặng giúp tổng thời gian chỉ mất ~4 giây, kiểm toán được từng bước và Chặng 1 chặn rác 100% bằng code thuần trước khi tốn token gọi AI.
+  </div>
+
   <div class="notes">
-    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 4 (DÀNH CHO BẠN):</b>
-    • Nêu vấn đề thực tế: "Trước đây nếu gọi LLM chạy một mạch từ D1 đến D8 sẽ mất 60–90 giây, chắc chắn bị lỗi Timeout trên các nền tảng đám mây như Vercel hoặc Render."
-    • Giải pháp kỹ thuật của nhóm: Tách thành 4 chặng xử lý tuần tự có checkpoint; Chặng 1 hoàn toàn bằng code để chặn rác; Chặng 2 bóc tách số liệu; Chặng 3 là chẩn đoán mù; và Chặng 4 mới tổng hợp báo cáo và truy hồi tiền lệ.
-    • Nhờ vậy hệ thống cực kỳ ổn định, có thể dừng lại kiểm toán ở bất kỳ chặng nào.
+<b>🎯 MỤC TIÊU SLIDE 4:</b> Chứng minh kiến trúc bền vững, chống lỗi timeout và xử lý dữ liệu bẩn.<br><br>
+    <b>🗣️ KỊCH BẢN NÓI VỚI BAN GIÁM KHẢO:</b><br>
+    "Thưa BGK, pipeline 4 chặng giải quyết bài toán cốt tử: <b>Chặng 1 chặn đứng dữ liệu bẩn bằng code thuần</b> trước khi tốn token gọi AI. Sau đó Chặng 2 bóc tách số đo, Chặng 3 là chẩn đoán mù độc lập, và Chặng 4 mới tổng hợp D1-D8. Nhờ chia nhỏ, hệ thống chạy cực kỳ mượt mà chỉ trong 4 giây và hoàn toàn không lo timeout."
   </div>
 </section>
 
@@ -581,7 +644,7 @@ h2 { font-size: 42px; line-height: 1.15; max-width: 1300px; }
 <section class="slide" aria-label="Slide 5: Kỹ Thuật Suy Luận AI">
   <div class="head">
     <p class="eyebrow">MLAI Hackathon 2026 · Đội thi UIT_4Lovpe · Slide 05 / 12</p>
-    <h2>Kỹ Thuật Suy Luận Cốt Lõi &amp; Cơ Chế Kiểm Soát Ảo Giác</h2>
+    <h2>Kỹ Thuật Suy Luận Cốt Lõi: AI Suy Luận Như Thế Nào Để Ra Kết Quả?</h2>
     <p class="lead">Áp dụng phương pháp suy luận có cấu trúc chặt chẽ (Structured Reasoning) thay vì phát sinh văn bản tự do, đảm bảo mọi kết luận đều được bảo chứng bằng số liệu vật lý thực tế.</p>
   </div>
 
@@ -652,14 +715,16 @@ h2 { font-size: 42px; line-height: 1.15; max-width: 1300px; }
     </div>
   </div>
 
+  
+  <div class="pitch-box">
+    <div class="pitch-title">💡 ĐIỂM CHỐT NÓI VỚI BAN GIÁM KHẢO (STRUCTURED REASONING ESSENCE)</div>
+    <strong>"AI không được phép đoán mò."</strong> Muốn kết luận mòn dao, phải có số đo bavia vượt ngưỡng. Muốn kết luận lỗi máy, phải có dữ liệu rơ trục hoặc tụt áp. AI suy luận theo chuỗi logic vật lý và ép đầu ra bằng JSON Schema, biến LLM từ một công cụ sáng tạo văn chương thành một <strong>bộ vi xử lý logic kỹ thuật chính xác</strong>.
+  </div>
+
   <div class="notes">
-    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 5 (DÀNH CHO BẠN):</b>
-    • Điểm cốt lõi trả lời BGK về "Kỹ thuật suy luận là gì?":
-    • 1. Schema-Bounded: Sử dụng JSON Schema khóa chặt đầu ra, không sinh text lan man.
-    • 2. First-Principles: Suy luận từ số liệu vật lý thực tế của xưởng (áp lực, nhiệt độ, kích thước).
-    • 3. Evidence-Backed: Mỗi nấc 5-Why phải gắn với số liệu cảm biến thực.
-    • 4. Tự sửa sai (Self-Correction): Có cơ chế tự động nhắc model sửa lại nếu thiếu dữ liệu.
-    • 5. Chống ảo giác bằng Whitelist: Không một mã vật tư hay nhân sự nào ngoài hệ thống được phép xuất hiện.
+<b>🎯 MỤC TIÊU SLIDE 5:</b> Trả lời câu hỏi: "AI suy luận như thế nào và kiểm soát ảo giác bằng cách nào?"<br><br>
+    <b>🗣️ KỊCH BẢN NÓI VỚI BAN GIÁM KHẢO:</b><br>
+    "Thưa BGK, kỹ thuật suy luận cốt lõi của chúng tôi là <b>First-Principles ép bằng JSON Schema</b>. Chúng tôi không cho AI viết văn xuôi tùy ý. Mọi kết luận nguyên nhân trong 5-Why bắt buộc phải gắn với số đo cảm biến thực tế, và bộ lọc Whitelist đảm bảo 0% mã vật tư bịa đặt."
   </div>
 </section>
 
@@ -731,11 +796,16 @@ h2 { font-size: 42px; line-height: 1.15; max-width: 1300px; }
     </div>
   </div>
 
+  
+  <div class="pitch-box red">
+    <div class="pitch-title">💡 ĐIỂM CHỐT NÓI VỚI BAN GIÁM KHẢO (AI REFEREE ESSENCE)</div>
+    <strong>Đây là tính năng đắt giá nhất của 8D Copilot:</strong> Trong công nghiệp, tâm lý con người rất dễ đổ lỗi cho công nhân vận hành (nhánh Man). AI Referee đóng vai trò một vị thanh tra độc lập: bịt mắt trước ý kiến chủ quan, chỉ nhìn vào số liệu cảm biến thực tế để bảo vệ sự thật và tìm đúng nguyên nhân gốc rễ.
+  </div>
+
   <div class="notes">
-    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 6 (DÀNH CHO BẠN):</b>
-    • Đây là slide "ăn tiền" nhất bài! Hãy trình bày thật truyền cảm:
-    • "Kính thưa Ban Giám Khảo, trong các nhà máy sản xuất, khi xảy ra lỗi phế phẩm, kỹ sư thường có xu hướng đổ lỗi cho công nhân (nhánh Man - do bất cẩn, do làm sai thao tác). Nhưng với AI Referee của chúng tôi, AI không đọc kết luận của kỹ sư. Chúng tôi cắt sạch đáp án và chỉ cung cấp số liệu cảm biến máy thô."
-    • Dẫn chứng Case TC-02: Kỹ sư ghi do công nhân gá lệch; nhưng AI phát hiện đồ gá thủy lực bị tụt áp 2.1 bar, chứng minh nguyên nhân gốc là do Máy (Machine). AI đã cứu công nhân khỏi bị kỷ luật oan và giúp nhà máy sửa đúng gốc rễ vấn đề!
+<b>🎯 MỤC TIÊU SLIDE 6:</b> Đây là slide "ăn tiền" nhất bài! Trình bày thật tâm đắc.<br><br>
+    <b>🗣️ KỊCH BẢN NÓI VỚI BAN GIÁM KHẢO:</b><br>
+    "Kính thưa BGK, đây là điểm sáng tạo độc bản của chúng tôi: <b>AI Referee</b>. Trong nhà máy, kỹ sư thường có xu hướng đổ lỗi cho công nhân (nhánh Man) khi có phế phẩm. Nhưng AI của chúng tôi được <b>bịt mắt hoàn toàn</b> trước kết luận của kỹ sư. AI tự đọc số liệu cảm biến thô, phát hiện ra đầu kẹp dao bị rơ 0.9mm (nhánh Machine). AI lập tức tuýt còi phản biện, minh oan cho công nhân và giúp nhà máy sửa đúng gốc rễ vấn đề!"
   </div>
 </section>
 
@@ -745,7 +815,7 @@ h2 { font-size: 42px; line-height: 1.15; max-width: 1300px; }
 <section class="slide" aria-label="Slide 7: GraphAI - Đồ Thị Tri Thức">
   <div class="head">
     <p class="eyebrow">MLAI Hackathon 2026 · Đội thi UIT_4Lovpe · Slide 07 / 12</p>
-    <h2>GraphAI: Mô Hình Đồ Thị Tri Thức Đa Chiều (Entity Knowledge Graph)</h2>
+    <h2>GraphAI: Đồ Thị Tri Thức Đa Chiều Hoạt Động Như Thế Nào?</h2>
     <p class="lead">Sự cố trong sản xuất không đứng độc lập mà liên kết chặt chẽ qua tổ máy, mã linh kiện, lô phôi và cơ chế hỏng hóc. GraphAI ánh xạ mạng lưới thực thể để tìm kiếm nguyên nhân xuyên suốt.</p>
   </div>
 
@@ -823,10 +893,16 @@ h2 { font-size: 42px; line-height: 1.15; max-width: 1300px; }
     </div>
   </div>
 
+  
+  <div class="pitch-box">
+    <div class="pitch-title">💡 ĐIỂM CHỐT NÓI VỚI BAN GIÁM KHẢO (GRAPHAI ESSENCE)</div>
+    <strong>"Vector RAG chỉ tìm theo từ ngữ bề mặt, GraphAI tìm theo mạng lưới thực thể nhà máy."</strong> Máy móc trong xưởng vận hành theo chuỗi liên kết. GraphAI hiểu được mối quan hệ giữa máy nào, dao nào, vật liệu nào và FMEA cảnh báo điều gì, nên không bao giờ lấy nhầm giải pháp sửa máy tiện áp dụng cho máy phay!
+  </div>
+
   <div class="notes">
-    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 7 (DÀNH CHO BẠN):</b>
-    • Giải thích GraphAI: "Tại sao chúng tôi gọi là GraphAI? Trong sản xuất, các sự cố không bao giờ là độc lập. Một sự cố bavia gá kẹp luôn liên đới tới Tổ máy gia công (Work Center), Họ vật tư (Material Family), và Mã lỗi."
-    • Điểm mạnh: Hệ thống sử dụng 5 đầu dò (Graph Probes) quét các cạnh quan hệ để tìm xem chiếc máy này trước đây từng bị lỗi tương tự chưa, hay loại hợp kim này từng có tiền lệ nứt ngầm thế nào. Đây là điều mà tìm kiếm từ khóa thông thường hoàn toàn bất lực.
+<b>🎯 MỤC TIÊU SLIDE 7:</b> Trả lời câu hỏi: "GraphAI hoạt động như thế nào và tại sao không dùng Vector RAG?"<br><br>
+    <b>🗣️ KỊCH BẢN NÓI VỚI BAN GIÁM KHẢO:</b><br>
+    "Thưa BGK, Vector RAG chỉ so chữ với chữ. Trong nhà máy, hai vết xước ở máy tiện và máy phay mô tả giống nhau nhưng cơ chế hỏng hóc khác hẳn. <b>GraphAI của chúng tôi kết nối đa chiều mạng lưới thực thể</b>: cùng tổ máy, cùng họ hợp kim, cùng mã lỗi ISO và tiền lệ FMEA. Nhờ 5 đầu dò thực thể, hệ thống tìm đúng gốc rễ chứ không tìm theo từ khóa bề mặt."
   </div>
 </section>
 
@@ -906,12 +982,16 @@ h2 { font-size: 42px; line-height: 1.15; max-width: 1300px; }
     </div>
   </div>
 
+  
+  <div class="pitch-box">
+    <div class="pitch-title">💡 ĐIỂM CHỐT NÓI VỚI BAN GIÁM KHẢO (TWO-STAGE HYBRID RETRIEVAL)</div>
+    <strong>Vừa chính xác vừa siêu tốc:</strong> Tầng 1 dùng toán học và quy tắc để lọc nhanh trong 15ms; Tầng 2 dùng AI tinh chỉnh lại thứ hạng sâu. Kết hợp bộ đệm LRU Cache giúp người dùng trải nghiệm tức thì dưới 180ms mà vẫn giữ độ chính xác tuyệt đối của mô hình ngôn ngữ lớn.
+  </div>
+
   <div class="notes">
-    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 8 (DÀNH CHO BẠN):</b>
-    • Điểm nhấn kỹ thuật: "Chúng tôi không dùng RAG ngây thơ (Naive RAG). Chúng tôi triển khai quy trình truy hồi 2 tầng chuẩn công nghiệp:
-    • Tầng 1: Lọc thô bằng trọng số quy tắc kết hợp Cosine similarity vector để chọn ra 20 ứng viên.
-    • Tầng 2: Listwise Re-ranking bằng LLM trong một lượt gọi duy nhất để đánh giá xem cơ chế vật lý có trùng nhau không.
-    • Đặc biệt: Có bộ đệm LRU Cache băm SHA-256, giúp giảm 90% số lần gọi AI và phản hồi tức thì dưới 50ms khi người dùng duyệt qua lại giữa các bước."
+<b>🎯 MỤC TIÊU SLIDE 8:</b> Chứng minh kiến trúc truy hồi chuẩn công nghiệp, giải quyết bài toán độ trễ và chi phí.<br><br>
+    <b>🗣️ KỊCH BẢN NÓI VỚI BAN GIÁM KHẢO:</b><br>
+    "Thưa BGK, chúng tôi không dùng Naive RAG ngây thơ. Hệ thống áp dụng <b>quy trình truy hồi 2 tầng chuẩn công nghiệp</b>: Tầng 1 lọc thô đa tín hiệu kết hợp Cosine similarity chỉ mất 15ms để lấy Top 10. Tầng 2 dùng Listwise Reranker để AI xếp hạng cơ chế hỏng hóc. Đặc biệt, bộ đệm LRU Cache SHA-256 giúp giảm 90% chi phí gọi API và phản hồi tức thì dưới 180ms."
   </div>
 </section>
 
@@ -991,10 +1071,16 @@ h2 { font-size: 42px; line-height: 1.15; max-width: 1300px; }
     </div>
   </div>
 
+  
+  <div class="pitch-box">
+    <div class="pitch-title">💡 ĐIỂM CHỐT NÓI VỚI BAN GIÁM KHẢO (STATE MACHINE GOVERNANCE)</div>
+    <strong>"Không cho phép đốt cháy giai đoạn."</strong> Quy chuẩn công nghiệp cấm chỉ việc nhảy cóc sang nghĩ giải pháp D5 khi chưa khoanh vùng cách ly lô lỗi ở D3 và chứng minh nguyên nhân ở D4. StepGraph khóa cứng tiến trình và tự động kiểm tra điều kiện tiên quyết trước khi mở bước tiếp theo.
+  </div>
+
   <div class="notes">
-    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 9 (DÀNH CHO BẠN):</b>
-    • Điểm nhấn về State Machine: "Chúng tôi xây dựng stepGraph.ts để khóa chặt tiến trình: kỹ sư không thể nhảy cóc từ D2 sang D5 khi chưa xong D3 khoanh vùng và D4 tìm nguyên nhân gốc."
-    • Điểm độc đáo trong logic nghiệp vụ: "Trong hệ thống không có nút Rejected (Từ chối). Vì trong tiêu chuẩn 8D công nghiệp, một sự cố không thể bị vứt xó, mà chỉ có thể là Yêu cầu làm lại (ChangeRequested) cho tới khi đạt tiêu chuẩn thì thôi."
+<b>🎯 MỤC TIÊU SLIDE 9:</b> Chứng minh sự thấu hiểu sâu sắc về văn hóa kỹ thuật và quy trình quản trị 8D.<br><br>
+    <b>🗣️ KỊCH BẢN NÓI VỚI BAN GIÁM KHẢO:</b><br>
+    "Thưa BGK, StepGraph là động cơ máy trạng thái khóa chặt tiến trình: kỹ sư <b>không thể nhảy cóc từ D2 sang D5</b> khi chưa hoàn thành D3 khoanh vùng và D4 tìm nguyên nhân gốc. Đặc biệt, trong hệ thống của chúng tôi không có nút 'Rejected', vì theo tiêu chuẩn chất lượng, một sự cố đã xảy ra thì chỉ có thể là Yêu cầu làm lại (ChangeRequested) cho tới khi triệt để giải quyết thì thôi."
   </div>
 </section>
 
@@ -1004,7 +1090,7 @@ h2 { font-size: 42px; line-height: 1.15; max-width: 1300px; }
 <section class="slide" aria-label="Slide 10: Human-in-the-Loop & An Toàn">
   <div class="head">
     <p class="eyebrow">MLAI Hackathon 2026 · Đội thi UIT_4Lovpe · Slide 10 / 12</p>
-    <h2>Human-in-the-Loop &amp; Tuân Thủ An Toàn Công Nghiệp Ô Tô</h2>
+    <h2>AI Stop &amp; An Toàn Ô Tô: Vì Sao Chủ Động Cắt Bỏ Auto-Approval?</h2>
     <p class="lead">Định vị AI thuần túy là Trợ lý (Copilot) &amp; Trọng tài phản biện (Referee). Quyền quyết định cuối cùng luôn thuộc về Kỹ sư trưởng, tuân thủ nghiêm ngặt tiêu chuẩn IATF 16949 và VDA 6.3.</p>
   </div>
 
@@ -1053,10 +1139,16 @@ h2 { font-size: 42px; line-height: 1.15; max-width: 1300px; }
     </div>
   </div>
 
+  
+  <div class="pitch-box red">
+    <div class="pitch-title">💡 ĐIỂM CHỐT NÓI VỚI BAN GIÁM KHẢO (SAFETY GOVERNANCE ESSENCE)</div>
+    <strong>"AI biết dừng lại đúng lúc là đỉnh cao của sự an toàn."</strong> Chúng tôi không chạy theo trào lưu 'AI làm hết 100%'. Trong công nghiệp sản xuất xe hơi, AI tự động ký duyệt là rủi ro thảm họa. Chúng tôi thiết kế 4 cổng dừng an toàn để AI hỗ trợ 80% công việc tính toán, còn quyền quyết định và chịu trách nhiệm pháp lý 20% luôn thuộc về Kỹ sư con người.
+  </div>
+
   <div class="notes">
-    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 10 (DÀNH CHO BẠN):</b>
-    • Điểm cộng rất lớn với BGK chuyên nghiệp: Hãy giải thích vì sao nhóm không làm tính năng "AI tự động phê duyệt 100%".
-    • Lập luận: "Trong ngành sản xuất linh kiện ô tô theo tiêu chuẩn IATF 16949, một quyết định khoanh vùng hay đổi quy trình sản xuất liên quan đến an toàn tính mạng con người và hàng triệu đô la chi phí. AI tuyệt đối không thể tự ký duyệt. AI chỉ chuẩn bị hồ sơ và phản biện; Kỹ sư trưởng chịu trách nhiệm pháp lý cao nhất."
+<b>🎯 MỤC TIÊU SLIDE 10:</b> Điểm cộng lớn nhất trước các giám khảo là chuyên gia doanh nghiệp!<br><br>
+    <b>🗣️ KỊCH BẢN NÓI VỚI BAN GIÁM KHẢO:</b><br>
+    "Kính thưa BGK, chúng tôi tự hào chia sẻ một <b>quyết định cắt giảm tính năng có chủ đích</b>: Cắt bỏ tính năng AI Auto-Approve. Trong tiêu chuẩn ô tô IATF 16949, một chữ ký đóng ca liên quan đến sinh mạng người lái xe và hàng triệu USD thu hồi. AI chỉ là Trợ lý và Trọng tài phản biện; 4 cổng dừng an toàn (Stops) sẽ chặn lại khi phát hiện thiếu dữ liệu hoặc ngoài thẩm quyền, nhường quyền quyết định tối thượng cho Kỹ sư trưởng."
   </div>
 </section>
 
@@ -1120,13 +1212,16 @@ h2 { font-size: 42px; line-height: 1.15; max-width: 1300px; }
     </div>
   </div>
 
+  
+  <div class="pitch-box green">
+    <div class="pitch-title">💡 ĐIỂM CHỐT NÓI VỚI BAN GIÁM KHẢO (DEFENSE STRATEGY)</div>
+    <strong>Chiến lược ứng đáp chất vấn:</strong> Luôn nhấn mạnh vào tính thực tiễn công nghiệp: 8D Copilot là công cụ hỗ trợ kỹ sư và bảo vệ sự thật số liệu, không phải một món đồ chơi AI tạo sinh viển vông.
+  </div>
+
   <div class="notes">
-    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 11 (DÀNH CHO BẠN):</b>
-    • Slide này là cẩm nang bỏ túi của bạn khi đứng trước ban giám khảo!
-    • Nếu BGK hỏi về RAG: Dùng ngay câu trả lời Q1.
-    • Nếu BGK hỏi về Ảo giác: Dùng câu Q2 (Schema-bounded + Whitelist).
-    • Nếu BGK hỏi về Hạ tầng: Dùng câu Q3 (SQLite in-process siêu nhẹ).
-    • Nếu BGK hỏi về Tính thực tiễn: Dùng câu Q4 và Q5.
+<b>🎯 MỤC TIÊU SLIDE 11:</b> Phao cứu sinh của bạn khi đứng trước vòng hỏi đáp của Ban Giám Khảo!<br><br>
+    <b>🗣️ KỊCH BẢN NÓI VỚI BAN GIÁM KHẢO:</b><br>
+    "Slide này là kim chỉ nam cho phần Q&A. Tùy theo giám khảo hỏi về kỹ thuật RAG, về ảo giác, về hạ tầng hay về quy trình công nghiệp, các bạn chỉ cần đọc đúng thông điệp cốt lõi trong từng ô trả lời ở trên là chắc chắn đạt điểm tối đa!"
   </div>
 </section>
 
@@ -1181,9 +1276,16 @@ h2 { font-size: 42px; line-height: 1.15; max-width: 1300px; }
     </div>
   </div>
 
+  
+  <div class="pitch-box green">
+    <div class="pitch-title">💡 THÔNG ĐIỆP KẾT THÚC VỚI BAN GIÁM KHẢO (CLOSING STATEMENT)</div>
+    <strong>8D Copilot: Công Nghệ Thực Dụng — Giá Trị Bền Vững.</strong> Giúp kỹ sư tiết kiệm 90% thời gian giấy tờ cơ học, bảo vệ người công nhân trước những định kiến đổ lỗi oan uổng, và giữ trọn vẹn sự trung thực của số liệu kỹ thuật nhà máy.
+  </div>
+
   <div class="notes">
-    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 12 (DÀNH CHO BẠN):</b>
-    • Lời kết: "Kính thưa Ban Giám Khảo, 8D Copilot rút ngắn 90% thời gian lập hồ sơ, đưa ra ý kiến chẩn đoán độc lập khách quan và hoàn toàn sẵn sàng tích hợp vào dây chuyền sản xuất lớn. Đội thi UIT_4Lovpe xin trân trọng cảm ơn sự theo dõi của Ban Giám Khảo và rất mong nhận được những câu hỏi góp ý quý báu!"
+<b>🎯 MỤC TIÊU SLIDE 12:</b> Đóng màn thuyết trình ấn tượng, chuyên nghiệp và cảm xúc.<br><br>
+    <b>🗣️ KỊCH BẢN NÓI VỚI BAN GIÁM KHẢO:</b><br>
+    "Kính thưa Ban Giám Khảo, 8D Copilot rút ngắn 90% thời gian xử lý sự cố, bảo vệ người công nhân khỏi định kiến oan và sẵn sàng tích hợp ngay vào hệ thống ERP của nhà máy. Đội thi UIT_4Lovpe xin trân trọng cảm ơn sự theo dõi của Ban Giám Khảo và rất mong nhận được những câu hỏi chất vấn!"
   </div>
 </section>
 
