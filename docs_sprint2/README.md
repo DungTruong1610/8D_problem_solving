@@ -14,4 +14,3 @@ Thư mục này tổng hợp toàn bộ tài liệu nghiên cứu, kiến trúc 
 | 8 | [GraphAI_Stage2.md](GraphAI_Stage2.md) | Markdown | Lộ trình và kiến trúc nâng cấp retrieval của GraphAI Stage 2 |
 | 9 | [plan.md](plan.md) | Markdown | Kế hoạch triển khai tổng thể và phân công công việc |
 | 10 | [UX.md](UX.md) | Markdown | Thiết kế trải nghiệm người dùng và hành trình tương tác trên giao diện |
-| 11 | [USER_FEEDBACK_SURVEY_PROPOSAL.md](USER_FEEDBACK_SURVEY_PROPOSAL.md) | Markdown | Báo cáo khảo sát người dùng thực tế, trích dẫn chuyên gia, đối chiếu commit và phân tích bất cập vận hành |
