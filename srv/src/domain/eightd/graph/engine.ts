@@ -191,7 +191,9 @@ async function rerankStep(
     const db = await cds.connect.to('db');
     const ids = pool.map((c) => c.notificationId);
     const rows = (await db.run(
-        `SELECT "NOTIFICATIONID", "SYMPTOMSHORTTEXT", "SEARCHTEXT"
+        // Alias tường minh: SQLite trả khoá theo tên khai báo của cột (xem hydrate.ts).
+        `SELECT "NOTIFICATIONID" AS "NOTIFICATIONID", "SYMPTOMSHORTTEXT" AS "SYMPTOMSHORTTEXT",
+                "SEARCHTEXT" AS "SEARCHTEXT"
          FROM "CNMA_PRORESOLVE_HISTORICALCASES" WHERE "NOTIFICATIONID" IN (${ids.map(() => '?').join(', ')})`,
         ids,
     )) as Array<{ NOTIFICATIONID: string; SYMPTOMSHORTTEXT: string | null; SEARCHTEXT: string | null }>;

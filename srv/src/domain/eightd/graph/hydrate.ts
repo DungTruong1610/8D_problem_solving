@@ -97,26 +97,35 @@ export async function hydratePrecedents(scored: readonly ScoredCase[]): Promise<
         ? 'date(a."PLANNEDENDDATE")'
         : `TO_VARCHAR(a."PLANNEDENDDATE", 'YYYY-MM-DD')`;
 
+    // Mọi cột đều mang alias, cùng quy ước với `probes.ts`. Không alias thì SQLite
+    // trả khoá theo tên KHAI BÁO của cột (`notificationId`), không theo chữ viết
+    // trong câu SELECT — `row.NOTIFICATIONID` thành undefined và mọi tiền lệ bị
+    // bỏ lặng lẽ ở `flatMap` bên dưới. HANA thì trả chữ hoa nên không lộ ra.
     const readCases = () => db.run(
-        `SELECT "NOTIFICATIONID", "SYMPTOMSHORTTEXT", "SAPSTATUS",
-                ${completionDate} AS "COMPLETIONDATE",
-                "QUANTITYEXTENT", "WORKCENTERID", "WORKCENTERDESC", "DEFECTCODE",
-                "DEFECTTEXT", "MATERIALID", "MATERIALDESC", "ROOTCAUSECATEGORY",
-                "COPQEUR", "FMEAID"
+        `SELECT "NOTIFICATIONID" AS "NOTIFICATIONID", "SYMPTOMSHORTTEXT" AS "SYMPTOMSHORTTEXT",
+                "SAPSTATUS" AS "SAPSTATUS", ${completionDate} AS "COMPLETIONDATE",
+                "QUANTITYEXTENT" AS "QUANTITYEXTENT", "WORKCENTERID" AS "WORKCENTERID",
+                "WORKCENTERDESC" AS "WORKCENTERDESC", "DEFECTCODE" AS "DEFECTCODE",
+                "DEFECTTEXT" AS "DEFECTTEXT", "MATERIALID" AS "MATERIALID",
+                "MATERIALDESC" AS "MATERIALDESC", "ROOTCAUSECATEGORY" AS "ROOTCAUSECATEGORY",
+                "COPQEUR" AS "COPQEUR", "FMEAID" AS "FMEAID"
          FROM "${TABLE.historicalCases}" WHERE "NOTIFICATIONID" IN (${holes})`,
         ids,
     ) as Promise<CaseRow[]>;
     const readTeam = () => db.run(
-        `SELECT h."NOTIFICATIONID", t."PARTNERID", t."PARTNERNAME", t."FUNCTIONTITLE",
-                t."PARTNERROLE", t."EMAIL", t."PHONE"
+        `SELECT h."NOTIFICATIONID" AS "NOTIFICATIONID", t."PARTNERID" AS "PARTNERID",
+                t."PARTNERNAME" AS "PARTNERNAME", t."FUNCTIONTITLE" AS "FUNCTIONTITLE",
+                t."PARTNERROLE" AS "PARTNERROLE", t."EMAIL" AS "EMAIL", t."PHONE" AS "PHONE"
          FROM "${TABLE.historicalTeam}" t
          JOIN "${TABLE.historicalCases}" h ON h."ID" = t."HISTORICALCASE_ID"
          WHERE h."NOTIFICATIONID" IN (${holes})`,
         ids,
     ) as Promise<TeamRow[]>;
     const readActions = () => db.run(
-        `SELECT h."NOTIFICATIONID", a."LINENO", a."ACTIONTYPE", a."ACTIONTEXT", a."STATUS",
-                a."TASKCODE", a."TASKCODEGROUP", a."TASKPROCESSOR", a."TIMEEFFORT",
+        `SELECT h."NOTIFICATIONID" AS "NOTIFICATIONID", a."LINENO" AS "LINENO",
+                a."ACTIONTYPE" AS "ACTIONTYPE", a."ACTIONTEXT" AS "ACTIONTEXT", a."STATUS" AS "STATUS",
+                a."TASKCODE" AS "TASKCODE", a."TASKCODEGROUP" AS "TASKCODEGROUP",
+                a."TASKPROCESSOR" AS "TASKPROCESSOR", a."TIMEEFFORT" AS "TIMEEFFORT",
                 ${plannedEndDate} AS "PLANNEDENDDATE"
          FROM "${TABLE.historicalActions}" a
          JOIN "${TABLE.historicalCases}" h ON h."ID" = a."HISTORICALCASE_ID"
