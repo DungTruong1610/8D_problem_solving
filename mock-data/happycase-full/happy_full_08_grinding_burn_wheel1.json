@@ -1,0 +1,270 @@
+{
+  "$title": "Grinding burn on guide rail raceway - WHEEL1 coolant nozzle",
+  "$comment": "Happy case: open 8D with a recorded investigation. Expected precedents: 8D-10049300, 8D-10049110. Import via Create 8D Report -> JSON.",
+  "notificationId": "8D-10049408",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Barkhausen screening found grinding burn on GR-200 guide rail raceway - all rails ground with WHEEL1",
+  "status": "In Process",
+  "foundDate": "2026-10-09",
+  "completionDate": null,
+  "quantityExtent": "18 units affected",
+  "defectQuantity": 18,
+  "defectQuantityUom": "PC",
+  "teamSize": 4,
+  "entryMode": "during-inspection",
+  "referenceNumber": "INT-2026-5131",
+  "plant": "1000",
+  "inspectionLotId": "0010000305",
+  "material": {
+    "materialId": "MAT-11280",
+    "description": "Guide Rail GR-200",
+    "materialGroup": "MG-LINEAR",
+    "plant": "1000"
+  },
+  "batch": {
+    "batchId": "B-50725",
+    "materialId": "MAT-11280"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-MAT",
+    "defectCode": "DEF-1140",
+    "defectText": "Grinding burn and micro-cracks on precision linear guideway",
+    "defectClass": "Critical"
+  },
+  "workCenter": {
+    "workCenterId": "WC-GRIND-01",
+    "description": "CNC Precision Surface Grinder 1"
+  },
+  "inspections": [
+    {
+      "characteristic": "Barkhausen noise peak",
+      "measuredValue": "81 mp",
+      "specLowerLimit": 0,
+      "specUpperLimit": 35,
+      "specUom": "mp",
+      "valuation": "Rejected",
+      "equipment": "WC-GRIND-01-WHEEL1"
+    },
+    {
+      "characteristic": "Raceway roughness Ra",
+      "measuredValue": "0.18 um",
+      "specLowerLimit": 0,
+      "specUpperLimit": 0.25,
+      "specUom": "um",
+      "valuation": "Accepted",
+      "equipment": "WC-GRIND-01-WHEEL1"
+    }
+  ],
+  "historicalInspectionLots": [
+    {
+      "lotId": "0010000133",
+      "materialId": "MAT-11280",
+      "characteristic": "Barkhausen noise peak",
+      "equipment": "WC-GRIND-01-WHEEL1",
+      "workCenterId": "WC-GRIND-01",
+      "measuredValue": "78 mp",
+      "conforming": false,
+      "lotDate": "2026-09-10",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000134",
+      "materialId": "MAT-11280",
+      "characteristic": "Barkhausen noise peak",
+      "equipment": "WC-GRIND-01-WHEEL1",
+      "workCenterId": "WC-GRIND-01",
+      "measuredValue": "78 mp",
+      "conforming": false,
+      "lotDate": "2026-09-11",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000135",
+      "materialId": "MAT-11280",
+      "characteristic": "Barkhausen noise peak",
+      "equipment": "WC-GRIND-01-WHEEL1",
+      "workCenterId": "WC-GRIND-01",
+      "measuredValue": "78 mp",
+      "conforming": false,
+      "lotDate": "2026-09-12",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000136",
+      "materialId": "MAT-11280",
+      "characteristic": "Barkhausen noise peak",
+      "equipment": "WC-GRIND-01-WHEEL2",
+      "workCenterId": "WC-GRIND-01",
+      "measuredValue": "22 mp",
+      "conforming": true,
+      "lotDate": "2026-09-05",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000137",
+      "materialId": "MAT-11280",
+      "characteristic": "Barkhausen noise peak",
+      "equipment": "WC-GRIND-01-WHEEL2",
+      "workCenterId": "WC-GRIND-01",
+      "measuredValue": "22 mp",
+      "conforming": true,
+      "lotDate": "2026-09-06",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000138",
+      "materialId": "MAT-11280",
+      "characteristic": "Barkhausen noise peak",
+      "equipment": "WC-GRIND-01-WHEEL2",
+      "workCenterId": "WC-GRIND-01",
+      "measuredValue": "22 mp",
+      "conforming": true,
+      "lotDate": "2026-09-07",
+      "plant": "1000"
+    }
+  ],
+  "isIsNot": {
+    "isWhereWhenItHappens": "GR-200 raceway - WC-GRIND-01-WHEEL1 - after the wheel change on 2026-10-08",
+    "isNotWhereWhenItDoesnt": "WC-GRIND-01-WHEEL2 - same blank lot RB-5602 and same dressing interval",
+    "notes": "Defect starts at the wheel change and stays on WHEEL1"
+  },
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "Grinder operator ran program GR-200-RW as released",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "WHEEL1 coolant nozzle out of position after the wheel change - only 11 l/min reaches the contact zone vs min 25",
+      "metricValue": "11 l/min",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "Dressing every 18 parts as restored after 8D-10049110",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Rail blank lot RB-5602 hardness 60 HRC, within specification",
+      "metricValue": "60 HRC",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Barkhausen probe BN-01 verified on reference sample",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Coolant temperature 21C, inside limits",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the raceway show grinding burn?",
+      "answer": "Barkhausen noise peak reached 81 mp against max 35 mp on rails ground with WHEEL1",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did WHEEL1 overheat the surface?",
+      "answer": "Coolant at the contact zone was 11 l/min instead of at least 25 l/min",
+      "evidenceCitation": "Flow check WC-GRIND-01-WHEEL1"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was coolant missing at the contact zone? (root cause)",
+      "answer": "The nozzle moved during the wheel change and the setup has no nozzle position check",
+      "evidenceCitation": "Setup sheet WC-GRIND-01"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Perform 100% Barkhausen noise inspection on all rails from batch B-50725",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "actionText": "Re-align the coolant nozzle on WC-GRIND-01 wheel 1 and restore coolant flow at the contact zone",
+      "status": "In Process"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "actionText": "Add coolant nozzle position check to the grinder setup checklist on all grinding cells",
+      "status": "Planned"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer & 8D Facilitator",
+      "partnerRole": "8D Team Leader",
+      "email": "heli.weber@proresolve.com",
+      "phone": "+49 89 2018 0001"
+    },
+    {
+      "partnerId": "BP-100138",
+      "partnerName": "Tobias Berg",
+      "functionTitle": "Milling & Machining Specialist",
+      "partnerRole": "8D Team Member",
+      "email": "tobias.berg@proresolve.com",
+      "phone": "+49 89 2018 0138"
+    },
+    {
+      "partnerId": "BP-100014",
+      "partnerName": "Karl Wagner",
+      "functionTitle": "Maintenance Technician & Mechanical Specialist",
+      "partnerRole": "8D Team Member",
+      "email": "karl.wagner@proresolve.com",
+      "phone": "+49 89 2018 0014"
+    },
+    {
+      "partnerId": "BP-100147",
+      "partnerName": "Lena Hoffmann",
+      "functionTitle": "Metrology Specialist & CMM Inspector",
+      "partnerRole": "8D Team Member",
+      "email": "lena.hoffmann@proresolve.com",
+      "phone": "+49 89 2018 0147"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-GRIND-02",
+    "description": "Thermal grinding burn from wheel glazing or insufficient coolant"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 13800
+  },
+  "lessonsLearned": {
+    "whatWorked": "Interim (case open): 100% Barkhausen screening stopped every burned rail before assembly",
+    "whatDidnt": "Interim (case open): the wheel change setup still has no coolant position check"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  },
+  "responsibility": {
+    "reportedBy": "Quyen La",
+    "coordinator": "Heli (QE)",
+    "department": "Quality Assurance"
+  }
+}

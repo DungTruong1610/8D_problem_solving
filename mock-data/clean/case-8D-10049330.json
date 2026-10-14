@@ -1,0 +1,174 @@
+{
+  "notificationId": "8D-10049330",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Low lap shear strength on S22 brackets bonded with DISPENSER1 - off-ratio adhesive mix from worn metering pump",
+  "status": "Closed",
+  "foundDate": "2026-05-12",
+  "completionDate": "2026-06-05",
+  "quantityExtent": "140 units affected",
+  "teamSize": 4,
+  "material": {
+    "materialId": "MAT-10744",
+    "description": "Sensor Mount Bracket S22",
+    "materialGroup": "MG-BRACKET"
+  },
+  "batch": {
+    "batchId": "B-52640",
+    "materialId": "MAT-10744"
+  },
+  "defect": {
+    "defectCode": "DEF-0810",
+    "defectText": "Adhesive bond failure"
+  },
+  "workCenter": {
+    "workCenterId": "WC-BOND-02",
+    "description": "Structural Bonding Cell 2"
+  },
+  "inspections": [
+    {
+      "characteristic": "Lap shear strength",
+      "measuredValue": "5.2 MPa",
+      "specValue": "min 12.0 MPa"
+    },
+    {
+      "characteristic": "Adhesive mix ratio",
+      "measuredValue": "1.32:1",
+      "specValue": "0.98-1.02:1"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "Bonding operator changed cartridges per DOC-8815 Rev B",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "WC-BOND-02-DISPENSER1 hardener metering pump worn - mix ratio 1.32:1 vs 1.00:1 +/-2%, adhesive under-cured",
+      "metricValue": "1.32:1",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "Cure profile 60 min at 80C unchanged since 8D-10048745",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Adhesive lot AD-3317 within shelf life and certificate",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Pull tester PT-05 verified with reference load cell",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Cell humidity 38% RH, inside the 45% maximum",
+      "metricValue": "38% RH",
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the S22 brackets fail the pull test?",
+      "answer": "Lap shear strength measured 5.2 MPa against a 12.0 MPa minimum on parts bonded with DISPENSER1",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why was the bond weak only on DISPENSER1 parts?",
+      "answer": "DISPENSER1 mixed resin and hardener at 1.32:1 instead of 1:1, so the adhesive never fully cured",
+      "evidenceCitation": "Mix ratio check WC-BOND-02-DISPENSER1"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why did DISPENSER1 mix off-ratio? (root cause)",
+      "answer": "The hardener metering pump was worn and the mix ratio was never checked at cartridge change",
+      "evidenceCitation": "SAP PM order history WC-BOND-02"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Block all S22 brackets from batch B-52640 and pull-test a sample from every pallet",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "actionText": "Replace the worn hardener metering pump assembly on WC-BOND-02-DISPENSER1 and verify the 1:1 mix ratio",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "actionText": "Add a mix ratio check by weight at every cartridge change to the bonding cell checklist on all dispensers",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer & 8D Facilitator",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100102",
+      "partnerName": "Dario Conti",
+      "functionTitle": "Bonding Process Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100014",
+      "partnerName": "Karl Wagner",
+      "functionTitle": "Maintenance Technician & Mechanical Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician & Line Inspector",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-BOND-2024",
+    "description": "Under-cured bond from off-ratio adhesive mix"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 17600
+  },
+  "lessonsLearned": {
+    "whatWorked": "Splitting pull-test results by dispenser isolated DISPENSER1 within a shift",
+    "whatDidnt": "Mix ratio was trusted to the machine - nobody weighed a shot after cartridge changes"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "S22 bond line - WC-BOND-02-DISPENSER1 - batch B-52640, May 2026",
+    "isNotWhereWhenItDoesnt": "WC-BOND-02-DISPENSER2 - same adhesive lot AD-3317 and same cure profile",
+    "notes": "Defect follows the dispenser, not the adhesive lot or humidity"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

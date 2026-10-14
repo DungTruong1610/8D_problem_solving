@@ -1,0 +1,174 @@
+{
+  "notificationId": "8D-10049180",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Sink mark on enclosure cover molded in cavity 1 - blocked cooling channel left a hot spot",
+  "status": "Closed",
+  "foundDate": "2026-06-22",
+  "completionDate": "2026-07-17",
+  "quantityExtent": "180 units affected",
+  "teamSize": 4,
+  "material": {
+    "materialId": "MAT-10730",
+    "description": "Electronic Enclosure EE-50",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-50440",
+    "materialId": "MAT-10730"
+  },
+  "defect": {
+    "defectCode": "DEF-0440",
+    "defectText": "Sink mark and internal void on cosmetic injection molded surface"
+  },
+  "workCenter": {
+    "workCenterId": "WC-MOLD-01",
+    "description": "150T Injection Molding Machine 1"
+  },
+  "inspections": [
+    {
+      "characteristic": "Sink mark depth",
+      "measuredValue": "0.28mm",
+      "specValue": "max 0.05mm"
+    },
+    {
+      "characteristic": "Cavity 1 cooling water flow",
+      "measuredValue": "2.1 l/min",
+      "specValue": "min 6.0 l/min"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "Mold setter started the job with the released recipe",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "Cavity 1 cooling channel of the WC-MOLD-01 mold blocked by limescale - flow 2.1 l/min vs min 6.0, hot spot under the boss",
+      "metricValue": "2.1 l/min",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "Holding pressure 5.5s at 650 bar as released after 8D-10049040",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "PC/ABS resin lot RS-4471 dried to 0.02% moisture",
+      "metricValue": "0.02%",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Depth gauge DG-0315 calibrated 2026-05-02",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Chilled water supply hardness not monitored",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the customer reject the enclosure covers?",
+      "answer": "Sink mark depth reached 0.28mm against max 0.05mm on parts from cavity 1",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did cavity 1 parts sink while cavity 2 parts did not?",
+      "answer": "Cavity 1 cooled slower: its channel carried 2.1 l/min instead of at least 6.0 l/min",
+      "evidenceCitation": "Flow measurement WC-MOLD-01"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was the cavity 1 cooling flow restricted? (root cause)",
+      "answer": "Limescale blocked the channel because the mold cooling circuits had no descaling interval",
+      "evidenceCitation": "SAP PM order history WC-MOLD-01"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Sort 180 enclosures at the customer facility and hold finished stock of batch B-50440",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "actionText": "Descale and flush the cavity 1 cooling channel on the WC-MOLD-01 mold and restore water flow above 6 l/min",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "actionText": "Add cooling water flow sensor with low-flow alarm to every cavity circuit on all molding machines",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer & 8D Facilitator",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100061",
+      "partnerName": "Anh Pham",
+      "functionTitle": "Tooling & Fixture Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100112",
+      "partnerName": "Thomas Meyer",
+      "functionTitle": "Mechanical Maintenance Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician & Line Inspector",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-MOLD-06",
+    "description": "Sink mark from uneven cavity cooling"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 11900
+  },
+  "lessonsLearned": {
+    "whatWorked": "Separating rejects by cavity number on the part stamp isolated cavity 1 at once",
+    "whatDidnt": "Cooling flow per cavity was not measured, so the blockage grew unnoticed"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "EE-50 top cover over the screw boss - WC-MOLD-01 cavity 1 - batch B-50440",
+    "isNotWhereWhenItDoesnt": "WC-MOLD-01 cavity 2 - same resin lot RS-4471 and same recipe",
+    "notes": "Defect follows the cavity, not the recipe or resin"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0611",
+    "customerPlantContact": "Mira Kovac - Plant 3, Graz",
+    "slaResponseDue": "2026-06-29"
+  }
+}

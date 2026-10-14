@@ -1,0 +1,174 @@
+{
+  "notificationId": "8D-10049300",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Grinding burn on guide rail raceway ground with WHEEL1 - coolant nozzle misaligned",
+  "status": "Completed",
+  "foundDate": "2026-07-30",
+  "completionDate": "2026-08-21",
+  "quantityExtent": "22 units affected",
+  "teamSize": 4,
+  "material": {
+    "materialId": "MAT-11280",
+    "description": "Guide Rail GR-200",
+    "materialGroup": "MG-LINEAR"
+  },
+  "batch": {
+    "batchId": "B-50700",
+    "materialId": "MAT-11280"
+  },
+  "defect": {
+    "defectCode": "DEF-1140",
+    "defectText": "Grinding burn and micro-cracks on precision linear guideway"
+  },
+  "workCenter": {
+    "workCenterId": "WC-GRIND-01",
+    "description": "CNC Precision Surface Grinder 1"
+  },
+  "inspections": [
+    {
+      "characteristic": "Barkhausen noise peak",
+      "measuredValue": "74 mp",
+      "specValue": "max 35 mp"
+    },
+    {
+      "characteristic": "Coolant flow at contact zone",
+      "measuredValue": "9 l/min",
+      "specValue": "min 25 l/min"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "Grinder operator ran program GR-200-RW as released",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "WHEEL1 coolant nozzle knocked out of position during wheel change - only 9 l/min reaches the contact zone vs min 25",
+      "metricValue": "9 l/min",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "Dressing every 18 parts as restored after 8D-10049110",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Rail blank lot RB-5530 hardness 60 HRC, within specification",
+      "metricValue": "60 HRC",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Barkhausen probe BN-01 verified on reference sample",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Coolant temperature 21C, inside limits",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the raceway show grinding burn?",
+      "answer": "Barkhausen noise peak reached 74 mp against max 35 mp on rails ground with WHEEL1",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did WHEEL1 overheat the surface?",
+      "answer": "Coolant at the contact zone was 9 l/min instead of at least 25 l/min",
+      "evidenceCitation": "Flow check WC-GRIND-01-WHEEL1"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was coolant missing at the contact zone? (root cause)",
+      "answer": "The nozzle was knocked out of position during the wheel change and the setup has no nozzle position check",
+      "evidenceCitation": "Setup sheet WC-GRIND-01"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Perform 100% Barkhausen noise inspection on all rails from batch B-50700",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "actionText": "Re-align the coolant nozzle on WC-GRIND-01 wheel 1 and restore coolant flow at the contact zone",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "actionText": "Add coolant nozzle position check to the grinder setup checklist on all grinding cells",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer & 8D Facilitator",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100138",
+      "partnerName": "Tobias Berg",
+      "functionTitle": "Milling & Machining Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100014",
+      "partnerName": "Karl Wagner",
+      "functionTitle": "Maintenance Technician & Mechanical Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100147",
+      "partnerName": "Lena Hoffmann",
+      "functionTitle": "Metrology Specialist & CMM Inspector",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-GRIND-02",
+    "description": "Thermal grinding burn from insufficient coolant at the contact zone"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 15200
+  },
+  "lessonsLearned": {
+    "whatWorked": "100% Barkhausen screening stopped every burned rail before assembly",
+    "whatDidnt": "Wheel change setup had no check that the coolant still hits the contact zone"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "GR-200 raceway - WC-GRIND-01-WHEEL1 - after wheel change on 2026-07-29",
+    "isNotWhereWhenItDoesnt": "WC-GRIND-01-WHEEL2 - same blank lot RB-5530 and same dressing interval",
+    "notes": "Defect starts at the wheel change and stays on WHEEL1"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "notificationId": "8D-90049300",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Grinding burn on guide rail raceway ground with WHEEL1 - coolant nozzle misaligned",
+  "status": "Completed",
+  "foundDate": "30.07.2026",
+  "completionDate": "21-AUG-26",
+  "quantityExtent": "22 St",
+  "teamSize": "",
+  "material": {
+    "materialId": "  MAT-11280 ",
+    "description": "Guide Rail GR-200",
+    "materialGroup": "MG-LINEAR"
+  },
+  "batch": {
+    "batchId": "B-50700",
+    "materialId": "  MAT-11280 "
+  },
+  "defect": {
+    "defectCode": "DEF-1140",
+    "defectText": "Grinding burn and micro-cracks on precision linear guideway"
+  },
+  "workCenter": {
+    "workCenterId": "WC-GRIND-01",
+    "description": "CNC Precision Surface Grinder 1"
+  },
+  "inspections": [
+    {
+      "characteristic": "Barkhausen noise peak",
+      "measuredValue": "Barkhausen noise peak = 74 mp (Vorgabe max 35 mp) - iO/niO: niO",
+      "specValue": "  "
+    },
+    {
+      "characteristic": "Coolant flow at contact zone",
+      "measuredValue": "9 l/min",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Machine",
+      "description": "WHEEL1 coolant nozzle knocked out of position during wheel change - only 9 l/min reaches the contact zone vs min 25",
+      "metricValue": "9 l/min",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Barkhausen probe BN-01 verified on reference sample",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Man",
+      "description": "Grinder operator ran program GR-200-RW as released",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    }
+  ],
+  "fiveWhyChain": [],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Eindaemmung",
+      "actionText": "Perform 100% Barkhausen noise inspection on all rails from batch B-50700",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Korrekturmassnahme",
+      "actionText": "Re-align the coolant nozzle on WC-GRIND-01 wheel 1 and restore coolant flow at the contact zone",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "",
+      "actionText": "Add coolant nozzle position check to the grinder setup checklist on all grinding cells",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng. & 8D Facilitator",
+      "partnerRole": "-",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100138",
+      "partnerName": "Tobias Berg",
+      "functionTitle": "Milling & Machining Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100014",
+      "partnerName": "Karl Wagner",
+      "functionTitle": "Maintenance Technician & Mechanical Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100147",
+      "partnerName": "Lena Hoffmann",
+      "functionTitle": "Metrology Specialist & CMM Inspector",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 15200
+  },
+  "lessonsLearned": {
+    "whatWorked": "k.A.",
+    "whatDidnt": "n.a."
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "GR-200 raceway - WC-GRIND-01-WHEEL1 - after wheel change on 2026-07-29",
+    "isNotWhereWhenItDoesnt": "WC-GRIND-01-WHEEL2 - same blank lot RB-5530 and same dressing interval",
+    "notes": "Defect starts at the wheel change and stays on WHEEL1"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

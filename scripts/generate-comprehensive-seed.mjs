@@ -106,6 +106,16 @@ addLotPair(12, 'MAT-11388', 'Gloss 60 degree', 'WC-PAINT-03-ROBOT1', '71', 'WC-P
 addLotPair(13, 'MAT-88410', 'Helium Leak Rate at 8.0 bar test pressure', 'WC-TEST-03-CHAMBER1', '1.45', 'WC-TEST-03-CHAMBER2', '0.08', 'sccm');
 addLotPair(13, 'MAT-88410', 'O-ring sealing seat surface roughness (Ra)', 'WC-TEST-03-CHAMBER1', '1.85', 'WC-TEST-03-CHAMBER2', '0.35', 'um');
 
+// 14-19. Tập so sánh Is/Is-Not cho bộ `mock-data/happycase-full/`. Thêm ở CUỐI để
+// lotId/ID của 108 dòng phía trên giữ nguyên. Tên đặc tính phải trùng TỪNG CHỮ với
+// đặc tính bị Rejected trong case input — `computeIsIsNot` so chuỗi, không so mã.
+addLotPair(14, 'MAT-10402', 'Effective case depth', 'WC-HEAT-03-COIL1', '1.25', 'WC-HEAT-03-COIL2', '2.05', 'mm', '2026-09');
+addLotPair(15, 'MAT-10840', 'Solder paste volume', 'WC-SMT-02-PRINTER1', '158', 'WC-SMT-02-PRINTER2', '102', '%', '2026-09');
+addLotPair(16, 'MAT-10730', 'Sink mark depth', 'WC-MOLD-01-CAV1', '0.31', 'WC-MOLD-01-CAV2', '0.02', 'mm', '2026-09');
+addLotPair(17, 'MAT-11060', 'Pit count per frame', 'WC-ANOD-01-TANK3', '9', 'WC-ANOD-01-TANK4', '0', 'count', '2026-09');
+addLotPair(18, 'MAT-11280', 'Barkhausen noise peak', 'WC-GRIND-01-WHEEL1', '78', 'WC-GRIND-01-WHEEL2', '22', 'mp', '2026-09');
+addLotPair(19, 'MAT-11002', 'Flange radius wall thinning', 'WC-PRESS-09-TOOL1', '24', 'WC-PRESS-09-TOOL2', '9', '%', '2026-09');
+
 // Write InspectionLots.csv
 const inspHeader = 'ID;lotId;materialId;characteristic;equipment;workCenterId;measuredValue;unit;conforming;lotDate;plant';
 const inspLines = [

@@ -1,0 +1,131 @@
+{
+  "notificationId": "8D-90049190",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Pitting on anodized bezel frames rinsed in tank 3 - chloride carry-over from open city water bypass",
+  "status": "Closed",
+  "foundDate": "20.07.2026",
+  "completionDate": "14-AUG-26",
+  "quantityExtent": "ca. 95 Stk.",
+  "teamSize": "  ",
+  "material": {
+    "materialId": "  MAT-11060 ",
+    "description": "Bezel Frame BF-10",
+    "materialGroup": "MG-FRAME"
+  },
+  "batch": {
+    "batchId": "B-50540",
+    "materialId": "  MAT-11060 "
+  },
+  "defect": {
+    "defectCode": "DEF-0714",
+    "defectText": "Pitting corrosion and dark discoloration on anodized aluminum bezel"
+  },
+  "workCenter": {
+    "workCenterId": "WC-ANOD-01",
+    "description": "Type II Sulfuric Anodizing Line 1"
+  },
+  "inspections": [
+    {
+      "characteristic": "Pit count per frame",
+      "measuredValue": "Pit count per frame: gemessen 11, Sollwert max 0",
+      "specValue": ""
+    },
+    {
+      "characteristic": "Rinse tank 3 chloride",
+      "measuredValue": "42 mg/l",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Method",
+      "description": "City water bypass valve on rinse tank 3 left open after resin change - no lock-out step in DOC-7105, chloride rose to 42 mg/l",
+      "metricValue": "42 mg/l",
+      "isRootCause": "Y",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Conductivity probe CP-03 read only at shift start",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Machine",
+      "description": "Rinse tank 3 pumps and heaters working, no alarm",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    }
+  ],
+  "fiveWhyChain": [],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Sofortmassnahme",
+      "actionText": "Quarantine batch B-50540 frames and sort all finished frames under 10x magnification",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Abstellmassnahme",
+      "actionText": "Flush rinse tank 3, close the city water bypass valve and restore DI water supply",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Vorbeugemassnahme",
+      "actionText": "Lock out the city water bypass valves and add conductivity monitoring alarm on all rinse tanks",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng. & 8D Facilitator",
+      "partnerRole": "",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100067",
+      "partnerName": "Marek Nowak",
+      "functionTitle": "Process Eng. - Coating & Surface Treatment",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100115",
+      "partnerName": "Eva Lindqvist",
+      "functionTitle": "Facilities Eng.",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100095",
+      "partnerName": "Elena Rostova",
+      "functionTitle": "Materials & Metallurgy Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 13500
+  },
+  "lessonsLearned": {
+    "whatWorked": "",
+    "whatDidnt": "-"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "BF-10 visible faces - WC-ANOD-01 rinse tank 3 - batch B-50540, July 2026",
+    "isNotWhereWhenItDoesnt": "Frames rinsed in tank 4 - same extrusion lot EX-9120",
+    "notes": "Defect follows the rinse tank, not the alloy lot"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0702",
+    "customerPlantContact": "Pieter de Vries, Plant 1, Eindhoven",
+    "slaResponseDue": "27.07.2026"
+  }
+}

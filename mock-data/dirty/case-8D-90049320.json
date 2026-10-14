@@ -1,0 +1,131 @@
+{
+  "notificationId": "8D-90049320",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Low clamp torque on end cap bolts tightened by nutrunner SPINDLE1 - torque transducer drift",
+  "status": "Closed",
+  "foundDate": "18.08.2026",
+  "completionDate": "11-SEP-26",
+  "quantityExtent": "57 St",
+  "teamSize": "",
+  "material": {
+    "materialId": "  MAT-10611 ",
+    "description": "Gearbox End Cap G45",
+    "materialGroup": "MG-GEARBOX"
+  },
+  "batch": {
+    "batchId": "B-52330",
+    "materialId": "  MAT-10611 "
+  },
+  "defect": {
+    "defectCode": "DEF-0723",
+    "defectText": "Bolt torque below specification"
+  },
+  "workCenter": {
+    "workCenterId": "WC-ASSY-08",
+    "description": "Gearbox Assembly Line 8"
+  },
+  "inspections": [
+    {
+      "characteristic": "Bolt seating torque",
+      "measuredValue": "Bolt seating torque = 22 Nm (Vorgabe 34-38 Nm) - iO/niO: niO",
+      "specValue": "  "
+    },
+    {
+      "characteristic": "Transducer deviation vs reference",
+      "measuredValue": "+31%",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Machine",
+      "description": "WC-ASSY-08-SPINDLE1 torque transducer drifted +31% - controller stopped at 22 Nm real torque while reading 36 Nm",
+      "metricValue": "+31%",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Environment",
+      "description": "Assembly hall 23C",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    },
+    {
+      "category": "Method",
+      "description": "Tightening program P-G45-04 target 36 Nm, unchanged",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    }
+  ],
+  "fiveWhyChain": [],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "SM",
+      "actionText": "Recall and re-torque all end caps from batch B-52330 already delivered to the customer",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Abstellmassnahme",
+      "actionText": "Replace the drifted torque transducer assembly on WC-ASSY-08 SPINDLE1 and recalibrate the nutrunner",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "",
+      "actionText": "Add a daily transducer verification against a reference meter to the preventive maintenance schedule in SAP PM",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng. & 8D Facilitator",
+      "partnerRole": "  ",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100045",
+      "partnerName": "Ingo Braun",
+      "functionTitle": "Manufacturing & Assembly Eng.",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100088",
+      "partnerName": "Rita Fischer",
+      "functionTitle": "Assembly Supervisor",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100072",
+      "partnerName": "Stefan Wolf",
+      "functionTitle": "Electrical & Controls Automation Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 18900
+  },
+  "lessonsLearned": {
+    "whatWorked": "  ",
+    "whatDidnt": "k.A."
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "G45 end cap bolts - WC-ASSY-08-SPINDLE1 - batch B-52330, August 2026",
+    "isNotWhereWhenItDoesnt": "WC-ASSY-08-SPINDLE2 - same bolt lot BL-2290 and same program",
+    "notes": "Defect follows the spindle, not the bolts or program"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0745",
+    "customerPlantContact": "Tomasz Zielinski, Plant 2, Poznan",
+    "slaResponseDue": "25.08.2026"
+  }
+}

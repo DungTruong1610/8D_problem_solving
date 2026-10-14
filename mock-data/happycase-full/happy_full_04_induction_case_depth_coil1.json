@@ -1,0 +1,270 @@
+{
+  "$title": "Induction case depth below minimum - COIL1 coupling gap",
+  "$comment": "Happy case: open 8D with a recorded investigation. Expected precedents: 8D-10049160, 8D-10049080. Import via Create 8D Report -> JSON.",
+  "notificationId": "8D-10049404",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Effective induction case depth below 1.80mm minimum on S150 drive shafts hardened on COIL1",
+  "status": "In Process",
+  "foundDate": "2026-10-07",
+  "completionDate": null,
+  "quantityExtent": "48 units affected",
+  "defectQuantity": 48,
+  "defectQuantityUom": "PC",
+  "teamSize": 4,
+  "entryMode": "during-inspection",
+  "referenceNumber": "INT-2026-5118",
+  "plant": "1000",
+  "inspectionLotId": "0010000303",
+  "material": {
+    "materialId": "MAT-10402",
+    "description": "Drive Shaft S150",
+    "materialGroup": "MG-SHAFT",
+    "plant": "1000"
+  },
+  "batch": {
+    "batchId": "B-70410",
+    "materialId": "MAT-10402"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-MAT",
+    "defectCode": "DEF-0822",
+    "defectText": "Insufficient case depth after induction hardening",
+    "defectClass": "Critical"
+  },
+  "workCenter": {
+    "workCenterId": "WC-HEAT-03",
+    "description": "Induction Hardening Cell 3"
+  },
+  "inspections": [
+    {
+      "characteristic": "Effective case depth",
+      "measuredValue": "1.22 mm",
+      "specLowerLimit": 1.8,
+      "specUpperLimit": 2.4,
+      "specUom": "mm",
+      "valuation": "Rejected",
+      "equipment": "WC-HEAT-03-COIL1"
+    },
+    {
+      "characteristic": "Surface hardness",
+      "measuredValue": "59 HRC",
+      "specLowerLimit": 56,
+      "specUpperLimit": 62,
+      "specUom": "HRC",
+      "valuation": "Accepted",
+      "equipment": "WC-HEAT-03-COIL1"
+    }
+  ],
+  "historicalInspectionLots": [
+    {
+      "lotId": "0010000109",
+      "materialId": "MAT-10402",
+      "characteristic": "Effective case depth",
+      "equipment": "WC-HEAT-03-COIL1",
+      "workCenterId": "WC-HEAT-03",
+      "measuredValue": "1.25 mm",
+      "conforming": false,
+      "lotDate": "2026-09-10",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000110",
+      "materialId": "MAT-10402",
+      "characteristic": "Effective case depth",
+      "equipment": "WC-HEAT-03-COIL1",
+      "workCenterId": "WC-HEAT-03",
+      "measuredValue": "1.25 mm",
+      "conforming": false,
+      "lotDate": "2026-09-11",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000111",
+      "materialId": "MAT-10402",
+      "characteristic": "Effective case depth",
+      "equipment": "WC-HEAT-03-COIL1",
+      "workCenterId": "WC-HEAT-03",
+      "measuredValue": "1.25 mm",
+      "conforming": false,
+      "lotDate": "2026-09-12",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000112",
+      "materialId": "MAT-10402",
+      "characteristic": "Effective case depth",
+      "equipment": "WC-HEAT-03-COIL2",
+      "workCenterId": "WC-HEAT-03",
+      "measuredValue": "2.05 mm",
+      "conforming": true,
+      "lotDate": "2026-09-05",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000113",
+      "materialId": "MAT-10402",
+      "characteristic": "Effective case depth",
+      "equipment": "WC-HEAT-03-COIL2",
+      "workCenterId": "WC-HEAT-03",
+      "measuredValue": "2.05 mm",
+      "conforming": true,
+      "lotDate": "2026-09-06",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000114",
+      "materialId": "MAT-10402",
+      "characteristic": "Effective case depth",
+      "equipment": "WC-HEAT-03-COIL2",
+      "workCenterId": "WC-HEAT-03",
+      "measuredValue": "2.05 mm",
+      "conforming": true,
+      "lotDate": "2026-09-07",
+      "plant": "1000"
+    }
+  ],
+  "isIsNot": {
+    "isWhereWhenItHappens": "S150 bearing journal - WC-HEAT-03-COIL1 - batch B-70410, October 2026",
+    "isNotWhereWhenItDoesnt": "WC-HEAT-03-COIL2 - same bar lot BS-3471 and same recipe",
+    "notes": "Defect follows the coil station, not the material or recipe"
+  },
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "Operator loaded shafts per work instruction, no deviation",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "WC-HEAT-03-COIL1 locating bushing worn - coupling gap 3.1mm vs 1.8-2.2mm, less energy into the surface",
+      "metricValue": "3.1 mm",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "Hardening recipe HT-S150-02 power and scan speed unchanged",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "42CrMo4 bar lot BS-3471 chemistry within specification",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Microhardness tester MH-02 verified on reference block",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Quench water 25C, inside 20-30C window",
+      "metricValue": "25C",
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why was the case depth below minimum?",
+      "answer": "Effective case depth measured 1.22mm against 1.80-2.40mm on shafts hardened on COIL1",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did COIL1 transfer less energy into the shaft?",
+      "answer": "The inductor coupling gap was 3.1mm instead of 1.8-2.2mm",
+      "evidenceCitation": "Setup measurement WC-HEAT-03-COIL1"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was the coupling gap too wide? (root cause)",
+      "answer": "The locating bushing is worn and the gap is not checked at setup",
+      "evidenceCitation": "SAP PM order history WC-HEAT-03"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Quarantine 48 drive shafts from batch B-70410 and perform 100% eddy current case depth sort",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "actionText": "Replace worn inductor locating bushing on WC-HEAT-03-COIL1 and re-qualify the coupling gap",
+      "status": "In Process"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "actionText": "Add coupling gap check to the induction setup checklist across all heat treat lines",
+      "status": "Planned"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer & 8D Facilitator",
+      "partnerRole": "8D Team Leader",
+      "email": "heli.weber@proresolve.com",
+      "phone": "+49 89 2018 0001"
+    },
+    {
+      "partnerId": "BP-100095",
+      "partnerName": "Elena Rostova",
+      "functionTitle": "Materials & Metallurgy Specialist",
+      "partnerRole": "8D Team Member",
+      "email": "elena.rostova@proresolve.com",
+      "phone": "+49 89 2018 0095"
+    },
+    {
+      "partnerId": "BP-100014",
+      "partnerName": "Karl Wagner",
+      "functionTitle": "Maintenance Technician & Mechanical Specialist",
+      "partnerRole": "8D Team Member",
+      "email": "karl.wagner@proresolve.com",
+      "phone": "+49 89 2018 0014"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician & Line Inspector",
+      "partnerRole": "8D Team Member",
+      "email": "quyen.la@proresolve.com",
+      "phone": "+49 89 2018 0011"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-HEAT-04",
+    "description": "Shallow hardening depth from inductor coupling gap or cooling restriction"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 11200
+  },
+  "lessonsLearned": {
+    "whatWorked": "Interim (case open): splitting case depth results by coil station pointed straight at COIL1",
+    "whatDidnt": "Interim (case open): the coupling gap check is not yet on the setup sheet"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  },
+  "responsibility": {
+    "reportedBy": "Quyen La",
+    "coordinator": "Heli (QE)",
+    "department": "Quality Assurance"
+  }
+}

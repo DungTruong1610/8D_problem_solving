@@ -1,0 +1,270 @@
+{
+  "$title": "Retainer flange radius cracks - worn draw punch on TOOL1",
+  "$comment": "Happy case: open 8D with a recorded investigation. Expected precedents: 8D-10049310, 8D-10048834. Import via Create 8D Report -> JSON.",
+  "notificationId": "8D-10049409",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Cracks at SR8 spring retainer flange radius after forming - all parts formed on TOOL1",
+  "status": "In Process",
+  "foundDate": "2026-10-07",
+  "completionDate": null,
+  "quantityExtent": "260 units affected",
+  "defectQuantity": 260,
+  "defectQuantityUom": "PC",
+  "teamSize": 4,
+  "entryMode": "during-inspection",
+  "referenceNumber": "INT-2026-5126",
+  "plant": "1000",
+  "inspectionLotId": "0010000306",
+  "material": {
+    "materialId": "MAT-11002",
+    "description": "Spring Retainer SR8",
+    "materialGroup": "MG-SPRING",
+    "plant": "1000"
+  },
+  "batch": {
+    "batchId": "B-53760",
+    "materialId": "MAT-11002"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-MAT",
+    "defectCode": "DEF-1120",
+    "defectText": "Retainer cracking during forming",
+    "defectClass": "Critical"
+  },
+  "workCenter": {
+    "workCenterId": "WC-PRESS-09",
+    "description": "Progressive Press Line 9"
+  },
+  "inspections": [
+    {
+      "characteristic": "Flange radius wall thinning",
+      "measuredValue": "24 %",
+      "specLowerLimit": 0,
+      "specUpperLimit": 15,
+      "specUom": "%",
+      "valuation": "Rejected",
+      "equipment": "WC-PRESS-09-TOOL1"
+    },
+    {
+      "characteristic": "Flange height",
+      "measuredValue": "4.02 mm",
+      "specLowerLimit": 3.95,
+      "specUpperLimit": 4.05,
+      "specUom": "mm",
+      "valuation": "Accepted",
+      "equipment": "WC-PRESS-09-TOOL1"
+    }
+  ],
+  "historicalInspectionLots": [
+    {
+      "lotId": "0010000139",
+      "materialId": "MAT-11002",
+      "characteristic": "Flange radius wall thinning",
+      "equipment": "WC-PRESS-09-TOOL1",
+      "workCenterId": "WC-PRESS-09",
+      "measuredValue": "24 %",
+      "conforming": false,
+      "lotDate": "2026-09-10",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000140",
+      "materialId": "MAT-11002",
+      "characteristic": "Flange radius wall thinning",
+      "equipment": "WC-PRESS-09-TOOL1",
+      "workCenterId": "WC-PRESS-09",
+      "measuredValue": "24 %",
+      "conforming": false,
+      "lotDate": "2026-09-11",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000141",
+      "materialId": "MAT-11002",
+      "characteristic": "Flange radius wall thinning",
+      "equipment": "WC-PRESS-09-TOOL1",
+      "workCenterId": "WC-PRESS-09",
+      "measuredValue": "24 %",
+      "conforming": false,
+      "lotDate": "2026-09-12",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000142",
+      "materialId": "MAT-11002",
+      "characteristic": "Flange radius wall thinning",
+      "equipment": "WC-PRESS-09-TOOL2",
+      "workCenterId": "WC-PRESS-09",
+      "measuredValue": "9 %",
+      "conforming": true,
+      "lotDate": "2026-09-05",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000143",
+      "materialId": "MAT-11002",
+      "characteristic": "Flange radius wall thinning",
+      "equipment": "WC-PRESS-09-TOOL2",
+      "workCenterId": "WC-PRESS-09",
+      "measuredValue": "9 %",
+      "conforming": true,
+      "lotDate": "2026-09-06",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000144",
+      "materialId": "MAT-11002",
+      "characteristic": "Flange radius wall thinning",
+      "equipment": "WC-PRESS-09-TOOL2",
+      "workCenterId": "WC-PRESS-09",
+      "measuredValue": "9 %",
+      "conforming": true,
+      "lotDate": "2026-09-07",
+      "plant": "1000"
+    }
+  ],
+  "isIsNot": {
+    "isWhereWhenItHappens": "SR8 flange radius - WC-PRESS-09-TOOL1 station 3 - batch B-53760, October 2026",
+    "isNotWhereWhenItDoesnt": "WC-PRESS-09-TOOL2 - same coil COIL-6790",
+    "notes": "Defect follows the tool, not the coil"
+  },
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "Press operator ran TOOL1 at the released stroke rate",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "WC-PRESS-09-TOOL1 draw punch insert worn - radius 0.7mm vs 1.0-1.2mm, material over-thinned at the flange",
+      "metricValue": "0.7 mm",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "Lubrication and stroke rate per DOC-8840 Rev C",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Coil COIL-6790 hardness 151 HV, elongation 25% - within specification",
+      "metricValue": "151 HV",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Ultrasonic thickness gauge UT-04 calibrated 2026-08-20",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Press hall 24C, no correlation",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the retainers crack at the flange radius?",
+      "answer": "Wall thinning at the radius reached 24% against max 15%",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did TOOL1 over-thin the flange radius?",
+      "answer": "The draw punch radius has worn down to 0.7mm, concentrating strain at the radius",
+      "evidenceCitation": "Tool measurement WC-PRESS-09-TOOL1"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why is the worn insert still in the tool? (root cause)",
+      "answer": "Punch inserts have no stroke count limit in SAP PM and are changed only after breakage",
+      "evidenceCitation": "SAP PM order history WC-PRESS-09"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Quarantine all SR8 retainers from batch B-53760 and 100% visual crack check under magnification",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "actionText": "Replace the worn draw punch insert on WC-PRESS-09 tool 1 station 3 and verify the 1.1mm radius",
+      "status": "In Process"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "actionText": "Add a stroke count limit for draw punch inserts to the preventive maintenance schedule in SAP PM",
+      "status": "Planned"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer & 8D Facilitator",
+      "partnerRole": "8D Team Leader",
+      "email": "heli.weber@proresolve.com",
+      "phone": "+49 89 2018 0001"
+    },
+    {
+      "partnerId": "BP-100133",
+      "partnerName": "Ola Nyberg",
+      "functionTitle": "Press Shop Engineer",
+      "partnerRole": "8D Team Member",
+      "email": "ola.nyberg@proresolve.com",
+      "phone": "+49 89 2018 0133"
+    },
+    {
+      "partnerId": "BP-100061",
+      "partnerName": "Anh Pham",
+      "functionTitle": "Tooling & Fixture Engineer",
+      "partnerRole": "8D Team Member",
+      "email": "anh.pham@proresolve.com",
+      "phone": "+49 89 2018 0061"
+    },
+    {
+      "partnerId": "BP-100095",
+      "partnerName": "Elena Rostova",
+      "functionTitle": "Materials & Metallurgy Specialist",
+      "partnerRole": "8D Team Member",
+      "email": "elena.rostova@proresolve.com",
+      "phone": "+49 89 2018 0095"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-PRESS09-03",
+    "description": "Flange radius cracking from material grade or worn draw punch"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 6900
+  },
+  "lessonsLearned": {
+    "whatWorked": "Interim (case open): measuring wall thinning per tool pointed at TOOL1 instead of the coil",
+    "whatDidnt": "Interim (case open): inserts are still run to failure"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  },
+  "responsibility": {
+    "reportedBy": "Quyen La",
+    "coordinator": "Heli (QE)",
+    "department": "Quality Assurance"
+  }
+}

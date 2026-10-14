@@ -1,0 +1,269 @@
+{
+  "$title": "Loose gearbox end cap bolts - SPINDLE1 torque transducer drift",
+  "$comment": "Happy case: open 8D with a recorded investigation. Expected precedents: 8D-10049320, 8D-10048702. Import via Create 8D Report -> JSON.",
+  "notificationId": "8D-10049410",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Customer found loose end cap bolts on G45 gearboxes - all units tightened by nutrunner SPINDLE1",
+  "status": "In Process",
+  "foundDate": "2026-10-06",
+  "completionDate": null,
+  "quantityExtent": "63 units affected",
+  "defectQuantity": 63,
+  "defectQuantityUom": "PC",
+  "teamSize": 4,
+  "entryMode": "outside-inspection",
+  "referenceNumber": "CC-2026-0929",
+  "plant": "1000",
+  "material": {
+    "materialId": "MAT-10611",
+    "description": "Gearbox End Cap G45",
+    "materialGroup": "MG-GEARBOX",
+    "plant": "1000"
+  },
+  "batch": {
+    "batchId": "B-52360",
+    "materialId": "MAT-10611"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-ASM",
+    "defectCode": "DEF-0723",
+    "defectText": "Bolt torque below specification",
+    "defectClass": "Major"
+  },
+  "workCenter": {
+    "workCenterId": "WC-ASSY-08",
+    "description": "Gearbox Assembly Line 8"
+  },
+  "inspections": [
+    {
+      "characteristic": "Bolt seating torque",
+      "measuredValue": "21 Nm",
+      "specLowerLimit": 34,
+      "specUpperLimit": 38,
+      "specUom": "Nm",
+      "valuation": "Rejected",
+      "equipment": "WC-ASSY-08-SPINDLE1"
+    },
+    {
+      "characteristic": "Bolt thread engagement",
+      "measuredValue": "9.5 mm",
+      "specLowerLimit": 8,
+      "specUpperLimit": 12,
+      "specUom": "mm",
+      "valuation": "Accepted",
+      "equipment": "WC-ASSY-08-SPINDLE1"
+    }
+  ],
+  "historicalInspectionLots": [
+    {
+      "lotId": "0010000049",
+      "materialId": "MAT-10611",
+      "characteristic": "Bolt seating torque",
+      "equipment": "WC-ASSY-08-SPINDLE1",
+      "workCenterId": "WC-ASSY-08",
+      "measuredValue": "18 Nm",
+      "conforming": false,
+      "lotDate": "2026-02-10",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000050",
+      "materialId": "MAT-10611",
+      "characteristic": "Bolt seating torque",
+      "equipment": "WC-ASSY-08-SPINDLE1",
+      "workCenterId": "WC-ASSY-08",
+      "measuredValue": "18 Nm",
+      "conforming": false,
+      "lotDate": "2026-02-11",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000051",
+      "materialId": "MAT-10611",
+      "characteristic": "Bolt seating torque",
+      "equipment": "WC-ASSY-08-SPINDLE1",
+      "workCenterId": "WC-ASSY-08",
+      "measuredValue": "18 Nm",
+      "conforming": false,
+      "lotDate": "2026-02-12",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000052",
+      "materialId": "MAT-10611",
+      "characteristic": "Bolt seating torque",
+      "equipment": "WC-ASSY-08-SPINDLE2",
+      "workCenterId": "WC-ASSY-08",
+      "measuredValue": "36 Nm",
+      "conforming": true,
+      "lotDate": "2026-02-05",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000053",
+      "materialId": "MAT-10611",
+      "characteristic": "Bolt seating torque",
+      "equipment": "WC-ASSY-08-SPINDLE2",
+      "workCenterId": "WC-ASSY-08",
+      "measuredValue": "36 Nm",
+      "conforming": true,
+      "lotDate": "2026-02-06",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000054",
+      "materialId": "MAT-10611",
+      "characteristic": "Bolt seating torque",
+      "equipment": "WC-ASSY-08-SPINDLE2",
+      "workCenterId": "WC-ASSY-08",
+      "measuredValue": "36 Nm",
+      "conforming": true,
+      "lotDate": "2026-02-07",
+      "plant": "1000"
+    }
+  ],
+  "isIsNot": {
+    "isWhereWhenItHappens": "G45 end cap bolts - WC-ASSY-08-SPINDLE1 - batch B-52360, early October 2026",
+    "isNotWhereWhenItDoesnt": "WC-ASSY-08-SPINDLE2 - same bolt lot BL-2344 and same program",
+    "notes": "Defect follows the spindle, not the bolts or program"
+  },
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "Assembler used the automated nutrunner as instructed",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "WC-ASSY-08-SPINDLE1 torque transducer drifted +28% - controller stopped at 21 Nm real torque while reading 36 Nm",
+      "metricValue": "+28%",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "Tightening program P-G45-04 target 36 Nm, unchanged",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "M8 bolt lot BL-2344 friction coefficient within datasheet",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Audit torque wrench TW-11 calibrated 2026-09-10",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Assembly hall 22C",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the customer find loose end cap bolts?",
+      "answer": "Audit torque was 21 Nm against 34-38 Nm on units tightened by SPINDLE1",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did SPINDLE1 stop below the target torque?",
+      "answer": "Its torque transducer reads 28% high, so the controller saw 36 Nm at 21 Nm real torque",
+      "evidenceCitation": "Transducer check WC-ASSY-08-SPINDLE1"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why did the transducer drift go undetected? (root cause)",
+      "answer": "Transducers are checked only at the yearly calibration, with no daily verification",
+      "evidenceCitation": "SAP PM calibration plan WC-ASSY-08"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Recall and re-torque all end caps from batch B-52360 already delivered to the customer",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "actionText": "Replace the drifted torque transducer assembly on WC-ASSY-08 SPINDLE1 and recalibrate the nutrunner",
+      "status": "In Process"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "actionText": "Add a daily transducer verification against a reference meter to the preventive maintenance schedule in SAP PM",
+      "status": "Planned"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer & 8D Facilitator",
+      "partnerRole": "8D Team Leader",
+      "email": "heli.weber@proresolve.com",
+      "phone": "+49 89 2018 0001"
+    },
+    {
+      "partnerId": "BP-100045",
+      "partnerName": "Ingo Braun",
+      "functionTitle": "Manufacturing & Assembly Engineer",
+      "partnerRole": "8D Team Member",
+      "email": "ingo.braun@proresolve.com",
+      "phone": "+49 89 2018 0045"
+    },
+    {
+      "partnerId": "BP-100088",
+      "partnerName": "Rita Fischer",
+      "functionTitle": "Assembly Supervisor",
+      "partnerRole": "8D Team Member",
+      "email": "rita.fischer@proresolve.com",
+      "phone": "+49 89 2018 0088"
+    },
+    {
+      "partnerId": "BP-100072",
+      "partnerName": "Stefan Wolf",
+      "functionTitle": "Electrical & Controls Automation Technician",
+      "partnerRole": "8D Team Member",
+      "email": "stefan.wolf@proresolve.com",
+      "phone": "+49 89 2018 0072"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-ASSY08-04",
+    "description": "Insufficient clamp load from uncontrolled or drifting torque"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 17200
+  },
+  "lessonsLearned": {
+    "whatWorked": "Interim (case open): audit torque split by spindle showed SPINDLE1 alone was low",
+    "whatDidnt": "Interim (case open): the yearly calibration is still the only transducer check"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0929",
+    "customerPlantContact": "Tomasz Zielinski - Plant 2, Poznan",
+    "slaResponseDue": "2026-10-13"
+  },
+  "responsibility": {
+    "reportedBy": "Alex Murphy",
+    "coordinator": "Heli (QE)",
+    "department": "Quality Assurance"
+  }
+}

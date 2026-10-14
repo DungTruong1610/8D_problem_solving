@@ -1,0 +1,270 @@
+{
+  "$title": "QFN solder bridging - PRINTER1 understencil wipe vacuum",
+  "$comment": "Happy case: open 8D with a recorded investigation. Expected precedents: 8D-10049170, 8D-10049050. Import via Create 8D Report -> JSON.",
+  "notificationId": "8D-10049405",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "AOI detected solder bridges on QFN U12 pins of PCBA-900 - all boards printed on PRINTER1",
+  "status": "In Process",
+  "foundDate": "2026-10-08",
+  "completionDate": null,
+  "quantityExtent": "57 units affected",
+  "defectQuantity": 57,
+  "defectQuantityUom": "PC",
+  "teamSize": 4,
+  "entryMode": "during-inspection",
+  "referenceNumber": "INT-2026-5124",
+  "plant": "1000",
+  "inspectionLotId": "0010000304",
+  "material": {
+    "materialId": "MAT-10840",
+    "description": "Control Board PCBA-900",
+    "materialGroup": "MG-PCBA",
+    "plant": "1000"
+  },
+  "batch": {
+    "batchId": "B-50495",
+    "materialId": "MAT-10840"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-ASM",
+    "defectCode": "DEF-0580",
+    "defectText": "Solder bridging short circuit on fine-pitch QFN package",
+    "defectClass": "Critical"
+  },
+  "workCenter": {
+    "workCenterId": "WC-SMT-02",
+    "description": "SMT Placement & Reflow Line 2"
+  },
+  "inspections": [
+    {
+      "characteristic": "Solder paste volume",
+      "measuredValue": "161 %",
+      "specLowerLimit": 80,
+      "specUpperLimit": 120,
+      "specUom": "%",
+      "valuation": "Rejected",
+      "equipment": "WC-SMT-02-PRINTER1"
+    },
+    {
+      "characteristic": "Component placement offset",
+      "measuredValue": "0.03 mm",
+      "specLowerLimit": 0,
+      "specUpperLimit": 0.05,
+      "specUom": "mm",
+      "valuation": "Accepted",
+      "equipment": "WC-SMT-02-PLACER1"
+    }
+  ],
+  "historicalInspectionLots": [
+    {
+      "lotId": "0010000115",
+      "materialId": "MAT-10840",
+      "characteristic": "Solder paste volume",
+      "equipment": "WC-SMT-02-PRINTER1",
+      "workCenterId": "WC-SMT-02",
+      "measuredValue": "158 %",
+      "conforming": false,
+      "lotDate": "2026-09-10",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000116",
+      "materialId": "MAT-10840",
+      "characteristic": "Solder paste volume",
+      "equipment": "WC-SMT-02-PRINTER1",
+      "workCenterId": "WC-SMT-02",
+      "measuredValue": "158 %",
+      "conforming": false,
+      "lotDate": "2026-09-11",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000117",
+      "materialId": "MAT-10840",
+      "characteristic": "Solder paste volume",
+      "equipment": "WC-SMT-02-PRINTER1",
+      "workCenterId": "WC-SMT-02",
+      "measuredValue": "158 %",
+      "conforming": false,
+      "lotDate": "2026-09-12",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000118",
+      "materialId": "MAT-10840",
+      "characteristic": "Solder paste volume",
+      "equipment": "WC-SMT-02-PRINTER2",
+      "workCenterId": "WC-SMT-02",
+      "measuredValue": "102 %",
+      "conforming": true,
+      "lotDate": "2026-09-05",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000119",
+      "materialId": "MAT-10840",
+      "characteristic": "Solder paste volume",
+      "equipment": "WC-SMT-02-PRINTER2",
+      "workCenterId": "WC-SMT-02",
+      "measuredValue": "102 %",
+      "conforming": true,
+      "lotDate": "2026-09-06",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000120",
+      "materialId": "MAT-10840",
+      "characteristic": "Solder paste volume",
+      "equipment": "WC-SMT-02-PRINTER2",
+      "workCenterId": "WC-SMT-02",
+      "measuredValue": "102 %",
+      "conforming": true,
+      "lotDate": "2026-09-07",
+      "plant": "1000"
+    }
+  ],
+  "isIsNot": {
+    "isWhereWhenItHappens": "QFN U12 pins - WC-SMT-02-PRINTER1 - batch B-50495, October 2026",
+    "isNotWhereWhenItDoesnt": "WC-SMT-02-PRINTER2 - same stencil design and same paste lot SP-2291",
+    "notes": "Defect follows the printer, not the paste or stencil design"
+  },
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "Line operator ran the standard print program PRG-900-A",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "WC-SMT-02-PRINTER1 understencil wipe vacuum filter clogged - 9 kPa vs min 25 kPa, paste smears under the apertures",
+      "metricValue": "9 kPa",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "Wipe every 5 prints per DOC-6120 Rev A, unchanged",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Solder paste lot SP-2291 viscosity within datasheet",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "SPI machine SPI-02 verified with golden board",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "SMT room 23C / 44% RH, within limits",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did solder bridges form on the QFN pins?",
+      "answer": "Solder paste volume was 161% against 80-120%, so neighbouring pads merged in reflow",
+      "evidenceCitation": "SPI record QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why was paste volume too high only on PRINTER1?",
+      "answer": "Paste built up under the stencil because the understencil wipe did not remove it",
+      "evidenceCitation": "SPI trend WC-SMT-02-PRINTER1"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why did the understencil wipe fail? (root cause)",
+      "answer": "The wipe vacuum filter is clogged, vacuum fell to 9 kPa, and no PM task covers the filter",
+      "evidenceCitation": "SAP PM order history WC-SMT-02"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Hold all PCBA-900 boards from batch B-50495 and perform 100% X-ray inspection of QFN solder",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "actionText": "Replace clogged understencil wipe vacuum filter on WC-SMT-02-PRINTER1 and verify 25 kPa vacuum",
+      "status": "In Process"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "actionText": "Add solder paste volume alarm with automatic wipe trigger from SPI to all SMT print stations",
+      "status": "Planned"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer & 8D Facilitator",
+      "partnerRole": "8D Team Leader",
+      "email": "heli.weber@proresolve.com",
+      "phone": "+49 89 2018 0001"
+    },
+    {
+      "partnerId": "BP-100072",
+      "partnerName": "Stefan Wolf",
+      "functionTitle": "Electrical & Controls Automation Technician",
+      "partnerRole": "8D Team Member",
+      "email": "stefan.wolf@proresolve.com",
+      "phone": "+49 89 2018 0072"
+    },
+    {
+      "partnerId": "BP-100045",
+      "partnerName": "Ingo Braun",
+      "functionTitle": "Manufacturing & Assembly Engineer",
+      "partnerRole": "8D Team Member",
+      "email": "ingo.braun@proresolve.com",
+      "phone": "+49 89 2018 0045"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician & Line Inspector",
+      "partnerRole": "8D Team Member",
+      "email": "quyen.la@proresolve.com",
+      "phone": "+49 89 2018 0011"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-SMT-03",
+    "description": "Solder paste bridging from stencil wear or paste smear"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 7900
+  },
+  "lessonsLearned": {
+    "whatWorked": "Interim (case open): SPI volume trend per printer flagged PRINTER1 before AOI rejects piled up",
+    "whatDidnt": "Interim (case open): wipe vacuum is still not monitored"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  },
+  "responsibility": {
+    "reportedBy": "Quyen La",
+    "coordinator": "Heli (QE)",
+    "department": "Quality Assurance"
+  }
+}

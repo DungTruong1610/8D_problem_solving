@@ -1,0 +1,131 @@
+{
+  "notificationId": "8D-90049170",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "AOI found solder bridges on QFN pins of boards printed on PRINTER1 - understencil wipe vacuum blocked",
+  "status": "Completed",
+  "foundDate": "04.06.2026",
+  "completionDate": "26-JUN-26",
+  "quantityExtent": "ca. 64 Stk.",
+  "teamSize": "n.a.",
+  "material": {
+    "materialId": "  MAT-10840 ",
+    "description": "Control Board PCBA-900",
+    "materialGroup": "MG-PCBA"
+  },
+  "batch": {
+    "batchId": "B-50470",
+    "materialId": "  MAT-10840 "
+  },
+  "defect": {
+    "defectCode": "DEF-0580",
+    "defectText": "Solder bridging short circuit on fine-pitch QFN package"
+  },
+  "workCenter": {
+    "workCenterId": "WC-SMT-02",
+    "description": "SMT Placement & Reflow Line 2"
+  },
+  "inspections": [
+    {
+      "characteristic": "Solder paste volume",
+      "measuredValue": "Messung Solder paste volume ergab 152%; lt. Zeichnung 80-120%",
+      "specValue": "n.a."
+    },
+    {
+      "characteristic": "Understencil wipe vacuum",
+      "measuredValue": "-8 kPa",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Machine",
+      "description": "WC-SMT-02-PRINTER1 understencil wipe vacuum filter clogged - vacuum -8 kPa vs min -25 kPa, paste smeared under the stencil apertures",
+      "metricValue": "-8 kPa",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Measurement",
+      "description": "SPI machine SPI-02 verified with golden board",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Method",
+      "description": "Wipe frequency every 5 prints per DOC-6120 Rev A, unchanged",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    }
+  ],
+  "fiveWhyChain": [],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "SM",
+      "actionText": "Hold all PCBA-900 boards from batch B-50470 and perform 100% X-ray inspection of QFN solder",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "",
+      "actionText": "Replace clogged understencil wipe vacuum filter on WC-SMT-02-PRINTER1 and verify -25 kPa vacuum",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "",
+      "actionText": "Add solder paste volume alarm with automatic wipe trigger from SPI to all SMT print stations",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng. & 8D Facilitator",
+      "partnerRole": "  ",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100072",
+      "partnerName": "Stefan Wolf",
+      "functionTitle": "Electrical & Controls Automation Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100045",
+      "partnerName": "Ingo Braun",
+      "functionTitle": "Manufacturing & Assembly Eng.",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician & Line Inspector",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 8600
+  },
+  "lessonsLearned": {
+    "whatWorked": "",
+    "whatDidnt": ""
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "QFN U12 pins - WC-SMT-02-PRINTER1 - batch B-50470, June 2026",
+    "isNotWhereWhenItDoesnt": "WC-SMT-02-PRINTER2 - same stencil design and same paste lot SP-2207",
+    "notes": "Defect follows the printer, not the paste or stencil design"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

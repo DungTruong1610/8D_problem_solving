@@ -1,0 +1,174 @@
+{
+  "notificationId": "8D-10049150",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Shaft outer diameter undersize after insert change on turning lathe L1 - wear offset not reset",
+  "status": "Completed",
+  "foundDate": "2026-06-11",
+  "completionDate": "2026-07-03",
+  "quantityExtent": "96 units affected",
+  "teamSize": 4,
+  "material": {
+    "materialId": "MAT-10402",
+    "description": "Drive Shaft S150",
+    "materialGroup": "MG-SHAFT"
+  },
+  "batch": {
+    "batchId": "B-70380",
+    "materialId": "MAT-10402"
+  },
+  "defect": {
+    "defectCode": "DEF-0377",
+    "defectText": "Shaft diameter below lower tolerance"
+  },
+  "workCenter": {
+    "workCenterId": "WC-TURN-02",
+    "description": "CNC Turning Cell 2"
+  },
+  "inspections": [
+    {
+      "characteristic": "Outer diameter",
+      "measuredValue": "24.921mm",
+      "specValue": "24.950-25.000mm"
+    },
+    {
+      "characteristic": "Insert flank wear",
+      "measuredValue": "0.31mm",
+      "specValue": "max 0.20mm"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "Setter changed the insert at shift start as scheduled",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "WC-TURN-02-L1 spindle runout 0.004mm, within limit",
+      "metricValue": "0.004 mm",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "Insert change procedure DOC-4410 Rev B has no step to reset the wear offset - L1 kept the old offset after the insert change",
+      "metricValue": null,
+      "isRootCause": "Y",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Bar stock 42CrMo4 lot BS-3391 hardness 285 HB, inside specification",
+      "metricValue": "285 HB",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Air gauge AG-0207 mastered at shift start",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Cell temperature 22C stable",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why were the shafts below the lower diameter tolerance?",
+      "answer": "Outer diameter measured 24.921mm against 24.950-25.000mm on parts turned on L1",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did L1 cut undersize after the insert change?",
+      "answer": "The CNC kept the wear offset of the previous insert, so the new insert cut 0.03mm deeper",
+      "evidenceCitation": "CNC offset table WC-TURN-02-L1"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was the wear offset not reset? (root cause)",
+      "answer": "The insert change procedure DOC-4410 has no offset reset step and the controller does not prompt for it",
+      "evidenceCitation": "DOC-4410 Rev B"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Quarantine batch B-70380 and gauge the outer diameter of all S150 shafts in stock",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "actionText": "Correct the tool wear offset in the WC-TURN-02 L1 turning program and re-release the first-off part",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "actionText": "Add insert tool-life counter with automatic offset reset to the CNC controller on all turning cells",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer & 8D Facilitator",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100012",
+      "partnerName": "Minh Dinh",
+      "functionTitle": "CNC Machining Process Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100061",
+      "partnerName": "Anh Pham",
+      "functionTitle": "Tooling & Fixture Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100147",
+      "partnerName": "Lena Hoffmann",
+      "functionTitle": "Metrology Specialist & CMM Inspector",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-TURN02-01",
+    "description": "Diameter drift from wear offset not reset after insert change"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 9800
+  },
+  "lessonsLearned": {
+    "whatWorked": "First-off measurement after the insert change caught the shift before parts left the cell",
+    "whatDidnt": "The procedure relied on the setter remembering the offset reset - no system prompt"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "S150 outer diameter - WC-TURN-02-L1 - first 96 parts after the insert change on 2026-06-11",
+    "isNotWhereWhenItDoesnt": "WC-TURN-02-L2 - parts turned on L1 before the insert change",
+    "notes": "Defect starts at the insert change and stays on L1"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

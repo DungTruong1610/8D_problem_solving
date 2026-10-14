@@ -208,6 +208,27 @@ export const BATCHES = [
     // MAT-10744 (Manifold Valve MV-04)
     { key: 'B-92741', text: 'Manifold Valve MV-04 - Lot 2026-01-MV (Quarantined: O-ring Sealing Groove Depth Defect)', materialId: 'MAT-10744', materialDesc: 'Manifold Valve MV-04', plant: '1000', status: 'Quarantined', batchDate: '2026-02-06' },
     { key: 'B-92742', text: 'Manifold Valve MV-04 - Lot 2026-02-MV (Unrestricted: Pressure Hold Tested)', materialId: 'MAT-10744', materialDesc: 'Manifold Valve MV-04', plant: '1000', status: 'Unrestricted', batchDate: '2026-02-24' },
+
+    // Lô của 10 tiền lệ 8D-10049140..330 và 10 case input `mock-data/happycase-full/`.
+    // Mô tả vật tư lấy theo kho case (`cases_clean.py`), không theo các dòng phía trên.
+    { key: 'B-52640', text: 'Sensor Mount Bracket S22 - Lot 2026-05-SM (Closed 8D: DISPENSER1 Off-Ratio Mix)', materialId: 'MAT-10744', materialDesc: 'Sensor Mount Bracket S22', plant: '1000', status: 'Unrestricted', batchDate: '2026-05-08' },
+    { key: 'B-52705', text: 'Sensor Mount Bracket S22 - Lot 2026-09-SM (Quarantined: Low Lap Shear Strength)', materialId: 'MAT-10744', materialDesc: 'Sensor Mount Bracket S22', plant: '1000', status: 'Quarantined', batchDate: '2026-09-24' },
+    { key: 'B-60290', text: 'Pump Housing P90 - Lot 2026-05-PH (Closed 8D: DIE1 Vent Blockage)', materialId: 'MAT-10318', materialDesc: 'Pump Housing P90', plant: '1000', status: 'Unrestricted', batchDate: '2026-05-20' },
+    { key: 'B-70380', text: 'Drive Shaft S150 - Lot 2026-06-DS (Closed 8D: Undersize after Insert Change)', materialId: 'MAT-10402', materialDesc: 'Drive Shaft S150', plant: '1000', status: 'Unrestricted', batchDate: '2026-06-09' },
+    { key: 'B-70395', text: 'Drive Shaft S150 - Lot 2026-07-DS (Closed 8D: Shallow Case Depth COIL1)', materialId: 'MAT-10402', materialDesc: 'Drive Shaft S150', plant: '1000', status: 'Unrestricted', batchDate: '2026-07-10' },
+    { key: 'B-70410', text: 'Drive Shaft S150 - Lot 2026-09-DS (Quarantined: Case Depth below Minimum)', materialId: 'MAT-10402', materialDesc: 'Drive Shaft S150', plant: '1000', status: 'Quarantined', batchDate: '2026-09-28' },
+    { key: 'B-50470', text: 'Control Board PCBA-900 - Lot 2026-06-CB (Closed 8D: Paste Smear PRINTER1)', materialId: 'MAT-10840', materialDesc: 'Control Board PCBA-900', plant: '1000', status: 'Unrestricted', batchDate: '2026-06-01' },
+    { key: 'B-50495', text: 'Control Board PCBA-900 - Lot 2026-09-CB (Quarantined: QFN Solder Bridges)', materialId: 'MAT-10840', materialDesc: 'Control Board PCBA-900', plant: '1000', status: 'Quarantined', batchDate: '2026-09-29' },
+    { key: 'B-50440', text: 'Electronic Enclosure EE-50 - Lot 2026-06-EE (Closed 8D: Cavity 1 Cooling)', materialId: 'MAT-10730', materialDesc: 'Electronic Enclosure EE-50', plant: '1000', status: 'Unrestricted', batchDate: '2026-06-18' },
+    { key: 'B-50460', text: 'Electronic Enclosure EE-50 - Lot 2026-09-EE (Quarantined: Sink Mark Cavity 1)', materialId: 'MAT-10730', materialDesc: 'Electronic Enclosure EE-50', plant: '1000', status: 'Quarantined', batchDate: '2026-09-22' },
+    { key: 'B-50540', text: 'Bezel Frame BF-10 - Lot 2026-07-BF (Closed 8D: Rinse Tank 3 Chloride)', materialId: 'MAT-11060', materialDesc: 'Bezel Frame BF-10', plant: '1000', status: 'Unrestricted', batchDate: '2026-07-16' },
+    { key: 'B-50575', text: 'Bezel Frame BF-10 - Lot 2026-09-BF (Quarantined: Surface Pitting)', materialId: 'MAT-11060', materialDesc: 'Bezel Frame BF-10', plant: '1000', status: 'Quarantined', batchDate: '2026-09-25' },
+    { key: 'B-50700', text: 'Guide Rail GR-200 - Lot 2026-07-GR (Closed 8D: WHEEL1 Coolant Nozzle)', materialId: 'MAT-11280', materialDesc: 'Guide Rail GR-200', plant: '1000', status: 'Unrestricted', batchDate: '2026-07-27' },
+    { key: 'B-50725', text: 'Guide Rail GR-200 - Lot 2026-10-GR (Quarantined: Raceway Grinding Burn)', materialId: 'MAT-11280', materialDesc: 'Guide Rail GR-200', plant: '1000', status: 'Quarantined', batchDate: '2026-10-01' },
+    { key: 'B-53720', text: 'Spring Retainer SR8 - Lot 2026-08-SR (Closed 8D: Worn Draw Punch TOOL1)', materialId: 'MAT-11002', materialDesc: 'Spring Retainer SR8', plant: '1000', status: 'Unrestricted', batchDate: '2026-08-10' },
+    { key: 'B-53760', text: 'Spring Retainer SR8 - Lot 2026-09-SR (Quarantined: Flange Radius Cracks)', materialId: 'MAT-11002', materialDesc: 'Spring Retainer SR8', plant: '1000', status: 'Quarantined', batchDate: '2026-09-30' },
+    { key: 'B-52330', text: 'Gearbox End Cap G45 - Lot 2026-08-GE (Closed 8D: SPINDLE1 Transducer Drift)', materialId: 'MAT-10611', materialDesc: 'Gearbox End Cap G45', plant: '1000', status: 'Unrestricted', batchDate: '2026-08-14' },
+    { key: 'B-52360', text: 'Gearbox End Cap G45 - Lot 2026-09-GE (Quarantined: Low Bolt Torque)', materialId: 'MAT-10611', materialDesc: 'Gearbox End Cap G45', plant: '1000', status: 'Quarantined', batchDate: '2026-09-26' },
 ];
 
 /**
@@ -283,6 +304,19 @@ export const INSPECTION_CHARACTERISTICS = [
 
     // MAT-10744 (Manifold Valve MV-04)
     { key: 'MIC-GROOVE-01', text: 'O-ring Sealing Groove Depth', materialId: 'MAT-10744', materialDesc: 'Manifold Valve MV-04', specLowerLimit: '2.4000', specUpperLimit: '2.5000', specUom: 'mm', defaultEquipment: 'DEPTH-MICROMETER-01', charType: 'Quantitative' },
+
+    // Đặc tính chính của 10 case `mock-data/happycase-full/` — `text` trùng TỪNG CHỮ
+    // với `characteristic` trong InspectionLots, vì Is/Is-Not so chuỗi.
+    { key: 'MIC-SHEAR-01', text: 'Lap shear strength', materialId: 'MAT-10744', materialDesc: 'Sensor Mount Bracket S22', specLowerLimit: '12.0000', specUpperLimit: '', specUom: 'MPa', defaultEquipment: 'PT-05', charType: 'Quantitative' },
+    { key: 'MIC-LEAK-02', text: 'Helium leak rate', materialId: 'MAT-10318', materialDesc: 'Pump Housing P90', specLowerLimit: '0.0000', specUpperLimit: '5.0000', specUom: 'mbar*l/s', defaultEquipment: 'HLT-03', charType: 'Quantitative' },
+    { key: 'MIC-OD-02', text: 'Outer diameter', materialId: 'MAT-10402', materialDesc: 'Drive Shaft S150', specLowerLimit: '24.9500', specUpperLimit: '25.0000', specUom: 'mm', defaultEquipment: 'AG-0207', charType: 'Quantitative' },
+    { key: 'MIC-CASE-01', text: 'Effective case depth', materialId: 'MAT-10402', materialDesc: 'Drive Shaft S150', specLowerLimit: '1.8000', specUpperLimit: '2.4000', specUom: 'mm', defaultEquipment: 'MH-02', charType: 'Quantitative' },
+    { key: 'MIC-PASTE-01', text: 'Solder paste volume', materialId: 'MAT-10840', materialDesc: 'Control Board PCBA-900', specLowerLimit: '80.0000', specUpperLimit: '120.0000', specUom: '%', defaultEquipment: 'SPI-02', charType: 'Quantitative' },
+    { key: 'MIC-SINK-01', text: 'Sink mark depth', materialId: 'MAT-10730', materialDesc: 'Electronic Enclosure EE-50', specLowerLimit: '0.0000', specUpperLimit: '0.0500', specUom: 'mm', defaultEquipment: 'DG-0315', charType: 'Quantitative' },
+    { key: 'MIC-PIT-01', text: 'Pit count per frame', materialId: 'MAT-11060', materialDesc: 'Bezel Frame BF-10', specLowerLimit: '0.0000', specUpperLimit: '0.0000', specUom: 'count', defaultEquipment: 'OPTICAL-MICROSCOPE', charType: 'Quantitative' },
+    { key: 'MIC-BARK-01', text: 'Barkhausen noise peak', materialId: 'MAT-11280', materialDesc: 'Guide Rail GR-200', specLowerLimit: '0.0000', specUpperLimit: '35.0000', specUom: 'mp', defaultEquipment: 'BN-01', charType: 'Quantitative' },
+    { key: 'MIC-THIN-01', text: 'Flange radius wall thinning', materialId: 'MAT-11002', materialDesc: 'Spring Retainer SR8', specLowerLimit: '0.0000', specUpperLimit: '15.0000', specUom: '%', defaultEquipment: 'UT-04', charType: 'Quantitative' },
+    { key: 'MIC-TORQ-01', text: 'Bolt seating torque', materialId: 'MAT-10611', materialDesc: 'Gearbox End Cap G45', specLowerLimit: '34.0000', specUpperLimit: '38.0000', specUom: 'Nm', defaultEquipment: 'TW-11', charType: 'Quantitative' },
 
     // Đặc tính chung (General / Across Materials)
     { key: 'MIC-VISUAL-01', text: 'Surface Cosmetic Defect / Scratch', materialId: '', materialDesc: 'General (All Materials)', specLowerLimit: '0.0000', specUpperLimit: '0.0000', specUom: 'visual', defaultEquipment: 'OPTICAL-MICROSCOPE', charType: 'Qualitative' },

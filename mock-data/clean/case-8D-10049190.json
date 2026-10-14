@@ -1,0 +1,174 @@
+{
+  "notificationId": "8D-10049190",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Pitting on anodized bezel frames rinsed in tank 3 - chloride carry-over from open city water bypass",
+  "status": "Closed",
+  "foundDate": "2026-07-20",
+  "completionDate": "2026-08-14",
+  "quantityExtent": "95 units affected",
+  "teamSize": 4,
+  "material": {
+    "materialId": "MAT-11060",
+    "description": "Bezel Frame BF-10",
+    "materialGroup": "MG-FRAME"
+  },
+  "batch": {
+    "batchId": "B-50540",
+    "materialId": "MAT-11060"
+  },
+  "defect": {
+    "defectCode": "DEF-0714",
+    "defectText": "Pitting corrosion and dark discoloration on anodized aluminum bezel"
+  },
+  "workCenter": {
+    "workCenterId": "WC-ANOD-01",
+    "description": "Type II Sulfuric Anodizing Line 1"
+  },
+  "inspections": [
+    {
+      "characteristic": "Pit count per frame",
+      "measuredValue": "11",
+      "specValue": "max 0"
+    },
+    {
+      "characteristic": "Rinse tank 3 chloride",
+      "measuredValue": "42 mg/l",
+      "specValue": "max 5 mg/l"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "Racking operator followed the standard rack pattern",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "Rinse tank 3 pumps and heaters working, no alarm",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "City water bypass valve on rinse tank 3 left open after resin change - no lock-out step in DOC-7105, chloride rose to 42 mg/l",
+      "metricValue": "42 mg/l",
+      "isRootCause": "Y",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Aluminium 6063 extrusion lot EX-9120 within specification",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Conductivity probe CP-03 read only at shift start",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Plant ambient 26C, no effect found",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the bezel frames show pitting?",
+      "answer": "Up to 11 pits per frame against zero allowed, all on frames rinsed in tank 3",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did tank 3 rinsing cause pitting?",
+      "answer": "Rinse water chloride reached 42 mg/l against max 5 mg/l and attacked the fresh oxide",
+      "evidenceCitation": "Lab analysis rinse tank 3"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was there chloride in the rinse tank? (root cause)",
+      "answer": "The city water bypass valve was left open after the resin change because the procedure has no lock-out step",
+      "evidenceCitation": "DOC-7105 Rev B"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Quarantine batch B-50540 frames and sort all finished frames under 10x magnification",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "actionText": "Flush rinse tank 3, close the city water bypass valve and restore DI water supply",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "actionText": "Lock out the city water bypass valves and add conductivity monitoring alarm on all rinse tanks",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer & 8D Facilitator",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100067",
+      "partnerName": "Marek Nowak",
+      "functionTitle": "Process Engineer - Coating & Surface Treatment",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100115",
+      "partnerName": "Eva Lindqvist",
+      "functionTitle": "Facilities Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100095",
+      "partnerName": "Elena Rostova",
+      "functionTitle": "Materials & Metallurgy Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-ANOD-05",
+    "description": "Pitting from chloride contamination of DI rinse water"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 13500
+  },
+  "lessonsLearned": {
+    "whatWorked": "Tracing rejects to the rinse tank number on the rack card found the source in two days",
+    "whatDidnt": "Valve positions after maintenance were not verified or locked"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "BF-10 visible faces - WC-ANOD-01 rinse tank 3 - batch B-50540, July 2026",
+    "isNotWhereWhenItDoesnt": "Frames rinsed in tank 4 - same extrusion lot EX-9120",
+    "notes": "Defect follows the rinse tank, not the alloy lot"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0702",
+    "customerPlantContact": "Pieter de Vries - Plant 1, Eindhoven",
+    "slaResponseDue": "2026-07-27"
+  }
+}

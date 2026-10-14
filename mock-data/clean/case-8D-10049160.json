@@ -1,0 +1,174 @@
+{
+  "notificationId": "8D-10049160",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Induction case depth below minimum on shafts hardened on COIL1 - inductor coupling gap too wide",
+  "status": "Closed",
+  "foundDate": "2026-07-14",
+  "completionDate": "2026-08-07",
+  "quantityExtent": "40 units affected",
+  "teamSize": 4,
+  "material": {
+    "materialId": "MAT-10402",
+    "description": "Drive Shaft S150",
+    "materialGroup": "MG-SHAFT"
+  },
+  "batch": {
+    "batchId": "B-70395",
+    "materialId": "MAT-10402"
+  },
+  "defect": {
+    "defectCode": "DEF-0822",
+    "defectText": "Insufficient case depth after induction hardening"
+  },
+  "workCenter": {
+    "workCenterId": "WC-HEAT-03",
+    "description": "Induction Hardening Cell 3"
+  },
+  "inspections": [
+    {
+      "characteristic": "Effective case depth",
+      "measuredValue": "1.32mm",
+      "specValue": "1.80-2.40mm"
+    },
+    {
+      "characteristic": "Inductor coupling gap",
+      "measuredValue": "3.4mm",
+      "specValue": "1.8-2.2mm"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "Operator loaded shafts per work instruction, no deviation",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "WC-HEAT-03-COIL1 locating bushing worn 1.2mm - inductor coupling gap 3.4mm vs 1.8-2.2mm, less energy into the surface",
+      "metricValue": "3.4 mm",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "Hardening recipe HT-S150-02 power and scan speed unchanged",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "42CrMo4 bar lot BS-3402 chemistry within specification",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Microhardness tester MH-02 verified on reference block",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Quench water 24C, inside 20-30C window",
+      "metricValue": "24C",
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why was the case depth below minimum?",
+      "answer": "Effective case depth measured 1.32mm against 1.80-2.40mm on shafts hardened on COIL1",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did COIL1 transfer less energy into the shaft?",
+      "answer": "The inductor coupling gap was 3.4mm instead of 1.8-2.2mm, so the heated layer stayed shallow",
+      "evidenceCitation": "Setup measurement WC-HEAT-03-COIL1"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was the coupling gap too wide? (root cause)",
+      "answer": "The locating bushing had worn 1.2mm and the gap was not checked at setup",
+      "evidenceCitation": "SAP PM order history WC-HEAT-03"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Quarantine 40 drive shafts from batch B-70395 and perform 100% eddy current case depth sort",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "actionText": "Replace worn inductor locating bushing on WC-HEAT-03-COIL1 and re-qualify the coupling gap",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "actionText": "Add coupling gap check to the induction setup checklist across all heat treat lines",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer & 8D Facilitator",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100095",
+      "partnerName": "Elena Rostova",
+      "functionTitle": "Materials & Metallurgy Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100014",
+      "partnerName": "Karl Wagner",
+      "functionTitle": "Maintenance Technician & Mechanical Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician & Line Inspector",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-HEAT-04",
+    "description": "Shallow hardening depth from inductor coupling gap drift"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 12700
+  },
+  "lessonsLearned": {
+    "whatWorked": "Splitting results by coil station pointed straight at COIL1 hardware",
+    "whatDidnt": "Coupling gap was set once at installation and never re-checked"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "S150 bearing journal - WC-HEAT-03-COIL1 - batch B-70395, July 2026",
+    "isNotWhereWhenItDoesnt": "WC-HEAT-03-COIL2 - same bar lot BS-3402 and same recipe",
+    "notes": "Defect follows the coil station, not the material or recipe"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

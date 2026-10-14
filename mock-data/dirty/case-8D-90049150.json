@@ -1,0 +1,131 @@
+{
+  "notificationId": "8D-90049150",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Shaft outer diameter undersize after insert change on turning lathe L1 - wear offset not reset",
+  "status": "Completed",
+  "foundDate": "11.06.2026",
+  "completionDate": "03-JUL-26",
+  "quantityExtent": "~96 Teile",
+  "teamSize": "n.a.",
+  "material": {
+    "materialId": "  MAT-10402 ",
+    "description": "Drive Shaft S150",
+    "materialGroup": "MG-SHAFT"
+  },
+  "batch": {
+    "batchId": "B-70380",
+    "materialId": "  MAT-10402 "
+  },
+  "defect": {
+    "defectCode": "DEF-0377",
+    "defectText": "Shaft diameter below lower tolerance"
+  },
+  "workCenter": {
+    "workCenterId": "WC-TURN-02",
+    "description": "CNC Turning Cell 2"
+  },
+  "inspections": [
+    {
+      "characteristic": "Outer diameter",
+      "measuredValue": "Outer diameter: gemessen 24,921mm, Sollwert 24,950-25,000mm",
+      "specValue": "  "
+    },
+    {
+      "characteristic": "Insert flank wear",
+      "measuredValue": "0,31mm",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Method",
+      "description": "Insert change procedure DOC-4410 Rev B has no step to reset the wear offset - L1 kept the old offset after the insert change",
+      "metricValue": null,
+      "isRootCause": "Y",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Machine",
+      "description": "WC-TURN-02-L1 spindle runout 0.004mm, within limit",
+      "metricValue": "0,004 mm",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Man",
+      "description": "Setter changed the insert at shift start as scheduled",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    }
+  ],
+  "fiveWhyChain": [],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Eindaemmung",
+      "actionText": "Quarantine batch B-70380 and gauge the outer diameter of all S150 shafts in stock",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Abstellmassnahme",
+      "actionText": "Correct the tool wear offset in the WC-TURN-02 L1 turning program and re-release the first-off part",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "",
+      "actionText": "Add insert tool-life counter with automatic offset reset to the CNC controller on all turning cells",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng. & 8D Facilitator",
+      "partnerRole": "",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100012",
+      "partnerName": "Minh Dinh",
+      "functionTitle": "CNC Machining Process Eng.",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100061",
+      "partnerName": "Anh Pham",
+      "functionTitle": "Tooling & Fixture Eng.",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100147",
+      "partnerName": "Lena Hoffmann",
+      "functionTitle": "Metrology Specialist & CMM Inspector",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 9800
+  },
+  "lessonsLearned": {
+    "whatWorked": "-",
+    "whatDidnt": "-"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "S150 outer diameter - WC-TURN-02-L1 - first 96 parts after the insert change on 2026-06-11",
+    "isNotWhereWhenItDoesnt": "WC-TURN-02-L2 - parts turned on L1 before the insert change",
+    "notes": "Defect starts at the insert change and stays on L1"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

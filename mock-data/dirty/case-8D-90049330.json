@@ -1,0 +1,131 @@
+{
+  "notificationId": "8D-90049330",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Low lap shear strength on S22 brackets bonded with DISPENSER1 - off-ratio adhesive mix from worn metering pump",
+  "status": "Closed",
+  "foundDate": "12.05.2026",
+  "completionDate": "05-JUN-26",
+  "quantityExtent": "~140 Teile",
+  "teamSize": "n.a.",
+  "material": {
+    "materialId": "  MAT-10744 ",
+    "description": "Sensor Mount Bracket S22",
+    "materialGroup": "MG-BRACKET"
+  },
+  "batch": {
+    "batchId": "B-52640",
+    "materialId": "  MAT-10744 "
+  },
+  "defect": {
+    "defectCode": "DEF-0810",
+    "defectText": "Adhesive bond failure"
+  },
+  "workCenter": {
+    "workCenterId": "WC-BOND-02",
+    "description": "Structural Bonding Cell 2"
+  },
+  "inspections": [
+    {
+      "characteristic": "Lap shear strength",
+      "measuredValue": "Lap shear strength = 5,2 MPa (Vorgabe min 12,0 MPa) - iO/niO: niO",
+      "specValue": "-"
+    },
+    {
+      "characteristic": "Adhesive mix ratio",
+      "measuredValue": "1,32:1",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Machine",
+      "description": "WC-BOND-02-DISPENSER1 hardener metering pump worn - mix ratio 1.32:1 vs 1.00:1 +/-2%, adhesive under-cured",
+      "metricValue": "1,32:1",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Pull tester PT-05 verified with reference load cell",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Method",
+      "description": "Cure profile 60 min at 80C unchanged since 8D-10048745",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    }
+  ],
+  "fiveWhyChain": [],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Eindaemmung",
+      "actionText": "Block all S22 brackets from batch B-52640 and pull-test a sample from every pallet",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "",
+      "actionText": "Replace the worn hardener metering pump assembly on WC-BOND-02-DISPENSER1 and verify the 1:1 mix ratio",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Vorbeugemassnahme",
+      "actionText": "Add a mix ratio check by weight at every cartridge change to the bonding cell checklist on all dispensers",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng. & 8D Facilitator",
+      "partnerRole": "",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100102",
+      "partnerName": "Dario Conti",
+      "functionTitle": "Bonding Process Eng.",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100014",
+      "partnerName": "Karl Wagner",
+      "functionTitle": "Maintenance Technician & Mechanical Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician & Line Inspector",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 17600
+  },
+  "lessonsLearned": {
+    "whatWorked": "k.A.",
+    "whatDidnt": "k.A."
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "S22 bond line - WC-BOND-02-DISPENSER1 - batch B-52640, May 2026",
+    "isNotWhereWhenItDoesnt": "WC-BOND-02-DISPENSER2 - same adhesive lot AD-3317 and same cure profile",
+    "notes": "Defect follows the dispenser, not the adhesive lot or humidity"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

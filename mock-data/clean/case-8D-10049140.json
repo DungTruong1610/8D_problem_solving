@@ -1,0 +1,174 @@
+{
+  "notificationId": "8D-10049140",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Helium leak test rejected P90 housings - gas pores and shrinkage cavity at sealing face from die DIE1",
+  "status": "Closed",
+  "foundDate": "2026-05-26",
+  "completionDate": "2026-06-19",
+  "quantityExtent": "74 units affected",
+  "teamSize": 4,
+  "material": {
+    "materialId": "MAT-10318",
+    "description": "Pump Housing P90",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-60290",
+    "materialId": "MAT-10318"
+  },
+  "defect": {
+    "defectCode": "DEF-0512",
+    "defectText": "Porosity at sealing flange face"
+  },
+  "workCenter": {
+    "workCenterId": "WC-CAST-03",
+    "description": "Aluminium Die Casting Line 3"
+  },
+  "inspections": [
+    {
+      "characteristic": "Helium leak rate",
+      "measuredValue": "13.1 mbar*l/s",
+      "specValue": "max 5 mbar*l/s"
+    },
+    {
+      "characteristic": "Die vacuum level at shot",
+      "measuredValue": "210 mbar",
+      "specValue": "max 80 mbar"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "Die cast operator followed DOC-3308 Rev D, no deviation logged",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "DIE1 chill vent block clogged with oxidised release agent - vacuum at shot 210 mbar vs max 80 mbar, gas trapped at the flange face",
+      "metricValue": "210 mbar",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "Die spray pattern unchanged, release agent dilution 1:80 as specified",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Ingot lot ING-77501 hydrogen 0.14 ppm, within 0.20 ppm limit",
+      "metricValue": "0.14 ppm",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Helium leak tester HLT-03 verified with reference leak at shift start",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Foundry ambient 29C, no correlation with reject rate",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the housings fail the helium leak test?",
+      "answer": "Gas pores and a shrinkage cavity broke through the machined sealing face, leak rate 13.1 against max 5 mbar*l/s",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why were gas pores formed only on DIE1 castings?",
+      "answer": "DIE1 vacuum at shot was 210 mbar instead of below 80 mbar, so air stayed in the cavity during fill",
+      "evidenceCitation": "Shot monitoring log WC-CAST-03"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was DIE1 vacuum insufficient? (root cause)",
+      "answer": "The chill vent block was clogged with oxidised release agent because vent cleaning was not part of the PM schedule",
+      "evidenceCitation": "SAP PM order history WC-CAST-03"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Quarantine batch B-60290 and 100% helium leak test all P90 housings before dispatch",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "actionText": "Replace clogged chill vent insert on die DIE1 and restore vacuum below 80 mbar at shot",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "actionText": "Add chill vent cleaning every 2,000 shots to the preventive maintenance schedule in SAP PM for all die casting cells",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer & 8D Facilitator",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100023",
+      "partnerName": "Luis Moreno",
+      "functionTitle": "Foundry & Casting Process Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100112",
+      "partnerName": "Thomas Meyer",
+      "functionTitle": "Mechanical Maintenance Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100147",
+      "partnerName": "Lena Hoffmann",
+      "functionTitle": "Metrology Specialist & CMM Inspector",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-CAST-2024",
+    "description": "Trapped gas at flange face from die vent blockage"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 21300
+  },
+  "lessonsLearned": {
+    "whatWorked": "Shot vacuum logging separated DIE1 from DIE2 on the same ingot lot within a day",
+    "whatDidnt": "Vent cleaning depended on operator judgement and had no interval in SAP PM"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "P90 sealing face - WC-CAST-03-DIE1 - batch B-60290, late May 2026",
+    "isNotWhereWhenItDoesnt": "WC-CAST-03-DIE2 castings from the same ingot lot ING-77501",
+    "notes": "Defect follows the die, not the ingot lot"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}

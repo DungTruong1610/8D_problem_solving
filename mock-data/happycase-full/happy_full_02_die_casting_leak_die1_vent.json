@@ -1,0 +1,270 @@
+{
+  "$title": "Die casting leak at sealing face - DIE1 chill vent blocked",
+  "$comment": "Happy case: open 8D with a recorded investigation. Expected precedents: 8D-10049140, 8D-10048577. Import via Create 8D Report -> JSON.",
+  "notificationId": "8D-10049402",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Leak test cell rejected 88 P90 pump housings - gas pores at sealing flange face, all cast in die DIE1",
+  "status": "In Process",
+  "foundDate": "2026-10-05",
+  "completionDate": null,
+  "quantityExtent": "88 units affected",
+  "defectQuantity": 88,
+  "defectQuantityUom": "PC",
+  "teamSize": 4,
+  "entryMode": "during-inspection",
+  "referenceNumber": "INT-2026-5102",
+  "plant": "1000",
+  "inspectionLotId": "0010000302",
+  "material": {
+    "materialId": "MAT-10318",
+    "description": "Pump Housing P90",
+    "materialGroup": "MG-HOUSING",
+    "plant": "1000"
+  },
+  "batch": {
+    "batchId": "B-60318",
+    "materialId": "MAT-10318"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-MAT",
+    "defectCode": "DEF-0512",
+    "defectText": "Porosity at sealing flange face",
+    "defectClass": "Critical"
+  },
+  "workCenter": {
+    "workCenterId": "WC-CAST-03",
+    "description": "Aluminium Die Casting Line 3"
+  },
+  "inspections": [
+    {
+      "characteristic": "Helium leak rate",
+      "measuredValue": "13.8 mbar*l/s",
+      "specLowerLimit": 0,
+      "specUpperLimit": 5,
+      "specUom": "mbar*l/s",
+      "valuation": "Rejected",
+      "equipment": "WC-CAST-03-DIE1"
+    },
+    {
+      "characteristic": "Sealing face roughness Ra",
+      "measuredValue": "0.6 um",
+      "specLowerLimit": 0,
+      "specUpperLimit": 0.8,
+      "specUom": "um",
+      "valuation": "Accepted",
+      "equipment": "WC-CAST-03-DIE1"
+    }
+  ],
+  "historicalInspectionLots": [
+    {
+      "lotId": "0010000025",
+      "materialId": "MAT-10318",
+      "characteristic": "Helium leak rate",
+      "equipment": "WC-CAST-03-DIE1",
+      "workCenterId": "WC-CAST-03",
+      "measuredValue": "14.2 mbar*l/s",
+      "conforming": false,
+      "lotDate": "2026-02-10",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000026",
+      "materialId": "MAT-10318",
+      "characteristic": "Helium leak rate",
+      "equipment": "WC-CAST-03-DIE1",
+      "workCenterId": "WC-CAST-03",
+      "measuredValue": "14.2 mbar*l/s",
+      "conforming": false,
+      "lotDate": "2026-02-11",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000027",
+      "materialId": "MAT-10318",
+      "characteristic": "Helium leak rate",
+      "equipment": "WC-CAST-03-DIE1",
+      "workCenterId": "WC-CAST-03",
+      "measuredValue": "14.2 mbar*l/s",
+      "conforming": false,
+      "lotDate": "2026-02-12",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000028",
+      "materialId": "MAT-10318",
+      "characteristic": "Helium leak rate",
+      "equipment": "WC-CAST-03-DIE2",
+      "workCenterId": "WC-CAST-03",
+      "measuredValue": "2.1 mbar*l/s",
+      "conforming": true,
+      "lotDate": "2026-02-05",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000029",
+      "materialId": "MAT-10318",
+      "characteristic": "Helium leak rate",
+      "equipment": "WC-CAST-03-DIE2",
+      "workCenterId": "WC-CAST-03",
+      "measuredValue": "2.1 mbar*l/s",
+      "conforming": true,
+      "lotDate": "2026-02-06",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000030",
+      "materialId": "MAT-10318",
+      "characteristic": "Helium leak rate",
+      "equipment": "WC-CAST-03-DIE2",
+      "workCenterId": "WC-CAST-03",
+      "measuredValue": "2.1 mbar*l/s",
+      "conforming": true,
+      "lotDate": "2026-02-07",
+      "plant": "1000"
+    }
+  ],
+  "isIsNot": {
+    "isWhereWhenItHappens": "P90 sealing flange face - WC-CAST-03-DIE1 - batch B-60318, early October 2026",
+    "isNotWhereWhenItDoesnt": "WC-CAST-03-DIE2 castings from the same ingot lot ING-77620",
+    "notes": "Defect follows the die, not the ingot lot"
+  },
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "Die cast operator followed DOC-3308 Rev D, no deviation logged",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "DIE1 chill vent block clogged with oxidised release agent - vacuum at shot 190 mbar vs max 80 mbar, gas trapped at the flange face",
+      "metricValue": "190 mbar",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "Release agent dilution 1:80 and spray pattern as specified",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Ingot lot ING-77620 hydrogen 0.15 ppm, within 0.20 ppm limit",
+      "metricValue": "0.15 ppm",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Helium leak tester HLT-03 verified with reference leak at shift start",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Foundry ambient 27C, no correlation with reject rate",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the housings fail the helium leak test?",
+      "answer": "Gas pores broke through the machined sealing face, leak rate 13.8 against max 5 mbar*l/s",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did the pores form only on DIE1 castings?",
+      "answer": "DIE1 vacuum at shot was 190 mbar instead of below 80 mbar, so air stayed in the cavity",
+      "evidenceCitation": "Shot monitoring log WC-CAST-03"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was DIE1 vacuum insufficient? (root cause)",
+      "answer": "The chill vent block is clogged with release agent and vent cleaning has no PM interval",
+      "evidenceCitation": "SAP PM order history WC-CAST-03"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Quarantine batch B-60318 and 100% helium leak test all P90 housings before dispatch",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "actionText": "Replace clogged chill vent insert on die DIE1 and restore vacuum below 80 mbar at shot",
+      "status": "In Process"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "actionText": "Add chill vent cleaning every 2,000 shots to the preventive maintenance schedule in SAP PM",
+      "status": "Planned"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer & 8D Facilitator",
+      "partnerRole": "8D Team Leader",
+      "email": "heli.weber@proresolve.com",
+      "phone": "+49 89 2018 0001"
+    },
+    {
+      "partnerId": "BP-100023",
+      "partnerName": "Luis Moreno",
+      "functionTitle": "Foundry & Casting Process Engineer",
+      "partnerRole": "8D Team Member",
+      "email": "luis.moreno@proresolve.com",
+      "phone": "+49 89 2018 0023"
+    },
+    {
+      "partnerId": "BP-100112",
+      "partnerName": "Thomas Meyer",
+      "functionTitle": "Mechanical Maintenance Technician",
+      "partnerRole": "8D Team Member",
+      "email": "thomas.meyer@proresolve.com",
+      "phone": "+49 89 2018 0112"
+    },
+    {
+      "partnerId": "BP-100147",
+      "partnerName": "Lena Hoffmann",
+      "functionTitle": "Metrology Specialist & CMM Inspector",
+      "partnerRole": "8D Team Member",
+      "email": "lena.hoffmann@proresolve.com",
+      "phone": "+49 89 2018 0147"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-CAST-2024",
+    "description": "Process FMEA for Aluminium High Pressure Die Casting"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 19600
+  },
+  "lessonsLearned": {
+    "whatWorked": "Interim (case open): shot vacuum logging separated DIE1 from DIE2 within one shift",
+    "whatDidnt": "Interim (case open): vent cleaning still depends on operator judgement"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  },
+  "responsibility": {
+    "reportedBy": "Quyen La",
+    "coordinator": "Heli (QE)",
+    "department": "Quality Assurance"
+  }
+}

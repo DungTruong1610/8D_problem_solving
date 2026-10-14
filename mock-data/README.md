@@ -2,10 +2,15 @@
 
 ```
 mock-data/
-  clean/    12 case chỉn chu — đúng chuẩn Golden Dataset
-  dirty/    12 case TƯƠNG ỨNG, ghi lại như dữ liệu SAP QM thật
-  beta/     bộ cũ, đóng băng để đối chiếu
+  clean/           35 case chỉn chu — đúng chuẩn Golden Dataset (kho tiền lệ)
+  dirty/           35 case TƯƠNG ỨNG, ghi lại như dữ liệu SAP QM thật
+  beta/            bộ cũ, đóng băng để đối chiếu
+  happycase-full/  10 case 8D đang mở, đủ dữ liệu cho mọi bước D1–D8 — xem README trong thư mục
 ```
+
+Nguồn của `clean/` và `dirty/` là `cases_clean.py`. Sinh lại bằng
+`PYTHONIOENCODING=utf-8 python mock-data/generate.py` (biến môi trường cần trên
+Windows, nếu không script dừng giữa chừng sau khi đã xoá file cũ).
 
 **`clean/` và `dirty/` mô tả CÙNG một sự thật.** Cùng chiếc dao mòn, cùng con số
 0,32mm — chỉ khác cách ghi lại. Đó là điều kiện để so sánh có nghĩa: nếu AI đọc

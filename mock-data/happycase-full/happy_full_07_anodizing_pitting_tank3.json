@@ -1,0 +1,275 @@
+{
+  "$title": "Anodized bezel pitting - rinse tank 3 conductivity probe fouled",
+  "$comment": "Happy case: open 8D with a recorded investigation. Expected precedents: 8D-10049190, 8D-10049070. Import via Create 8D Report -> JSON.",
+  "notificationId": "8D-10049407",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Customer incoming inspection rejected anodized BF-10 bezel frames for pitting and dark spots - all frames rinsed in tank 3",
+  "status": "In Process",
+  "foundDate": "2026-10-01",
+  "completionDate": null,
+  "quantityExtent": "120 units affected",
+  "defectQuantity": 120,
+  "defectQuantityUom": "PC",
+  "teamSize": 4,
+  "entryMode": "outside-inspection",
+  "referenceNumber": "CC-2026-0908",
+  "plant": "1000",
+  "material": {
+    "materialId": "MAT-11060",
+    "description": "Bezel Frame BF-10",
+    "materialGroup": "MG-FRAME",
+    "plant": "1000"
+  },
+  "batch": {
+    "batchId": "B-50575",
+    "materialId": "MAT-11060"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-SUR",
+    "defectCode": "DEF-0714",
+    "defectText": "Pitting corrosion and dark discoloration on anodized aluminum bezel",
+    "defectClass": "Minor"
+  },
+  "workCenter": {
+    "workCenterId": "WC-ANOD-01",
+    "description": "Type II Sulfuric Anodizing Line 1"
+  },
+  "inspections": [
+    {
+      "characteristic": "Pit count per frame",
+      "measuredValue": "9 count",
+      "specLowerLimit": 0,
+      "specUpperLimit": 0,
+      "specUom": "count",
+      "valuation": "Rejected",
+      "equipment": "WC-ANOD-01-TANK3"
+    },
+    {
+      "characteristic": "Anodic coating thickness",
+      "measuredValue": "14.5 um",
+      "specLowerLimit": 12,
+      "specUpperLimit": 18,
+      "specUom": "um",
+      "valuation": "Accepted",
+      "equipment": "WC-ANOD-01-TANK3"
+    }
+  ],
+  "historicalInspectionLots": [
+    {
+      "lotId": "0010000127",
+      "materialId": "MAT-11060",
+      "characteristic": "Pit count per frame",
+      "equipment": "WC-ANOD-01-TANK3",
+      "workCenterId": "WC-ANOD-01",
+      "measuredValue": "9 count",
+      "conforming": false,
+      "lotDate": "2026-09-10",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000128",
+      "materialId": "MAT-11060",
+      "characteristic": "Pit count per frame",
+      "equipment": "WC-ANOD-01-TANK3",
+      "workCenterId": "WC-ANOD-01",
+      "measuredValue": "9 count",
+      "conforming": false,
+      "lotDate": "2026-09-11",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000129",
+      "materialId": "MAT-11060",
+      "characteristic": "Pit count per frame",
+      "equipment": "WC-ANOD-01-TANK3",
+      "workCenterId": "WC-ANOD-01",
+      "measuredValue": "9 count",
+      "conforming": false,
+      "lotDate": "2026-09-12",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000130",
+      "materialId": "MAT-11060",
+      "characteristic": "Pit count per frame",
+      "equipment": "WC-ANOD-01-TANK4",
+      "workCenterId": "WC-ANOD-01",
+      "measuredValue": "0 count",
+      "conforming": true,
+      "lotDate": "2026-09-05",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000131",
+      "materialId": "MAT-11060",
+      "characteristic": "Pit count per frame",
+      "equipment": "WC-ANOD-01-TANK4",
+      "workCenterId": "WC-ANOD-01",
+      "measuredValue": "0 count",
+      "conforming": true,
+      "lotDate": "2026-09-06",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000132",
+      "materialId": "MAT-11060",
+      "characteristic": "Pit count per frame",
+      "equipment": "WC-ANOD-01-TANK4",
+      "workCenterId": "WC-ANOD-01",
+      "measuredValue": "0 count",
+      "conforming": true,
+      "lotDate": "2026-09-07",
+      "plant": "1000"
+    }
+  ],
+  "isIsNot": {
+    "isWhereWhenItHappens": "BF-10 visible faces - WC-ANOD-01 rinse tank 3 - batch B-50575, late September 2026",
+    "isNotWhereWhenItDoesnt": "Frames rinsed in tank 4 - same extrusion lot EX-9188",
+    "notes": "Defect follows the rinse tank, not the alloy lot"
+  },
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "Racking operator followed the standard rack pattern",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "Rinse tank 3 pumps and heaters working",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "City water bypass valves locked out since 8D-10049190",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Aluminium 6063 extrusion lot EX-9188 within specification",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Conductivity probe CP-03 on rinse tank 3 fouled - read 3 uS/cm while lab measured 41 uS/cm, so the alarm never triggered as the resin exhausted",
+      "metricValue": "41 uS/cm",
+      "isRootCause": "Y",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Plant ambient 24C, no effect found",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the bezel frames show pitting?",
+      "answer": "Up to 9 pits per frame against zero allowed, all on frames rinsed in tank 3",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did tank 3 rinsing cause pitting?",
+      "answer": "Rinse water chloride reached 38 mg/l against max 5 mg/l because the ion exchange resin was exhausted",
+      "evidenceCitation": "Lab analysis rinse tank 3"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was the exhausted resin not detected? (root cause)",
+      "answer": "Conductivity probe CP-03 was fouled and read low, so the high-limit alarm never triggered",
+      "evidenceCitation": "Probe check against reference meter"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Quarantine batch B-50575 frames and sort all finished frames under 10x magnification",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Containment",
+      "actionText": "Sort 120 frames already delivered at the customer dock",
+      "status": "Done"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Corrective",
+      "actionText": "Replace the fouled conductivity probe CP-03 on rinse tank 3 and recharge the ion exchange resin",
+      "status": "In Process"
+    },
+    {
+      "lineNo": 4,
+      "actionType": "Preventive",
+      "actionText": "Add weekly conductivity probe verification against a reference meter to the preventive maintenance schedule in SAP PM",
+      "status": "Planned"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer & 8D Facilitator",
+      "partnerRole": "8D Team Leader",
+      "email": "heli.weber@proresolve.com",
+      "phone": "+49 89 2018 0001"
+    },
+    {
+      "partnerId": "BP-100067",
+      "partnerName": "Marek Nowak",
+      "functionTitle": "Process Engineer - Coating & Surface Treatment",
+      "partnerRole": "8D Team Member",
+      "email": "marek.nowak@proresolve.com",
+      "phone": "+49 89 2018 0067"
+    },
+    {
+      "partnerId": "BP-100115",
+      "partnerName": "Eva Lindqvist",
+      "functionTitle": "Facilities Engineer",
+      "partnerRole": "8D Team Member",
+      "email": "eva.lindqvist@proresolve.com",
+      "phone": "+49 89 2018 0115"
+    },
+    {
+      "partnerId": "BP-100095",
+      "partnerName": "Elena Rostova",
+      "functionTitle": "Materials & Metallurgy Specialist",
+      "partnerRole": "8D Team Member",
+      "email": "elena.rostova@proresolve.com",
+      "phone": "+49 89 2018 0095"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-ANOD-05",
+    "description": "Pitting corrosion in anodic oxide from contaminated DI rinse water"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 10400
+  },
+  "lessonsLearned": {
+    "whatWorked": "Interim (case open): the rinse tank number on the rack card traced every reject to tank 3",
+    "whatDidnt": "Interim (case open): the conductivity alarm was trusted without checking the probe itself"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0908",
+    "customerPlantContact": "Pieter de Vries - Plant 1, Eindhoven",
+    "slaResponseDue": "2026-10-08"
+  },
+  "responsibility": {
+    "reportedBy": "Alex Murphy",
+    "coordinator": "Heli (QE)",
+    "department": "Quality Assurance"
+  }
+}

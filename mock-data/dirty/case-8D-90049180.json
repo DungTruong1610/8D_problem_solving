@@ -1,0 +1,131 @@
+{
+  "notificationId": "8D-90049180",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Sink mark on enclosure cover molded in cavity 1 - blocked cooling channel left a hot spot",
+  "status": "Closed",
+  "foundDate": "22.06.2026",
+  "completionDate": "17-JUL-26",
+  "quantityExtent": "~180 Teile",
+  "teamSize": "  ",
+  "material": {
+    "materialId": "  MAT-10730 ",
+    "description": "Electronic Enclosure EE-50",
+    "materialGroup": "MG-HOUSING"
+  },
+  "batch": {
+    "batchId": "B-50440",
+    "materialId": "  MAT-10730 "
+  },
+  "defect": {
+    "defectCode": "DEF-0440",
+    "defectText": "Sink mark and internal void on cosmetic injection molded surface"
+  },
+  "workCenter": {
+    "workCenterId": "WC-MOLD-01",
+    "description": "150T Injection Molding Machine 1"
+  },
+  "inspections": [
+    {
+      "characteristic": "Sink mark depth",
+      "measuredValue": "Sink mark depth = 0,28mm (Vorgabe max 0,05mm) - iO/niO: niO",
+      "specValue": "k.A."
+    },
+    {
+      "characteristic": "Cavity 1 cooling water flow",
+      "measuredValue": "2,1 l/min",
+      "specValue": "lt. Zeichnung"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Machine",
+      "description": "Cavity 1 cooling channel of the WC-MOLD-01 mold blocked by limescale - flow 2.1 l/min vs min 6.0, hot spot under the boss",
+      "metricValue": "2,1 l/min",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "Holding pressure 5.5s at 650 bar as released after 8D-10049040",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "PC/ABS resin lot RS-4471 dried to 0.02% moisture",
+      "metricValue": "0,02%",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    }
+  ],
+  "fiveWhyChain": [],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "SM",
+      "actionText": "Sort 180 enclosures at the customer facility and hold finished stock of batch B-50440",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Abstellmassnahme",
+      "actionText": "Descale and flush the cavity 1 cooling channel on the WC-MOLD-01 mold and restore water flow above 6 l/min",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "VM",
+      "actionText": "Add cooling water flow sensor with low-flow alarm to every cavity circuit on all molding machines",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Eng. & 8D Facilitator",
+      "partnerRole": "",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100061",
+      "partnerName": "Anh Pham",
+      "functionTitle": "Tooling & Fixture Eng.",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100112",
+      "partnerName": "Thomas Meyer",
+      "functionTitle": "Mechanical Maintenance Technician",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100011",
+      "partnerName": "Quyen La",
+      "functionTitle": "Quality Technician & Line Inspector",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": null,
+  "costCopq": {
+    "costOfPoorQualityEur": 11900
+  },
+  "lessonsLearned": {
+    "whatWorked": "n.a.",
+    "whatDidnt": ""
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "EE-50 top cover over the screw boss - WC-MOLD-01 cavity 1 - batch B-50440",
+    "isNotWhereWhenItDoesnt": "WC-MOLD-01 cavity 2 - same resin lot RS-4471 and same recipe",
+    "notes": "Defect follows the cavity, not the recipe or resin"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0611",
+    "customerPlantContact": "Mira Kovac, Plant 3, Graz",
+    "slaResponseDue": "29.06.2026"
+  }
+}

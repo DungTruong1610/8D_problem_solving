@@ -1,0 +1,275 @@
+{
+  "$title": "Shaft outer diameter undersize - wear offset not reset on lathe L1",
+  "$comment": "Happy case: open 8D with a recorded investigation. Expected precedents: 8D-10049150, 8D-10048603. Import via Create 8D Report -> JSON.",
+  "notificationId": "8D-10049403",
+  "origin": "Q1 - Customer Complaint",
+  "symptomShortText": "Customer assembly reported loose bearing fit - S150 shaft outer diameter below lower tolerance, all turned on lathe L1",
+  "status": "In Process",
+  "foundDate": "2026-10-06",
+  "completionDate": null,
+  "quantityExtent": "134 units affected",
+  "defectQuantity": 134,
+  "defectQuantityUom": "PC",
+  "teamSize": 4,
+  "entryMode": "outside-inspection",
+  "referenceNumber": "CC-2026-0934",
+  "plant": "1000",
+  "material": {
+    "materialId": "MAT-10402",
+    "description": "Drive Shaft S150",
+    "materialGroup": "MG-SHAFT",
+    "plant": "1000"
+  },
+  "batch": {
+    "batchId": "B-70402",
+    "materialId": "MAT-10402"
+  },
+  "defect": {
+    "defectCodeGroup": "QM-DIM",
+    "defectCode": "DEF-0377",
+    "defectText": "Shaft diameter below lower tolerance",
+    "defectClass": "Major"
+  },
+  "workCenter": {
+    "workCenterId": "WC-TURN-02",
+    "description": "CNC Turning Cell 2"
+  },
+  "inspections": [
+    {
+      "characteristic": "Outer diameter",
+      "measuredValue": "24.918 mm",
+      "specLowerLimit": 24.95,
+      "specUpperLimit": 25.0,
+      "specUom": "mm",
+      "valuation": "Rejected",
+      "equipment": "WC-TURN-02-L1"
+    },
+    {
+      "characteristic": "Surface roughness Ra",
+      "measuredValue": "1.2 um",
+      "specLowerLimit": 0,
+      "specUpperLimit": 1.6,
+      "specUom": "um",
+      "valuation": "Accepted",
+      "equipment": "WC-TURN-02-L1"
+    }
+  ],
+  "historicalInspectionLots": [
+    {
+      "lotId": "0010000031",
+      "materialId": "MAT-10402",
+      "characteristic": "Outer diameter",
+      "equipment": "WC-TURN-02-L1",
+      "workCenterId": "WC-TURN-02",
+      "measuredValue": "24.912 mm",
+      "conforming": false,
+      "lotDate": "2026-02-10",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000032",
+      "materialId": "MAT-10402",
+      "characteristic": "Outer diameter",
+      "equipment": "WC-TURN-02-L1",
+      "workCenterId": "WC-TURN-02",
+      "measuredValue": "24.912 mm",
+      "conforming": false,
+      "lotDate": "2026-02-11",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000033",
+      "materialId": "MAT-10402",
+      "characteristic": "Outer diameter",
+      "equipment": "WC-TURN-02-L1",
+      "workCenterId": "WC-TURN-02",
+      "measuredValue": "24.912 mm",
+      "conforming": false,
+      "lotDate": "2026-02-12",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000034",
+      "materialId": "MAT-10402",
+      "characteristic": "Outer diameter",
+      "equipment": "WC-TURN-02-L2",
+      "workCenterId": "WC-TURN-02",
+      "measuredValue": "24.985 mm",
+      "conforming": true,
+      "lotDate": "2026-02-05",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000035",
+      "materialId": "MAT-10402",
+      "characteristic": "Outer diameter",
+      "equipment": "WC-TURN-02-L2",
+      "workCenterId": "WC-TURN-02",
+      "measuredValue": "24.985 mm",
+      "conforming": true,
+      "lotDate": "2026-02-06",
+      "plant": "1000"
+    },
+    {
+      "lotId": "0010000036",
+      "materialId": "MAT-10402",
+      "characteristic": "Outer diameter",
+      "equipment": "WC-TURN-02-L2",
+      "workCenterId": "WC-TURN-02",
+      "measuredValue": "24.985 mm",
+      "conforming": true,
+      "lotDate": "2026-02-07",
+      "plant": "1000"
+    }
+  ],
+  "isIsNot": {
+    "isWhereWhenItHappens": "S150 outer diameter - WC-TURN-02-L1 - parts after the insert change on 2026-09-29",
+    "isNotWhereWhenItDoesnt": "WC-TURN-02-L2 - parts turned on L1 before the insert change",
+    "notes": "Defect starts at the insert change and stays on L1"
+  },
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "Setter changed the insert on L1 at shift start as scheduled",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "WC-TURN-02-L1 spindle runout 0.004mm, within limit",
+      "metricValue": "0.004 mm",
+      "isRootCause": "N",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "Insert change procedure DOC-4410 Rev B has no wear offset reset step - L1 kept the old offset",
+      "metricValue": null,
+      "isRootCause": "Y",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Bar stock 42CrMo4 lot BS-3460 hardness 288 HB, inside specification",
+      "metricValue": "288 HB",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Air gauge AG-0207 mastered at shift start",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Cell temperature 22C stable",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why were the shafts below the lower diameter tolerance?",
+      "answer": "Outer diameter measured 24.918mm against 24.950-25.000mm on parts turned on L1",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did L1 cut undersize after the insert change?",
+      "answer": "The CNC kept the wear offset of the previous insert, so the new insert cut too deep",
+      "evidenceCitation": "CNC offset table WC-TURN-02-L1"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was the wear offset not reset? (root cause)",
+      "answer": "DOC-4410 has no offset reset step and the controller does not prompt for it",
+      "evidenceCitation": "DOC-4410 Rev B"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Quarantine batch B-70402 and gauge the outer diameter of all S150 shafts in stock",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Containment",
+      "actionText": "Sort 134 shafts already delivered at the customer plant",
+      "status": "Done"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Corrective",
+      "actionText": "Correct the tool wear offset in the WC-TURN-02 L1 turning program and re-release the first-off part",
+      "status": "In Process"
+    },
+    {
+      "lineNo": 4,
+      "actionType": "Preventive",
+      "actionText": "Add insert tool-life counter with automatic offset reset to the CNC controller on all turning cells",
+      "status": "Planned"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer & 8D Facilitator",
+      "partnerRole": "8D Team Leader",
+      "email": "heli.weber@proresolve.com",
+      "phone": "+49 89 2018 0001"
+    },
+    {
+      "partnerId": "BP-100012",
+      "partnerName": "Minh Dinh",
+      "functionTitle": "CNC Machining Process Engineer",
+      "partnerRole": "8D Team Member",
+      "email": "minh.dinh@proresolve.com",
+      "phone": "+49 89 2018 0012"
+    },
+    {
+      "partnerId": "BP-100061",
+      "partnerName": "Anh Pham",
+      "functionTitle": "Tooling & Fixture Engineer",
+      "partnerRole": "8D Team Member",
+      "email": "anh.pham@proresolve.com",
+      "phone": "+49 89 2018 0061"
+    },
+    {
+      "partnerId": "BP-100147",
+      "partnerName": "Lena Hoffmann",
+      "functionTitle": "Metrology Specialist & CMM Inspector",
+      "partnerRole": "8D Team Member",
+      "email": "lena.hoffmann@proresolve.com",
+      "phone": "+49 89 2018 0147"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-TURN02-01",
+    "description": "Tool offset mismatch after insert or fixture change"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 22400
+  },
+  "lessonsLearned": {
+    "whatWorked": "Interim (case open): first-off measurement per lathe isolated L1 within hours",
+    "whatDidnt": "Interim (case open): the offset reset still relies on the setter's memory"
+  },
+  "customerReference": {
+    "complaintReference": "CC-2026-0934",
+    "customerPlantContact": "Hannah Becker - Plant 4, Stuttgart",
+    "slaResponseDue": "2026-10-13"
+  },
+  "responsibility": {
+    "reportedBy": "Alex Murphy",
+    "coordinator": "Minh Dinh",
+    "department": "Quality Assurance"
+  }
+}

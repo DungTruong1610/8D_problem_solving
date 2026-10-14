@@ -1,0 +1,174 @@
+{
+  "notificationId": "8D-10049310",
+  "origin": "Q3 - Internal Defect",
+  "symptomShortText": "Cracks at retainer flange radius formed on TOOL1 - worn draw punch insert",
+  "status": "Closed",
+  "foundDate": "2026-08-12",
+  "completionDate": "2026-09-04",
+  "quantityExtent": "310 units affected",
+  "teamSize": 4,
+  "material": {
+    "materialId": "MAT-11002",
+    "description": "Spring Retainer SR8",
+    "materialGroup": "MG-SPRING"
+  },
+  "batch": {
+    "batchId": "B-53720",
+    "materialId": "MAT-11002"
+  },
+  "defect": {
+    "defectCode": "DEF-1120",
+    "defectText": "Retainer cracking during forming"
+  },
+  "workCenter": {
+    "workCenterId": "WC-PRESS-09",
+    "description": "Progressive Press Line 9"
+  },
+  "inspections": [
+    {
+      "characteristic": "Flange radius wall thinning",
+      "measuredValue": "23%",
+      "specValue": "max 15%"
+    },
+    {
+      "characteristic": "Draw punch radius",
+      "measuredValue": "0.6mm",
+      "specValue": "1.0-1.2mm"
+    }
+  ],
+  "causesIshikawa": [
+    {
+      "category": "Man",
+      "description": "Press operator ran TOOL1 at the released stroke rate",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/HR"
+    },
+    {
+      "category": "Machine",
+      "description": "WC-PRESS-09-TOOL1 draw punch insert worn after 410k strokes - radius 0.6mm vs 1.0-1.2mm, material over-thinned at the flange",
+      "metricValue": "410k strokes",
+      "isRootCause": "Y",
+      "source": "SAP: EQUI/AFIH (PM)"
+    },
+    {
+      "category": "Method",
+      "description": "Lubrication and stroke rate per DOC-8840 Rev C",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: DRAW/PLPO (DMS+Routing)"
+    },
+    {
+      "category": "Material",
+      "description": "Coil COIL-6705 hardness 148 HV, elongation 26% - within specification",
+      "metricValue": "148 HV",
+      "isRootCause": "N",
+      "source": "SAP: QALS/QAMR (incoming)"
+    },
+    {
+      "category": "Measurement",
+      "description": "Ultrasonic thickness gauge UT-04 calibrated 2026-07-01",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "SAP: Test Equipment Mgmt"
+    },
+    {
+      "category": "Environment",
+      "description": "Press hall 25C, no correlation",
+      "metricValue": null,
+      "isRootCause": "N",
+      "source": "ASSUMED: MES/IoT"
+    }
+  ],
+  "fiveWhyChain": [
+    {
+      "stepNo": 1,
+      "question": "Why did the retainers crack at the flange radius?",
+      "answer": "Wall thinning at the radius reached 23% against max 15%, beyond what the steel can stretch",
+      "evidenceCitation": "Inspection lot QALS/QAMR"
+    },
+    {
+      "stepNo": 2,
+      "question": "Why did TOOL1 over-thin the flange radius?",
+      "answer": "The draw punch radius had worn down to 0.6mm, concentrating strain at the radius",
+      "evidenceCitation": "Tool measurement WC-PRESS-09-TOOL1"
+    },
+    {
+      "stepNo": 3,
+      "question": "Why was the worn insert still in the tool? (root cause)",
+      "answer": "Punch inserts had no stroke count limit in SAP PM and were changed only after breakage",
+      "evidenceCitation": "SAP PM order history WC-PRESS-09"
+    }
+  ],
+  "actions": [
+    {
+      "lineNo": 1,
+      "actionType": "Containment",
+      "actionText": "Quarantine all SR8 retainers from batch B-53720 and 100% visual crack check under magnification",
+      "status": "Done"
+    },
+    {
+      "lineNo": 2,
+      "actionType": "Corrective",
+      "actionText": "Replace the worn draw punch insert on WC-PRESS-09 tool 1 station 3 and verify the 1.1mm radius",
+      "status": "Verified"
+    },
+    {
+      "lineNo": 3,
+      "actionType": "Preventive",
+      "actionText": "Add a stroke count limit for draw punch inserts to the preventive maintenance schedule in SAP PM",
+      "status": "Verified in production"
+    }
+  ],
+  "teamAssignments": [
+    {
+      "partnerId": "BP-100001",
+      "partnerName": "Heli Weber",
+      "functionTitle": "Quality Engineer & 8D Facilitator",
+      "partnerRole": "8D Team Leader",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100133",
+      "partnerName": "Ola Nyberg",
+      "functionTitle": "Press Shop Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100061",
+      "partnerName": "Anh Pham",
+      "functionTitle": "Tooling & Fixture Engineer",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    },
+    {
+      "partnerId": "BP-100095",
+      "partnerName": "Elena Rostova",
+      "functionTitle": "Materials & Metallurgy Specialist",
+      "partnerRole": "8D Team Member",
+      "source": "Backfilled from case record"
+    }
+  ],
+  "fmeaLink": {
+    "fmeaId": "FMEA-PRESS09-03",
+    "description": "Flange radius cracking from worn draw punch insert"
+  },
+  "costCopq": {
+    "costOfPoorQualityEur": 7400
+  },
+  "lessonsLearned": {
+    "whatWorked": "Measuring wall thinning per tool pointed at TOOL1 instead of the coil",
+    "whatDidnt": "Inserts were run to failure - no stroke-based replacement"
+  },
+  "isIsNot": {
+    "isWhereWhenItHappens": "SR8 flange radius - WC-PRESS-09-TOOL1 station 3 - batch B-53720, August 2026",
+    "isNotWhereWhenItDoesnt": "WC-PRESS-09-TOOL2 - same coil COIL-6705",
+    "notes": "Defect follows the tool, not the coil"
+  },
+  "customerReference": {
+    "complaintReference": "N/A - Internal Defect",
+    "customerPlantContact": "N/A - Internal Defect",
+    "slaResponseDue": "N/A - Internal Defect"
+  }
+}
