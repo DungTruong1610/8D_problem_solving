@@ -40,7 +40,7 @@ import { isDeliberateNA, isRootCauseFlag } from './datasetValidator';
  * Chấp nhận cả dấu phẩy thập phân kiểu Đức (`0,32 mm`) — dữ liệu SAP xuất theo
  * locale của người dùng, và một hệ thống chỉ hiểu dấu chấm sẽ đọc 0,32 thành 0.
  */
-function firstNumber(s: string): number | null {
+export function firstNumber(s: string): number | null {
     const m = String(s).match(/-?\d+(?:[.,]\d+)?/);
     if (!m) return null;
     const n = Number(m[0].replace(',', '.'));
@@ -239,7 +239,7 @@ export function formatSpecRange(
     lo: number | null, hi: number | null, uom: string | null,
 ): string {
     const u = uom ? ` ${uom}` : '';
-    if (lo !== null && hi !== null) return `${lo} – ${hi}${u}`;
+    if (lo !== null && hi !== null) return `${lo} - ${hi}${u}`;
     if (hi !== null) return `max ${hi}${u}`;
     if (lo !== null) return `min ${lo}${u}`;
     return '';
@@ -621,7 +621,7 @@ export function mapCase(raw: any): CaseContext {
         lotDate: normalizeDate(r.lot_date),
         plant: text(r.plant),
     }));
-    if (!inspections.length) gaps.push('No inspection results — D2 cannot be quantified from measurements.');
+    if (!inspections.length) gaps.push('No inspection results - D2 cannot be quantified from measurements.');
     if (inspections.length && inspections.every((i) => i.outOfSpec === null)) {
         gaps.push('Inspection values could not be compared with the specification automatically.');
     }
@@ -630,7 +630,7 @@ export function mapCase(raw: any): CaseContext {
     // Nói đích danh đặc tính nào, vì đó là thứ người sửa cần biết.
     const unresolved = inspections.filter((i) => i.outOfSpec === null).map((i) => i.characteristic || '(unnamed)');
     if (unresolved.length && unresolved.length < inspections.length) {
-        gaps.push(`No valuation or numeric limits recorded for ${unresolved.join(', ')} — those rows were not judged.`);
+        gaps.push(`No valuation or numeric limits recorded for ${unresolved.join(', ')} - those rows were not judged.`);
     }
     const outOfSpecInspections = inspections.filter((i) => i.outOfSpec === true);
     if (outOfSpecInspections.length > 1) {
@@ -650,7 +650,7 @@ export function mapCase(raw: any): CaseContext {
         source: String(r.source ?? ''),
     }));
     const rootRow = ishikawa.find((r) => r.isRootCause) ?? null;
-    if (!rootRow) gaps.push('No Ishikawa row is flagged as the root cause — D4 rests on the 5-Why chain alone.');
+    if (!rootRow) gaps.push('No Ishikawa row is flagged as the root cause - D4 rests on the 5-Why chain alone.');
 
     // ── 5-Why ──
     const fiveWhy: FiveWhyRow[] = rows(data, 'five_why_chain')
@@ -662,7 +662,7 @@ export function mapCase(raw: any): CaseContext {
             isRootCauseStep: String(r.question ?? '').toLowerCase().includes('(root cause)'),
         }))
         .sort((a, b) => a.stepNo - b.stepNo);
-    if (!fiveWhy.length) gaps.push('No 5-Why chain — D4 has no causal reasoning to cite.');
+    if (!fiveWhy.length) gaps.push('No 5-Why chain - D4 has no causal reasoning to cite.');
 
     // ── Actions, gom theo ánh xạ do dataset khai ──
     const toAction = (r: Row): ActionRow => ({
@@ -687,9 +687,9 @@ export function mapCase(raw: any): CaseContext {
             'to D3, D5 or D7.',
         );
     }
-    if (!actions.containment.length) gaps.push('No containment action recorded — D3 has no source data.');
-    if (!actions.corrective.length) gaps.push('No corrective action recorded — D5 has no source data.');
-    if (!actions.preventive.length) gaps.push('No preventive action recorded — D7 has no source data.');
+    if (!actions.containment.length) gaps.push('No containment action recorded - D3 has no source data.');
+    if (!actions.corrective.length) gaps.push('No corrective action recorded - D5 has no source data.');
+    if (!actions.preventive.length) gaps.push('No preventive action recorded - D7 has no source data.');
 
     // ── Team ──
     const teamRows: TeamRow[] = rows(data, 'team_assignments').map((r) => ({
@@ -709,14 +709,14 @@ export function mapCase(raw: any): CaseContext {
         gaps.push('No team leader was marked; assuming the first listed member leads the team.');
     }
     const members = teamRows.filter((r) => r !== leader);
-    if (!teamRows.length) gaps.push('No 8D team members recorded — D1 has no source data.');
+    if (!teamRows.length) gaps.push('No 8D team members recorded - D1 has no source data.');
 
     // ── Phần còn lại ──
     const fmeaRow = one(data, 'fmea_link');
     const fmea = fmeaRow?.fmea_id
         ? { fmeaId: String(fmeaRow.fmea_id), description: String(fmeaRow.description ?? '') }
         : null;
-    if (!fmea) gaps.push('No FMEA link — D7 cannot reference an existing failure-mode entry.');
+    if (!fmea) gaps.push('No FMEA link - D7 cannot reference an existing failure-mode entry.');
 
     const costRow = one(data, 'cost_copq');
     const rawCopq = costRow?.cost_of_poor_quality_eur;
@@ -732,7 +732,7 @@ export function mapCase(raw: any): CaseContext {
     const lessonsLearned = whatWorked || whatDidnt
         ? { whatWorked: whatWorked ?? '', whatDidnt: whatDidnt ?? '' }
         : null;
-    if (!lessonsLearned) gaps.push('No lessons learned recorded — D8 has no source data.');
+    if (!lessonsLearned) gaps.push('No lessons learned recorded - D8 has no source data.');
 
     // Is/Is-Not chỉ có giá trị khi có ít nhất một vế. Cả hai trống thì bỏ hẳn —
     // đây là công cụ khoanh vùng của D2, và một bảng rỗng không khoanh được gì.
@@ -743,7 +743,7 @@ export function mapCase(raw: any): CaseContext {
         ? { is: iinIs ?? '', isNot: iinIsNot ?? '', notes: text(iinRow?.notes) }
         : null;
     if (!isIsNot) {
-        gaps.push('No Is / Is-Not comparison recorded — the problem boundary is undefined.');
+        gaps.push('No Is / Is-Not comparison recorded - the problem boundary is undefined.');
     }
 
     // ── Khách hàng ──
@@ -791,7 +791,7 @@ export function mapCase(raw: any): CaseContext {
     const inspectionLotId = lotAllowed ? rawLotId : null;
     if (!lotAllowed && rawLotId) {
         gaps.push(
-            `Inspection lot ${rawLotId} was recorded against a customer complaint and has been dropped — `
+            `Inspection lot ${rawLotId} was recorded against a customer complaint and has been dropped - `
             + 'a customer complaint is raised after delivery, so it has no inspection lot of ours.',
         );
     }

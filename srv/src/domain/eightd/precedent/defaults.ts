@@ -42,7 +42,7 @@ export const DEFAULT_CRITERIA: readonly (Criterion & {
         label: 'Defect code',
         description:
             'Same catalogued defect. Falls back to shared keywords in the defect text when the '
-            + 'codes differ — two plants often catalogue the same failure under different codes.',
+            + 'codes differ - two plants often catalogue the same failure under different codes.',
         sourceTable: 'HistoricalCases · GD 3 Defects',
         sourceField: 'defectCode',
         matchType: 'exact',
@@ -75,7 +75,7 @@ export const DEFAULT_CRITERIA: readonly (Criterion & {
         description:
             'Semantic similarity between the two case narratives, from an embedding of the defect, '
             + 'the investigation findings and the causal chain. This is the only criterion that can '
-            + 'connect two cases whose work centre, part and defect code all differ — the case where '
+            + 'connect two cases whose work centre, part and defect code all differ - the case where '
             + 'the same failure was written up in different words.',
         sourceTable: 'HistoricalCases.searchText (embedding)',
         sourceField: 'embedding',
@@ -142,6 +142,8 @@ export const RERANK_PROFILE_SPECS: readonly {
     label: string;
     profileDescription: string;
     stepCode: 'D4' | 'D5';
+    /** Ngưỡng riêng của profile; không có thì lấy theo `default`. */
+    minScore?: number;
     criterion: Criterion & { description: string; sourceTable: string };
 }[] = Object.freeze([
     Object.freeze({
@@ -149,8 +151,15 @@ export const RERANK_PROFILE_SPECS: readonly {
         label: 'Diagnosis (D4)',
         profileDescription:
             'Cloned from Default for D4. Adds an optional LLM re-rank pass tuned to '
-            + '"same failure mechanism" — enable it on the rerank criterion after evaluating.',
+            + '"same failure mechanism" - enable it on the rerank criterion after evaluating.',
         stepCode: 'D4' as const,
+        /**
+         * D4 là chỗ AI trích tiền lệ để kết luận NGUYÊN NHÂN GỐC, nên chỉ trùng
+         * work center (4) + vật tư (3) = 7 là không đủ: một lỗi hàn trên cell phay
+         * sẽ nhận các case bavia phay làm tiền lệ (TC-04). Ngưỡng 8 đòi thêm trùng
+         * mã lỗi hoặc mô tả giống về ngữ nghĩa.
+         */
+        minScore: 8,
         criterion: Object.freeze({
             criterionKey: 'rerank',
             label: 'Mechanism re-rank',
@@ -176,7 +185,7 @@ export const RERANK_PROFILE_SPECS: readonly {
         label: 'Corrective (D5)',
         profileDescription:
             'Cloned from Default for D5. Adds an optional LLM re-rank pass tuned to '
-            + '"does the candidate’s corrective action address this root cause" — '
+            + '"does the candidate’s corrective action address this root cause" - '
             + 'enable it on the rerank criterion after evaluating.',
         stepCode: 'D5' as const,
         criterion: Object.freeze({
@@ -535,5 +544,5 @@ export const DEFAULT_STEP_PROMPTS: readonly {
     { stepCode: 'D5', label: 'Permanent Corrective Actions', description: 'Tie each corrective action to a step of the root cause chain.' , systemPrompt: DEFAULT_DISCIPLINE_GUIDE.D5 },
     { stepCode: 'D6', label: 'Verify Effectiveness', description: 'Write the verification plan; this dataset carries no verification evidence.' , systemPrompt: DEFAULT_DISCIPLINE_GUIDE.D6 },
     { stepCode: 'D7', label: 'Prevent Recurrence', description: 'Preventive actions and the FMEA entry to update.' , systemPrompt: DEFAULT_DISCIPLINE_GUIDE.D7 },
-    { stepCode: 'D8', label: 'Closure and Recognition', description: 'Lessons learned and the completeness gate over D1–D7.' , systemPrompt: DEFAULT_DISCIPLINE_GUIDE.D8 },
+    { stepCode: 'D8', label: 'Closure and Recognition', description: 'Lessons learned and the completeness gate over D1-D7.' , systemPrompt: DEFAULT_DISCIPLINE_GUIDE.D8 },
 ].map((row) => ({ ...row, ...(STRUCTURED_CONFIG_OVERRIDES[row.stepCode] ?? {}) })).map((r) => Object.freeze(r)));

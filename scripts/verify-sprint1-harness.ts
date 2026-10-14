@@ -18,10 +18,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import cds from '@sap/cds';
 import { validateDataset, blockingIssues } from '../srv/src/domain/eightd/datasetValidator';
-import { mapCase } from '../srv/src/domain/eightd/caseMapper';
-import { isPgvectorAvailable, searchSimilarCasesByVector } from '../srv/src/domain/eightd/precedent/pgvectorBridge';
-import { contestedEntry } from '../srv/src/domain/eval/dataset';
+import { firstNumber, mapCase } from '../srv/src/domain/eightd/caseMapper';
+import { findPrecedentsByStep } from '../srv/src/domain/eightd/precedent/findPrecedents';
 import {
+    contradictingEvidence,
     evaluateStops,
     incompleteInputStop,
     notManufacturingStop,
@@ -79,7 +79,7 @@ export interface VerifyHarnessReport {
     };
 }
 
-const { SELECT, INSERT, DELETE, UPDATE } = cds.ql;
+const { SELECT } = cds.ql;
 const TEST_CASES_DIR = path.resolve(__dirname, '../mock-data/sprint1-test-cases');
 
 async function initDatabaseConnection() {
@@ -112,84 +112,135 @@ async function initDatabaseConnection() {
  */
 
 /**
+ * ── Luật chung cho bốn test case ─────────────────────────────────────────────
+ *
+ * Mỗi test chạy ĐÚNG đường mà app chạy cho một case thật — không có đường tắt
+ * riêng cho harness:
+ *   - kiểm tra dữ liệu: `validateDataset` / `mapCase`
+ *   - tiền lệ: `findPrecedentsByStep(...).byStep.D4`, đúng nguồn mà
+ *     `getCaseStops` dùng để quyết định dừng "không có tiền lệ"
+ *   - lần dừng: `evaluateStops`
+ *
+ * Đáp án đúng KHÔNG nằm trong file này: nó là `$expectedOutcome` của chính file
+ * test trong `mock-data/sprint1-test-cases/`. Harness chỉ so kết quả đo được với
+ * đáp án đó. Không có câu "kết quả" nào viết sẵn: mọi chi tiết trong `details`
+ * đều đọc từ thứ vừa chạy, hoặc từ DB.
+ *
+ * Không gọi model sinh văn bản (D1-D8 drafting), nên chạy nhanh — dưới một
+ * giây là bình thường. Thứ tốn thời gian duy nhất là engine tiền lệ (có thể gọi
+ * embedding nếu tiêu chí ngữ nghĩa đang bật).
+ */
+
+function loadTestCase(file: string): { raw: any; expected: Record<string, any> } {
+    const raw = JSON.parse(fs.readFileSync(path.join(TEST_CASES_DIR, file), 'utf8'));
+    const expected = raw?.$expectedOutcome;
+    if (!expected || typeof expected !== 'object') {
+        throw new Error(`${file} has no $expectedOutcome — the test has nothing to compare against.`);
+    }
+    return { raw, expected };
+}
+
+interface D4PrecedentCheck {
+    count: number;
+    ids: string[];
+    top: { notificationId: string; explanation: string }[];
+    reason: string | null;
+    basis: string;
+}
+
+/**
+ * Tiền lệ cho D4, chạy bằng engine thật của app.
+ *
+ * Bỏ chính case đang xét nếu nó đã có trong kho (case đóng được nạp lại làm
+ * input) — một case tự khớp với chính nó thì không chứng minh được gì.
+ */
+async function realD4Precedents(ctx: any, raw: any): Promise<D4PrecedentCheck> {
+    const perStep = await findPrecedentsByStep(ctx, raw);
+    const d4 = perStep.byStep.D4;
+    const self = String(ctx.notificationId ?? '');
+    const precedents = d4.precedents.filter((p) => p.notificationId !== self);
+    return {
+        count: precedents.length,
+        ids: precedents.map((p) => p.notificationId),
+        top: precedents.slice(0, 3).map((p) => ({ notificationId: p.notificationId, explanation: p.explanation })),
+        reason: d4.reason,
+        basis: `${precedents.length} precedent(s) qualified for D4 (${d4.candidatesScored} candidates scored, min score ${d4.settings.minScore})`,
+    };
+}
+
+/** Report của chính case test, nếu DB có. Không có thì null — không bịa ID. */
+async function existingReportId(db: any, notificationId: string): Promise<string | undefined> {
+    const rep = await db.run(SELECT.one.from('cnma.proresolve.Reports').columns('ID').where({ notificationId }));
+    return rep?.ID ?? undefined;
+}
+
+/**
  * Executes TC-01: Happy Path End-to-End Workflow (Strong Precedent Match)
  */
 async function runTC01(db: any): Promise<TestCaseResult> {
     const t0 = Date.now();
-    const filePath = path.join(TEST_CASES_DIR, 'tc-01-happy-path.json');
-    const raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const { raw, expected } = loadTestCase('tc-01-happy-path.json');
+    const base = {
+        id: 'TC-01',
+        title: 'Milling Burr Defect (Happy Path - Strong Precedent Match)',
+        category: 'Quadrant 1 - Perfect End-to-End Workflow',
+        inputSummary: raw.symptomShortText,
+        expectedBehavior: `Clean validation, D4 precedent search returns ${expected.topPrecedent}, symptom and measurements present, no blocking stop`,
+        notificationId: raw.notificationId,
+    };
 
-    // 1. Dataset Validation
-    const val = validateDataset(raw);
-    if (blockingIssues(val).length > 0) {
+    const blocking = blockingIssues(validateDataset(raw));
+    if (blocking.length > 0) {
         return {
-            id: 'TC-01',
-            title: 'Milling Burr Defect (Happy Path — Strong Precedent Match)',
-            category: 'Quadrant 1 — Perfect End-to-End Workflow',
-            inputSummary: 'Q3 Internal Defect at WC-MILL-07, Material MAT-10247, Burr height 0.26mm vs max 0.10mm',
-            expectedBehavior: 'Clean validation, match precedent 8D-10048412 from the case library, inputs complete for a D1-D8 draft, no stop raised',
-            actualBehavior: `Validation failed with blocking issues: ${blockingIssues(val).join(', ')}`,
+            ...base,
+            actualBehavior: `Validation failed with blocking issues: ${blocking.map((b) => b.message).join('; ')}`,
             status: 'FAIL',
             durationMs: Date.now() - t0,
             stopType: null,
             stops: [],
-            details: { blocking: blockingIssues(val) }
+            details: { blocking },
         };
     }
 
-    // 2. Case Mapping
     const ctx = mapCase(raw);
+    const prec = await realD4Precedents(ctx, raw);
+    const precedentFound = prec.ids.includes(expected.topPrecedent);
 
-    // 3. Precedent search on PostgreSQL
-    const matchingCases = await db.run(
-        SELECT.from('cnma.proresolve.HistoricalCases')
-            .where({ workCenterId: ctx.product.workCenterId, materialId: ctx.product.materialId })
-    );
-
-    const topMatch = matchingCases.find((c: any) => c.notificationId === '8D-10048412');
-    const precedentFound = Boolean(topMatch);
-
-    // 4. Verify Workflow Rules
+    const stops = evaluateStops({ caseContext: ctx, precedents: { count: prec.count, reason: prec.reason, basis: prec.basis } });
+    const blockingStops = stops.filter((s) => s.blocking);
     const hasSymptom = Boolean(ctx.header.symptomShortText);
     const hasMeasurements = (ctx.inspections?.length ?? 0) > 0;
-    // Happy path phải KHÔNG dừng — dừng ở đây là báo lên thừa.
-    const stops = evaluateStops({ caseContext: ctx, precedents: { count: matchingCases.length } });
-    const isE2EOk = precedentFound && hasSymptom && hasMeasurements && stops.length === 0;
+    const isOk = expected.precedentFound === true && precedentFound && hasSymptom && hasMeasurements && blockingStops.length === 0;
 
-    // 5. Query active 8D Report record
-    const rep = await db.run(
-        SELECT.one.from('cnma.proresolve.Reports').where({ notificationId: '8D-10048412' })
-    );
+    // Bài học của tiền lệ đó, đọc từ kho — không viết sẵn.
+    const library = precedentFound
+        ? await db.run(SELECT.one.from('cnma.proresolve.HistoricalCases')
+            .columns('rootCauseCategory', 'symptomShortText')
+            .where({ notificationId: expected.topPrecedent }))
+        : null;
 
-
-    // Realistic AI pipeline latency (vector lookup, validation & drafting)
-    await new Promise((r) => setTimeout(r, 1120));
-    const durationMs = Date.now() - t0;
     return {
-        id: 'TC-01',
-        title: 'Milling Burr Defect (Happy Path — Strong Precedent Match)',
-        category: 'Quadrant 1 — Perfect End-to-End Workflow',
-        inputSummary: 'Q3 Internal Defect at WC-MILL-07, Material MAT-10247, Burr height 0.26mm vs max 0.10mm',
-        expectedBehavior: 'Clean validation, match precedent 8D-10048412 from the case library, inputs complete for a D1-D8 draft, no stop raised',
-        actualBehavior: isE2EOk
-            ? `Matched precedent 8D-10048412 in the case library (same work center ${ctx.product.workCenterId} and material ${ctx.product.materialId}); symptom and ${ctx.inspections.length} measurement(s) present for the D1–D8 draft.`
-            : stops.length > 0
-                ? `Unexpected stop on a clean case: ${stops.map((s) => s.id).join(', ')}`
-                : `Precedent match failed: found ${matchingCases.length} cases but expected 8D-10048412`,
-        status: isE2EOk ? 'PASS' : 'FAIL',
-        durationMs,
-        reportId: rep?.ID || 'f4f74a75-0136-4719-b540-825f3572f410',
-        notificationId: '8D-10048412',
+        ...base,
+        actualBehavior: isOk
+            ? `D4 precedent search returned ${prec.count} case(s) including ${expected.topPrecedent} (${prec.top.find((p) => p.notificationId === expected.topPrecedent)?.explanation ?? 'qualified'}); symptom and ${ctx.inspections.length} measurement(s) present; no blocking stop.`
+            : !precedentFound
+                ? `Expected precedent ${expected.topPrecedent} was not returned. D4 got: ${prec.ids.join(', ') || 'none'}${prec.reason ? ` (${prec.reason})` : ''}.`
+                : blockingStops.length > 0
+                    ? `Unexpected blocking stop on a clean case: ${blockingStops.map((s) => s.id).join(', ')}`
+                    : `Input incomplete: symptom ${hasSymptom}, measurements ${ctx.inspections?.length ?? 0}.`,
+        status: isOk ? 'PASS' : 'FAIL',
+        durationMs: Date.now() - t0,
+        reportId: await existingReportId(db, raw.notificationId),
         stopType: primaryStopType(stops),
         stops: stops.map(toJudgeStop),
         details: {
-            topPrecedent: topMatch?.notificationId,
-            defectText: ctx.product.defectText,
-            workCenter: ctx.product.workCenterDesc,
-            rootCauseIdentified: 'Machine (Deburring tool wear)',
-            actionGenerated: 'Replace deburring tool EQ-MILL07-002 and recalibrate',
-            reportId: rep?.ID || 'f4f74a75-0136-4719-b540-825f3572f410'
-        }
+            precedentsReturned: prec.top,
+            precedentBasis: prec.basis,
+            expectedPrecedent: expected.topPrecedent,
+            precedentRootCause: library?.rootCauseCategory ?? null,
+            expectedRootCauseCategory: expected.rootCauseCategory ?? null,
+            measurement: ctx.inspections[0] ? `${ctx.inspections[0].characteristic}: ${ctx.inspections[0].measuredValue} (${ctx.inspections[0].specValue})` : null,
+        },
     };
 }
 
@@ -198,67 +249,56 @@ async function runTC01(db: any): Promise<TestCaseResult> {
  */
 async function runTC02(db: any): Promise<TestCaseResult> {
     const t0 = Date.now();
-    const filePath = path.join(TEST_CASES_DIR, 'tc-02-dirty-sap.json');
-    const raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const { raw, expected } = loadTestCase('tc-02-dirty-sap.json');
 
-    // 1. Validation of Dirty Data: must not block on quality issues
+    // 1. Dữ liệu bẩn không được làm chặn cứng.
     const val = validateDataset(raw);
     const isCleanOfBlocking = blockingIssues(val).length === 0;
 
-    // 2. Map dirty SAP fields
+    // 2. Chuẩn hoá bằng mapper thật.
     const ctx = mapCase(raw);
+    const rawMaterial = String(raw.material?.materialId ?? '');
+    const idTrimmed = ctx.product.materialId === rawMaterial.trim() && rawMaterial !== rawMaterial.trim();
 
-    // 3. Check whitespace trimming
-    const idTrimmed = ctx.product.materialId === 'MAT-10247';
+    // 3. Số đo bóc bằng CHÍNH hàm parse của app, từ dòng đo đầu tiên của mapper.
+    const first = ctx.inspections?.[0];
+    const parsedNumber = first ? firstNumber(String(first.measuredValue ?? '')) : null;
+    const expectedValue = Number(expected.extractedMeasurements?.measuredValue);
+    const metricExtracted = parsedNumber !== null && parsedNumber === expectedValue;
 
-    // 4. Check comma decimal & metric extraction from German sentence
-    const inspectionText = raw.inspections?.[0]?.measuredValue || '';
-    const numRegex = /gemessen\s+([0-9]+,[0-9]+)\s*mm/i;
-    const match = inspectionText.match(numRegex);
-    const parsedNumber = match ? parseFloat(match[1].replace(',', '.')) : null;
-    const metricExtracted = parsedNumber === 0.32;
-
-    // 5. Check gaps honesty
+    // 4. Phải báo khoảng trống dữ liệu, không lấp bằng đoán.
     const hasGapsReported = ctx.gaps.length > 0;
 
-    // 6. The parsed 0.32 came out of free text — the AI must stop and ask the QE
-    // to confirm it before any D4 conclusion (stop type 1).
-    const stops = evaluateStops({ caseContext: ctx });
+    // 5. Số bóc từ chữ tự do phải dừng chờ QE xác nhận (dừng loại 1).
+    const prec = await realD4Precedents(ctx, raw);
+    const stops = evaluateStops({ caseContext: ctx, precedents: { count: prec.count, reason: prec.reason, basis: prec.basis } });
     const factStopRaised = stops.some((s) => s.id === 'unverified-facts:ambiguous-measurement:D4' && s.blocking);
 
-    // 6. Query active 8D Report record
-    const rep = await db.run(
-        SELECT.one.from('cnma.proresolve.Reports').where({ notificationId: '8D-90048412' })
-    );
-
-
     const isOk = isCleanOfBlocking && idTrimmed && metricExtracted && hasGapsReported && factStopRaised;
-    // Realistic AI pipeline latency (dirty German text regex & normalization)
-    await new Promise((r) => setTimeout(r, 880));
-    const durationMs = Date.now() - t0;
 
     return {
         id: 'TC-02',
         title: 'Dirty SAP QM Flange Defect (Messy Real-World Normalization)',
-        category: 'Quadrant 2 — Messy / Real-World Fault Tolerance',
-        inputSummary: 'German text "Grat an Flanschkante", comma decimal "0,32 mm", unpadded ID "  MAT-10247 "',
-        expectedBehavior: 'Zero crashes, normalize whitespace, extract 0.32mm, report gaps — and stop (unverified facts) until a QE confirms the parsed value',
+        category: 'Quadrant 2 - Messy / Real-World Fault Tolerance',
+        inputSummary: `Free-text measurement "${String(raw.inspections?.[0]?.measuredValue ?? '')}", material ID "${rawMaterial}"`,
+        expectedBehavior: `No crash, whitespace trimmed, ${expectedValue} parsed from free text, gaps reported, and a stop until a QE confirms the parsed value`,
         actualBehavior: isOk
-            ? `Normalized whitespace ('MAT-10247'), extracted 0.32mm from German text, reported ${ctx.gaps.length} data gaps, and stopped: the value was parsed from free text and needs QE confirmation before D4.`
-            : `Dirty data handling failed. Trimmed: ${idTrimmed}, Metric extracted: ${metricExtracted}, Blocking: ${blockingIssues(val).length}, Fact stop raised: ${factStopRaised}`,
+            ? `Trimmed material ID to '${ctx.product.materialId}', parsed ${parsedNumber} from "${first?.measuredValue}", reported ${ctx.gaps.length} data gap(s), and stopped at D4 for QE confirmation of the parsed value.`
+            : `Dirty data handling failed. Blocking-free: ${isCleanOfBlocking}, trimmed: ${idTrimmed}, parsed: ${parsedNumber} (expected ${expectedValue}), gaps: ${ctx.gaps.length}, fact stop: ${factStopRaised}`,
         status: isOk ? 'PASS' : 'FAIL',
-        durationMs,
-        reportId: rep?.ID || '43139acd-46b4-494c-9b8f-f440d5bf3c57',
-        notificationId: '8D-90048412',
+        durationMs: Date.now() - t0,
+        reportId: await existingReportId(db, raw.notificationId),
+        notificationId: raw.notificationId,
         stopType: primaryStopType(stops),
         stops: stops.map(toJudgeStop),
         details: {
-            extractedMeasurement: `${parsedNumber} mm`,
+            extractedMeasurement: parsedNumber,
+            expectedMeasurement: expectedValue,
             normalizedMaterialId: ctx.product.materialId,
             reportedGapsCount: ctx.gaps.length,
-            sampleGap: ctx.gaps[0],
-            reportId: rep?.ID || '43139acd-46b4-494c-9b8f-f440d5bf3c57'
-        }
+            sampleGap: ctx.gaps[0] ?? null,
+            precedentBasis: prec.basis,
+        },
     };
 }
 
@@ -267,62 +307,46 @@ async function runTC02(db: any): Promise<TestCaseResult> {
  */
 async function runTC03(db: any): Promise<TestCaseResult> {
     const t0 = Date.now();
-    const filePath = path.join(TEST_CASES_DIR, 'tc-03-bias-hunter.json');
-    const raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-
+    const { raw, expected } = loadTestCase('tc-03-bias-hunter.json');
     const ctx = mapCase(raw);
 
-    // 1. Check Engineer initial claim vs physical evidence
-    const engineerCause = raw.causesIshikawa.find((c: any) => c.isRootCause === 'Y');
-    const machineCause = raw.causesIshikawa.find((c: any) => c.category === 'Machine');
-    const isShiftSpread = raw.isIsNot?.isWhereWhenItHappens?.includes('Shifts A, B, and C');
+    // Kết luận "ghi sai" lấy từ luật thật của app (`contradictingEvidence`, cũng
+    // là thứ sinh ra lần dừng bên dưới) — không so chuỗi trong harness.
+    const evidence = contradictingEvidence(ctx);
+    const recorded = evidence?.flagged ?? null;
+    const measuredCategory = evidence?.measured?.category ?? null;
 
-    // 2. Blind diagnosis rule check:
-    // When Man has null metric and Machine has 0.9mm drift (> 0.2mm limit), and defect occurs across all shifts,
-    // AI must reject Man and determine Machine as true root cause.
-    const contested = contestedEntry(raw.notificationId);
-    const aiDetermination = (machineCause && machineCause.metricValue?.includes('0.9mm')) ? 'Machine' : 'Unknown';
-
-    // 3. Query active 8D Report record and ensure disciplines are Completed
-    const rep = await db.run(
-        SELECT.one.from('cnma.proresolve.Reports').where({ notificationId: '8D-10048880' })
-    );
-
-
-    const biasDetected = engineerCause?.category === 'Man' && aiDetermination === 'Machine';
-    // The record blames Man with no metric while Machine has a measured drift:
-    // a type-1 stop that blocks D4 until the QE answers.
-    const stops = evaluateStops({ caseContext: ctx });
+    const prec = await realD4Precedents(ctx, raw);
+    const stops = evaluateStops({ caseContext: ctx, precedents: { count: prec.count, reason: prec.reason, basis: prec.basis } });
     const contradictionStop = stops.some((s) => s.id === 'unverified-facts:record-contradicts-evidence:D4' && s.blocking);
-    const isOk = biasDetected && Boolean(contested) && contradictionStop;
-    // Realistic AI pipeline latency (bias detection & contradiction arbitration)
-    await new Promise((r) => setTimeout(r, 1040));
-    const durationMs = Date.now() - t0;
+
+    const biasDetected = recorded === expected.engineerClaim
+        && measuredCategory === expected.aiDetermination
+        && !evidence?.flaggedMetric;
+    const isOk = expected.biasDetected === true && biasDetected && contradictionStop;
 
     return {
         id: 'TC-03',
-        title: 'Pocket Depth Deviation (Confirmation Bias Hunter — Human-in-the-Loop)',
-        category: 'Quadrant 3 — Decision Support & Blind Diagnosis',
-        inputSummary: 'Engineer blamed Shift C Operator (Man, 0 metrics); Tool changer drift measured 0.9mm vs 0.2mm max',
-        expectedBehavior: 'Flag that the recorded cause (Man) has no evidence while Machine has a measured drift, and stop D4 for the QE to decide',
+        title: 'Pocket Depth Deviation (Confirmation Bias Hunter - Human-in-the-Loop)',
+        category: 'Quadrant 3 - Decision Support & Blind Diagnosis',
+        inputSummary: `Record blames "${recorded ?? '?'}"; ${measuredCategory ?? 'no other cause'} has a measured value (${evidence?.measured?.metric ?? 'none'})`,
+        expectedBehavior: `Flag that the recorded cause (${expected.engineerClaim}) has no evidence while ${expected.aiDetermination} has a measured deviation, and stop D4 for the QE to decide`,
         actualBehavior: isOk
-            ? `Stopped at D4: the record blames 'Man' with no metric, while 'Machine' shows a 0.9mm tool-changer drift (0.2mm max). The QE must confirm or change the root cause; the AI does not overwrite it.`
-            : `Failed to detect confirmation bias. Engineer cause: ${engineerCause?.category}, AI: ${aiDetermination}`,
+            ? `Stopped at D4: the record blames '${recorded}' with no metric, while '${measuredCategory}' shows ${evidence?.measured?.metric}. The QE must confirm or change the root cause; the AI does not overwrite it.`
+            : `Bias check failed. Recorded: ${recorded ?? 'none'} (expected ${expected.engineerClaim}), evidence points to: ${measuredCategory ?? 'none'} (expected ${expected.aiDetermination}), contradiction stop: ${contradictionStop}`,
         status: isOk ? 'PASS' : 'FAIL',
-        durationMs,
-        reportId: rep?.ID || '21840423-b67e-48db-b543-b2e4325e4ddc',
-        notificationId: '8D-10048880',
+        durationMs: Date.now() - t0,
+        reportId: await existingReportId(db, raw.notificationId),
+        notificationId: raw.notificationId,
         stopType: primaryStopType(stops),
         stops: stops.map(toJudgeStop),
         details: {
-            engineerSubjectiveClaim: engineerCause?.category,
-            engineerEvidence: engineerCause?.metricValue ?? 'No empirical metric (ASSUMED)',
-            aiObjectiveDetermination: aiDetermination,
-            physicalEvidence: machineCause?.description,
-            multiShiftProof: raw.isIsNot?.notes,
-            committeeAlert: 'Human-in-the-loop: Grounded disagreement flagged to Quality Council',
-            reportId: rep?.ID || '21840423-b67e-48db-b543-b2e4325e4ddc'
-        }
+            recordedRootCause: recorded,
+            recordedEvidence: evidence?.flaggedMetric ?? null,
+            evidenceRootCause: measuredCategory,
+            evidenceMetric: evidence?.measured?.metric ?? null,
+            expected: { engineerClaim: expected.engineerClaim, aiDetermination: expected.aiDetermination },
+        },
     };
 }
 
@@ -331,73 +355,44 @@ async function runTC03(db: any): Promise<TestCaseResult> {
  */
 async function runTC04(db: any): Promise<TestCaseResult> {
     const t0 = Date.now();
-    const filePath = path.join(TEST_CASES_DIR, 'tc-04-graceful-refusal.json');
-    const raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-
+    const { raw, expected } = loadTestCase('tc-04-graceful-refusal.json');
     const ctx = mapCase(raw);
 
-    // 1. Search for matching cases in database (Milling cell has no laser welding precedents)
-    const rawMatches = await db.run(
-        SELECT.from('cnma.proresolve.HistoricalCases')
-            .where({ workCenterId: ctx.product.workCenterId, defectCode: ctx.product.defectCode })
-    );
-    const matchingCases = rawMatches.filter(
-        (c: any) => c.notificationId !== ctx.notificationId && c.notificationId !== '8D-10049003'
-    );
+    // Đúng nguồn mà app dùng để quyết định dừng "ngoài phạm vi" ở D4.
+    const prec = await realD4Precedents(ctx, raw);
+    const stops = evaluateStops({ caseContext: ctx, precedents: { count: prec.count, reason: prec.reason, basis: prec.basis } });
+    const scopeStop = stops.find((s) => s.id === 'outside-scope:no-precedent:D4');
 
-    // 2. Precedent rule: no closed case shares this work center AND defect code,
-    // so there is nothing the AI may cite. (The old harness printed an invented
-    // "similarity 28%"; the measured fact is the count below.)
-    const hasPrecedent = matchingCases.length > 0;
-    const refusalTriggered = !hasPrecedent;
-    const stops = evaluateStops({
-        caseContext: ctx,
-        precedents: {
-            count: matchingCases.length,
-            basis: `${matchingCases.length} closed case(s) share ${ctx.product.workCenterId} + ${ctx.product.defectCode}`,
-        },
-    });
-    const scopeStop = stops.some((s) => s.id === 'outside-scope:no-precedent:D4');
-
-    // 3. Query active 8D Report record
-    const rep = await db.run(
-        SELECT.one.from('cnma.proresolve.Reports').where({ notificationId: '8D-10049003' })
-    );
-
-
-    // 4. Generate structured technical escalation instead of fake answer
-    const escalationPacket = {
-        escalatedTo: 'Welding SME / Quality Director',
-        reason: `No closed case in the library shares work center ${ctx.product.workCenterId} and defect code ${ctx.product.defectCode} (${matchingCases.length} found). No precedent is cited.`,
-        suggestedInquiries: [
-            'Verify robot welding arc current (A) and travel speed (cm/min) against WPS-12800.',
-            'Perform destructive cross-section macro-etching on sample B-49172 to measure weld throat depth.',
-            'Confirm shielding gas mix (82% Ar / 18% CO2) flow rate at fixture nozzle.'
-        ],
-        reportId: rep?.ID || 'bff585aa-b23a-45e4-a1ec-70a8ddf66671'
-    };
-
-    const isOk = refusalTriggered && scopeStop && escalationPacket.suggestedInquiries.length === 3;
-    // Realistic AI pipeline latency (scope check & SME escalation generation)
-    await new Promise((r) => setTimeout(r, 920));
-    const durationMs = Date.now() - t0;
+    // Câu hỏi chuyển cho người là câu hỏi của chính lần dừng "ngoài phạm vi" (và
+    // các lần dừng khác nếu có) — không viết sẵn.
+    const escalating = scopeStop ? [scopeStop, ...stops.filter((s) => s !== scopeStop && s.blocking)] : [];
+    const questions = escalating.map((s) => s.questionForHuman);
+    const refused = prec.count === 0;
+    const isOk = expected.precedentFound === false && refused && Boolean(scopeStop) && questions.length > 0;
 
     return {
         id: 'TC-04',
-        title: 'Laser Welding Defect on Milling Cell (Safe Escalation & Precedent Refusal)',
-        category: 'Quadrant 4 — Safe Refusal & Escalation (Mandatory Rule)',
-        inputSummary: 'WC-MILL-07, Housing Cover MAT-10247, Out-of-domain welding defect DEF-0910',
-        expectedBehavior: 'No matching precedent -> stop (outside scope), refuse to cite one, escalate to a welding SME with concrete questions',
+        title: 'Welding Defect on Milling Cell (Safe Escalation & Precedent Refusal)',
+        category: 'Quadrant 4 - Safe Refusal & Escalation (Mandatory Rule)',
+        inputSummary: `${ctx.product.workCenterId}, ${ctx.product.materialId}, out-of-domain defect ${ctx.product.defectCode}: ${raw.symptomShortText}`,
+        expectedBehavior: 'D4 precedent search returns nothing, so the AI stops (outside scope), cites no precedent, and hands concrete questions to a person',
         actualBehavior: isOk
-            ? `Refused to cite a precedent: 0 closed cases share ${ctx.product.workCenterId} + ${ctx.product.defectCode}. Escalated to a welding SME with 3 technical questions.`
-            : `Refusal check failed. Matching cases found: ${matchingCases.length}`,
+            ? `Refused to cite a precedent: ${prec.basis}. Stopped at D4 and escalated with ${questions.length} question(s) for a person.`
+            : refused
+                ? (scopeStop ? 'Outside-scope stop raised, but it carries no question for a person.' : 'No precedent returned, but no outside-scope stop was raised.')
+                : `Refusal failed: D4 precedent search returned ${prec.count} case(s) for an out-of-domain defect (${prec.top.map((p) => `${p.notificationId} ${p.explanation}`).join('; ')}), so the AI would cite them.`,
         status: isOk ? 'PASS' : 'FAIL',
-        durationMs,
-        reportId: rep?.ID || 'bff585aa-b23a-45e4-a1ec-70a8ddf66671',
-        notificationId: '8D-10049003',
+        durationMs: Date.now() - t0,
+        reportId: await existingReportId(db, raw.notificationId),
+        notificationId: raw.notificationId,
         stopType: primaryStopType(stops),
         stops: stops.map(toJudgeStop),
-        details: escalationPacket
+        details: {
+            precedentBasis: prec.basis,
+            precedentsReturned: prec.top,
+            escalationQuestions: questions,
+            escalateTo: [...new Set(escalating.map((s) => s.requiredRole))],
+        },
     };
 }
 
@@ -419,8 +414,6 @@ const str = (v: unknown): string | null => (typeof v === 'string' && v.trim() ? 
  * không có gì được soạn.
  */
 export async function evaluateJudgeInput(rawInput: unknown, db: any): Promise<JudgeEvaluation> {
-    // Realistic AI deliberation latency on live judge input
-    await new Promise((r) => setTimeout(r, 650));
     const t0 = Date.now();
     const timestamp = new Date().toISOString();
     const raw = rawInput as any;
@@ -474,19 +467,14 @@ export async function evaluateJudgeInput(rawInput: unknown, db: any): Promise<Ju
         const ctx = mapCase(raw);
         const wc = str(ctx.product.workCenterId);
         const code = str(ctx.product.defectCode);
-        const where: Record<string, string> = {};
-        if (wc) where.workCenterId = wc;
-        if (code) where.defectCode = code;
-        const matching: any[] = Object.keys(where).length
-            ? await db.run(SELECT.from('cnma.proresolve.HistoricalCases').columns('notificationId').where(where))
-            : [];
-        const basis = Object.keys(where).length
-            ? `same ${[wc && `work center ${wc}`, code && `defect code ${code}`].filter(Boolean).join(' and ')}`
-            : 'no work center or defect code given — nothing to match on';
+        // Cùng engine tiền lệ mà app dùng cho D4 - không phải một câu lọc riêng.
+        const prec = await realD4Precedents(ctx, raw);
+        const matching = prec.ids.map((notificationId) => ({ notificationId }));
+        const basis = prec.basis;
 
         const stops = evaluateStops({
             caseContext: ctx,
-            precedents: Object.keys(where).length ? { count: matching.length, basis: `${matching.length} closed case(s) with ${basis}` } : null,
+            precedents: { count: prec.count, reason: prec.reason, basis },
         });
         const primary = primaryStopType(stops);
         const needsPerson = stops.filter((s) => s.type !== 'exceeds-authority');
@@ -525,7 +513,7 @@ export async function evaluateJudgeInput(rawInput: unknown, db: any): Promise<Ju
             },
             validation: { blocking: [], warnings: val.length },
             precedentCheck: {
-                performed: Object.keys(where).length > 0,
+                performed: true,
                 matchingCases: matching.length,
                 basis,
                 sample: matching.slice(0, 3).map((m) => String(m.notificationId)),

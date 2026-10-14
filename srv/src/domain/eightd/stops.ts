@@ -101,7 +101,7 @@ function stop(type: StopType, rule: string, step: string, fields: Omit<Stop, 'id
 }
 
 /** Nguyên nhân được hồ sơ đánh dấu, và dòng Ishikawa có số đo mâu thuẫn với nó. */
-function contradictingEvidence(ctx: any): { flagged: string; flaggedMetric: string | null; measured: { category: string; metric: string } | null } | null {
+export function contradictingEvidence(ctx: any): { flagged: string; flaggedMetric: string | null; measured: { category: string; metric: string } | null } | null {
     const rows: any[] = Array.isArray(ctx?.ishikawa) ? ctx.ishikawa : [];
     const flaggedRow = rows.find((r) => r?.isRootCause === true || r?.isRootCause === 'Y');
     const flagged = text(flaggedRow?.category) || text(ctx?.rootCause?.category);
@@ -130,7 +130,7 @@ export function evaluateStops(input: StopInput): Stop[] {
     if (measured.length === 0) {
         stops.push(stop('unverified-facts', 'no-measurement', 'D4', {
             reason: inspections.length === 0
-                ? `No inspection result is on record for "${symptom}" — there is nothing to measure the root cause against.`
+                ? `No inspection result is on record for "${symptom}" - there is nothing to measure the root cause against.`
                 : `${inspections.length} inspection row(s) are on record but none carries a measured number.`,
             questionForHuman: 'Which characteristic was measured, what value was found, and what is its specification?',
             requiredRole: 'Quality Engineer',
@@ -203,7 +203,7 @@ export function evaluateStops(input: StopInput): Stop[] {
 
     if (ctx?.isCustomerFacing === true) {
         stops.push(stop('exceeds-authority', 'customer-notification', 'D8', {
-            reason: 'This is a customer complaint (Q1). What the customer is told — and when — is not the AI\'s call.',
+            reason: 'This is a customer complaint (Q1). What the customer is told - and when - is not the AI\'s call.',
             questionForHuman: 'Who informs the customer of the root cause and corrective action, and has it been sent?',
             requiredRole: 'Customer Quality Engineer',
             blocking: true,

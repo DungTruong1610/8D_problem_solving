@@ -7,7 +7,6 @@ import {
     ChevronDown,
     Clock,
     FileText,
-    Info,
     Play,
     RefreshCw,
     ShieldCheck,
@@ -18,10 +17,6 @@ import { eightDService } from '@/services/eightd-service';
 import { JudgeReportModal } from '@/components/verify/JudgeReportModal';
 import { TestCaseReportModal } from '@/components/verify/TestCaseReportModal';
 import {
-    TEST_CASE_SUMMARIES,
-    type TestCaseSummary,
-} from '@/components/verify/test-case-summary-data';
-import {
     JUDGE_STOP_LABEL,
     type JudgeEvaluation,
     type JudgeStopType,
@@ -29,12 +24,10 @@ import {
 import {
     JUDGE_PRESETS,
     TEST_CASES,
-    buildReferenceReport,
     type VerifyHarnessReport,
 } from '../guide-data';
 import { GuideCard, TabIntro } from '../guide-ui';
 
-type ReportSource = 'live' | 'reference';
 
 /**
  * Kết quả khi KHÔNG gọi được backend: chỉ là luật đơn giản chạy ở trình duyệt,
@@ -74,7 +67,7 @@ function localEvaluation(parsed: any, reason: string, decision: JudgeEvaluation[
             gaps: [],
         },
         validation: { blocking: [], warnings: 0 },
-        precedentCheck: { performed: false, matchingCases: 0, basis: 'Not run — the case library is only searched on the server.', sample: [] },
+        precedentCheck: { performed: false, matchingCases: 0, basis: 'Not run - the case library is only searched on the server.', sample: [] },
         nextStep: {
             title: decision === 'GRACEFULLY_REFUSED' ? 'Refused' : 'Run again when the backend is reachable',
             summary: simulated
@@ -93,10 +86,10 @@ function simulateJudge(parsed: any): JudgeEvaluation {
         return localEvaluation(parsed, 'The input is not a JSON object.', 'GRACEFULLY_REFUSED', 'unverified-facts', true);
     }
     if (parsed.invoiceId || parsed.amountVnd || /finance|accounting|hr|payroll/i.test(String(parsed.department ?? ''))) {
-        return localEvaluation(parsed, 'This looks like a finance document, not a quality notification — refused.', 'GRACEFULLY_REFUSED', 'outside-scope', true);
+        return localEvaluation(parsed, 'This looks like a finance document, not a quality notification - refused.', 'GRACEFULLY_REFUSED', 'outside-scope', true);
     }
     if (!parsed.notificationId && !parsed.symptomShortText && !parsed.defect) {
-        return localEvaluation(parsed, 'No notificationId, symptom or defect — the defect cannot be identified.', 'GRACEFULLY_REFUSED', 'unverified-facts', true);
+        return localEvaluation(parsed, 'No notificationId, symptom or defect - the defect cannot be identified.', 'GRACEFULLY_REFUSED', 'unverified-facts', true);
     }
     return localEvaluation(parsed, 'Looks like a quality notification. The precedent search and stop rules need the server, so no verdict is given here.', 'ESCALATED', null, true);
 }
@@ -117,8 +110,8 @@ function StopPill({ type }: { type?: JudgeStopType | null }) {
 }
 
 const DECISION_LABEL: Record<JudgeEvaluation['decision'], string> = {
-    HANDLED_APPROPRIATELY: 'Handled — no stop',
-    ESCALATED: 'Stopped — handed to a person',
+    HANDLED_APPROPRIATELY: 'Handled - no stop',
+    ESCALATED: 'Stopped - handed to a person',
     GRACEFULLY_REFUSED: 'Refused',
 };
 
@@ -145,7 +138,9 @@ export function EvaluationTab() {
     const [isRunning, setIsRunning] = useState(false);
     const [elapsedMs, setElapsedMs] = useState(0);
     const [report, setReport] = useState<VerifyHarnessReport | null>(null);
-    const [source, setSource] = useState<ReportSource>('live');
+    // Backend không trả lời thì BÁO LỖI — không dựng một bảng "4/4 PASS" tham
+    // khảo thay vào, vì nhìn lướt nó y hệt một lần chạy thật.
+    const [runError, setRunError] = useState<string | null>(null);
     const [expanded, setExpanded] = useState<string | null>(null);
     const timerRef = useRef<number | null>(null);
 
@@ -155,7 +150,7 @@ export function EvaluationTab() {
     const [judgeResult, setJudgeResult] = useState<JudgeEvaluation | null>(null);
 
     // ── Modals ──
-    const [summaryCase, setSummaryCase] = useState<TestCaseSummary | null>(null);
+    const [summaryId, setSummaryId] = useState<string | null>(null);
     const [isJudgeModalOpen, setIsJudgeModalOpen] = useState(false);
 
     // "Open case" only makes sense for cases that exist in this database. The
@@ -173,17 +168,19 @@ export function EvaluationTab() {
     const runVerify = async () => {
         setIsRunning(true);
         setReport(null);
+        setRunError(null);
         setElapsedMs(0);
         const started = Date.now();
         timerRef.current = window.setInterval(() => setElapsedMs(Date.now() - started), 100);
         try {
             const res = await fetch('/api/verify/sprint1');
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            if (!res.ok) {
+                const body = await res.json().catch(() => null);
+                throw new Error(body?.error ?? `HTTP ${res.status}`);
+            }
             setReport(await res.json());
-            setSource('live');
-        } catch {
-            setReport(buildReferenceReport());
-            setSource('reference');
+        } catch (err: any) {
+            setRunError(err?.message ?? 'The verification backend could not be reached.');
         } finally {
             if (timerRef.current) window.clearInterval(timerRef.current);
             setIsRunning(false);
@@ -230,10 +227,12 @@ export function EvaluationTab() {
                 }
             />
 
-            {report && source === 'reference' && (
-                <div className="flex items-start gap-2.5 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2.5 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
-                    <Info className="mt-0.5 size-4 shrink-0" />
-                    <span>The backend could not be reached, so these are reference results — not a live run. Start the backend and run again.</span>
+            {runError && (
+                <div role="alert" className="flex items-start gap-2.5 rounded-lg border border-destructive/30 bg-error-bg px-3 py-2.5 text-sm text-destructive">
+                    <XCircle className="mt-0.5 size-4 shrink-0" />
+                    <span>
+                        Verification did not run: {runError}. No result is shown, because none was measured. Check that the backend is running and try again.
+                    </span>
                 </div>
             )}
 
@@ -251,7 +250,7 @@ export function EvaluationTab() {
                     />
                     <StatTile
                         label="Source"
-                        value={source === 'live' ? 'Live run' : 'Reference'}
+                        value="Live run"
                         hint={new Date(report.executedAt).toLocaleString()}
                     />
                 </div>
@@ -289,16 +288,18 @@ export function EvaluationTab() {
 
                                     <div className="flex shrink-0 items-center gap-2 pl-7 md:pl-0">
                                         <span className="w-16 text-right font-mono text-xs text-muted-foreground">
-                                            {result ? `${result.durationMs}ms` : '—'}
+                                            {result ? `${result.durationMs}ms` : '-'}
                                         </span>
-                                        {result ? <StopPill type={result.stopType} /> : <span className="inline-flex w-[124px] justify-center text-xs text-muted-foreground">—</span>}
+                                        {result ? <StopPill type={result.stopType} /> : <span className="inline-flex w-[124px] justify-center text-xs text-muted-foreground">-</span>}
                                         <StatusPill status={result?.status} />
                                         <Button
                                             type="button"
                                             variant="outline"
                                             size="sm"
                                             className="gap-1.5"
-                                            onClick={() => setSummaryCase(TEST_CASE_SUMMARIES[tc.id] ?? null)}
+                                            disabled={!result}
+                                            title={result ? undefined : 'Run verification first - the summary shows the result of a run'}
+                                            onClick={() => setSummaryId(tc.id)}
                                         >
                                             <FileText className="size-3.5" />
                                             Summary
@@ -338,7 +339,7 @@ export function EvaluationTab() {
                                                 <ul className="space-y-1">
                                                     {result.stops.map((st) => (
                                                         <li key={st.id} className="text-foreground">
-                                                            <span className="font-medium">{JUDGE_STOP_LABEL[st.type]} · {st.step}</span> — {st.reason}{' '}
+                                                            <span className="font-medium">{JUDGE_STOP_LABEL[st.type]} · {st.step}</span> - {st.reason}{' '}
                                                             <span className="text-muted-foreground">Asks {st.requiredRole}: {st.questionForHuman}</span>
                                                         </li>
                                                     ))}
@@ -363,7 +364,7 @@ export function EvaluationTab() {
                         </div>
                         <div>
                             <h3 className="text-sm font-semibold text-foreground">Judge sandbox</h3>
-                            <p className="mt-0.5 text-sm text-muted-foreground">Paste any JSON and see whether it is handled, stopped for a person, or refused — and why.</p>
+                            <p className="mt-0.5 text-sm text-muted-foreground">Paste any JSON and see whether it is handled, stopped for a person, or refused - and why.</p>
                         </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
@@ -402,14 +403,14 @@ export function EvaluationTab() {
                         <div className="min-w-0 space-y-0.5">
                             <p className="flex flex-wrap items-center gap-2 font-semibold">
                                 {judgeResult.decision === 'HANDLED_APPROPRIATELY' && judgeResult.stops.length > 0
-                                    ? 'Handled — sign-off needed at closure'
+                                    ? 'Handled - sign-off needed at closure'
                                     : DECISION_LABEL[judgeResult.decision]}
                                 {judgeResult.primaryStopType && (
                                     <span className="rounded-full border border-current/30 px-2 py-px text-xs font-medium">
                                         Stop: {JUDGE_STOP_LABEL[judgeResult.primaryStopType]}
                                     </span>
                                 )}
-                                {judgeResult.simulated && <span className="text-xs font-normal opacity-75">(browser check only — backend unreachable)</span>}
+                                {judgeResult.simulated && <span className="text-xs font-normal opacity-75">(browser check only - backend unreachable)</span>}
                             </p>
                             <p>{judgeResult.reason}</p>
                         </div>
@@ -421,7 +422,24 @@ export function EvaluationTab() {
                 )}
             </GuideCard>
 
-            <TestCaseReportModal isOpen={!!summaryCase} onClose={() => setSummaryCase(null)} testCase={summaryCase} />
+            {(() => {
+                const meta = TEST_CASES.find((tc) => tc.id === summaryId) ?? null;
+                const result = report?.results.find((r) => r.id === summaryId) ?? null;
+                const caseId = result?.notificationId || meta?.notificationId || '';
+                return (
+                    <TestCaseReportModal
+                        meta={meta}
+                        result={result}
+                        executedAt={report?.executedAt ?? null}
+                        canOpenCase={existingCases.has(caseId)}
+                        onOpenCase={() => {
+                            setSummaryId(null);
+                            navigate(`/8d/${caseId}`);
+                        }}
+                        onClose={() => setSummaryId(null)}
+                    />
+                );
+            })()}
             <JudgeReportModal isOpen={isJudgeModalOpen} onClose={() => setIsJudgeModalOpen(false)} report={judgeResult} />
         </div>
     );

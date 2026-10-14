@@ -122,7 +122,7 @@ describe('resolveOutOfSpec', () => {
 
 describe('formatSpecRange', () => {
     it.each([
-        [0.05, 0.1, 'mm', '0.05 – 0.1 mm'],
+        [0.05, 0.1, 'mm', '0.05 - 0.1 mm'],
         [null, 0.1, 'mm', 'max 0.1 mm'],
         [60, null, 'um', 'min 60 um'],
         [null, 0.1, null, 'max 0.1'],
@@ -215,7 +215,8 @@ describe('mapCase — case gốc của nhóm', () => {
         expect(ctx.origin).toBe('Q3 - Internal Defect');
         expect(ctx.isCustomerFacing).toBe(false);
         expect(ctx.header.quantityExtent).toBe('128 units affected');
-        expect(ctx.header.completionDate).toBeNull();
+        // Case gốc được đóng trong generate.py (TEMPLATE_CLOSURE) để làm tiền lệ cho TC-01.
+        expect(ctx.header.completionDate).toBe('2026-09-21');
     });
 
     it('join master data qua khoá ngoại', () => {
@@ -243,7 +244,7 @@ describe('mapCase — case gốc của nhóm', () => {
         expect(ctx.actions.containment).toHaveLength(1);
         expect(ctx.actions.corrective).toHaveLength(1);
         expect(ctx.actions.preventive).toHaveLength(1);
-        expect(ctx.actions.preventive[0].status).toBe('Planned');
+        expect(ctx.actions.preventive[0].status).toBe('Done');
     });
 
     it('tách leader khỏi members', () => {

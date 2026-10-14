@@ -62,6 +62,14 @@ Q3 = "Q3 - Internal Defect"
 # demo: không báo lỗi, chỉ đơn giản là không bao giờ ăn điểm.
 TEMPLATE_MATERIAL_GROUP = "MG-HOUSING"   # MAT-10247 Bracket Housing X240
 
+# Trạng thái đóng của case gốc — cùng lý do file gốc không sửa được.
+#
+# File gốc ghi case này "In Process" (chưa có ngày hoàn tất, action phòng ngừa
+# còn Planned). Nhưng nó là tiền lệ mà TC-01 của bộ verify phải tìm thấy, và kho
+# tiền lệ chỉ nhận case ĐÃ ĐÓNG: để nguyên thì engine tiền lệ loại nó, đúng luật,
+# và TC-01 hỏng trên mọi DB dựng mới. Ngày đóng khớp ngày nó được đóng trong app.
+TEMPLATE_CLOSURE = {"status": "Completed", "completion_date": "2026-09-21"}
+
 
 def case_from_template(doc: dict) -> dict:
     """
@@ -87,12 +95,16 @@ def case_from_template(doc: dict) -> dict:
         "batch": {"batch_id": d["batches"][0]["batch_id"]},
         "defect": d["defect_catalog"][0],
         "work_center": d["work_centers"][0],
-        "header": {k: note[k] for k in header_keys},
+        "header": {**{k: note[k] for k in header_keys}, **TEMPLATE_CLOSURE},
         "inspections": strip_nid(d["inspections"]),
         "causes_ishikawa": strip_nid(d["causes_ishikawa"]),
         "five_why_chain": strip_nid(d["five_why_chain"]),
         "is_is_not": strip_nid(d["is_is_not"])[0],
-        "actions": strip_nid(d["actions"]),
+        # Case đã đóng thì không còn action nào "Planned".
+        "actions": [
+            {**a, "status": "Done"} if a.get("status") == "Planned" else a
+            for a in strip_nid(d["actions"])
+        ],
         "fmea_link": {k: v for k, v in fmea.items() if k != "notification_id"} if fmea else None,
         "cost_copq": d["cost_copq"][0]["cost_of_poor_quality_eur"],
         "lessons_learned": strip_nid(d["lessons_learned"])[0],

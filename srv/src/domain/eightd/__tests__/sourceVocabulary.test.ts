@@ -86,9 +86,9 @@ describe('giải đường dẫn — chấp nhận', () => {
     });
 
     it('chấp nhận trỏ vào trường có giá trị null — đó là sự thật, không phải bịa', () => {
-        // Case này chưa đóng nên completion_date là null.
-        expect(ctx.header.completionDate).toBeNull();
-        expect(vocab.has('header.completionDate')).toBe(true);
+        // Case này không có số tham chiếu nên reference_number là null.
+        expect(ctx.header.referenceNumber).toBeNull();
+        expect(vocab.has('header.referenceNumber')).toBe(true);
     });
 
     it('chấp nhận mảng — gaps hoặc unmapped', () => {

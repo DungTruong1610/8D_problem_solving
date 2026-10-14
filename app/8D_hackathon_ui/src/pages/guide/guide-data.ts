@@ -34,8 +34,8 @@ export interface VerifyHarnessReport {
 export const STANDARD_TEST_CASE_TEMPLATE = {
     "$schema": "",
     "$testCaseId": "TC-01",
-    "$title": "Milling Burr Defect (Happy Path — Strong Precedent Match)",
-    "$category": "Quadrant 1 — Perfect End-to-End Workflow",
+    "$title": "Milling Burr Defect (Happy Path - Strong Precedent Match)",
+    "$category": "Quadrant 1 - Perfect End-to-End Workflow",
     "notificationId": "8D-10049001",
     "origin": "Q3 - Internal Defect",
     "symptomShortText": "Operator stopped the line - rough edge felt on bracket flange after milling",
@@ -86,8 +86,8 @@ export const STANDARD_TEST_CASE_TEMPLATE = {
 export const SANDBOX_INITIAL_JSON = {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$testCaseId": "TC-01",
-    "$title": "Milling Burr Defect (Happy Path — Strong Precedent Match)",
-    "$category": "Quadrant 1 — Perfect End-to-End Workflow",
+    "$title": "Milling Burr Defect (Happy Path - Strong Precedent Match)",
+    "$category": "Quadrant 1 - Perfect End-to-End Workflow",
     "notificationId": "8D-10049001",
     "origin": "Q3 - Internal Defect",
     "symptomShortText": "Operator stopped the line - rough edge felt on bracket flange after milling",
@@ -363,7 +363,7 @@ export const PAGE_CARDS = [
         key: '8d-detail',
         title: '8D Workspace',
         route: `/8d/${BENCHMARK_NOTIFICATION_ID}`,
-        summary: 'Work through D1 – D8 with AI drafts and precedent matches.',
+        summary: 'Work through D1 - D8 with AI drafts and precedent matches.',
         steps: [
             'Check precedent matches in the side panel.',
             'Review each discipline from D1 to D8.',
@@ -388,7 +388,7 @@ export const PAGE_CARDS = [
         summary: 'Models, discipline prompts and precedent retrieval settings.',
         steps: [
             'Choose the LLM provider.',
-            'Edit prompts for D1 – D8.',
+            'Edit prompts for D1 - D8.',
             'Tune retrieval weights and cutoff.',
         ],
     },
@@ -402,7 +402,7 @@ export const AI_CONFIG_CARDS = [
         title: 'LLM provider',
         summary: 'Pick the model that drafts every discipline.',
         items: [
-            { label: 'DeepSeek', note: 'Default — fast and low cost' },
+            { label: 'DeepSeek', note: 'Default - fast and low cost' },
             { label: 'Gemini', note: 'Strong multilingual extraction' },
             { label: 'Mock mode', note: 'Offline, no API key needed' },
         ],
@@ -410,7 +410,7 @@ export const AI_CONFIG_CARDS = [
     {
         key: 'prompts',
         title: 'Discipline prompts',
-        summary: 'Each of D1 – D8 has its own system and user prompt.',
+        summary: 'Each of D1 - D8 has its own system and user prompt.',
         items: [
             { label: '{{symptomShortText}}', note: 'Defect description' },
             { label: '{{inspections}}', note: 'Measured vs spec values' },
@@ -466,9 +466,9 @@ export const TEST_CASES = [
         id: 'TC-01',
         title: 'Milling burr defect',
         quadrant: 'Happy path',
-        notificationId: '8D-10048412',
-        summary: 'Internal defect on WC-MILL-07, burr 0.26mm vs max 0.10mm.',
-        expected: 'Matches precedent 8D-10048412, inputs complete for a D1 – D8 draft, no stop raised.',
+        notificationId: '8D-10049001',
+        summary: 'New internal defect on WC-MILL-07, burr 0.26mm vs max 0.10mm.',
+        expected: 'The D4 precedent search (same engine as the app) returns 8D-10048412; symptom and measurement present; no blocking stop.',
         stopType: null,
         jsonPath: 'mock-data/sprint1-test-cases/tc-01-happy-path.json',
     },
@@ -478,7 +478,7 @@ export const TEST_CASES = [
         quadrant: 'Messy real-world data',
         notificationId: '8D-90048412',
         summary: 'German text, comma decimal "0,32 mm", padded material ID, missing fields.',
-        expected: 'No crash, values normalized, gaps reported — and stops (unverified facts) until a QE confirms the parsed 0.32 mm.',
+        expected: 'No crash, values normalized, gaps reported - and stops (unverified facts) until a QE confirms the parsed 0.32 mm.',
         stopType: 'unverified-facts',
         jsonPath: 'mock-data/sprint1-test-cases/tc-02-dirty-sap.json',
     },
@@ -497,8 +497,8 @@ export const TEST_CASES = [
         title: 'Welding defect on milling cell',
         quadrant: 'Safe refusal',
         notificationId: '8D-10049003',
-        summary: 'Welding defect code on a milling cell — no closed case shares the work center and defect code.',
-        expected: 'Stops (outside scope): 0 matching closed cases, so no precedent is cited; escalates to a welding SME.',
+        summary: 'Welding defect code on a milling cell - only the work center and material match past cases.',
+        expected: 'The D4 precedent search returns nothing above its threshold, so the AI stops (outside scope), cites no precedent and escalates to a person.',
         stopType: 'outside-scope',
         jsonPath: 'mock-data/sprint1-test-cases/tc-04-graceful-refusal.json',
     },
@@ -509,42 +509,6 @@ export const JUDGE_PRESETS = [
     { key: 'out-of-domain', label: 'Out of domain', payload: SAMPLE_JUDGE_OUT_OF_DOMAIN },
     { key: 'junk', label: 'Junk invoice', payload: SAMPLE_JUDGE_OUT_OF_SCOPE },
 ] as const;
-
-/**
- * Reference results shown when `/api/verify/sprint1` is unreachable (e.g. the
- * hosted backend is cold-starting). The UI labels them as such — they are NOT
- * a live run.
- */
-export function buildReferenceReport(): VerifyHarnessReport {
-    const durations: Record<string, number> = { 'TC-01': 1528, 'TC-02': 1365, 'TC-03': 1532, 'TC-04': 1702 };
-    const results: TestCaseResult[] = TEST_CASES.map((tc) => ({
-        id: tc.id,
-        title: tc.title,
-        category: tc.quadrant,
-        inputSummary: tc.summary,
-        expectedBehavior: tc.expected,
-        actualBehavior: tc.expected,
-        status: 'PASS',
-        durationMs: durations[tc.id],
-        details: {},
-        notificationId: tc.notificationId,
-        stopType: tc.stopType,
-        stops: [],
-    }));
-    return {
-        suite: 'Sprint 1 Verify Suite',
-        track: 'Track 1: OrganizationAI',
-        challenge: 'Challenge B: The Whole Workflow (8D Copilot)',
-        executedAt: new Date().toISOString(),
-        totalDurationMs: results.reduce((sum, r) => sum + r.durationMs, 0),
-        targetDurationLimitMs: 90000,
-        passed: results.length,
-        failed: 0,
-        total: results.length,
-        verdict: 'PASS',
-        results,
-    };
-}
 
 // ── Tab 5: CLI ──────────────────────────────────────────────────────────────
 
@@ -576,7 +540,7 @@ export const TOUR_STEPS = [
         description: 'Review AI drafts discipline by discipline, with precedents on the side.',
         actions: [
             'Check the precedent matches and their scores.',
-            'Step through D1 – D8 and approve each one.',
+            'Step through D1 - D8 and approve each one.',
         ],
     },
     {

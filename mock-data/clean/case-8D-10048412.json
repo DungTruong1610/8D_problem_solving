@@ -2,9 +2,9 @@
   "notificationId": "8D-10048412",
   "origin": "Q3 - Internal Defect",
   "symptomShortText": "Flange edge burr above limit after milling",
-  "status": "In Process",
+  "status": "Completed",
   "foundDate": "2026-08-03",
-  "completionDate": null,
+  "completionDate": "2026-09-21",
   "quantityExtent": "128 units affected",
   "teamSize": 4,
   "material": {
@@ -117,7 +117,7 @@
       "lineNo": 3,
       "actionType": "Preventive",
       "actionText": "Add tool-life counter alarm at 8,000 cycles on WC-MILL-07",
-      "status": "Planned"
+      "status": "Done"
     }
   ],
   "teamAssignments": [

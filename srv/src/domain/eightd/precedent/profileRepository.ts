@@ -236,7 +236,7 @@ async function readLegacyGlobalConfig(): Promise<{
             closedOnly: settings?.closedOnly !== false,
         };
     } catch (e: any) {
-        LOG.warn(`Không đọc được cấu hình toàn cục cũ (${e.message}) — seed từ hằng số trong code.`);
+        LOG.warn(`Không đọc được cấu hình toàn cục cũ (${e.message}) - seed từ hằng số trong code.`);
         return {
             criteria: DEFAULT_CRITERIA.map((c) => ({ ...c })),
             minScore: DEFAULT_RETRIEVAL_SETTINGS.minScore,
@@ -369,7 +369,7 @@ export async function seedRetrievalProfiles(): Promise<void> {
                     profileKey: spec.profileKey,
                     label: spec.label,
                     description: spec.profileDescription,
-                    minScore: Number(defProfile?.minScore ?? DEFAULT_RETRIEVAL_SETTINGS.minScore),
+                    minScore: spec.minScore ?? Number(defProfile?.minScore ?? DEFAULT_RETRIEVAL_SETTINGS.minScore),
                     topN: Number(defProfile?.topN ?? DEFAULT_RETRIEVAL_SETTINGS.topN),
                     closedOnly: defProfile ? defProfile.closedOnly !== false : DEFAULT_RETRIEVAL_SETTINGS.closedOnly,
                     isSystem: true,
@@ -398,7 +398,7 @@ export async function seedRetrievalProfiles(): Promise<void> {
 
             LOG.info(
                 `Đã tạo profile "${spec.profileKey}" (${baseCriteria.length} tiêu chí + rerank, TẮT sẵn) `
-                + `và gán cho ${spec.stepCode}${currentKey && currentKey !== DEFAULT_PROFILE_KEY ? ' — GIỮ binding admin đã chỉnh' : ''}`,
+                + `và gán cho ${spec.stepCode}${currentKey && currentKey !== DEFAULT_PROFILE_KEY ? ' - GIỮ binding admin đã chỉnh' : ''}`,
             );
         }
 
@@ -577,7 +577,7 @@ export async function saveProfile(profileKey: string, input: SaveProfileInput): 
             }
             if (matchType === 'cosine' && String(c.sourceField ?? '') !== 'embedding') {
                 throw Object.assign(
-                    new Error(`Tiêu chí "${criterionKey}" dùng cosine nhưng so trên "${c.sourceField}" — chỉ "embedding" có vector.`),
+                    new Error(`Tiêu chí "${criterionKey}" dùng cosine nhưng so trên "${c.sourceField}" - chỉ "embedding" có vector.`),
                     { code: 400 },
                 );
             }
@@ -680,7 +680,7 @@ export async function deleteProfile(profileKey: string): Promise<{ rebound: stri
 
     if (key === DEFAULT_PROFILE_KEY) {
         throw Object.assign(
-            new Error('Không xoá được profile mặc định — nó là chỗ mọi bước rơi về.'),
+            new Error('Không xoá được profile mặc định - nó là chỗ mọi bước rơi về.'),
             { code: 400 },
         );
     }

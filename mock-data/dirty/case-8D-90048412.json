@@ -2,9 +2,9 @@
   "notificationId": "8D-90048412",
   "origin": "Q3 - Internal Defect",
   "symptomShortText": "Grat an Flanschkante > Grenzwert n. Fraesen, Schicht C",
-  "status": "In Process",
+  "status": "Completed",
   "foundDate": "2026-08-03",
-  "completionDate": null,
+  "completionDate": "21.09.2026",
   "quantityExtent": "128 St",
   "teamSize": "n.a.",
   "material": {

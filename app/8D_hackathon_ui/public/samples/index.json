@@ -21,9 +21,9 @@
     "file": "issue-C-new-welding.json",
     "notificationId": "8D-10049003",
     "origin": "Q3 - Internal Defect",
-    "symptom": "Weld seam cracked during frame straightening at the fixture",
-    "workCenter": "WC-WELD-11",
-    "material": "MAT-12800",
+    "symptom": "Laser welding porosity on machined housing cover flange",
+    "workCenter": "WC-MILL-07",
+    "material": "MAT-10247",
     "investigated": false
   }
 ]

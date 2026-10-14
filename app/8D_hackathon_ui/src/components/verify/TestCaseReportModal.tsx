@@ -1,313 +1,246 @@
 import { useState } from 'react';
 import {
-    CheckCircle2,
-    X,
-    FileText,
-    ExternalLink,
-    Copy,
-    Check,
-    Cpu,
-    Database,
-    Clock,
-    Activity,
-    ShieldCheck,
-    Layers
-} from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { TestCaseSummary } from './test-case-summary-data';
+    Badge,
+    Button,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    cn,
+} from '@cnma/react-ui';
+import { ArrowRight, Check, CheckCircle2, Clock, Copy, FileJson, Hand, XCircle } from 'lucide-react';
+import { JUDGE_STOP_LABEL } from '../../../../../shared/judge-evaluation';
+import type { TestCaseResult } from '@/pages/guide/guide-data';
 
-interface TestCaseReportModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    testCase: TestCaseSummary | null;
+/** Phần mô tả tĩnh của một test case (tên, nhóm, file input) — không phải kết quả. */
+export interface TestCaseMeta {
+    id: string;
+    title: string;
+    quadrant: string;
+    jsonPath: string;
 }
 
-export function TestCaseReportModal({ isOpen, onClose, testCase }: TestCaseReportModalProps) {
-    const navigate = useNavigate();
+interface TestCaseReportModalProps {
+    meta: TestCaseMeta | null;
+    /** Kết quả của LẦN CHẠY VỪA RỒI. Popup chỉ hiện thứ đã đo được. */
+    result: TestCaseResult | null;
+    executedAt: string | null;
+    canOpenCase: boolean;
+    onOpenCase: () => void;
+    onClose: () => void;
+}
+
+/** Tên khoá trong `details` → nhãn đọc được. */
+function humanize(key: string): string {
+    return key
+        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        .replace(/^./, (c) => c.toUpperCase());
+}
+
+function isPrecedentList(v: unknown): v is { notificationId: string; explanation: string }[] {
+    return Array.isArray(v) && v.every((x) => x && typeof x === 'object' && 'notificationId' in x);
+}
+
+function DetailValue({ value }: { value: unknown }) {
+    if (value === null || value === undefined || value === '') {
+        return <span className="text-muted-foreground">None</span>;
+    }
+    if (isPrecedentList(value)) {
+        return value.length === 0 ? (
+            <span className="text-muted-foreground">None qualified</span>
+        ) : (
+            <ul className="space-y-1">
+                {value.map((p) => (
+                    <li key={p.notificationId} className="flex flex-wrap items-baseline gap-x-2">
+                        <span className="font-mono font-semibold text-foreground">{p.notificationId}</span>
+                        <span className="text-muted-foreground">{p.explanation}</span>
+                    </li>
+                ))}
+            </ul>
+        );
+    }
+    if (Array.isArray(value)) {
+        return (
+            <ul className="list-disc space-y-1 pl-4">
+                {value.map((v, i) => <li key={i}>{typeof v === 'object' ? JSON.stringify(v) : String(v)}</li>)}
+            </ul>
+        );
+    }
+    if (typeof value === 'object') {
+        return (
+            <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5">
+                {Object.entries(value as Record<string, unknown>).map(([k, v]) => (
+                    <div key={k} className="contents">
+                        <dt className="text-muted-foreground">{humanize(k)}</dt>
+                        <dd className="text-foreground">{String(v)}</dd>
+                    </div>
+                ))}
+            </dl>
+        );
+    }
+    return <span className="break-words text-foreground">{String(value)}</span>;
+}
+
+function buildCopyText(meta: TestCaseMeta, result: TestCaseResult, executedAt: string | null): string {
+    const lines = [
+        `${meta.id} - ${meta.title} (${meta.quadrant})`,
+        `Status: ${result.status} in ${result.durationMs}ms${executedAt ? `, run at ${new Date(executedAt).toLocaleString()}` : ''}`,
+        `Input file: ${meta.jsonPath}`,
+        '',
+        `Input: ${result.inputSummary}`,
+        `Expected: ${result.expectedBehavior}`,
+        `Actual: ${result.actualBehavior}`,
+    ];
+    if (result.stops?.length) {
+        lines.push('', 'Stops:');
+        for (const s of result.stops) lines.push(`- [${s.type}] ${s.step}: ${s.reason} (asks ${s.requiredRole}: ${s.questionForHuman})`);
+    }
+    lines.push('', 'Measured details:', JSON.stringify(result.details ?? {}, null, 2));
+    return lines.join('\n');
+}
+
+/**
+ * Tóm tắt MỘT test case từ kết quả chạy thật.
+ *
+ * Bản trước là một bài viết tay soạn từ Sprint 1 — "PASS", "1528ms", "100%
+ * similarity on pgvector", cả ma trận D1-D8 "COMPLETE" — hiện y nguyên dù lần
+ * chạy có ra sao. Giờ mọi thứ trong popup đều đọc từ `result`; chưa chạy thì
+ * không có gì để tóm tắt.
+ */
+export function TestCaseReportModal({ meta, result, executedAt, canOpenCase, onOpenCase, onClose }: TestCaseReportModalProps) {
     const [copied, setCopied] = useState(false);
+    const open = Boolean(meta && result);
+    const passed = result?.status === 'PASS';
 
-    if (!isOpen || !testCase) return null;
-
-    const handleCopy = () => {
-        const textToCopy = `=== ${testCase.id} FULL SUMMARY REPORT: ${testCase.title} ===
-Quadrant: ${testCase.quadrant}
-Status: ${testCase.status} (${testCase.score})
-Execution Duration: ${testCase.durationMs}ms
-Notification ID: ${testCase.notificationId}
-Material: ${testCase.materialId}
-Work Center: ${testCase.workCenter}
-
---- 1. SCENARIO & OBJECTIVE ---
-${testCase.scenario.description}
-Context: ${testCase.scenario.productionContext}
-Challenge: ${testCase.scenario.challengeType}
-
---- 2. EMPIRICAL TELEMETRY & PHYSICAL EVIDENCE ---
-Metric: ${testCase.empiricalEvidence.keyMetric}
-Specification Limit: ${testCase.empiricalEvidence.toleranceSpec}
-Sensor Telemetry: ${testCase.empiricalEvidence.sensorTelemetry}
-Finding Analysis: ${testCase.empiricalEvidence.findingAnalysis}
-
---- 3. TWO-TIER AI DEFENSE ---
-Tier 1: ${testCase.defenseBreakdown.tier1Schema}
-Tier 2: ${testCase.defenseBreakdown.tier2Retrieval}
-Similarity: ${testCase.defenseBreakdown.similarityScore}
-Bias Resolution: ${testCase.defenseBreakdown.biasOverrideResult || 'N/A'}
-
---- 4. 8D DISCIPLINES MATRIX ---
-${testCase.disciplinesMatrix.map(d => `[${d.code} ${d.name}]: ${d.summary}`).join('\n')}
-
---- 5. AUDIT & RUBRIC COMPLIANCE ---
-Rubric: ${testCase.auditCompliance.rubricItem}
-Verdict: ${testCase.auditCompliance.complianceVerdict}
-Hallucination Check: ${testCase.auditCompliance.hallucinationCheck}
-`;
-        navigator.clipboard.writeText(textToCopy);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+    const copy = async () => {
+        if (!meta || !result) return;
+        try {
+            await navigator.clipboard.writeText(buildCopyText(meta, result, executedAt));
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            // Clipboard bị chặn (trang không ở HTTPS / không có quyền) — nút giữ nguyên.
+        }
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-            <div className="relative w-full max-w-4xl max-h-[92vh] flex flex-col bg-card rounded-2xl border border-border shadow-2xl overflow-hidden">
-                {/* ── Modal Header ── */}
-                <div className="p-5 border-b border-border bg-muted/30 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                            <CheckCircle2 className="w-6 h-6" />
-                        </div>
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <span className="font-mono text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold">
-                                    {testCase.id}
+        <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
+            <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl">
+                {meta && result && (
+                    <>
+                        <DialogHeader className="space-y-2 border-b px-6 py-5 text-left">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <span className="rounded-md bg-muted px-2 py-0.5 font-mono text-xs font-semibold text-foreground">{meta.id}</span>
+                                <Badge
+                                    variant="outline"
+                                    className={cn(
+                                        'gap-1 font-semibold',
+                                        passed ? 'border-success/30 bg-success-bg text-success' : 'border-destructive/30 bg-error-bg text-destructive',
+                                    )}
+                                >
+                                    {passed ? <CheckCircle2 className="size-3.5" /> : <XCircle className="size-3.5" />}
+                                    {result.status}
+                                </Badge>
+                                <span className="inline-flex items-center gap-1 font-mono text-xs text-muted-foreground">
+                                    <Clock className="size-3.5" />
+                                    {result.durationMs}ms
                                 </span>
-                                <h2 className="text-lg font-bold text-foreground">
-                                    {testCase.title}
-                                </h2>
                             </div>
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                                {testCase.quadrant} • Comprehensive Evaluation &amp; Evidence Summary
-                            </p>
-                        </div>
-                    </div>
+                            <DialogTitle className="text-lg">{meta.title}</DialogTitle>
+                            <DialogDescription>
+                                {meta.quadrant} - live run{executedAt ? ` at ${new Date(executedAt).toLocaleString()}` : ''}
+                            </DialogDescription>
+                        </DialogHeader>
 
-                    <button
-                        onClick={onClose}
-                        className="p-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
-                        title="Close Modal"
-                    >
-                        <X className="w-5 h-5" />
-                    </button>
-                </div>
-
-                {/* ── Modal Body (Scrollable) ── */}
-                <div className="p-6 overflow-y-auto space-y-6 text-sm">
-                    {/*
-                      Nội dung modal này là bản viết tay soạn từ Sprint 1, KHÔNG phải
-                      kết quả của lần chạy vừa rồi — phải nói rõ, nếu không người
-                      xem sẽ đọc các con số tĩnh bên dưới như số đo trực tiếp.
-                    */}
-                    <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2.5 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
-                        Reference write-up prepared for this test case. It is static content, not the output of the run you just did —
-                        live results (status, timing, stop type) are in the Verify table.
-                    </div>
-
-                    {/* Top KPI Summary Banner */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-muted/20 p-4 rounded-xl border border-border">
-                        <div>
-                            <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Test Status</div>
-                            <div className="font-bold text-emerald-600 dark:text-emerald-400 text-base mt-0.5 flex items-center gap-1.5">
-                                <CheckCircle2 className="w-4 h-4" />
-                                {testCase.status} (PASS)
-                            </div>
-                        </div>
-
-                        <div>
-                            <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Criterion 2 Score</div>
-                            <div className="font-bold text-foreground text-base mt-0.5">
-                                {testCase.score}
-                            </div>
-                        </div>
-
-                        <div>
-                            <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">AI Duration</div>
-                            <div className="font-mono font-bold text-blue-600 dark:text-blue-400 text-base mt-0.5 flex items-center gap-1">
-                                <Clock className="w-4 h-4" />
-                                {testCase.durationMs}ms
-                            </div>
-                        </div>
-
-                        <div>
-                            <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">8D Case ID</div>
-                            <div className="font-mono font-bold text-primary text-base mt-0.5">
-                                {testCase.notificationId}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Section 1: Scenario & Manufacturing Challenge */}
-                    <div className="space-y-2">
-                        <div className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
-                            <FileText className="w-4 h-4 text-primary" />
-                            <span>1. Scenario &amp; Production Context</span>
-                        </div>
-                        <div className="p-4 rounded-xl border border-border bg-card space-y-2 text-xs">
-                            <p className="text-foreground leading-relaxed">
-                                {testCase.scenario.description}
-                            </p>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-border/60 text-muted-foreground">
-                                <div><strong>Production Context:</strong> {testCase.scenario.productionContext}</div>
-                                <div><strong>Strategic Challenge:</strong> {testCase.scenario.challengeType}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Section 2: Empirical Telemetry & Physical Evidence */}
-                    <div className="space-y-2">
-                        <div className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
-                            <Activity className="w-4 h-4 text-emerald-500" />
-                            <span>2. Empirical Telemetry &amp; Objective Finding</span>
-                        </div>
-                        <div className="p-4 rounded-xl border border-border bg-card space-y-3 text-xs">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div className="p-3 rounded-lg bg-muted/40 border border-border">
-                                    <span className="text-muted-foreground font-semibold">Key Inspection Metric:</span>
-                                    <div className="font-bold text-foreground mt-0.5">{testCase.empiricalEvidence.keyMetric}</div>
-                                </div>
-                                <div className="p-3 rounded-lg bg-muted/40 border border-border">
-                                    <span className="text-muted-foreground font-semibold">Drawing / Tolerance Limit:</span>
-                                    <div className="font-mono font-bold text-amber-600 dark:text-amber-400 mt-0.5">{testCase.empiricalEvidence.toleranceSpec}</div>
-                                </div>
-                            </div>
-
-                            <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 space-y-1">
-                                <span className="font-bold text-primary">Measured Telemetry:</span>
-                                <div className="font-mono text-foreground">{testCase.empiricalEvidence.sensorTelemetry}</div>
-                            </div>
-
-                            <p className="text-muted-foreground leading-relaxed">
-                                <strong>Analytical Finding:</strong> {testCase.empiricalEvidence.findingAnalysis}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Section 3: Two-Tier AI Defense Breakdown */}
-                    <div className="space-y-2">
-                        <div className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
-                            <Cpu className="w-4 h-4 text-purple-500" />
-                            <span>3. Two-Tier AI Defense &amp; Bias Safeguards</span>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                            <div className="p-3.5 rounded-xl border border-border bg-card space-y-1.5">
-                                <span className="font-bold text-foreground flex items-center gap-1.5">
-                                    <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
-                                    Tier 1: Boundary &amp; Ingestion Filter
-                                </span>
-                                <p className="text-muted-foreground leading-relaxed">
-                                    {testCase.defenseBreakdown.tier1Schema}
+                        <div className="space-y-5 overflow-y-auto px-6 py-5 text-sm">
+                            <section className="space-y-1.5">
+                                <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Input</h3>
+                                <p className="text-foreground">{result.inputSummary}</p>
+                                <p className="inline-flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+                                    <FileJson className="size-3.5" />
+                                    {meta.jsonPath}
                                 </p>
-                            </div>
+                            </section>
 
-                            <div className="p-3.5 rounded-xl border border-border bg-card space-y-1.5">
-                                <span className="font-bold text-foreground flex items-center gap-1.5">
-                                    <Database className="w-3.5 h-3.5 text-purple-500" />
-                                    Tier 2: Retrieval &amp; Anti-Hallucination
-                                </span>
-                                <p className="text-muted-foreground leading-relaxed">
-                                    {testCase.defenseBreakdown.tier2Retrieval}
-                                </p>
-                                <div className="text-[11px] font-mono text-primary font-semibold">
-                                    Precedent Score: {testCase.defenseBreakdown.similarityScore}
+                            <section className="grid gap-3 md:grid-cols-2">
+                                <div className="space-y-1.5 rounded-lg border bg-muted/30 p-4">
+                                    <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Expected</h3>
+                                    <p className="text-foreground">{result.expectedBehavior}</p>
                                 </div>
-                            </div>
-                        </div>
+                                <div
+                                    className={cn(
+                                        'space-y-1.5 rounded-lg border p-4',
+                                        passed ? 'border-success/30 bg-success-bg' : 'border-destructive/30 bg-error-bg',
+                                    )}
+                                >
+                                    <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Actual (this run)</h3>
+                                    <p className="text-foreground">{result.actualBehavior}</p>
+                                </div>
+                            </section>
 
-                        {testCase.defenseBreakdown.biasOverrideResult && (
-                            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-900 dark:text-amber-200">
-                                <strong>Bias Safeguard Verdict:</strong> {testCase.defenseBreakdown.biasOverrideResult}
-                            </div>
-                        )}
-                    </div>
+                            <section className="space-y-2">
+                                <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Where the AI stopped</h3>
+                                {result.stops && result.stops.length > 0 ? (
+                                    <ul className="space-y-2">
+                                        {result.stops.map((s) => (
+                                            <li key={s.id} className="space-y-1 rounded-lg border p-3">
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <Badge variant="outline" className="font-semibold">{JUDGE_STOP_LABEL[s.type]}</Badge>
+                                                    <span className="font-mono text-xs text-muted-foreground">{s.step}</span>
+                                                    {!s.blocking && <span className="text-xs text-muted-foreground">non-blocking</span>}
+                                                </div>
+                                                <p className="text-foreground">{s.reason}</p>
+                                                <p className="inline-flex items-start gap-1.5 text-muted-foreground">
+                                                    <Hand className="mt-0.5 size-3.5 shrink-0" />
+                                                    <span>Asks {s.requiredRole}: {s.questionForHuman}</span>
+                                                </p>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="text-muted-foreground">No stop - the AI may proceed.</p>
+                                )}
+                            </section>
 
-                    {/* Section 4: 8D Disciplines Synthesis Table */}
-                    <div className="space-y-2">
-                        <div className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
-                            <Layers className="w-4 h-4 text-primary" />
-                            <span>4. 8D Disciplines Synthesis (D1 – D8)</span>
-                        </div>
-                        <div className="border border-border rounded-xl overflow-hidden bg-card">
-                            <div className="divide-y divide-border text-xs">
-                                {testCase.disciplinesMatrix.map((d) => (
-                                    <div key={d.code} className="p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-muted/20 transition-colors">
-                                        <div className="flex items-start sm:items-center gap-2.5">
-                                            <span className="font-mono font-bold text-primary w-8 shrink-0">
-                                                {d.code}
-                                            </span>
-                                            <span className="font-semibold text-foreground w-44 shrink-0">
-                                                {d.name}:
-                                            </span>
-                                            <span className="text-muted-foreground">
-                                                {d.summary}
-                                            </span>
+                            <section className="space-y-2">
+                                <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Measured in this run</h3>
+                                <dl className="divide-y rounded-lg border">
+                                    {Object.entries(result.details ?? {}).map(([key, value]) => (
+                                        <div key={key} className="grid gap-1 px-4 py-2.5 sm:grid-cols-[12rem_1fr] sm:gap-4">
+                                            <dt className="text-muted-foreground">{humanize(key)}</dt>
+                                            <dd><DetailValue value={value} /></dd>
                                         </div>
-                                        <span className="self-start sm:self-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
-                                            {d.status}
-                                        </span>
-                                    </div>
-                                ))}
+                                    ))}
+                                </dl>
+                            </section>
+                        </div>
+
+                        <DialogFooter className="flex-row items-center justify-between gap-2 border-t px-6 py-4 sm:justify-between">
+                            <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={copy}>
+                                {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+                                {copied ? 'Copied' : 'Copy summary'}
+                            </Button>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="gap-1.5"
+                                    disabled={!canOpenCase}
+                                    title={canOpenCase ? undefined : `No 8D report for ${result.notificationId ?? meta.id} in this database`}
+                                    onClick={onOpenCase}
+                                >
+                                    Open case
+                                    <ArrowRight className="size-3.5" />
+                                </Button>
+                                <Button type="button" size="sm" onClick={onClose}>Close</Button>
                             </div>
-                        </div>
-                    </div>
-
-                    {/* Section 5: Audit & Compliance */}
-                    <div className="p-4 rounded-xl bg-muted/20 border border-border space-y-1.5 text-xs">
-                        <div className="font-bold text-foreground flex items-center gap-2">
-                            <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                            <span>5. Hackathon Evaluation Rubric Audit</span>
-                        </div>
-                        <div className="text-muted-foreground">
-                            <strong>Compliance:</strong> {testCase.auditCompliance.complianceVerdict}
-                        </div>
-                        <div className="text-muted-foreground">
-                            <strong>Hallucination Check:</strong> {testCase.auditCompliance.hallucinationCheck}
-                        </div>
-                    </div>
-                </div>
-
-                {/* ── Modal Footer ── */}
-                <div className="p-4 border-t border-border bg-muted/20 flex flex-wrap items-center justify-between gap-3">
-                    <button
-                        onClick={handleCopy}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background hover:bg-muted text-xs font-medium text-foreground transition-all cursor-pointer"
-                    >
-                        {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                        <span>{copied ? 'Copied Full Report' : 'Copy Summary Report'}</span>
-                    </button>
-
-                    <div className="flex items-center gap-2">
-                        {testCase.reportId && (
-                            <button
-                                onClick={() => {
-                                    onClose();
-                                    navigate(`/8d/${testCase.reportId}`);
-                                }}
-                                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold transition-all shadow cursor-pointer"
-                            >
-                                <FileText className="w-3.5 h-3.5" />
-                                <span>Open Full 8D Workspace</span>
-                                <ExternalLink className="w-3 h-3" />
-                            </button>
-                        )}
-
-                        <button
-                            onClick={onClose}
-                            className="px-4 py-2 rounded-lg border border-border bg-background hover:bg-muted text-xs font-semibold text-foreground transition-colors cursor-pointer"
-                        >
-                            Close
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        </DialogFooter>
+                    </>
+                )}
+            </DialogContent>
+        </Dialog>
     );
 }
