@@ -72,3 +72,6 @@ app/cnma_proresolve_ui/public/samples/
 docs/
 !docs/SPRINT1-VERIFY-RUNBOOK.md
 !docs/USER-AND-JUDGE-GUIDE.md
+
+# Temporary local root lock
+/BAN_CHAT_LOGIC_AI_VA_DB.pdf
