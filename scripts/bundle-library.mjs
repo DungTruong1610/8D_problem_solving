@@ -44,6 +44,23 @@ const bytes = files.reduce((n, f) => n + fs.statSync(path.join(DEST, f)).size, 0
 console.log(`[bundle-library] Đã gói ${files.length} case (${Math.round(bytes / 1024)} KB) vào srv/data/case-library/`);
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Bốn test case của bộ verify
+//
+// `/api/verify/sprint1` đọc file test lúc chạy. Trên deploy, server chạy từ
+// `gen/srv/` nơi không có `mock-data/`, nên phải gói theo srv giống kho case.
+// ─────────────────────────────────────────────────────────────────────────────
+const TC_SRC = path.join(ROOT, 'mock-data', 'sprint1-test-cases');
+const TC_DEST = path.join(ROOT, 'srv', 'data', 'sprint1-test-cases');
+
+if (fs.existsSync(TC_SRC)) {
+    fs.rmSync(TC_DEST, { recursive: true, force: true });
+    fs.mkdirSync(TC_DEST, { recursive: true });
+    const tcFiles = fs.readdirSync(TC_SRC).filter((f) => /^tc-\d+.*\.json$/.test(f)).sort();
+    for (const f of tcFiles) fs.copyFileSync(path.join(TC_SRC, f), path.join(TC_DEST, f));
+    console.log(`[bundle-library] Đã gói ${tcFiles.length} test case vào srv/data/sprint1-test-cases/`);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Sự vụ mẫu cho UI
 //
 // Trang 8D cần nạp được một sự vụ mới mà KHÔNG bắt người dùng đi tìm file trên

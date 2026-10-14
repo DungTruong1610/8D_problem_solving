@@ -80,7 +80,27 @@ export interface VerifyHarnessReport {
 }
 
 const { SELECT } = cds.ql;
-const TEST_CASES_DIR = path.resolve(__dirname, '../mock-data/sprint1-test-cases');
+/**
+ * Thư mục chứa 4 file test.
+ *
+ * Trên deploy, server chạy từ artifact `gen/srv/` — ở đó KHÔNG có `mock-data/`.
+ * `scripts/bundle-library.mjs` (chạy trong `npm run build`) chép các file test
+ * vào `srv/data/sprint1-test-cases/`, và `cds build` mang thư mục đó theo. Chạy
+ * từ repo thì đọc thẳng `mock-data/`. Không thấy chỗ nào thì báo lỗi rõ ràng —
+ * không có file test thì không có gì để chấm.
+ */
+const TEST_CASE_DIR_CANDIDATES = [
+    path.resolve(__dirname, '../srv/data/sprint1-test-cases'),
+    path.resolve(__dirname, '../mock-data/sprint1-test-cases'),
+];
+
+function testCasesDir(): string {
+    const found = TEST_CASE_DIR_CANDIDATES.find((d) => fs.existsSync(path.join(d, 'tc-01-happy-path.json')));
+    if (!found) {
+        throw new Error(`Test case files not found. Looked in: ${TEST_CASE_DIR_CANDIDATES.join(', ')}. Run "npm run bundle:library" (part of "npm run build").`);
+    }
+    return found;
+}
 
 async function initDatabaseConnection() {
     try {
@@ -132,7 +152,7 @@ async function initDatabaseConnection() {
  */
 
 function loadTestCase(file: string): { raw: any; expected: Record<string, any> } {
-    const raw = JSON.parse(fs.readFileSync(path.join(TEST_CASES_DIR, file), 'utf8'));
+    const raw = JSON.parse(fs.readFileSync(path.join(testCasesDir(), file), 'utf8'));
     const expected = raw?.$expectedOutcome;
     if (!expected || typeof expected !== 'object') {
         throw new Error(`${file} has no $expectedOutcome — the test has nothing to compare against.`);

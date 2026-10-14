@@ -50,6 +50,9 @@ __pycache__/
 # Gói theo srv để app tự nạp kho lúc khởi động trên CF. Nguồn là mock-data/.
 srv/data/case-library/
 
+# Bốn test case của bộ verify, do scripts/bundle-library.mjs chép từ mock-data/sprint1-test-cases/.
+srv/data/sprint1-test-cases/
+
 # Sự vụ mẫu, do scripts/bundle-library.mjs sinh ra từ mock-data/incoming/.
 app/cnma_proresolve_ui/public/samples/
 
