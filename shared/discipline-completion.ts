@@ -16,6 +16,29 @@
 
 import { normalizeActionStatus, normalizeTasks, type ActionTask } from './action-task';
 
+/**
+ * Bước nào phải DUYỆT xong thì bước này mới được bắt đầu / duyệt.
+ *
+ * Gần như nối đuôi D1→D8, trừ cặp D5/D6: D5 giao việc, D6 theo dõi chính những
+ * việc đó tới Done — hai bước chạy song song, cùng mở khi D4 xong. D7 là chỗ hai
+ * nhánh gặp lại, nên đợi cả hai. Backend (cổng thật) và UI cùng đọc bảng này.
+ */
+export const STEP_PREREQUISITES: Record<string, readonly string[]> = {
+    D1: [],
+    D2: ['D1'],
+    D3: ['D2'],
+    D4: ['D3'],
+    D5: ['D4'],
+    D6: ['D4'],
+    D7: ['D5', 'D6'],
+    D8: ['D7'],
+};
+
+/** Các bước tiên quyết của `code` chưa duyệt — rỗng nghĩa là đã mở khoá. */
+export function blockingPrerequisites(code: string, isApproved: (code: string) => boolean): string[] {
+    return (STEP_PREREQUISITES[code] ?? []).filter((prev) => !isApproved(prev));
+}
+
 /** Bước có task giao cho người, và nhánh JSON chứa task của từng bước. */
 export const ACTION_STEP_PREFIX: Record<string, 'containment' | 'corrective' | 'preventive'> = {
     D3: 'containment',
@@ -76,9 +99,10 @@ export interface CompletionInput {
     /** `resultJson` của bước đang duyệt — chuỗi hoặc đã parse. */
     resultJson: unknown;
     /**
-     * Task id đã có file bằng chứng (bảng `TaskEvidences`) của CHÍNH bước này.
-     * Thiếu tham số nghĩa là không biết — coi như chưa có bằng chứng nào, vì
-     * "không tra được" không phải là "đã có".
+     * Task id đã có file bằng chứng (bảng `TaskEvidences`) của bước sở hữu task:
+     * chính bước này với D3/D7, và D5 khi đang duyệt D6 (task D5 nộp bằng chứng
+     * ở màn hình D6 nhưng vẫn lưu dưới mã D5). Thiếu tham số nghĩa là không biết
+     * — coi như chưa có bằng chứng nào, vì "không tra được" không phải là "đã có".
      */
     evidenceTaskIds?: Iterable<string>;
     /** Các bước anh em, cho luật liên bước (D6 đọc task của D5). */
@@ -88,13 +112,54 @@ export interface CompletionInput {
 const label = (task: ActionTask) => `${task.name || task.id}`;
 
 /**
+ * Từng task phải có người phụ trách, đã Done, và có bằng chứng NẾU task đó yêu
+ * cầu bằng chứng. Task không yêu cầu bằng chứng thì KHÔNG bị đòi thêm — "không
+ * yêu cầu" khác "đang thiếu".
+ *
+ * `code` là bước đang duyệt (bị chặn); `owner` là bước sở hữu task — khác nhau
+ * khi D6 duyệt task của D5.
+ */
+function taskExecutionBlockers(
+    code: string,
+    owner: string,
+    tasks: ActionTask[],
+    evidenceTaskIds: Iterable<string> | undefined,
+): CompletionBlocker[] {
+    const blockers: CompletionBlocker[] = [];
+    const evidence = new Set(evidenceTaskIds ?? []);
+    for (const task of tasks) {
+        const ref = { code, taskId: task.id, taskName: task.name };
+        if (!task.assignee) {
+            blockers.push({ ...ref, issue: 'no-assignee', message: `${owner} task "${label(task)}" has no assignee.` });
+        }
+        const status = normalizeActionStatus(task.status);
+        if (status !== 'Done') {
+            blockers.push({ ...ref, issue: 'not-done', message: `${owner} task "${label(task)}" is ${status}, not Done.` });
+        }
+        // Bằng chứng: file trong TaskEvidences, hoặc file đính kèm lưu sẵn trong
+        // task (dữ liệu nạp từ kho/seed mang theo `attachments`).
+        const required = task.evidenceRequired ?? true;
+        const hasEvidence = evidence.has(task.id) || task.attachments.length > 0;
+        if (required && !hasEvidence) {
+            blockers.push({
+                ...ref,
+                issue: 'evidence-missing',
+                message: `${owner} task "${label(task)}" requires completion evidence and none is uploaded.`,
+            });
+        }
+    }
+    return blockers;
+}
+
+/**
  * Luật duyệt cho từng bước. Trả danh sách chặn rỗng nghĩa là duyệt được.
  *
- * - D3/D5/D7: mỗi task đã giao phải có người phụ trách, đã Done, và có bằng
- *   chứng NẾU task đó yêu cầu bằng chứng. Task không yêu cầu bằng chứng thì
- *   KHÔNG bị đòi thêm — "không yêu cầu" khác "đang thiếu".
- *   D5/D7 còn cần ít nhất một hành động (giữ nguyên luật cũ của UI).
- * - D6: mọi task khắc phục của D5 phải Done (luật cũ của backend, dời vào đây).
+ * - D3/D7: luật thực thi đầy đủ cho từng task (xem `taskExecutionBlockers`).
+ *   D7 còn cần ít nhất một hành động.
+ * - D5: chỉ là GIAO VIỆC — duyệt được ngay khi có ít nhất một task đã có người
+ *   nhận. Việc làm xong và nộp bằng chứng thuộc về D6, nên D5 không đòi Done.
+ * - D6: quản lý thực thi task của D5 — mọi task D5 phải có người, Done, và có
+ *   bằng chứng nếu bắt buộc; D5 chưa giao task nào thì chưa có gì để kiểm.
  * - Bước khác: không có luật task — cổng D8 nằm ở `evaluateClosureGate`.
  */
 export function evaluateDisciplineCompletion(input: CompletionInput): CompletionVerdict {
@@ -102,55 +167,37 @@ export function evaluateDisciplineCompletion(input: CompletionInput): Completion
     const blockers: CompletionBlocker[] = [];
     const result = parse(input.resultJson);
 
-    if (ACTION_STEP_PREFIX[code]) {
-        const tasks = assignedTasksOf(code, result);
-        const evidence = new Set(input.evidenceTaskIds ?? []);
-
-        if ((code === 'D5' || code === 'D7') && tasks.length === 0 && suggestedActionsOf(code, result).length === 0) {
+    if (code === 'D5') {
+        if (!assignedTasksOf('D5', result).some((t) => t.assignee)) {
             blockers.push({
                 code,
                 issue: 'no-actions',
-                message: `${code} has no ${code === 'D5' ? 'corrective' : 'preventive'} action yet — add or accept at least one.`,
+                message: 'D5 has no assigned corrective task yet - assign at least one task to an owner.',
             });
         }
-
-        for (const task of tasks) {
-            const ref = { code, taskId: task.id, taskName: task.name };
-            if (!task.assignee) {
-                blockers.push({ ...ref, issue: 'no-assignee', message: `${code} task "${label(task)}" has no assignee.` });
-            }
-            const status = normalizeActionStatus(task.status);
-            if (status !== 'Done') {
-                blockers.push({ ...ref, issue: 'not-done', message: `${code} task "${label(task)}" is ${status}, not Done.` });
-            }
-            // Bằng chứng: file trong TaskEvidences, hoặc file đính kèm lưu sẵn trong
-            // task (dữ liệu nạp từ kho/seed mang theo `attachments`).
-            const required = task.evidenceRequired ?? true;
-            const hasEvidence = evidence.has(task.id) || task.attachments.length > 0;
-            if (required && !hasEvidence) {
-                blockers.push({
-                    ...ref,
-                    issue: 'evidence-missing',
-                    message: `${code} task "${label(task)}" requires completion evidence and none is uploaded.`,
-                });
-            }
+    } else if (ACTION_STEP_PREFIX[code]) {
+        const tasks = assignedTasksOf(code, result);
+        if (code === 'D7' && tasks.length === 0 && suggestedActionsOf(code, result).length === 0) {
+            blockers.push({
+                code,
+                issue: 'no-actions',
+                message: 'D7 has no preventive action yet - add or accept at least one.',
+            });
         }
+        blockers.push(...taskExecutionBlockers(code, code, tasks, input.evidenceTaskIds));
     }
 
     if (code === 'D6') {
         const d5 = (input.siblings ?? []).find((s) => s.code === 'D5');
-        for (const task of assignedTasksOf('D5', parse(d5?.resultJson))) {
-            const status = normalizeActionStatus(task.status);
-            if (status !== 'Done') {
-                blockers.push({
-                    code,
-                    issue: 'prerequisite-open',
-                    taskId: task.id,
-                    taskName: task.name,
-                    message: `D5 task "${label(task)}" is ${status} — verify effectiveness only after every corrective action is Done.`,
-                });
-            }
+        const d5Tasks = assignedTasksOf('D5', parse(d5?.resultJson));
+        if (d5Tasks.length === 0) {
+            blockers.push({
+                code,
+                issue: 'prerequisite-open',
+                message: 'D5 has no assigned corrective task yet - there is nothing to verify.',
+            });
         }
+        blockers.push(...taskExecutionBlockers(code, 'D5', d5Tasks, input.evidenceTaskIds));
     }
 
     return { canApprove: blockers.length === 0, blockers };

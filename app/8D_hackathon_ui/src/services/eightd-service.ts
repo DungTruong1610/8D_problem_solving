@@ -7,6 +7,7 @@ import {
     parseStoredPrecedents as parseStoredShape,
 } from '../../../../shared/precedent-shape';
 import type { RetrievalEngineInfo } from '../../../../shared/retrieval-engine';
+import { blockingPrerequisites } from '../../../../shared/discipline-completion';
 
 /**
  * Truy cập EightDService.
@@ -132,17 +133,21 @@ export function parseConfirmedFields(json: string | null | undefined): string[] 
 }
 
 /**
- * Kiểm tra một bước D có được mở khóa để thực hiện hay không (Stage-Gate khắt khe):
- * - D1 luôn mở khóa.
- * - Các bước tiếp theo (D2..D8) chỉ mở khóa khi bước ngay trước đó đã Completed / Approved.
+ * Các bước tiên quyết của `code` chưa xong — rỗng nghĩa là đã mở khoá.
+ *
+ * Bảng điều kiện nằm ở `shared/discipline-completion.ts`, chung với cổng backend:
+ * D1 luôn mở; D6 chạy song song với D5 (cùng chờ D4); D7 chờ cả D5 lẫn D6.
  */
+export function pendingPrerequisites(code: string, disciplines: Discipline8D[] = []): string[] {
+    return blockingPrerequisites(code, (prevCode) => {
+        const prev = disciplines.find((d) => d.code === prevCode);
+        return Boolean(prev) && (reviewStatusOf(prev!) === 'Approved' || prev!.workState === 'Completed');
+    });
+}
+
+/** Một bước D đã được mở khóa để thực hiện chưa (xem `pendingPrerequisites`). */
 export function isStepUnlocked(code: string, disciplines: Discipline8D[] = []): boolean {
-    const idx = STEP_CODES.indexOf(code as StepCode);
-    if (idx <= 0) return true;
-    const prevCode = STEP_CODES[idx - 1];
-    const prev = disciplines.find((d) => d.code === prevCode);
-    if (!prev) return false;
-    return reviewStatusOf(prev) === 'Approved' || prev.workState === 'Completed';
+    return pendingPrerequisites(code, disciplines).length === 0;
 }
 
 /** Trạng thái xử lý của bước D: Approved -> Completed; còn lại là InProgress hoặc NotStarted (theo Stage-Gate). */
@@ -428,13 +433,13 @@ class EightDService extends BaseODataService<Report8D> {
                     .top(1),
             );
             if (list?.value?.length) {
-                return list.value[0];
+                return withPlainDashTitles(list.value[0]);
             }
         }
-        return this.getById(
+        return withPlainDashTitles(await this.getById(
             id,
             new ODataQueryBuilder().expand('disciplines($orderby=sequence)'),
-        );
+        ));
     }
 
     /** Chỉ trạng thái — dùng cho vòng poll, tránh kéo cả báo cáo về mỗi 3 giây. */
@@ -575,6 +580,20 @@ export function parseStoredPrecedents(precedentsJson: string | null | undefined)
     return parseStoredShape<Precedent>(precedentsJson);
 }
 
+/**
+ * Tiêu đề bước lưu từ dữ liệu cũ dùng dấu gạch dài ("D1 — Team Roster"). UI chỉ
+ * dùng gạch ngắn, nên chuẩn hoá một lần lúc nạp — mọi màn hình đọc từ đây.
+ */
+function withPlainDashTitles<T extends { disciplines?: Discipline8D[] }>(report: T): T {
+    if (!report?.disciplines) return report;
+    return {
+        ...report,
+        disciplines: report.disciplines.map((d) => (
+            d.title ? { ...d, title: d.title.replace(/\s*[—–]\s*/g, ' - ') } : d
+        )),
+    };
+}
+
 export const eightDService = new EightDService();
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -621,7 +640,7 @@ export function isCustomerComplaint(origin: string | null | undefined): boolean 
 
 /** 'Q1 - Customer Complaint' → 'Q1'. Cột danh sách hẹp, tên đầy đủ không vừa. */
 export function originShort(origin: string | null | undefined): string {
-    return String(origin ?? '').split(' ')[0] || '—';
+    return String(origin ?? '').split(' ')[0] || '-';
 }
 
 /**

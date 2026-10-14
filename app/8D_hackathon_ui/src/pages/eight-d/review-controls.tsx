@@ -17,7 +17,7 @@ import {
     reviewDiscipline,
     reviewStatusOf,
     isStepUnlocked,
-    STEP_CODES,
+    pendingPrerequisites,
     saveDisciplineField,
     setDisciplineWorkState,
     type CaseStop,
@@ -79,7 +79,7 @@ export function ClosureGateBar({ disciplines }: { disciplines: Discipline8D[] })
 
                 <span className="text-sm text-muted-foreground">
                     {canClose
-                        ? 'D1–D7 completed — the case can be closed.'
+                        ? 'D1-D7 completed - the case can be closed.'
                         : <>Closure blocked by <strong className="font-medium text-foreground">{blocking.join(', ')}</strong></>}
                 </span>
             </div>
@@ -90,7 +90,7 @@ export function ClosureGateBar({ disciplines }: { disciplines: Discipline8D[] })
                     return (
                         <span
                             key={d.ID}
-                            title={`${d.code} — ${STATUS_STYLE[status].label}`}
+                            title={`${d.code} - ${STATUS_STYLE[status].label}`}
                             className={cn(
                                 'inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-sm font-medium',
                                 status === 'Approved' && 'border-success/30 text-success',
@@ -120,15 +120,15 @@ function parseJsonSafe(val: unknown): Record<string, any> | null {
 }
 
 /**
- * Tiêu đề bước, ví dụ "D1 — Team Roster".
+ * Tiêu đề bước, ví dụ "D1 - Team Roster".
  *
- * Một số case lưu sẵn mã bước trong `title` ("D1 — Team Roster"); ghép thêm mã
- * vào trước sẽ thành "D1 — D1 — Team Roster". Tiêu đề đã có mã thì dùng nguyên.
+ * Một số case lưu sẵn mã bước trong `title` ("D1 — Team Roster", dấu gạch dài
+ * từ dữ liệu cũ); ghép thêm mã vào trước sẽ thành "D1 - D1 — Team Roster". Nên
+ * bóc mã (và dấu gạch theo sau, dài hay ngắn) ra rồi ghép lại theo một kiểu.
  */
 function stepHeading(code: string, title: string | null | undefined): string {
-    const text = (title ?? '').trim();
-    if (!text) return code;
-    return new RegExp(`^${code}\\b`, 'i').test(text) ? text : `${code} — ${text}`;
+    const text = (title ?? '').trim().replace(new RegExp(`^${code}\\b\\s*[—–-]?\\s*`, 'i'), '');
+    return text ? `${code} - ${text}` : code;
 }
 
 /** Ô quyết định và trạng thái nằm dưới nội dung của một bước. */
@@ -153,8 +153,8 @@ export function DisciplineReviewBox({
     const allSiblings = siblings || [];
     const isApproved = reviewStatusOf(discipline) === 'Approved' || discipline.workState === 'Completed';
     const unlocked = isApproved || isStepUnlocked(discipline.code, allSiblings);
-    const stepIdx = STEP_CODES.indexOf(discipline.code as any);
-    const prevCode = stepIdx > 0 ? STEP_CODES[stepIdx - 1] : null;
+    // Bước còn chặn (D7 có thể chờ hai bước: "D5 and D6").
+    const prevCode = pendingPrerequisites(discipline.code, allSiblings).join(' and ') || null;
 
     const currentStatus: 'NotStarted' | 'InProgress' | 'Completed' = isApproved
         ? 'Completed'
@@ -171,8 +171,9 @@ export function DisciplineReviewBox({
         () => evaluateDisciplineCompletion({
             code: discipline.code,
             resultJson: discipline.resultJson,
+            // D6 duyệt task của D5, và bằng chứng của chúng lưu dưới mã D5.
             evidenceTaskIds: (evidence ?? [])
-                .filter((e) => e.disciplineCode === discipline.code)
+                .filter((e) => e.disciplineCode === (discipline.code === 'D6' ? 'D5' : discipline.code))
                 .map((e) => e.taskId),
             siblings: allSiblings.map((s) => ({ code: s.code, resultJson: s.resultJson })),
         }),
@@ -190,7 +191,7 @@ export function DisciplineReviewBox({
         mutationFn: ({ decision, text }: { decision: ReviewDecision; text?: string }) =>
             reviewDiscipline(discipline.ID, decision, text),
         onSuccess: (result, { decision }) => {
-            toast.success(decision === 'approve' ? `${result.code} — Complete` : `${result.code} reopened`, {
+            toast.success(decision === 'approve' ? `${result.code} - Complete` : `${result.code} reopened`, {
                 description: result.gate.reason,
             });
             void queryClient.invalidateQueries({ queryKey: ['8d'] });
@@ -207,7 +208,7 @@ export function DisciplineReviewBox({
     const openStops = stops.filter((s) => s.blocking && s.status === 'open');
     // Tính sẵn để nút Approve nhạt đi khi chưa đủ điều kiện.
     const approveBlockers = [
-        ...openStops.map((s) => `AI stopped here — ${s.questionForHuman} (open "AI stops" at the top to resolve it)`),
+        ...openStops.map((s) => `AI stopped here - ${s.questionForHuman} (open "AI stops" at the top to resolve it)`),
         ...completion.blockers.map((b) => b.message),
     ];
     const canApprove = approveBlockers.length === 0;
@@ -254,7 +255,7 @@ export function DisciplineReviewBox({
         setStarting(true);
         try {
             await changeWorkState('InProgress');
-            toast.success(`${discipline.code} — In process`);
+            toast.success(`${discipline.code} - In process`);
             await queryClient.invalidateQueries({ queryKey: ['8d'] });
         } catch (err: any) {
             toast.error(err?.response?.data?.error?.message ?? err?.message ?? 'Could not start the step.');
@@ -293,7 +294,7 @@ export function DisciplineReviewBox({
                     {currentStatus === 'Completed' ? (
                         <div className="mt-1 flex flex-col min-w-0">
                             <span className="text-sm font-medium text-foreground">
-                                Completed{discipline.reviewedBy ? <> by <strong className="font-semibold text-foreground">{discipline.reviewedBy}</strong></> : ' — verified and approved'}
+                                Completed{discipline.reviewedBy ? <> by <strong className="font-semibold text-foreground">{discipline.reviewedBy}</strong></> : ' - verified and approved'}
                             </span>
                             <span className="text-sm text-muted-foreground tabular-nums">
                                 {discipline.reviewedAt ? formatReviewedAt(discipline.reviewedAt) : 'All criteria verified'}
@@ -302,10 +303,10 @@ export function DisciplineReviewBox({
                     ) : (
                         <p className="mt-0.5 text-sm text-muted-foreground">
                             {currentStatus === 'InProgress'
-                                ? 'In process — editing and confirmation enabled'
+                                ? 'In process - editing and confirmation enabled'
                                 : !unlocked
-                                    ? `Not started (locked) — complete previous step (${prevCode}) to unlock`
-                                    : 'Not started (read-only) — click "Start the process" to edit'}
+                                    ? `Not started (locked) - complete ${prevCode} to unlock`
+                                    : 'Not started (read-only) - click "Start the process" to edit'}
                         </p>
                     )}
                 </div>

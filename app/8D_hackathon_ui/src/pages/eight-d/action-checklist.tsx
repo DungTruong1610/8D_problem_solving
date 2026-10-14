@@ -152,10 +152,15 @@ export function ActionChecklist({
     // D5 discipline — nguồn dữ liệu duy nhất cho D6
     const d5Discipline = disciplines?.find((d) => d.code === 'D5');
 
+    // D6 quản lý thực thi task của D5 (Done, bằng chứng) — chỉ sửa được khi chính
+    // D6 đang In process, giống mọi bước khác. Backend chặn cùng điều kiện.
+    const d6Discipline = disciplines?.find((d) => d.code === 'D6');
+    const d6Editable = d6Discipline?.workState === 'InProgress' && d6Discipline.reviewStatus !== 'Approved';
+
     // Kế thừa root cause từ D4 hệt như D5
     const d4Discipline = disciplines?.find((d) => d.code === 'D4');
     const d4RootCause = resolveD4RootCause(d4Discipline, caseContext);
-    const effectiveRootCause = (rootCause && rootCause !== '—') ? rootCause : d4RootCause;
+    const effectiveRootCause = (rootCause && rootCause !== '-') ? rootCause : d4RootCause;
 
     // Danh sách tasks thực tế của D5
     const d5Tasks = d5Discipline
@@ -191,7 +196,7 @@ export function ActionChecklist({
                     <CircleDashed className="w-8 h-8 text-muted-foreground/60" />
                     <p className="text-sm font-semibold text-foreground">No active actions in D5 yet</p>
                     <p className="text-sm text-muted-foreground max-w-md">
-                        Action tasks will automatically appear here for verification once corrective actions (D5) step is switched to <strong className="text-foreground">In process</strong>.
+                        Corrective tasks appear here once they are assigned in D5. D6 runs alongside D5: track each task to <strong className="text-foreground">Done</strong> here, with its evidence.
                     </p>
                 </div>
             </Card>
@@ -313,7 +318,7 @@ export function ActionChecklist({
                             toast.error(msg);
                         }
                     }}
-                    readOnly={false}
+                    readOnly={!d6Editable}
                     reportID={reportID}
                     disciplineCode="D5"
                     rootCause={effectiveRootCause}
@@ -361,7 +366,7 @@ export function ActionChecklist({
                                                 <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                                                     <Select
                                                         value={norm}
-                                                        disabled={isUpdating || !row.originDisciplineID}
+                                                        disabled={isUpdating || !row.originDisciplineID || !d6Editable}
                                                         onValueChange={(val) => handleTaskStatusChange(row, val)}
                                                     >
                                                         <SelectTrigger
@@ -407,7 +412,7 @@ export function ActionChecklist({
             )}
 
             <p className="text-sm text-muted-foreground pt-1">
-                Actions are defined and managed in D5 (Permanent Corrective Actions).
+                Tasks are assigned in D5 (Permanent Corrective Actions); their execution, status and evidence are managed here in D6.
             </p>
         </div>
     );

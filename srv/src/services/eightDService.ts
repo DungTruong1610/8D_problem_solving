@@ -40,6 +40,7 @@ import {
     getReportForRerun,
     getReviewTrail,
     isoDateOrNull,
+    isTaskWorkOpen,
     listTaskEvidence,
     markAnalyzing,
     markFailed,
@@ -81,10 +82,10 @@ function describe(e: any): string {
         return `${base} ${e.details.join(' ')}`;
     }
     if (e?.response?.data) {
-        return `${base} — Details: ${JSON.stringify(e.response.data)}`;
+        return `${base} - Details: ${JSON.stringify(e.response.data)}`;
     }
     if (e?.cause) {
-        return `${base} — Cause: ${e.cause.message ?? e.cause}`;
+        return `${base} - Cause: ${e.cause.message ?? e.cause}`;
     }
     return base;
 }
@@ -539,7 +540,7 @@ export function registerEightDHandlers(srv: any): void {
         // Nhận cả một case đơn lẻ lẫn cả mẻ — người gọi không phải bọc mảng chỉ
         // để nạp một file.
         const cases = Array.isArray(parsed) ? parsed : [parsed];
-        if (!cases.length) return req.error(400, 'payload is empty — no cases to seed.');
+        if (!cases.length) return req.error(400, 'payload is empty - no cases to seed.');
 
         return JSON.stringify(await seedLibrary(cases));
     });
@@ -1009,7 +1010,7 @@ export function registerEightDHandlers(srv: any): void {
             return req.error(400, `Discipline ${disciplineCode} has been completed and locked.`);
         }
 
-        if (discipline.workState !== 'InProgress') {
+        if (!isTaskWorkOpen(String(disciplineCode), discipline)) {
             return req.error(400, `Discipline ${disciplineCode} is not in process. Switch status to 'In process' to upload evidence.`);
         }
 
@@ -1069,7 +1070,7 @@ export function registerEightDHandlers(srv: any): void {
                 if (discipline.reviewStatus === 'Approved' && !isActionStep) {
                     return req.error(400, `Discipline ${row.disciplineCode} has been completed and locked.`);
                 }
-                if (discipline.workState !== 'InProgress') {
+                if (!isTaskWorkOpen(String(row.disciplineCode), discipline)) {
                     return req.error(400, `Discipline ${row.disciplineCode} is not in process. Switch status to 'In process' to delete evidence.`);
                 }
             }

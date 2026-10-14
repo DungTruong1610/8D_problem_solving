@@ -124,6 +124,17 @@ describe('blockingPreviousStep', () => {
         expect(blockingPreviousStep('D2', steps(['D1']))).toBeNull();
     });
 
+    it('D6 chạy song song với D5: chỉ chờ D4, không chờ D5', () => {
+        expect(blockingPreviousStep('D6', steps(['D1', 'D2', 'D3', 'D4']))).toBeNull();
+        expect(blockingPreviousStep('D6', steps(['D1', 'D2', 'D3']))).toBe('D4');
+    });
+
+    it('D7 chờ cả D5 lẫn D6, và nêu đủ các bước còn chặn', () => {
+        expect(blockingPreviousStep('D7', steps(['D1', 'D2', 'D3', 'D4']))).toBe('D5 and D6');
+        expect(blockingPreviousStep('D7', steps(['D1', 'D2', 'D3', 'D4', 'D6']))).toBe('D5');
+        expect(blockingPreviousStep('D7', steps(['D1', 'D2', 'D3', 'D4', 'D5', 'D6']))).toBeNull();
+    });
+
     it('chỉ xét bước NGAY trước — bước xa hơn chưa duyệt không làm đổi kết quả', () => {
         expect(blockingPreviousStep('D3', steps(['D2']))).toBeNull();
     });

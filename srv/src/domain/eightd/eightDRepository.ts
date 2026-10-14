@@ -636,6 +636,21 @@ const HUMAN_WRITABLE_FIELDS: Readonly<Record<string, ReadonlySet<string>>> = Obj
 });
 
 /**
+ * Task (và bằng chứng của task) của một bước còn ghi được không.
+ *
+ * Mặc định: chỉ khi bước đang In process. Riêng D5: D5 chỉ giao việc và được
+ * duyệt ngay khi có một task có người nhận; làm xong, nộp bằng chứng diễn ra ở
+ * D6 — nên task của D5 ĐÃ DUYỆT vẫn ghi tự do, không cần mở lại D5.
+ */
+export function isTaskWorkOpen(
+    code: string,
+    discipline: { workState?: string | null; reviewStatus?: string | null },
+): boolean {
+    if (discipline.workState === 'InProgress') return true;
+    return code === 'D5' && normalizeStatus(discipline.reviewStatus) === 'Approved';
+}
+
+/**
  * Ghi mot khoa vao `resultJson` cua mot discipline.
  *
  * Doc-sua-ghi o SERVER chu khong nhan ca cuc `resultJson` tu client: nhan ca cuc
@@ -660,7 +675,8 @@ export async function saveDisciplineFieldValue(
             { code: 400 },
         );
     }
-    if ((row as any).workState !== 'InProgress') {
+    const taskWriteOpen = isTaskActionUpdate && isTaskWorkOpen(String(row.code), row as any);
+    if ((row as any).workState !== 'InProgress' && !taskWriteOpen) {
         throw Object.assign(
             new Error(`Discipline ${row.code} is not in process (current status: ${(row as any).workState ?? 'NotStarted'}). Switch status to 'In process' to edit.`),
             { code: 400 },
@@ -1157,7 +1173,8 @@ export async function reviewDiscipline(
     // quyết định đang nhìn thấy.
     const [self, evidence, report] = await Promise.all([
         SELECT.one.from(DISCIPLINES).columns('resultJson', 'summary').where({ ID: disciplineID }),
-        SELECT.from(TASK_EVIDENCES).columns('taskId').where({ reportID, disciplineCode: code }),
+        // D6 duyệt task của D5, và bằng chứng của chúng lưu dưới mã D5.
+        SELECT.from(TASK_EVIDENCES).columns('taskId').where({ reportID, disciplineCode: code === 'D6' ? 'D5' : code }),
         SELECT.one.from(REPORTS)
             .columns('notificationId', 'caseContext', 'precedentsJson', 'rootCauseCategory', 'aiRootCause', 'aiModelAnalyze', 'analyzedAt')
             .where({ ID: reportID }),
@@ -1208,7 +1225,7 @@ export async function reviewDiscipline(
         if (openStops.length > 0) {
             throw Object.assign(new Error([
                 `Cannot approve ${code}: the AI stopped here and nobody has resolved it yet.`,
-                ...openStops.map((s) => `• ${s.reason} — ${s.questionForHuman}`),
+                ...openStops.map((s) => `• ${s.reason} - ${s.questionForHuman}`),
             ].join('\n')), { code: 400 });
         }
 
@@ -1478,7 +1495,7 @@ export async function createTaskEvidence(params: {
             { code: 400 },
         );
     }
-    if ((discipline as any).workState !== 'InProgress') {
+    if (!isTaskWorkOpen(String(disciplineCode), discipline as any)) {
         throw Object.assign(
             new Error(`Discipline ${disciplineCode} is not in process. Switch status to 'In process' to upload evidence.`),
             { code: 400 },
@@ -1558,6 +1575,7 @@ export async function deleteTaskEvidence(evidenceID: string): Promise<{ deleted:
 
     const discipline = await SELECT.one.from(DISCIPLINES)
         .columns('ID', 'code', 'reviewStatus', 'workState')
+        .where({ report_ID: (row as any).reportID, code: (row as any).disciplineCode });
     if (discipline) {
         const isActionStep = ['D3', 'D5', 'D7'].includes(String((row as any).disciplineCode));
         if (normalizeStatus((discipline as any).reviewStatus) === 'Approved' && !isActionStep) {
@@ -1566,7 +1584,7 @@ export async function deleteTaskEvidence(evidenceID: string): Promise<{ deleted:
                 { code: 400 },
             );
         }
-        if ((discipline as any).workState !== 'InProgress') {
+        if (!isTaskWorkOpen(String((row as any).disciplineCode), discipline as any)) {
             throw Object.assign(
                 new Error(`Discipline ${(row as any).disciplineCode} is not in process. Switch status to 'In process' to delete evidence.`),
                 { code: 400 },

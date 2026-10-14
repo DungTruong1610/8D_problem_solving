@@ -159,7 +159,7 @@ export const TOUR_STEPS: TourStep[] = [
         anchor: tourTarget('create-dialog'),
         controls: { 'worklist.createDialog': 'pick' },
         title: 'Preview, then Create & Analyze',
-        body: "Picking a defect shows a read-only preview of what the 8D will analyse, plus two fields you own: **Required completion date** and **Coordinator**. **Create & Analyze** then starts the AI. It extracts the facts and drafts D1–D8 in the background (about 3 minutes), and the worklist updates on its own.",
+        body: "Picking a defect shows a read-only preview of what the 8D will analyse, plus two fields you own: **Required completion date** and **Coordinator**. **Create & Analyze** then starts the AI. It extracts the facts and drafts D1-D8 in the background (about 3 minutes), and the worklist updates on its own.",
     },
     {
         id: 'create-import-toggle',
@@ -297,7 +297,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'top',
         controls: { 'masterData.tab': 'historical-cases' },
         title: 'Closed Case Library',
-        body: "The precedent store the AI retrieves from. It holds completed and closed cases only, because an open case has no proven lesson to reuse yet. The better this library, the better every D1–D8 draft.",
+        body: "The precedent store the AI retrieves from. It holds completed and closed cases only, because an open case has no proven lesson to reuse yet. The better this library, the better every D1-D8 draft.",
     },
     {
         id: 'master-library-import',
@@ -348,7 +348,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'bottom',
         controls: { 'aiConfig.tab': 'global' },
         title: 'Where AI enters the chain',
-        body: "Steps 1–3 are records and human decisions, with no AI involved. The AI starts at step 4, retrieving precedents, and step 5, drafting D1–D8. Everything on this page configures those two highlighted steps.",
+        body: "Steps 1-3 are records and human decisions, with no AI involved. The AI starts at step 4, retrieving precedents, and step 5, drafting D1-D8. Everything on this page configures those two highlighted steps.",
     },
     {
         id: 'ai-tabs',
@@ -396,7 +396,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'top',
         controls: { 'aiConfig.tab': 'graph' },
         title: 'Graph Retrieval Weights',
-        body: "How much each kind of shared evidence counts when the graph engine looks for precedents, set per step D1–D8. The dot beside each step shows whether its numbers are in force, on built-in defaults, or rejected by the server, so what you see is what actually runs.",
+        body: "How much each kind of shared evidence counts when the graph engine looks for precedents, set per step D1-D8. The dot beside each step shows whether its numbers are in force, on built-in defaults, or rejected by the server, so what you see is what actually runs.",
     },
     {
         id: 'ai-model-registry',
@@ -493,7 +493,7 @@ export const TOUR_STEPS: TourStep[] = [
         side: 'right',
         controls: { 'caseDetail.tab': 'disciplines', 'caseDetail.step': 'current' },
         title: 'The eight disciplines',
-        body: "Overall completeness, then D1–D8 with their status: Not started, In process, Changes requested or Complete. Click a step to open it. Steps unlock in order, and each needs the one before it completed. We opened the first step that is not complete yet.",
+        body: "Overall completeness, then D1-D8 with their status: Not started, In process, Changes requested or Complete. Click a step to open it. Steps unlock in order, each once the one before it is completed. The exception is D5 and D6, which run side by side once D4 is done: D5 assigns the corrective tasks and D6 tracks them to Done. D7 waits for both. We opened the first step that is not complete yet.",
     },
     {
         id: 'case-review',
