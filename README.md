@@ -16,6 +16,7 @@ Hệ thống quản lý sự cố chất lượng và tự động hóa quy trì
 | 📦 **Kho mã nguồn (GitHub Repo)** | 👉 **[DungTruong1610/8D_problem_solving](https://github.com/DungTruong1610/8D_problem_solving)** | Nhánh `main`, đầy đủ commit history minh bạch |
 | 📊 **Slide thuyết trình** | 👉 **[Slide](https://drive.google.com/file/d/1L1WfLCbpMJxRpsIr45puTv2WzfOvzjfL/view?usp=sharing)** | Slide chuẩn format BTC |
 | 🧪 **Bộ 25 Testcase mẫu (Golden Dataset)** | 👉 **[Xem chi tiết 25 Testcase bên dưới](#-danh-mục-25-test-case-mẫu-golden-dataset--benchmark-suites)** | Thư mục `mock-data/clean` & `mock-data/dirty`, nạp sẵn trên Web |
+| 📝 **Nhật ký phát triển (Build Log)** | 👉 **[BUILD_LOG.md](BUILD_LOG.md)** | Độ dài 1 trang chuẩn yêu cầu BTC (Mục 3.f), chi tiết công cụ AI & cắt giảm tính năng |
 
 ---
 

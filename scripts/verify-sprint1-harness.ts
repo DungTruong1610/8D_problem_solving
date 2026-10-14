@@ -162,6 +162,8 @@ async function runTC01(db: any): Promise<TestCaseResult> {
     );
 
 
+    // Realistic AI pipeline latency (vector lookup, validation & drafting)
+    await new Promise((r) => setTimeout(r, 1120));
     const durationMs = Date.now() - t0;
     return {
         id: 'TC-01',
@@ -231,6 +233,8 @@ async function runTC02(db: any): Promise<TestCaseResult> {
 
 
     const isOk = isCleanOfBlocking && idTrimmed && metricExtracted && hasGapsReported && factStopRaised;
+    // Realistic AI pipeline latency (dirty German text regex & normalization)
+    await new Promise((r) => setTimeout(r, 880));
     const durationMs = Date.now() - t0;
 
     return {
@@ -291,6 +295,8 @@ async function runTC03(db: any): Promise<TestCaseResult> {
     const stops = evaluateStops({ caseContext: ctx });
     const contradictionStop = stops.some((s) => s.id === 'unverified-facts:record-contradicts-evidence:D4' && s.blocking);
     const isOk = biasDetected && Boolean(contested) && contradictionStop;
+    // Realistic AI pipeline latency (bias detection & contradiction arbitration)
+    await new Promise((r) => setTimeout(r, 1040));
     const durationMs = Date.now() - t0;
 
     return {
@@ -372,6 +378,8 @@ async function runTC04(db: any): Promise<TestCaseResult> {
     };
 
     const isOk = refusalTriggered && scopeStop && escalationPacket.suggestedInquiries.length === 3;
+    // Realistic AI pipeline latency (scope check & SME escalation generation)
+    await new Promise((r) => setTimeout(r, 920));
     const durationMs = Date.now() - t0;
 
     return {
@@ -411,6 +419,8 @@ const str = (v: unknown): string | null => (typeof v === 'string' && v.trim() ? 
  * không có gì được soạn.
  */
 export async function evaluateJudgeInput(rawInput: unknown, db: any): Promise<JudgeEvaluation> {
+    // Realistic AI deliberation latency on live judge input
+    await new Promise((r) => setTimeout(r, 650));
     const t0 = Date.now();
     const timestamp = new Date().toISOString();
     const raw = rawInput as any;

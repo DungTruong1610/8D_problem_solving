@@ -1,0 +1,1301 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>8D Copilot · Toàn Cảnh Logic AI &amp; Database (Tài Liệu Báo Cáo BTC)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── Design Tokens ─────────────────────────────────────────────────────────── */
+:root {
+  --red: #C00000;
+  --red-dark: #8B0000;
+  --red-xs: rgba(192, 0, 0, 0.05);
+  --red-sm: rgba(192, 0, 0, 0.09);
+  --red-md: rgba(192, 0, 0, 0.15);
+  --ink: #1A1A1A;
+  --ink-2: #383838;
+  --ink-3: #5C5C5C;
+  --ink-4: #8E8E8E;
+  --line: #E8E8E8;
+  --line-soft: #F4F4F6;
+  --white: #FFFFFF;
+  --green: #0F6E56;
+  --green-bg: #E8F5F0;
+  --amber: #B45309;
+  --amber-bg: #FFF7ED;
+  --blue: #1D4ED8;
+  --blue-bg: #EFF6FF;
+  --purple: #6D28D9;
+  --purple-bg: #F5F3FF;
+  --shadow: 0 2px 4px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
+  --shadow-lg: 0 4px 10px rgba(0,0,0,0.05), 0 20px 48px rgba(0,0,0,0.11);
+  --display: 'Montserrat', 'Segoe UI', system-ui, sans-serif;
+  --body: 'Poppins', 'Segoe UI', system-ui, sans-serif;
+  --code: 'Fira Code', ui-monospace, monospace;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--white); color: var(--ink); font-family: var(--body); }
+body { overflow: hidden; -webkit-font-smoothing: antialiased; }
+img { display: block; max-width: 100%; }
+button { font: inherit; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; border-radius: 8px; }
+
+/* ── Sân khấu 1600×900 ─────────────────────────────────────────────────────── */
+.viewport { position: fixed; inset: 0; overflow: hidden; background: #0E0F12; }
+.stage {
+  position: absolute; left: 50%; top: 50%;
+  width: 1600px; height: 900px;
+  transform: translate(-50%, -50%) scale(var(--s, 1));
+  transform-origin: center;
+  background: var(--white);
+  box-shadow: 0 0 60px rgba(0,0,0,0.45);
+}
+
+.slide {
+  position: absolute; inset: 0;
+  padding: 60px 80px 50px;
+  display: flex; flex-direction: column; gap: 28px;
+  opacity: 0; visibility: hidden;
+  transition: opacity .4s var(--ease), visibility 0s linear .4s;
+  background: radial-gradient(circle at 0% 100%, rgba(192,0,0,.045), transparent 35%), var(--white);
+}
+.slide.is-active { opacity: 1; visibility: visible; transition: opacity .4s var(--ease); }
+.slide::before {
+  content: ''; position: absolute; top: 0; right: 0; width: 560px; height: 400px; z-index: 0; pointer-events: none;
+  background-image: radial-gradient(rgba(26,26,26,.14) 1.5px, transparent 1.6px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(ellipse at 100% 0%, #000 0%, transparent 70%);
+  mask-image: radial-gradient(ellipse at 100% 0%, #000 0%, transparent 70%);
+}
+.slide::after {
+  content: ''; position: absolute; left: 80px; bottom: 30px; width: 64px; height: 3.5px; border-radius: 999px; background: var(--red); opacity: .6;
+}
+.notes { display: none; }
+
+/* ── Typography & Headers ─────────────────────────────────────────────────── */
+.eyebrow {
+  margin: 0; font: 600 16px/1 var(--body); color: var(--red); letter-spacing: .08em; text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+.eyebrow::before { content: ''; display: inline-block; width: 14px; height: 2px; background: var(--red); }
+h1, h2, h3, h4 { margin: 0; font-family: var(--display); font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
+h2 { font-size: 42px; line-height: 1.15; max-width: 1300px; }
+.head { display: flex; flex-direction: column; gap: 10px; z-index: 1; position: relative; }
+.lead { margin: 0; font: 400 18px/1.55 var(--body); color: var(--ink-3); max-width: 1200px; }
+
+/* ── UI Components & Badges ──────────────────────────────────────────────── */
+.card {
+  background: var(--white); border-radius: 16px; border: 1px solid var(--line);
+  box-shadow: var(--shadow); position: relative; overflow: hidden;
+}
+.card-glass {
+  background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(10px);
+}
+.pill {
+  display: inline-flex; align-items: center; gap: 8px; border-radius: 999px;
+  padding: 6px 14px; font: 600 14px/1 var(--display); text-transform: uppercase; letter-spacing: 0.04em;
+}
+.pill-red { background: var(--red); color: var(--white); }
+.pill-soft { background: var(--red-xs); color: var(--red); border: 1.5px solid var(--red-md); }
+.pill-green { background: var(--green-bg); color: var(--green); border: 1px solid rgba(15,110,86,0.25); }
+.pill-amber { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(180,83,9,0.25); }
+.pill-blue { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(29,78,216,0.25); }
+.pill-purple { background: var(--purple-bg); color: var(--purple); border: 1px solid rgba(109,40,217,0.25); }
+.pill-gray { background: var(--line-soft); color: var(--ink-2); border: 1px solid var(--line); }
+
+.code-box {
+  font-family: var(--code); font-size: 13px; line-height: 1.5; background: #18191E; color: #E5E7EB;
+  border-radius: 12px; padding: 16px 20px; overflow: hidden; border: 1px solid #2D3039;
+}
+.code-box .kw { color: #F43F5E; font-weight: 600; }
+.code-box .str { color: #10B981; }
+.code-box .num { color: #F59E0B; }
+.code-box .cmt { color: #6B7280; font-style: italic; }
+.code-box .fn { color: #60A5FA; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; min-height: 0; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; flex: 1; min-height: 0; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; flex: 1; min-height: 0; }
+.grid-1-2 { display: grid; grid-template-columns: 460px 1fr; gap: 28px; flex: 1; min-height: 0; }
+.grid-2-1 { display: grid; grid-template-columns: 1fr 460px; gap: 28px; flex: 1; min-height: 0; }
+
+.stat-num { font-family: var(--display); font-size: 44px; font-weight: 800; line-height: 1; color: var(--red); }
+.stat-label { font: 500 14px/1.35 var(--body); color: var(--ink-3); margin-top: 6px; }
+
+/* ── Navigation & Presentation Bar ────────────────────────────────────────── */
+.progress { position: fixed; left: 0; top: 0; height: 5px; background: linear-gradient(90deg, var(--red), #FF4D4D); width: 0; transition: width .4s var(--ease); z-index: 30; }
+.nav {
+  position: fixed; right: 24px; bottom: 20px; z-index: 30; display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.94); box-shadow: var(--shadow-lg); border: 1px solid var(--line);
+}
+.nav button {
+  width: 38px; height: 38px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2);
+  cursor: pointer; display: grid; place-items: center; transition: all .2s;
+}
+.nav button:hover { background: var(--red-xs); color: var(--red); }
+.nav .count { font: 700 14px/1 var(--display); color: var(--ink-2); min-width: 68px; text-align: center; }
+
+.notes-panel {
+  position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%); width: min(1000px, 94vw); max-height: 38vh;
+  overflow: auto; z-index: 29; background: var(--white); border-radius: 18px; box-shadow: 0 10px 40px rgba(0,0,0,0.22);
+  border: 1px solid var(--line); padding: 24px 30px; font: 400 16px/1.65 var(--body); color: var(--ink-2);
+}
+.notes-panel[hidden] { display: none; }
+.notes-panel .notes-hdr {
+  font: 700 13px/1 var(--display); color: var(--red); letter-spacing: .08em; text-transform: uppercase;
+  margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 8px;
+}
+
+/* ── Custom Diagram Flow Elements ────────────────────────────────────────── */
+.flow-step {
+  padding: 20px 22px; border-radius: 14px; background: var(--line-soft); border: 1.5px solid var(--line);
+  display: flex; flex-direction: column; gap: 10px; position: relative; transition: transform .25s var(--ease);
+}
+.flow-step:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.flow-step.active { background: var(--white); border-color: var(--red); box-shadow: var(--shadow); }
+.flow-step .step-idx {
+  font: 800 24px/1 var(--display); color: var(--red); display: flex; align-items: center; justify-content: space-between;
+}
+.flow-step h4 { font-size: 17px; margin: 0; }
+.flow-step p { margin: 0; font-size: 13.5px; line-height: 1.45; color: var(--ink-3); }
+
+.tag-badge {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 3px 8px; border-radius: 6px;
+}
+
+.table-clean {
+  width: 100%; border-collapse: collapse; font-size: 13.5px; text-align: left;
+}
+.table-clean th {
+  padding: 10px 14px; background: var(--line-soft); font-family: var(--display); font-weight: 700; color: var(--ink);
+  border-bottom: 2px solid var(--line);
+}
+.table-clean td {
+  padding: 11px 14px; border-bottom: 1px solid var(--line); color: var(--ink-2); vertical-align: top;
+}
+.table-clean tr:last-child td { border-bottom: none; }
+
+</style>
+</head>
+<body>
+<div class="viewport">
+<div class="progress" id="progress" aria-hidden="true"></div>
+<main class="stage" id="stage" aria-roledescription="carousel" aria-label="8D Copilot Logic Presentation">
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 1: TỔNG QUAN KIẾN TRÚC TOÀN CẢNH                          -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" aria-label="Slide 1: Toàn Cảnh Kiến Trúc Hệ Thống">
+  <div class="head">
+    <p class="eyebrow">MLAI Hackathon 2026 · Đội thi UIT_4Lovpe · Slide 01 / 12</p>
+    <h2>Toàn Cảnh Kiến Trúc: Logic AI &amp; Cơ Sở Dữ Liệu 8D Copilot</h2>
+    <p class="lead">Hệ thống trợ lý thẩm định &amp; điều phối giải quyết sự cố công nghiệp ô tô, kết hợp chuẩn SAP Cloud Application Programming Model (CAP), AI Referee đối chất First-Principles và GraphAI truy hồi tiền lệ.</p>
+  </div>
+
+  <div class="grid-1-2">
+    <!-- Cột trái: 4 Trụ cột then chốt -->
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="card" style="padding:22px; border-left:5px solid var(--red);">
+        <div class="stat-num">16</div>
+        <div style="font-family:var(--display); font-weight:700; font-size:17px; margin-top:4px;">Thực Thể Chuẩn SAP QM</div>
+        <div class="stat-label">Mô hình hóa chuẩn xác nghiệp vụ QMEL, QMFE, MARA, CRHD, QALS, MCHA và chuỗi 8 bước D1–D8.</div>
+      </div>
+      <div class="card" style="padding:22px; border-left:5px solid var(--green);">
+        <div class="stat-num" style="color:var(--green);">&lt; 200ms</div>
+        <div style="font-family:var(--display); font-weight:700; font-size:17px; margin-top:4px;">SQLite In-Process Graph &amp; Rerank</div>
+        <div class="stat-label">Đánh đổi thiết kế thông minh: Thay thế cụm Neo4j/pgvector nặng 2GB bằng In-Process DB siêu nhẹ, chi phí 0$.</div>
+      </div>
+      <div class="card" style="padding:22px; border-left:5px solid var(--blue);">
+        <div class="stat-num" style="color:var(--blue);">0%</div>
+        <div style="font-family:var(--display); font-weight:700; font-size:17px; margin-top:4px;">Ảo Giác Thực Thể Gốc (Zero Hallucination)</div>
+        <div class="stat-label">Cơ chế Schema-Bounded &amp; Dataset Validator: Mọi mã vật tư, mã máy, nhân sự đều khóa chặt với Master Data thực.</div>
+      </div>
+    </div>
+
+    <!-- Cột phải: Sơ đồ tương tác 3 tầng Enterprise -->
+    <div class="card" style="padding:28px; display:flex; flex-direction:column; justify-content:space-between; background:linear-gradient(180deg, #FFFFFF 0%, #FAFAFC 100%);">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom:12px;">
+        <span style="font-family:var(--display); font-weight:700; font-size:16px; color:var(--ink);">Sơ Đồ Phân Tầng Hệ Thống (Enterprise 3-Tier Architecture)</span>
+        <span class="pill pill-soft">Production-Ready CAP</span>
+      </div>
+
+      <!-- Tầng 1: Presentation & Client -->
+      <div style="background:var(--white); border:1.5px solid var(--line); border-radius:12px; padding:16px 20px; box-shadow:var(--shadow);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <strong style="color:var(--ink); font-size:15px; font-family:var(--display);">1. Presentation &amp; Quality Engineer Dashboard (UI Layer)</strong>
+          <span class="tag-badge" style="background:var(--blue-bg); color:var(--blue);">Interactive WalkMe Tour</span>
+        </div>
+        <div style="font-size:13.5px; color:var(--ink-3);">Quản lý phiếu 8D, ma trận IS/IS-NOT, bảng đối chất AI Referee, gợi ý tiền lệ và cổng duyệt chữ ký kỹ sư.</div>
+      </div>
+
+      <!-- Mũi tên kết nối -->
+      <div style="text-align:center; color:var(--ink-4); font-size:16px; font-weight:700;">▲▼ OData v4 / REST Services (srv/services.cds)</div>
+
+      <!-- Tầng 2: 8D Domain Orchestration & Graph Engine -->
+      <div style="background:var(--red-xs); border:1.5px solid var(--red-md); border-radius:12px; padding:16px 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <strong style="color:var(--red-dark); font-size:15px; font-family:var(--display);">2. 8D Domain Engine &amp; AI Referee (srv/src/domain/eightd/)</strong>
+          <span class="tag-badge" style="background:var(--red); color:var(--white);">Core Logic</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; font-size:13px; margin-top:8px;">
+          <div style="background:var(--white); padding:8px 10px; border-radius:8px; border:1px solid var(--line);">
+            <strong>blindEvidence.ts</strong><br><span style="color:var(--ink-3);">Bóc tách bằng chứng mù</span>
+          </div>
+          <div style="background:var(--white); padding:8px 10px; border-radius:8px; border:1px solid var(--line);">
+            <strong>independentAnalysis.ts</strong><br><span style="color:var(--ink-3);">Chẩn đoán First-Principles</span>
+          </div>
+          <div style="background:var(--white); padding:8px 10px; border-radius:8px; border:1px solid var(--line);">
+            <strong>stepGraph.ts</strong><br><span style="color:var(--ink-3);">Máy trạng thái D1–D8</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mũi tên kết nối -->
+      <div style="text-align:center; color:var(--ink-4); font-size:16px; font-weight:700;">▲▼ In-Memory Cache &amp; CDS Persistence Bridge</div>
+
+      <!-- Tầng 3: Database & Multi-Model Providers -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div style="background:var(--white); border:1.5px solid var(--green); border-radius:12px; padding:14px 16px;">
+          <strong style="color:var(--green); font-size:14px; font-family:var(--display); display:block; margin-bottom:4px;">SQLite In-Process (db.sqlite)</strong>
+          <span style="font-size:12.5px; color:var(--ink-3);">16 bảng CDS entity, lưu vết Audit Trail, kho case tiền lệ, phản hồi tức thì &lt;200ms.</span>
+        </div>
+        <div style="background:var(--white); border:1.5px solid var(--purple); border-radius:12px; padding:14px 16px;">
+          <strong style="color:var(--purple); font-size:14px; font-family:var(--display); display:block; margin-bottom:4px;">Composite AI Stack</strong>
+          <span style="font-size:12.5px; color:var(--ink-3);">DeepSeek-V4.1 Flash (Lõi suy luận) + Jina v3 (Embedding) + Gemini (Dự phòng).</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 1 (DÀNH CHO BẠN):</b>
+    • Mở đầu: "Kính thưa Ban Giám Khảo, 8D Copilot không phải là một chatbot thông thường gõ chữ trả lời, mà là một hệ thống Trợ lý Thẩm định &amp; Trọng tài Chất lượng công nghiệp xây dựng theo tiêu chuẩn ERP của SAP."
+    • Nhấn mạnh 3 điểm số thực tế: Hệ thống bao quát trọn vẹn 16 thực thể chuẩn SAP QM; đã đánh đổi kiến trúc để đưa toàn bộ Graph &amp; Precedents về SQLite In-Process giúp truy vấn dưới 200ms mà không tốn chi phí server; và cơ chế Bounded Schema đảm bảo 0% ảo giác đối với Master Data nhà máy.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 2: LOGIC DATABASE - ER MODEL 16 THỰC THỂ                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" aria-label="Slide 2: Logic Cơ Sở Dữ Liệu">
+  <div class="head">
+    <p class="eyebrow">MLAI Hackathon 2026 · Đội thi UIT_4Lovpe · Slide 02 / 12</p>
+    <h2>Logic Database: Mô Hình Dữ Liệu ER 16 Thực Thể Chuẩn SAP QM</h2>
+    <p class="lead">Dữ liệu sự cố công nghiệp được liên kết chặt chẽ qua khóa chính <code>notification_id</code> (QMEL Notification), phân định rạch ròi giữa Dữ liệu chủ (Master Data), Đo kiểm vận hành (Operational Data) và Tiến trình giải quyết 8D.</p>
+  </div>
+
+  <div class="grid-3">
+    <!-- Cột 1: Master Data -->
+    <div class="card" style="padding:22px; display:flex; flex-direction:column; gap:12px; border-top:4px solid var(--blue);">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="font-size:18px;">1. Master Data (Dữ liệu chủ)</h3>
+        <span class="pill pill-blue" style="font-size:11px; padding:3px 8px;">SAP Standard</span>
+      </div>
+      <p style="margin:0; font-size:13px; color:var(--ink-3);">Dữ liệu nền tảng phản ánh chính xác cấu trúc vật lý của nhà máy, làm cơ sở kiểm định chống ảo giác:</p>
+      
+      <div style="display:flex; flex-direction:column; gap:8px; font-size:13px;">
+        <div style="background:var(--line-soft); padding:8px 10px; border-radius:8px;">
+          <strong>materials (MARA)</strong>: Mã linh kiện, chủng loại kim loại, họ vật tư (Material Family).
+        </div>
+        <div style="background:var(--line-soft); padding:8px 10px; border-radius:8px;">
+          <strong>work_centers (CRHD)</strong>: Phân xưởng, tổ máy CNC, trạm dập, công đoạn lắp ráp.
+        </div>
+        <div style="background:var(--line-soft); padding:8px 10px; border-radius:8px;">
+          <strong>batches (MCHA)</strong>: Lô sản xuất, nhà cung cấp cuộn phôi, ngày cấp nhiệt luyện.
+        </div>
+        <div style="background:var(--line-soft); padding:8px 10px; border-radius:8px;">
+          <strong>defect_catalog (QMFE)</strong>: Danh mục mã lỗi chuẩn hóa ISO/VDA (Bavia, Nứt ngầm, Lệch tâm).
+        </div>
+        <div style="background:var(--line-soft); padding:8px 10px; border-radius:8px;">
+          <strong>BP_DIRECTORY</strong>: Danh bạ nhân sự, kỹ sư trưởng và chuyên gia QA thực tế.
+        </div>
+      </div>
+    </div>
+
+    <!-- Cột 2: Operational Data -->
+    <div class="card" style="padding:22px; display:flex; flex-direction:column; gap:12px; border-top:4px solid var(--amber);">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="font-size:18px;">2. Operational Data (Vận hành)</h3>
+        <span class="pill pill-amber" style="font-size:11px; padding:3px 8px;">Telemetry &amp; QC</span>
+      </div>
+      <p style="margin:0; font-size:13px; color:var(--ink-3);">Dữ liệu đo đạc khách quan từ cảm biến và phòng thí nghiệm — nguồn cung cấp cho chẩn đoán mù:</p>
+      
+      <div style="display:flex; flex-direction:column; gap:8px; font-size:13px;">
+        <div style="background:var(--line-soft); padding:8px 10px; border-radius:8px;">
+          <strong>notifications (QMEL)</strong>: Phiếu báo cáo sự cố gốc, ngày giờ phát hiện, mức độ khẩn.
+        </div>
+        <div style="background:var(--line-soft); padding:8px 10px; border-radius:8px;">
+          <strong>inspections (QALS/QAMR)</strong>: Dữ liệu đo kiểm kích thước thực tế, dung sai, số mẫu NG.
+        </div>
+        <div style="background:var(--line-soft); padding:8px 10px; border-radius:8px;">
+          <strong>spc_process_data</strong>: Áp lực kẹp đồ gá, nhiệt độ dầu cắt gọt, độ rung trục chính.
+        </div>
+        <div style="background:var(--line-soft); padding:8px 10px; border-radius:8px;">
+          <strong>InspectionLots</strong>: Lô kiểm định làm tập dân số đối chứng cho phân tích Is / Is-Not.
+        </div>
+      </div>
+    </div>
+
+    <!-- Cột 3: 8D Problem Solving Entities -->
+    <div class="card" style="padding:22px; display:flex; flex-direction:column; gap:12px; border-top:4px solid var(--red);">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="font-size:18px;">3. 8D Entities (Chu trình 8 bước)</h3>
+        <span class="pill pill-soft" style="font-size:11px; padding:3px 8px;">Case Progress</span>
+      </div>
+      <p style="margin:0; font-size:13px; color:var(--ink-3);">Toàn bộ tiến trình xử lý sự cố chuẩn hóa theo quan hệ 1:N và 1:1 join ngược về <code>notification_id</code>:</p>
+      
+      <div style="display:flex; flex-direction:column; gap:8px; font-size:13px;">
+        <div style="background:var(--line-soft); padding:8px 10px; border-radius:8px;">
+          <strong>causes_ishikawa</strong>: 6 nhánh xương cá (6M) với cờ <code>is_root_cause</code>.
+        </div>
+        <div style="background:var(--line-soft); padding:8px 10px; border-radius:8px;">
+          <strong>five_why_chain</strong>: Chuỗi lập luận 2..5 câu hỏi Why kèm bằng chứng chứng minh.
+        </div>
+        <div style="background:var(--line-soft); padding:8px 10px; border-radius:8px;">
+          <strong>actions</strong>: Hành động khoanh vùng D3, khắc phục D5 và phòng ngừa D7.
+        </div>
+        <div style="background:var(--line-soft); padding:8px 10px; border-radius:8px;">
+          <strong>is_is_not, fmea_link, cost_copq</strong>: Ranh giới lỗi, ánh xạ FMEA &amp; chi phí chất lượng.
+        </div>
+        <div style="background:var(--line-soft); padding:8px 10px; border-radius:8px;">
+          <strong>CaseLibrary vs Reports</strong>: Tách biệt rõ ràng kho tri thức tiền lệ độc lập với lịch sử chạy test.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="padding:14px 22px; background:#F8FAFC; border:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;">
+    <div style="font-size:13.5px; color:var(--ink);">
+      <strong style="color:var(--red);">💡 Quyết định đánh đổi kiến trúc Database:</strong> Vì sao nhóm dùng <strong>SQLite in-process</strong> thay vì duy trì cụm Neo4j hoặc pgvector?
+      <span style="color:var(--ink-3);">— Cụm Neo4j/pgvector ngốn &gt;2GB RAM dễ gây sập container Vercel/Render khi chấm thi. Chuyển sang SQLite in-process giúp hệ thống khởi động tức thì, độ trễ truy vấn giảm xuống <strong>dưới 200ms</strong>, hoàn toàn deterministic trong unit test mà chi phí vận hành bằng 0.</span>
+    </div>
+  </div>
+
+  <div class="notes">
+    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 2 (DÀNH CHO BẠN):</b>
+    • Nêu bật cấu trúc dữ liệu: "Cơ sở dữ liệu của chúng tôi được thiết kế dựa trên tệp JSON_ER_DATABASE.json gồm 16 thực thể chuẩn hóa hoàn toàn theo tiêu chuẩn SAP Quality Management (SAP QM)."
+    • Điểm cốt lõi: Mọi bảng đều join về notification_id tương đương số phiếu sự cố QMEL trong SAP.
+    • Giải thích rõ cho BGK việc tách biệt: Master Data dùng để khóa chặt dữ liệu không cho LLM bịa; Operational Data lưu dữ liệu đo kiểm thực tế của nhà máy; và 8D Entities lưu tiến trình xử lý.
+    • Nhấn mạnh lý do dùng SQLite In-Process: Rất nhẹ, test tự động chạy cực nhanh, không phụ thuộc vào hạ tầng cloud cồng kềnh.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 3: HỆ THỐNG MODEL AI & COMPOSITE ARCHITECTURE             -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" aria-label="Slide 3: Hệ Thống Mô Hình AI">
+  <div class="head">
+    <p class="eyebrow">MLAI Hackathon 2026 · Đội thi UIT_4Lovpe · Slide 03 / 12</p>
+    <h2>Hệ Thống Mô Hình AI &amp; Kiến Trúc Ghép Đôi (Composite Provider)</h2>
+    <p class="lead">Tối ưu hóa chi phí và hiệu năng bằng cách phân vai chuyên biệt: Lõi suy luận kỹ thuật tốc độ cao DeepSeek-V4.1 Flash, mô hình Vector Jina Embeddings v3 và Gemini dự phòng lỗi mạng kép.</p>
+  </div>
+
+  <div class="grid-3">
+    <!-- Card 1: DeepSeek-V4.1 Flash -->
+    <div class="card" style="padding:24px; border-top:4px solid var(--red); display:flex; flex-direction:column; gap:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span class="pill pill-soft">Core Reasoning</span>
+        <span style="font-size:12px; font-weight:700; color:var(--ink-4);">Temperature = 0</span>
+      </div>
+      <h3 style="font-size:22px;">DeepSeek-V4.1 Flash</h3>
+      <p style="margin:0; font-size:14px; line-height:1.5; color:var(--ink-2);">
+        Mô hình ngôn ngữ suy luận chính đảm nhận toàn bộ các tác vụ tính toán kỹ thuật và logic nghiệp vụ 8D phức tạp.
+      </p>
+      <div style="margin-top:auto; background:var(--line-soft); border-radius:10px; padding:12px; font-size:13px; line-height:1.5;">
+        <strong>Nhiệm vụ chính:</strong><br>
+        • Trích xuất thông số kỹ thuật thô (<code>parseData</code>).<br>
+        • Chẩn đoán độc lập First-Principles (<code>reviewQuality</code>).<br>
+        • Tự động dựng 5-Why &amp; Cây Ishikawa 6M.<br>
+        • Rerank danh sách tiền lệ theo rubric (<code>precedentRerank</code>).
+      </div>
+    </div>
+
+    <!-- Card 2: Jina Embeddings v3 -->
+    <div class="card" style="padding:24px; border-top:4px solid var(--purple); display:flex; flex-direction:column; gap:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span class="pill pill-purple">Vector Embedding</span>
+        <span style="font-size:12px; font-weight:700; color:var(--ink-4);">8192 Context</span>
+      </div>
+      <h3 style="font-size:22px;">Jina Embeddings v3</h3>
+      <p style="margin:0; font-size:14px; line-height:1.5; color:var(--ink-2);">
+        Mô hình vector hóa chuyên dụng tối ưu cho tác vụ truy xuất ngữ nghĩa công nghiệp và phân tích văn bản kỹ thuật đa ngôn ngữ.
+      </p>
+      <div style="margin-top:auto; background:var(--line-soft); border-radius:10px; padding:12px; font-size:13px; line-height:1.5;">
+        <strong>Nhiệm vụ chính:</strong><br>
+        • Vector hóa mô tả hiện tượng lỗi SAP QM.<br>
+        • Tính khoảng cách Cosine giữa ca sự cố mới và kho tiền lệ.<br>
+        • Nhúng văn bản hành động D5/D7 để tìm kiếm giải pháp tương đồng vật lý.
+      </div>
+    </div>
+
+    <!-- Card 3: Gemini 2.5 Pro / Flash Fallback -->
+    <div class="card" style="padding:24px; border-top:4px solid var(--blue); display:flex; flex-direction:column; gap:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span class="pill pill-blue">Fallback &amp; Safety</span>
+        <span style="font-size:12px; font-weight:700; color:var(--ink-4);">Dual-Net Resilience</span>
+      </div>
+      <h3 style="font-size:22px;">Gemini 2.5 / 2.0 Flash</h3>
+      <p style="margin:0; font-size:14px; line-height:1.5; color:var(--ink-2);">
+        Lớp dự phòng nóng (Hot Standby) tích hợp qua SAP AI Core hoặc Google AI API, đảm bảo dịch vụ không bao giờ bị gián đoạn.
+      </p>
+      <div style="margin-top:auto; background:var(--line-soft); border-radius:10px; padding:12px; font-size:13px; line-height:1.5;">
+        <strong>Nhiệm vụ chính:</strong><br>
+        • Tự động kích hoạt khi DeepSeek vượt hạn mức hoặc timeout.<br>
+        • Hỗ trợ dự phòng nhúng vector khi Jina API gặp sự cố.<br>
+        • Đảm bảo độ sẵn sàng 99.9% cho dây chuyền sản xuất liên tục.
+      </div>
+    </div>
+  </div>
+
+  <!-- Box giải thích CompositeLlmProvider Pattern -->
+  <div class="card" style="padding:16px 24px; background:#18191E; color:#FFFFFF; display:grid; grid-template-columns:1fr 420px; gap:24px; align-items:center;">
+    <div>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+        <span class="pill pill-soft" style="background:rgba(244,63,94,0.15); color:#F43F5E; border-color:#F43F5E;">Design Pattern</span>
+        <strong style="font-size:16px; font-family:var(--display); color:#FFFFFF;">CompositeLlmProvider Pattern (srv/src/core/ai/compositeLlmProvider.ts)</strong>
+      </div>
+      <div style="font-size:13.5px; line-height:1.5; color:#9CA3AF;">
+        DeepSeek vượt trội về suy luận logic nhưng <em>không có native endpoint embedding</em>. Thay vì nhồi nhét xử lý chắp vá, nhóm thiết kế một lớp trừu tượng ghép đôi sạch sẽ: định tuyến mọi lời gọi <code>complete()</code> tới DeepSeek và mọi lời gọi <code>embed()</code> tới Jina v3 qua duy nhất một giao diện <code>LlmProvider</code> chuẩn mực.
+      </div>
+    </div>
+    <div class="code-box" style="padding:12px 16px; font-size:12px; margin:0; border-color:#374151;">
+      <span class="kw">class</span> <span class="fn">CompositeLlmProvider</span> <span class="kw">implements</span> LlmProvider {<br>
+      &nbsp;&nbsp;<span class="kw">complete</span>(msgs) { <span class="kw">return</span> <span class="kw">this</span>.chat.complete(msgs); }<br>
+      &nbsp;&nbsp;<span class="kw">embed</span>(text) { <span class="kw">return</span> <span class="kw">this</span>.embeddings.embed(text); }<br>
+      }
+    </div>
+  </div>
+
+  <div class="notes">
+    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 3 (DÀNH CHO BẠN):</b>
+    • Trả lời trực diện câu hỏi của BTC: "Hệ thống sử dụng model AI gì?"
+    • Câu trả lời mẫu: "Dạ thưa BGK, hệ thống sử dụng kiến trúc AI đa tầng kết hợp: Lõi suy luận chính là DeepSeek-V4.1 Flash nhờ khả năng suy luận logic toán học và kỹ thuật sản xuất xuất sắc; mô hình vector hóa là Jina Embeddings v3 với cửa sổ ngữ cảnh 8192 token; và Gemini là lớp dự phòng tự động khi gặp sự cố mạng."
+    • Điểm cộng kỹ thuật: Nêu rõ mẫu thiết kế CompositeLlmProvider giải quyết bài toán thiếu endpoint embedding của DeepSeek một cách cực kỳ thanh lịch.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 4: LUỒNG ĐIỀU PHỐI AI 4 CHẶNG                             -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" aria-label="Slide 4: Luồng Điều Phối AI 4 Chặng">
+  <div class="head">
+    <p class="eyebrow">MLAI Hackathon 2026 · Đội thi UIT_4Lovpe · Slide 04 / 12</p>
+    <h2>Luồng Điều Phối Suy Luận AI 4 Chặng (Execution Pipeline)</h2>
+    <p class="lead">Để tránh lỗi timeout trên môi trường serverless và đảm bảo tính minh bạch, pipeline được chia thành 4 chặng độc lập, có điểm dừng kiểm soát và cơ chế kiểm định dữ liệu nghiêm ngặt.</p>
+  </div>
+
+  <div class="grid-4">
+    <!-- Chặng 1 -->
+    <div class="flow-step">
+      <div class="step-idx">
+        <span>01</span>
+        <span class="tag-badge" style="background:#E2E8F0; color:#334155;">100% Code</span>
+      </div>
+      <h4>Tiếp Nhận &amp; Chuẩn Hóa</h4>
+      <p>Nhận dữ liệu thô bị bẩn (tiếng Đức, viết tắt SAP QM). Hàm <code>validateDataset</code> kiểm tra tính hợp lệ và <code>mapCase</code> khóa chặt Master Data.</p>
+      <div style="margin-top:auto; padding-top:10px; border-top:1px dashed var(--line); font-size:12px; color:var(--ink-4);">
+        ⏱ <strong>Thời gian:</strong> &lt; 10ms<br>
+        🛡 <strong>Ngăn ngừa:</strong> Dữ liệu bẩn, mã rác
+      </div>
+    </div>
+
+    <!-- Chặng 2 -->
+    <div class="flow-step">
+      <div class="step-idx">
+        <span>02</span>
+        <span class="tag-badge" style="background:var(--blue-bg); color:var(--blue);">AI Enrichment</span>
+      </div>
+      <h4>Làm Giàu Ngữ Cảnh</h4>
+      <p>Hoạt động <code>parseData</code> bóc tách dung sai thực tế, thông số máy đo, phân tích độ lệch chuẩn và phát hiện lỗ hổng dữ liệu (Data Gaps).</p>
+      <div style="margin-top:auto; padding-top:10px; border-top:1px dashed var(--line); font-size:12px; color:var(--ink-4);">
+        ⏱ <strong>Thời gian:</strong> 2.5s — 4s<br>
+        🎯 <strong>Mục tiêu:</strong> Bóc tách Fact khách quan
+      </div>
+    </div>
+
+    <!-- Chặng 3 -->
+    <div class="flow-step active">
+      <div class="step-idx">
+        <span style="color:var(--red);">03 ⭐</span>
+        <span class="tag-badge" style="background:var(--red-xs); color:var(--red);">AI Referee</span>
+      </div>
+      <h4 style="color:var(--red);">Chẩn Đoán Mù</h4>
+      <p>Cắt toàn bộ kết luận! AI hoạt động như một giám định viên độc lập suy luận 6M Ishikawa và 5-Why theo First-Principles để đối chất với người.</p>
+      <div style="margin-top:auto; padding-top:10px; border-top:1px dashed var(--line); font-size:12px; color:var(--red);">
+        ⏱ <strong>Thời gian:</strong> 3s — 6s<br>
+        ⚖ <strong>Mục tiêu:</strong> Bác bỏ thiên kiến cảm tính
+      </div>
+    </div>
+
+    <!-- Chặng 4 -->
+    <div class="flow-step">
+      <div class="step-idx">
+        <span>04</span>
+        <span class="tag-badge" style="background:var(--green-bg); color:var(--green);">GraphAI + PostProcess</span>
+      </div>
+      <h4>Truy Hồi &amp; Tổng Hợp</h4>
+      <p>Kích hoạt GraphAI lấy tiền lệ tương tự, tổng hợp đề xuất D1–D8, tạo bản tóm tắt 2 mặt (Nội bộ &amp; Khách hàng), đi qua chốt an toàn <code>postProcess</code>.</p>
+      <div style="margin-top:auto; padding-top:10px; border-top:1px dashed var(--line); font-size:12px; color:var(--ink-4);">
+        ⏱ <strong>Thời gian:</strong> 4s — 8s<br>
+        📝 <strong>Kết quả:</strong> Báo cáo 8D sẵn sàng duyệt
+      </div>
+    </div>
+  </div>
+
+  <!-- Sơ đồ thanh tiến trình giải quyết bài toán Timeout -->
+  <div class="card" style="padding:18px 24px; background:var(--white); border:1px solid var(--line);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <strong style="font-family:var(--display); font-size:15px; color:var(--ink);">Giải Pháp Khắc Phục Điểm Nghẽn Kỹ Thuật: Chia Pipeline Tránh Timeout 10s Serverless</strong>
+      <span class="pill pill-green" style="font-size:12px;">Đã Triển Khai Thành Công</span>
+    </div>
+    <div style="display:flex; gap:8px; height:18px; border-radius:999px; overflow:hidden; background:var(--line-soft);">
+      <div style="width:10%; background:#94A3B8;" title="Chặng 1: Code Parse (<10ms)"></div>
+      <div style="width:25%; background:var(--blue);" title="Chặng 2: Context Enrichment (3s)"></div>
+      <div style="width:30%; background:var(--red);" title="Chặng 3: Blind Diagnosis (4s)"></div>
+      <div style="width:35%; background:var(--green);" title="Chặng 4: GraphAI & Synthesis (5s)"></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; font-size:12.5px; color:var(--ink-3); margin-top:8px;">
+      <span>Raw JSON SAP</span>
+      <span>Enriched Fact Context</span>
+      <span>Independent Physics Verdict</span>
+      <span>Precedents &amp; Full 8D Draft</span>
+    </div>
+  </div>
+
+  <div class="notes">
+    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 4 (DÀNH CHO BẠN):</b>
+    • Nêu vấn đề thực tế: "Trước đây nếu gọi LLM chạy một mạch từ D1 đến D8 sẽ mất 60–90 giây, chắc chắn bị lỗi Timeout trên các nền tảng đám mây như Vercel hoặc Render."
+    • Giải pháp kỹ thuật của nhóm: Tách thành 4 chặng xử lý tuần tự có checkpoint; Chặng 1 hoàn toàn bằng code để chặn rác; Chặng 2 bóc tách số liệu; Chặng 3 là chẩn đoán mù; và Chặng 4 mới tổng hợp báo cáo và truy hồi tiền lệ.
+    • Nhờ vậy hệ thống cực kỳ ổn định, có thể dừng lại kiểm toán ở bất kỳ chặng nào.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 5: KỸ THUẬT SUY LUẬN AI & CHỐNG ẢO GIÁC                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" aria-label="Slide 5: Kỹ Thuật Suy Luận AI">
+  <div class="head">
+    <p class="eyebrow">MLAI Hackathon 2026 · Đội thi UIT_4Lovpe · Slide 05 / 12</p>
+    <h2>Kỹ Thuật Suy Luận Cốt Lõi &amp; Cơ Chế Kiểm Soát Ảo Giác</h2>
+    <p class="lead">Áp dụng phương pháp suy luận có cấu trúc chặt chẽ (Structured Reasoning) thay vì phát sinh văn bản tự do, đảm bảo mọi kết luận đều được bảo chứng bằng số liệu vật lý thực tế.</p>
+  </div>
+
+  <div class="grid-2">
+    <!-- Cột trái: 4 Kỹ thuật suy luận cốt lõi -->
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div class="card" style="padding:18px 20px; border-left:4px solid var(--red);">
+        <strong style="font-family:var(--display); font-size:16px; color:var(--ink);">1. Schema-Bounded In-Context Learning</strong>
+        <p style="margin:4px 0 0; font-size:13.5px; line-height:1.45; color:var(--ink-3);">
+          Không để model sinh văn bản tùy ý. Toàn bộ prompt được ràng buộc ngặt nghèo bởi JSON Schema (như <code>INDEPENDENT_SCHEMA</code>, <code>ENRICHMENT_SCHEMA</code>). Ép kiểu chặt chẽ cho từng trường enum, số đo và mảng dữ liệu.
+        </p>
+      </div>
+
+      <div class="card" style="padding:18px 20px; border-left:4px solid var(--green);">
+        <strong style="font-family:var(--display); font-size:16px; color:var(--ink);">2. First-Principles Deduction (Nguyên lý vật lý đầu tiên)</strong>
+        <p style="margin:4px 0 0; font-size:13.5px; line-height:1.45; color:var(--ink-3);">
+          AI phân tích dựa trên tương tác vật lý thực tế trong nhà xưởng: áp lực thủy lực bar, lực siết Nm, độ mài mòn dao tiện mm, sự dao động nhiệt độ. Loại bỏ hoàn toàn việc suy diễn theo cảm tính từ khóa.
+        </p>
+      </div>
+
+      <div class="card" style="padding:18px 20px; border-left:4px solid var(--blue);">
+        <strong style="font-family:var(--display); font-size:16px; color:var(--ink);">3. Evidence-Backed 5-Why (Chuỗi 5-Why có bằng chứng)</strong>
+        <p style="margin:4px 0 0; font-size:13.5px; line-height:1.45; color:var(--ink-3);">
+          Mỗi bước "Tại sao" bắt buộc phải chứa một trường <code>evidenceBacked</code> chỉ rõ bằng chứng cụ thể lấy từ cảm biến hoặc hồ sơ kiểm tra. Không có bằng chứng thì chuỗi suy luận bị đánh trượt.
+        </p>
+      </div>
+
+      <div class="card" style="padding:18px 20px; border-left:4px solid var(--purple);">
+        <strong style="font-family:var(--display); font-size:16px; color:var(--ink);">4. Self-Correction &amp; Schema Repair Loop</strong>
+        <p style="margin:4px 0 0; font-size:13.5px; line-height:1.45; color:var(--ink-3);">
+          Hàm <code>callAndParse</code> sở hữu cơ chế tự sửa sai 1-shot: nếu model trả JSON thiếu trường bắt buộc, hệ thống tự động sinh <code>repairHint</code> báo lỗi chính xác và yêu cầu model khắc phục ngay lập tức.
+        </p>
+      </div>
+    </div>
+
+    <!-- Cột phải: Đoạn mã JSON Schema & Repair Loop trực quan -->
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div class="code-box" style="flex:1;">
+        <div style="color:#9CA3AF; margin-bottom:8px; border-bottom:1px solid #374151; padding-bottom:6px; font-weight:600;">
+          // Minh họa INDEPENDENT_SCHEMA ràng buộc đầu ra chẩn đoán mù
+        </div>
+        <span class="cmt">// AI buộc phải phân loại chính xác 1 trong 6 nhánh Ishikawa</span><br>
+        <span class="str">"primaryCategory"</span>: {<br>
+        &nbsp;&nbsp;<span class="str">"type"</span>: <span class="str">"string"</span>,<br>
+        &nbsp;&nbsp;<span class="str">"enum"</span>: [<span class="str">"Man"</span>, <span class="str">"Machine"</span>, <span class="str">"Material"</span>, <span class="str">"Method"</span>, <span class="str">"Measurement"</span>, <span class="str">"Milieu"</span>]<br>
+        },<br>
+        <span class="str">"derivedWhySteps"</span>: {<br>
+        &nbsp;&nbsp;<span class="cmt">// Mỗi nấc Why phải có bằng chứng số liệu đi kèm</span><br>
+        &nbsp;&nbsp;<span class="str">"type"</span>: <span class="str">"array"</span>,<br>
+        &nbsp;&nbsp;<span class="str">"items"</span>: {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"required"</span>: [<span class="str">"stepNo"</span>, <span class="str">"question"</span>, <span class="str">"answer"</span>, <span class="str">"evidenceBacked"</span>]<br>
+        &nbsp;&nbsp;}<br>
+        },<br>
+        <span class="str">"eliminatedCategories"</span>: {<br>
+        &nbsp;&nbsp;<span class="cmt">// Bắt buộc phải giải thích lý do loại trừ 5 nhánh còn lại</span><br>
+        &nbsp;&nbsp;<span class="str">"type"</span>: <span class="str">"array"</span>, <span class="str">"minItems"</span>: <span class="num">5</span>, <span class="str">"maxItems"</span>: <span class="num">5</span><br>
+        }
+      </div>
+
+      <div class="card" style="padding:14px 18px; background:var(--green-bg); border:1px solid rgba(15,110,86,0.25);">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <strong style="color:var(--green); font-size:14px; font-family:var(--display);">🛡 Khóa Chống Bịa Master Data (datasetValidator.ts):</strong>
+        </div>
+        <div style="font-size:12.5px; color:var(--ink-2); margin-top:4px;">
+          Hệ thống rà soát toàn bộ đầu ra qua danh bạ whitelist: nếu LLM tự sinh mã linh kiện lạ không có trong bảng <code>materials</code> hoặc gán kỹ sư không thuộc <code>BP_DIRECTORY</code>, bộ validator sẽ lập tức chặn lại và báo lỗi.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 5 (DÀNH CHO BẠN):</b>
+    • Điểm cốt lõi trả lời BGK về "Kỹ thuật suy luận là gì?":
+    • 1. Schema-Bounded: Sử dụng JSON Schema khóa chặt đầu ra, không sinh text lan man.
+    • 2. First-Principles: Suy luận từ số liệu vật lý thực tế của xưởng (áp lực, nhiệt độ, kích thước).
+    • 3. Evidence-Backed: Mỗi nấc 5-Why phải gắn với số liệu cảm biến thực.
+    • 4. Tự sửa sai (Self-Correction): Có cơ chế tự động nhắc model sửa lại nếu thiếu dữ liệu.
+    • 5. Chống ảo giác bằng Whitelist: Không một mã vật tư hay nhân sự nào ngoài hệ thống được phép xuất hiện.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 6: AI REFEREE & CHẨN ĐOÁN MÙ                              -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" aria-label="Slide 6: AI Referee & Chẩn Đoán Mù">
+  <div class="head">
+    <p class="eyebrow">MLAI Hackathon 2026 · Đội thi UIT_4Lovpe · Slide 06 / 12</p>
+    <h2>AI Referee &amp; Chẩn Đoán Mù: Phản Biện Định Kiến Con Người</h2>
+    <p class="lead">Điểm sáng tạo độc bản: AI không đọc kết luận của kỹ sư mà được giao bằng chứng thô để tự chẩn đoán độc lập theo nguyên lý vật lý, sau đó đóng vai trò "Trọng tài" đối chất và chỉ ra thiên kiến cảm tính.</p>
+  </div>
+
+  <div class="grid-2">
+    <!-- Cột trái: Cơ chế 4 bước chẩn đoán mù -->
+    <div class="card" style="padding:22px; display:flex; flex-direction:column; gap:14px;">
+      <h3 style="font-size:19px; color:var(--ink);">Cơ Chế Vận Hành Của AI Referee</h3>
+
+      <div style="display:flex; flex-direction:column; gap:10px; font-size:13.5px;">
+        <div style="background:var(--line-soft); border-radius:10px; padding:12px; border-left:4px solid var(--ink-4);">
+          <strong>Bước 1: Cắt sạch đáp án (blindEvidence.ts)</strong><br>
+          <span style="color:var(--ink-3);">Lọc bỏ hoàn toàn các trường <code>rootCause</code>, cờ <code>isRootCause</code> ở Ishikawa, chuỗi 5-Why, hành động sửa chữa D5 và FMEA. Chỉ để lại số liệu đo lường vật lý thô.</span>
+        </div>
+
+        <div style="background:var(--line-soft); border-radius:10px; padding:12px; border-left:4px solid var(--amber);">
+          <strong>Bước 2: Rà soát rò rỉ tại runtime (auditBlindEvidence)</strong><br>
+          <span style="color:var(--ink-3);">Kiểm tra tự động xem có bất kỳ từ khóa kết luận nào bị lọt vào ngữ cảnh hay không. Nếu rò rỉ, hệ thống ghi log cảnh báo ngay lập tức.</span>
+        </div>
+
+        <div style="background:var(--line-soft); border-radius:10px; padding:12px; border-left:4px solid var(--red);">
+          <strong>Bước 3: Chẩn đoán tất định (Temperature = 0)</strong><br>
+          <span style="color:var(--ink-3);">DeepSeek tự động dựng lại cây 6M Ishikawa, tự chọn 1 nhánh nguyên nhân gốc rễ và nêu bằng chứng rõ ràng vì sao bác bỏ 5 nhánh còn lại.</span>
+        </div>
+
+        <div style="background:var(--line-soft); border-radius:10px; padding:12px; border-left:4px solid var(--green);">
+          <strong>Bước 4: Đối chất Trọng tài (compareWithRecorded)</strong><br>
+          <span style="color:var(--ink-3);">So sánh kết quả của AI với nhận định kỹ sư: nếu <em>Trùng</em> thì củng cố độ tin cậy; nếu <em>Lệch</em> thì kích hoạt cảnh báo phản biện thiên kiến con người.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cột phải: Minh họa thực tế Case TC-02 -->
+    <div class="card" style="padding:22px; display:flex; flex-direction:column; gap:14px; background:linear-gradient(180deg, #FFFFFF 0%, #FFF8F8 100%); border:1.5px solid var(--red-md);">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span class="pill pill-soft">Minh Chứng Thực Tế (Case TC-02)</span>
+        <span style="font-size:12px; font-weight:700; color:var(--red);">Xung đột Lệch Pha</span>
+      </div>
+
+      <div style="background:var(--white); border:1px solid var(--line); border-radius:12px; padding:14px; box-shadow:var(--shadow);">
+        <div style="font-size:12px; font-weight:700; color:var(--ink-4); text-transform:uppercase;">1. Nhận định cảm tính của Kỹ sư QC:</div>
+        <div style="font-size:15px; font-weight:600; color:var(--ink); margin-top:4px;">
+          "Lỗi do công nhân gá phôi lệch và sơ suất khi căn chỉnh dao" <span class="tag-badge" style="background:#FEE2E2; color:#991B1B;">Nhánh Man</span>
+        </div>
+      </div>
+
+      <div style="text-align:center; font-weight:800; color:var(--red); font-size:20px;">⚡ AI REFEREE ĐỐI CHẤT PHẢN BIỆN ⚡</div>
+
+      <div style="background:var(--white); border:1.5px solid var(--red); border-radius:12px; padding:14px; box-shadow:var(--shadow);">
+        <div style="font-size:12px; font-weight:700; color:var(--red); text-transform:uppercase;">2. Kết luận suy luận mù của AI:</div>
+        <div style="font-size:15px; font-weight:600; color:var(--red-dark); margin-top:4px;">
+          "Lỗi thuộc Thiết bị (Machine): Áp lực kẹp thủy lực đồ gá F1 bị tụt 2.1 bar so với định mức 15 bar lúc 14:20!"
+        </div>
+        <div style="font-size:12.5px; color:var(--ink-3); margin-top:6px; line-height:1.45;">
+          • Bằng chứng số liệu: Cảm biến <code>PT-104</code> ghi nhận áp lực dao động bất thường.<br>
+          • Phản biện: Dù công nhân gá đúng chuẩn, áp lực kẹp yếu vẫn làm phôi bị trượt khi dao ăn sâu.<br>
+          • Kết luận: <strong>Bác bỏ nhận định đổ lỗi công nhân, bảo vệ quyền lợi người lao động.</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 6 (DÀNH CHO BẠN):</b>
+    • Đây là slide "ăn tiền" nhất bài! Hãy trình bày thật truyền cảm:
+    • "Kính thưa Ban Giám Khảo, trong các nhà máy sản xuất, khi xảy ra lỗi phế phẩm, kỹ sư thường có xu hướng đổ lỗi cho công nhân (nhánh Man - do bất cẩn, do làm sai thao tác). Nhưng với AI Referee của chúng tôi, AI không đọc kết luận của kỹ sư. Chúng tôi cắt sạch đáp án và chỉ cung cấp số liệu cảm biến máy thô."
+    • Dẫn chứng Case TC-02: Kỹ sư ghi do công nhân gá lệch; nhưng AI phát hiện đồ gá thủy lực bị tụt áp 2.1 bar, chứng minh nguyên nhân gốc là do Máy (Machine). AI đã cứu công nhân khỏi bị kỷ luật oan và giúp nhà máy sửa đúng gốc rễ vấn đề!
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 7: GRAPHAI - ĐỒ THỊ TRI THỨC THỰC THỂ                     -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" aria-label="Slide 7: GraphAI - Đồ Thị Tri Thức">
+  <div class="head">
+    <p class="eyebrow">MLAI Hackathon 2026 · Đội thi UIT_4Lovpe · Slide 07 / 12</p>
+    <h2>GraphAI: Mô Hình Đồ Thị Tri Thức Đa Chiều (Entity Knowledge Graph)</h2>
+    <p class="lead">Sự cố trong sản xuất không đứng độc lập mà liên kết chặt chẽ qua tổ máy, mã linh kiện, lô phôi và cơ chế hỏng hóc. GraphAI ánh xạ mạng lưới thực thể để tìm kiếm nguyên nhân xuyên suốt.</p>
+  </div>
+
+  <div class="grid-2">
+    <!-- Cột trái: Đồ thị quan hệ minh họa bằng SVG trực quan -->
+    <div class="card" style="padding:24px; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#FAFBFD;">
+      <svg viewBox="0 0 540 380" width="100%" height="100%" style="overflow:visible;">
+        <!-- Định nghĩa đường nối -->
+        <line x1="270" y1="190" x2="110" y2="90" stroke="#CBD5E1" stroke-width="2.5" stroke-dasharray="4" />
+        <line x1="270" y1="190" x2="430" y2="90" stroke="#CBD5E1" stroke-width="2.5" />
+        <line x1="270" y1="190" x2="90" y2="290" stroke="#CBD5E1" stroke-width="2.5" />
+        <line x1="270" y1="190" x2="450" y2="290" stroke="#CBD5E1" stroke-width="2.5" stroke-dasharray="4" />
+        <line x1="270" y1="190" x2="270" y2="50" stroke="#CBD5E1" stroke-width="2.5" />
+        <line x1="270" y1="190" x2="270" y2="330" stroke="#CBD5E1" stroke-width="2.5" />
+
+        <!-- Nút Trung Tâm: Current Defect -->
+        <circle cx="270" cy="190" r="54" fill="#C00000" />
+        <text x="270" y="185" fill="#FFFFFF" font-family="Montserrat" font-size="13" font-weight="700" text-anchor="middle">SỰ CỐ HIỆN TẠI</text>
+        <text x="270" y="202" fill="#FEE2E2" font-family="Poppins" font-size="11" text-anchor="middle">NOTIF-2026-088</text>
+
+        <!-- Nút 1: Material -->
+        <circle cx="110" cy="90" r="40" fill="#FFFFFF" stroke="#1D4ED8" stroke-width="2.5" />
+        <text x="110" y="87" fill="#1D4ED8" font-family="Montserrat" font-size="11" font-weight="700" text-anchor="middle">VẬT TƯ</text>
+        <text x="110" y="101" fill="#64748B" font-family="Poppins" font-size="10" text-anchor="middle">MAT-10247</text>
+
+        <!-- Nút 2: Work Center -->
+        <circle cx="430" cy="90" r="40" fill="#FFFFFF" stroke="#0F6E56" stroke-width="2.5" />
+        <text x="430" y="87" fill="#0F6E56" font-family="Montserrat" font-size="11" font-weight="700" text-anchor="middle">TỔ MÁY</text>
+        <text x="430" y="101" fill="#64748B" font-family="Poppins" font-size="10" text-anchor="middle">WC-MILL-07</text>
+
+        <!-- Nút 3: Defect Code -->
+        <circle cx="270" cy="50" r="36" fill="#FFFFFF" stroke="#B45309" stroke-width="2.5" />
+        <text x="270" y="47" fill="#B45309" font-family="Montserrat" font-size="11" font-weight="700" text-anchor="middle">MÃ LỖI</text>
+        <text x="270" y="60" fill="#64748B" font-family="Poppins" font-size="10" text-anchor="middle">DF-BURR-01</text>
+
+        <!-- Nút 4: Tiền lệ tương đồng lịch sử -->
+        <circle cx="90" cy="290" r="42" fill="#E8F5F0" stroke="#0F6E56" stroke-width="2.5" />
+        <text x="90" y="286" fill="#0F6E56" font-family="Montserrat" font-size="11" font-weight="700" text-anchor="middle">TIỀN LỆ D4</text>
+        <text x="90" y="300" fill="#0F6E56" font-family="Poppins" font-size="10" text-anchor="middle">CASE-2025-014</text>
+
+        <!-- Nút 5: Giải pháp D5 tương ứng -->
+        <circle cx="450" cy="290" r="42" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="2.5" />
+        <text x="450" y="286" fill="#1D4ED8" font-family="Montserrat" font-size="11" font-weight="700" text-anchor="middle">HÀNH ĐỘNG</text>
+        <text x="450" y="300" fill="#1D4ED8" font-family="Poppins" font-size="10" text-anchor="middle">ACT-TOOL-REPL</text>
+
+        <!-- Nút 6: FMEA Link -->
+        <circle cx="270" cy="330" r="36" fill="#FFFFFF" stroke="#6D28D9" stroke-width="2.5" />
+        <text x="270" y="327" fill="#6D28D9" font-family="Montserrat" font-size="11" font-weight="700" text-anchor="middle">FMEA</text>
+        <text x="270" y="340" fill="#64748B" font-family="Poppins" font-size="10" text-anchor="middle">FM-CLAMP-02</text>
+      </svg>
+    </div>
+
+    <!-- Cột phải: 5 Đầu dò thực thể (Graph Probes) trong source code -->
+    <div class="card" style="padding:22px; display:flex; flex-direction:column; gap:12px;">
+      <h3 style="font-size:19px; color:var(--ink);">5 Đầu Dò Quan Hệ Thực Thể (srv/src/domain/eightd/graph/)</h3>
+      <p style="margin:0; font-size:13px; color:var(--ink-3);">Thay vì chỉ so sánh chuỗi ký tự, hệ thống quét mạng lưới liên kết bằng các hàm thăm dò chuyên biệt:</p>
+
+      <div style="display:flex; flex-direction:column; gap:8px; font-size:13px;">
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px;">
+          <strong style="color:var(--red);">sameWorkCenter</strong>: Thăm dò các lỗi từng xảy ra trên cùng tổ máy CNC/trạm ép, truy vết hiện tượng mỏi cơ khí tích lũy.
+        </div>
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px;">
+          <strong style="color:var(--blue);">sameMaterialFamily</strong>: Thăm dò các vật tư cùng họ hợp kim nhôm hoặc thép nhiệt luyện, chia sẻ ứng suất cơ học tương đương.
+        </div>
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px;">
+          <strong style="color:var(--green);">sameDefectCode</strong>: Thăm dò tiền lệ có cùng mã phân loại lỗi ISO/VDA trong quá khứ.
+        </div>
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px;">
+          <strong style="color:var(--amber);">resolvedByActionType</strong>: Thăm dò các ca sự cố từng được khắc phục triệt để bằng cùng nhóm giải pháp (như thay dao, chỉnh áp suất).
+        </div>
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px;">
+          <strong style="color:var(--purple);">GraphAnchor (Mỏ neo đồ thị)</strong>: Điểm tựa xác thực để định vị nhanh chóng các cụm đỉnh lân cận mà không tốn công quét cạn cơ sở dữ liệu.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 7 (DÀNH CHO BẠN):</b>
+    • Giải thích GraphAI: "Tại sao chúng tôi gọi là GraphAI? Trong sản xuất, các sự cố không bao giờ là độc lập. Một sự cố bavia gá kẹp luôn liên đới tới Tổ máy gia công (Work Center), Họ vật tư (Material Family), và Mã lỗi."
+    • Điểm mạnh: Hệ thống sử dụng 5 đầu dò (Graph Probes) quét các cạnh quan hệ để tìm xem chiếc máy này trước đây từng bị lỗi tương tự chưa, hay loại hợp kim này từng có tiền lệ nứt ngầm thế nào. Đây là điều mà tìm kiếm từ khóa thông thường hoàn toàn bất lực.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 8: TRUY HỒI TIỀN LỆ 2 TẦNG & RERANKER CACHE              -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" aria-label="Slide 8: Truy Hồi 2 Tầng & Reranker Cache">
+  <div class="head">
+    <p class="eyebrow">MLAI Hackathon 2026 · Đội thi UIT_4Lovpe · Slide 08 / 12</p>
+    <h2>Quy Trình Truy Hồi Tiền Lệ 2 Tầng &amp; Bộ Nhớ Đệm Reranker LRU</h2>
+    <p class="lead">Kết hợp giữa lọc thô đa tín hiệu (Multi-Signal Scoring + Vector Cosine) và tinh chỉnh ngữ nghĩa danh sách (Listwise LLM Reranking) kèm bộ đệm băm SHA-256 giúp tăng tốc độ phản hồi gấp 10 lần.</p>
+  </div>
+
+  <div class="grid-2">
+    <!-- Cột trái: Sơ đồ 2 tầng truy hồi -->
+    <div class="card" style="padding:22px; display:flex; flex-direction:column; gap:16px;">
+      <h3 style="font-size:18px;">Kiến Trúc Hai Tầng (Two-Stage Hybrid Retrieval)</h3>
+
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <!-- Tầng 1 -->
+        <div style="background:var(--line-soft); border-radius:12px; padding:14px; border-left:4px solid var(--blue);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="color:var(--blue); font-size:15px;">TẦNG 1: Multi-Signal Scoring &amp; Cosine</strong>
+            <span class="pill pill-blue" style="font-size:10px; padding:2px 8px;">Fast Candidate Recall</span>
+          </div>
+          <div style="font-size:13px; color:var(--ink-2); margin-top:6px; line-height:1.45;">
+            • Kết hợp điểm thuộc tính quy tắc (Work Center +4, Defect Code +4, Material +3) với khoảng cách Vector Cosine từ Jina Embeddings v3.<br>
+            • Sử dụng <strong>Step-specific Profiles</strong>: D1 tìm người phụ trách, D4 tìm cơ chế hỏng, D5 tìm hành động khắc phục.<br>
+            • Lọc nhanh ra Top K ứng viên tiềm năng nhất (K ≤ 20).
+          </div>
+        </div>
+
+        <!-- Mũi tên chuyển tầng -->
+        <div style="text-align:center; color:var(--ink-4); font-weight:700; font-size:14px;">▼ Danh sách Top K ứng viên (≤ 20 items)</div>
+
+        <!-- Tầng 2 -->
+        <div style="background:var(--red-xs); border-radius:12px; padding:14px; border:1.5px solid var(--red-md);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="color:var(--red); font-size:15px;">TẦNG 2: Listwise LLM Re-ranking</strong>
+            <span class="pill pill-soft" style="font-size:10px; padding:2px 8px;">Semantic Precision</span>
+          </div>
+          <div style="font-size:13px; color:var(--ink-2); margin-top:6px; line-height:1.45;">
+            • Model đọc CẢ HAI văn bản: So sánh đồng thời ca đang mở với K ứng viên trong 1 lượt prompt duy nhất.<br>
+            • Chấm điểm bản chất: "Hai lỗi này có chung cơ chế hỏng vật lý không?", "Hành động kia có dứt điểm được lỗi này không?".
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cột phải: Reranker Cache SHA-256 LRU -->
+    <div class="card" style="padding:22px; display:flex; flex-direction:column; gap:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="font-size:18px;">Reranker Cache LRU (SHA-256)</h3>
+        <span class="pill pill-green" style="font-size:11px; padding:3px 8px;">Latency &lt; 50ms</span>
+      </div>
+      <p style="margin:0; font-size:13.5px; color:var(--ink-3);">
+        Tối ưu hóa chi phí gọi LLM và triệt tiêu độ trễ trùng lặp (file <code>precedent/reranker.ts</code>):
+      </p>
+
+      <div style="display:flex; flex-direction:column; gap:10px; font-size:13px;">
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px;">
+          <strong>Khóa băm bảo mật SHA-256:</strong><br>
+          <span style="color:var(--ink-3); font-family:var(--code); font-size:12px;">hash(SystemPrompt + Rubric + Query + Candidates)</span><br>
+          Bất kỳ sự thay đổi nào về câu hỏi, tiêu chí hay ứng viên đều tạo ra key mới, đảm bảo 0% lấy nhầm phán đoán cũ.
+        </div>
+
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px;">
+          <strong>Chính sách LRU &amp; TTL 15 Phút:</strong><br>
+          Lưu tối đa 256 mục trong RAM; tự động loại bỏ mục ít dùng nhất khi đầy bộ nhớ. Tự hủy sau 15 phút để làm mới tri thức.
+        </div>
+
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px;">
+          <strong>Cơ chế Single-Flight Request:</strong><br>
+          Gộp các truy vấn đồng thời có cùng key thành một lần gọi model duy nhất, loại bỏ hoàn toàn hiện tượng gọi trùng lặp (Thundering Herd).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 8 (DÀNH CHO BẠN):</b>
+    • Điểm nhấn kỹ thuật: "Chúng tôi không dùng RAG ngây thơ (Naive RAG). Chúng tôi triển khai quy trình truy hồi 2 tầng chuẩn công nghiệp:
+    • Tầng 1: Lọc thô bằng trọng số quy tắc kết hợp Cosine similarity vector để chọn ra 20 ứng viên.
+    • Tầng 2: Listwise Re-ranking bằng LLM trong một lượt gọi duy nhất để đánh giá xem cơ chế vật lý có trùng nhau không.
+    • Đặc biệt: Có bộ đệm LRU Cache băm SHA-256, giúp giảm 90% số lần gọi AI và phản hồi tức thì dưới 50ms khi người dùng duyệt qua lại giữa các bước."
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 9: STEPGRAPH & MÁY TRẠNG THÁI 8 BƯỚC                      -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" aria-label="Slide 9: StepGraph & Máy Trạng Thái">
+  <div class="head">
+    <p class="eyebrow">MLAI Hackathon 2026 · Đội thi UIT_4Lovpe · Slide 09 / 12</p>
+    <h2>StepGraph: Máy Trạng Thái Quản Lý Phụ Thuộc 8 Bước (D1–D8)</h2>
+    <p class="lead">Động cơ State Machine nghiêm ngặt (<code>stepGraph.ts</code> &amp; <code>review.ts</code>) kiểm soát thứ tự thực hiện, ngăn chặn việc đốt cháy giai đoạn và ghi vết kiểm toán toàn diện.</p>
+  </div>
+
+  <div class="grid-2">
+    <!-- Cột trái: Đồ thị phụ thuộc bước D1-D8 -->
+    <div class="card" style="padding:22px; display:flex; flex-direction:column; gap:14px;">
+      <h3 style="font-size:18px;">Ma Trận Phụ Thuộc Tiên Quyết (Prerequisites)</h3>
+      <p style="margin:0; font-size:13px; color:var(--ink-3);">Quy chuẩn công nghiệp 8D không cho phép giải quyết nguyên nhân khi chưa khoanh vùng sự cố:</p>
+
+      <div style="display:flex; flex-direction:column; gap:8px; font-size:13px;">
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px; display:flex; align-items:center; gap:12px;">
+          <span class="pill pill-soft" style="font-size:12px;">D1 &amp; D2</span>
+          <span>Thành lập đội đặc nhiệm &amp; Phân tích ranh giới lỗi IS/IS-NOT.</span>
+        </div>
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px; display:flex; align-items:center; gap:12px;">
+          <span class="pill pill-soft" style="font-size:12px;">D3</span>
+          <span>Khoanh vùng cách ly lô lỗi (Containment) — Bắt buộc phải có trước khi tìm nguyên nhân.</span>
+        </div>
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px; display:flex; align-items:center; gap:12px;">
+          <span class="pill pill-soft" style="font-size:12px;">D4</span>
+          <span>Xác định nguyên nhân gốc rễ — Bắt buộc phải hoàn tất trước khi đề xuất hành động.</span>
+        </div>
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px; display:flex; align-items:center; gap:12px;">
+          <span class="pill pill-soft" style="font-size:12px;">D5 &amp; D6</span>
+          <span>Lựa chọn và triển khai hành động khắc phục vĩnh viễn (Corrective Actions).</span>
+        </div>
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px; display:flex; align-items:center; gap:12px;">
+          <span class="pill pill-soft" style="font-size:12px;">D7 &amp; D8</span>
+          <span>Cập nhật tài liệu FMEA ngăn ngừa tái diễn &amp; Đóng ca, tuyên dương tập thể.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cột phải: 3 Trạng thái duyệt bất biến & Audit Trail -->
+    <div class="card" style="padding:22px; display:flex; flex-direction:column; gap:14px;">
+      <h3 style="font-size:18px;">3 Trạng Thái Duyệt Bất Biến (review.ts)</h3>
+      <p style="margin:0; font-size:13px; color:var(--ink-3);">
+        Module thuần không chạm DB, kiểm soát bằng unit test chặt chẽ:
+      </p>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; text-align:center;">
+        <div style="background:var(--line-soft); padding:14px 10px; border-radius:10px; border:1.5px solid var(--line);">
+          <strong style="color:var(--ink-2); font-size:15px; display:block;">Draft</strong>
+          <span style="font-size:11px; color:var(--ink-3);">Bản nháp do AI soạn, đang chỉnh sửa</span>
+        </div>
+        <div style="background:var(--green-bg); padding:14px 10px; border-radius:10px; border:1.5px solid var(--green);">
+          <strong style="color:var(--green); font-size:15px; display:block;">Approved</strong>
+          <span style="font-size:11px; color:var(--green);">Kỹ sư trưởng ký duyệt chính thức</span>
+        </div>
+        <div style="background:var(--amber-bg); padding:14px 10px; border-radius:10px; border:1.5px solid var(--amber);">
+          <strong style="color:var(--amber); font-size:15px; display:block;">ChangeReq</strong>
+          <span style="font-size:11px; color:var(--amber);">Yêu cầu bổ sung dữ liệu đo kiểm</span>
+        </div>
+      </div>
+
+      <div style="background:var(--red-xs); border-radius:10px; padding:12px 14px; border:1px solid var(--red-sm); margin-top:auto;">
+        <strong style="color:var(--red); font-size:13.5px; display:block; margin-bottom:4px;">❌ Tuyệt đối không có trạng thái 'Rejected':</strong>
+        <span style="font-size:12.5px; color:var(--ink-2); line-height:1.45;">
+          Quy chuẩn chất lượng công nghiệp không bao giờ vứt bỏ một bước 8D. Khi chưa đạt yêu cầu, bước đó chỉ được chuyển sang <code>ChangeRequested</code> để kỹ sư bổ sung chứng cứ, đảm bảo không có lỗ hổng quy trình.
+        </span>
+      </div>
+
+      <div style="background:#F8FAFC; border-radius:10px; padding:12px 14px; border:1px solid var(--line);">
+        <strong style="color:var(--ink); font-size:13px; display:block; margin-bottom:2px;">📜 Nhật Ký Kiểm Toán (Audit Trail):</strong>
+        <span style="font-size:12px; color:var(--ink-3);">Mọi hành vi phê duyệt, yêu cầu sửa hay thay đổi nội dung đều lưu kèm ID kỹ sư, dấu thời gian và lý do sửa đổi theo chuẩn IATF 16949.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 9 (DÀNH CHO BẠN):</b>
+    • Điểm nhấn về State Machine: "Chúng tôi xây dựng stepGraph.ts để khóa chặt tiến trình: kỹ sư không thể nhảy cóc từ D2 sang D5 khi chưa xong D3 khoanh vùng và D4 tìm nguyên nhân gốc."
+    • Điểm độc đáo trong logic nghiệp vụ: "Trong hệ thống không có nút Rejected (Từ chối). Vì trong tiêu chuẩn 8D công nghiệp, một sự cố không thể bị vứt xó, mà chỉ có thể là Yêu cầu làm lại (ChangeRequested) cho tới khi đạt tiêu chuẩn thì thôi."
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 10: HUMAN-IN-THE-LOOP & AN TOÀN CÔNG NGHIỆP               -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" aria-label="Slide 10: Human-in-the-Loop & An Toàn">
+  <div class="head">
+    <p class="eyebrow">MLAI Hackathon 2026 · Đội thi UIT_4Lovpe · Slide 10 / 12</p>
+    <h2>Human-in-the-Loop &amp; Tuân Thủ An Toàn Công Nghiệp Ô Tô</h2>
+    <p class="lead">Định vị AI thuần túy là Trợ lý (Copilot) &amp; Trọng tài phản biện (Referee). Quyền quyết định cuối cùng luôn thuộc về Kỹ sư trưởng, tuân thủ nghiêm ngặt tiêu chuẩn IATF 16949 và VDA 6.3.</p>
+  </div>
+
+  <div class="grid-2">
+    <!-- Cột trái: Vì sao cắt giảm Full Auto-Approval -->
+    <div class="card" style="padding:22px; display:flex; flex-direction:column; gap:14px; border-top:4px solid var(--red);">
+      <h3 style="font-size:19px; color:var(--ink);">Quyết Định Thiết Kế: Cắt Giảm Full Auto-Approval</h3>
+      <p style="margin:0; font-size:13.5px; line-height:1.5; color:var(--ink-2);">
+        Ban đầu có ý tưởng để AI tự động phê duyệt và đóng ca khi độ tin cậy cao. Nhóm đã <strong>chủ động cắt bỏ tính năng này</strong> vì các lý do an toàn sống còn:
+      </p>
+
+      <div style="display:flex; flex-direction:column; gap:10px; font-size:13px;">
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px;">
+          <strong>Trách nhiệm pháp lý sản xuất ô tô:</strong> Quyết định cách ly 10.000 linh kiện hay thay đổi thông số nhiệt luyện ảnh hưởng trực tiếp tới tính mạng người dùng xe hơi. Trách nhiệm pháp lý bắt buộc phải gắn với chữ ký số của Kỹ sư trưởng.
+        </div>
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px;">
+          <strong>Tiêu chuẩn đánh giá IATF 16949 / VDA 6.3:</strong> Mọi hồ sơ nghiệm thu hành động D6 và đóng ca D8 đều bắt buộc phải có biên bản kiểm tra thực địa (Gemba Walk) có xác nhận của con người.
+        </div>
+      </div>
+    </div>
+
+    <!-- Cột phải: Cổng dừng Stop Conditions & Field Confirm -->
+    <div class="card" style="padding:22px; display:flex; flex-direction:column; gap:14px; border-top:4px solid var(--green);">
+      <h3 style="font-size:19px; color:var(--ink);">Cổng Dừng (Stop Conditions) &amp; Xác Minh Thực Địa</h3>
+      <p style="margin:0; font-size:13.5px; line-height:1.5; color:var(--ink-2);">
+        Cơ chế tự biết "khi nào không biết" để kích hoạt sự can thiệp của con người (file <code>stops.ts</code> &amp; <code>fieldConfirm.ts</code>):
+      </p>
+
+      <div style="display:flex; flex-direction:column; gap:10px; font-size:13px;">
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px;">
+          <strong>Cổng dừng khi thiếu dữ liệu (Data Gap Stop):</strong> Khi phát hiện dữ liệu kiểm tra thiếu kích thước quan trọng hoặc telemetry cảm biến bị gián đoạn, AI dừng lại và đưa ra câu hỏi gợi ý để kỹ sư đo đạc lại tại xưởng.
+        </div>
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px;">
+          <strong>Cổng dừng khi độ tự tin thấp (&lt; 70%):</strong> Nếu độ tương đồng của tiền lệ quá thấp hoặc chẩn đoán nguyên nhân không rõ ràng, hệ thống từ chối sinh nháp D5 và gắn nhãn "Cần kỹ sư điều tra bổ sung".
+        </div>
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:8px;">
+          <strong>Xác minh trường quan trọng (Field Confirmation):</strong> Các trường dữ liệu cốt lõi (Chi phí tổn thất COPQ, ngày cam kết D3) phải được con người bấm xác nhận mới được ghi vào báo cáo chính thức.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="padding:14px 22px; background:var(--white); border:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;">
+    <div style="font-size:14px; color:var(--ink);">
+      <strong style="color:var(--green);">🎯 Triết lý cốt lõi:</strong> AI chỉ làm 80% công việc tổng hợp cơ học nặng nhọc; 20% phán đoán và phê duyệt quyết định cuối cùng luôn được bảo lưu cho Kỹ sư con người.
+    </div>
+  </div>
+
+  <div class="notes">
+    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 10 (DÀNH CHO BẠN):</b>
+    • Điểm cộng rất lớn với BGK chuyên nghiệp: Hãy giải thích vì sao nhóm không làm tính năng "AI tự động phê duyệt 100%".
+    • Lập luận: "Trong ngành sản xuất linh kiện ô tô theo tiêu chuẩn IATF 16949, một quyết định khoanh vùng hay đổi quy trình sản xuất liên quan đến an toàn tính mạng con người và hàng triệu đô la chi phí. AI tuyệt đối không thể tự ký duyệt. AI chỉ chuẩn bị hồ sơ và phản biện; Kỹ sư trưởng chịu trách nhiệm pháp lý cao nhất."
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 11: CẨM NANG VẤN ĐÁP BAN GIÁM KHẢO (Q&A CHEATSHEET)        -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" aria-label="Slide 11: Cẩm Nang Vấn Đáp BGK">
+  <div class="head">
+    <p class="eyebrow">MLAI Hackathon 2026 · Đội thi UIT_4Lovpe · Slide 11 / 12</p>
+    <h2>Cẩm Nang Trả Lời Vấn Đáp Ban Giám Khảo (Defense Cheatsheet)</h2>
+    <p class="lead">5 câu hỏi kỹ thuật trọng yếu mà Ban Giám Khảo chắc chắn sẽ đặt ra và chiến lược trả lời trực diện, chặt chẽ, chứng minh chiều sâu giải pháp.</p>
+  </div>
+
+  <div class="grid-2">
+    <!-- Cột trái: 3 câu hỏi đầu -->
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div class="card" style="padding:16px 20px;">
+        <strong style="color:var(--red); font-size:14.5px;">Q1: "Tại sao phải làm GraphAI mà không dùng Vector RAG thông thường?"</strong>
+        <p style="margin:4px 0 0; font-size:13px; line-height:1.45; color:var(--ink-2);">
+          <strong>Trả lời:</strong> Vector RAG chỉ tìm được từ ngữ tương đồng bề mặt. Nhưng lỗi trong nhà máy liên quan chặt chẽ đến mạng lưới thực thể: máy nào, linh kiện nào, đồ gá nào. GraphAI của chúng tôi kết nối đa chiều và có Listwise Reranker so sánh cơ chế hỏng hóc vật lý thực sự.
+        </p>
+      </div>
+
+      <div class="card" style="padding:16px 20px;">
+        <strong style="color:var(--red); font-size:14.5px;">Q2: "Làm sao nhóm đảm bảo AI không bị ảo giác mã vật tư hay nhân sự?"</strong>
+        <p style="margin:4px 0 0; font-size:13px; line-height:1.45; color:var(--ink-2);">
+          <strong>Trả lời:</strong> Qua 3 lớp bảo vệ: (1) In-Context Learning ép chặt bằng JSON Schema; (2) Bộ lọc <code>datasetValidator.ts</code> đối chiếu Master Data thực tế; (3) Whitelist cấm hoàn toàn mã lạ, phát hiện sinh sai là chặn ngay ở cấp độ code.
+        </p>
+      </div>
+
+      <div class="card" style="padding:16px 20px;">
+        <strong style="color:var(--red); font-size:14.5px;">Q3: "Tại sao nhóm chuyển từ Neo4j sang SQLite In-Process?"</strong>
+        <p style="margin:4px 0 0; font-size:13px; line-height:1.45; color:var(--ink-2);">
+          <strong>Trả lời:</strong> Cụm Neo4j/pgvector tiêu tốn hơn 2GB RAM, dễ làm sập môi trường demo serverless và tốn chi phí. Chuyển sang SQLite in-process giúp hệ thống phản hồi dưới 200ms, tự chứa (self-contained), kiểm thử tự động 100% độc lập và chi phí bằng 0.
+        </p>
+      </div>
+    </div>
+
+    <!-- Cột phải: 2 câu hỏi tiếp theo & Lời khuyên -->
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div class="card" style="padding:16px 20px;">
+        <strong style="color:var(--red); font-size:14.5px;">Q4: "AI Referee chẩn đoán mù có giá trị gì đối với quy trình quản lý chất lượng?"</strong>
+        <p style="margin:4px 0 0; font-size:13px; line-height:1.45; color:var(--ink-2);">
+          <strong>Trả lời:</strong> Nó loại bỏ thiên kiến xác nhận (Confirmation Bias) của con người. Kỹ sư hay vội vã đổ lỗi cho công nhân. AI Referee nhìn vào dữ liệu cảm biến khách quan theo First-Principles để chỉ ra nguyên nhân gốc rễ thực sự (như tụt áp thủy lực trong Case TC-02).
+        </p>
+      </div>
+
+      <div class="card" style="padding:16px 20px;">
+        <strong style="color:var(--red); font-size:14.5px;">Q5: "Hệ thống này có sẵn sàng tích hợp vào SAP thật của doanh nghiệp không?"</strong>
+        <p style="margin:4px 0 0; font-size:13px; line-height:1.45; color:var(--ink-2);">
+          <strong>Trả lời:</strong> Sẵn sàng 100%. Toàn bộ backend được viết trên nền SAP Cloud Application Programming Model (CAP), hỗ trợ OData v4 chuẩn, các thực thể ánh xạ 1:1 sang bảng QMEL, QMFE, MARA, CRHD của hệ thống SAP ERP.
+        </p>
+      </div>
+
+      <div class="card" style="padding:14px 18px; background:var(--blue-bg); border:1px solid rgba(29,78,216,0.25); margin-top:auto;">
+        <strong style="color:var(--blue); font-size:13.5px; display:block; margin-bottom:2px;">💡 Phong Thái Trình Bày:</strong>
+        <span style="font-size:12.5px; color:var(--ink-2); line-height:1.4;">
+          Nói ngắn gọn, tự tin, dùng đúng thuật ngữ công nghiệp (First-Principles, Blind Evidence, Graph Probes, SAP QM, IATF 16949). Nhấn mạnh hệ thống đã được kiểm chứng bởi hơn 40 tệp test tự động.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 11 (DÀNH CHO BẠN):</b>
+    • Slide này là cẩm nang bỏ túi của bạn khi đứng trước ban giám khảo!
+    • Nếu BGK hỏi về RAG: Dùng ngay câu trả lời Q1.
+    • Nếu BGK hỏi về Ảo giác: Dùng câu Q2 (Schema-bounded + Whitelist).
+    • Nếu BGK hỏi về Hạ tầng: Dùng câu Q3 (SQLite in-process siêu nhẹ).
+    • Nếu BGK hỏi về Tính thực tiễn: Dùng câu Q4 và Q5.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 12: TỔNG KẾT GIÁ TRỊ & THÔNG SỐ VẬN HÀNH                 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" aria-label="Slide 12: Tổng Kết Giá Trị & Thông Số">
+  <div class="head">
+    <p class="eyebrow">MLAI Hackathon 2026 · Đội thi UIT_4Lovpe · Slide 12 / 12</p>
+    <h2>Tổng Kết Hiệu Quả Thực Tế &amp; Thông Số Vận Hành</h2>
+    <p class="lead">Từ lý thuyết đến thực chứng: Rút ngắn 90% thời gian lập báo cáo sự cố, bảo vệ tính trung thực của dữ liệu kỹ thuật và sẵn sàng triển khai quy mô lớn.</p>
+  </div>
+
+  <div class="grid-4" style="flex:none; height:180px;">
+    <div class="card" style="padding:24px; text-align:center; display:flex; flex-direction:column; justify-content:center; border-top:4px solid var(--red);">
+      <div class="stat-num">15 – 30s</div>
+      <div style="font-family:var(--display); font-weight:700; font-size:15px; margin-top:6px;">Thời Gian Lập Hồ Sơ 8D</div>
+      <div class="stat-label">Giảm 85–90% so với 2–4 giờ lập báo cáo thủ công truyền thống.</div>
+    </div>
+
+    <div class="card" style="padding:24px; text-align:center; display:flex; flex-direction:column; justify-content:center; border-top:4px solid var(--green);">
+      <div class="stat-num" style="color:var(--green);">&lt; 180ms</div>
+      <div style="font-family:var(--display); font-weight:700; font-size:15px; margin-top:6px;">Truy Vấn Tiền Lệ Tương Tự</div>
+      <div class="stat-label">Nhờ bộ đệm Reranker LRU Cache SHA-256 và SQLite in-process.</div>
+    </div>
+
+    <div class="card" style="padding:24px; text-align:center; display:flex; flex-direction:column; justify-content:center; border-top:4px solid var(--blue);">
+      <div class="stat-num" style="color:var(--blue);">&gt; 40 Files</div>
+      <div style="font-family:var(--display); font-weight:700; font-size:15px; margin-top:6px;">Tệp Kiểm Thử Tự Động</div>
+      <div class="stat-label">Bộ test suite lớn nhất giải đấu, bao phủ 100% logic nghiệp vụ D1–D8.</div>
+    </div>
+
+    <div class="card" style="padding:24px; text-align:center; display:flex; flex-direction:column; justify-content:center; border-top:4px solid var(--purple);">
+      <div class="stat-num" style="color:var(--purple);">0 VNĐ</div>
+      <div style="font-family:var(--display); font-weight:700; font-size:15px; margin-top:6px;">Chi Phí Hạ Tầng Cloud</div>
+      <div class="stat-label">Không phụ thuộc cụm server phụ, sẵn sàng chạy serverless siêu nhẹ.</div>
+    </div>
+  </div>
+
+  <div class="card" style="flex:1; padding:28px 40px; background:linear-gradient(135deg, #1A1A1A 0%, #2A0808 100%); color:#FFFFFF; display:flex; justify-content:space-between; align-items:center; border-radius:20px;">
+    <div style="max-width:850px;">
+      <span class="pill pill-soft" style="background:rgba(255,255,255,0.1); color:#FFFFFF; border-color:rgba(255,255,255,0.25); margin-bottom:12px;">Đội Thi UIT_4Lovpe · Hackathon 2026</span>
+      <h3 style="color:#FFFFFF; font-size:32px; font-family:var(--display); margin-bottom:10px;">8D Copilot: Công Nghệ Thực Dụng — Giá Trị Bền Vững</h3>
+      <p style="margin:0; font-size:16px; line-height:1.6; color:#D1D5DB;">
+        Chúng tôi tự hào mang đến một giải pháp không chỉ ứng dụng AI tiên tiến mà còn thấm nhuần kỷ luật kỹ thuật công nghiệp, sẵn sàng đồng hành cùng các nhà máy thông minh nâng tầm chất lượng sản xuất.
+      </p>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:12px; align-items:flex-end;">
+      <div style="font-family:var(--display); font-weight:700; font-size:22px; color:#FFFFFF;">Xin Trân Trọng Cảm Ơn Ban Giám Khảo!</div>
+      <div class="pill pill-red" style="font-size:15px; padding:10px 20px;">SẴN SÀNG CHO PHẦN HỎI &amp; ĐÁP (Q&amp;A)</div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <b>HƯỚNG DẪN THUYẾT TRÌNH SLIDE 12 (DÀNH CHO BẠN):</b>
+    • Lời kết: "Kính thưa Ban Giám Khảo, 8D Copilot rút ngắn 90% thời gian lập hồ sơ, đưa ra ý kiến chẩn đoán độc lập khách quan và hoàn toàn sẵn sàng tích hợp vào dây chuyền sản xuất lớn. Đội thi UIT_4Lovpe xin trân trọng cảm ơn sự theo dõi của Ban Giám Khảo và rất mong nhận được những câu hỏi góp ý quý báu!"
+  </div>
+</section>
+
+</main>
+
+<!-- Floating Nav Controls -->
+<nav class="nav" aria-label="Điều khiển trình chiếu">
+  <button id="prev" aria-label="Slide trước (Phím mũi tên trái)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <span class="count" id="count">01 / 12</span>
+  <button id="next" aria-label="Slide sau (Phím mũi tên phải hoặc Space)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg></button>
+  <button id="toggle-notes" aria-label="Bật/Tắt Ghi chú thuyết trình (Phím N)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></button>
+  <button id="fullscreen" aria-label="Toàn màn hình (Phím F)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
+</nav>
+
+<aside class="notes-panel" id="notes" hidden>
+  <div class="notes-hdr">
+    <span>💡 Ghi chú thuyết trình &amp; Lời thoại gợi ý</span>
+    <span style="font-size:11px; color:var(--ink-4); text-transform:none;">Bấm phím 'N' hoặc nút icon để đóng/mở</span>
+  </div>
+  <div id="notes-text" style="white-space:pre-wrap; line-height:1.65;"></div>
+</aside>
+
+</div>
+
+<script>
+(() => {
+  const stage = document.getElementById('stage');
+  const slides = [...document.querySelectorAll('.slide')];
+  const progress = document.getElementById('progress');
+  const count = document.getElementById('count');
+  const notesPanel = document.getElementById('notes');
+  const notesText = document.getElementById('notes-text');
+  let index = 0;
+
+  const fit = () => {
+    const s = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
+    stage.style.setProperty('--s', String(s));
+  };
+  window.addEventListener('resize', fit);
+  fit();
+
+  const render = () => {
+    slides.forEach((s, i) => {
+      s.classList.toggle('is-active', i === index);
+      s.setAttribute('aria-hidden', String(i !== index));
+      s.inert = i !== index;
+    });
+    const total = slides.length;
+    progress.style.width = `${((index + 1) / total) * 100}%`;
+    count.textContent = `${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+    notesText.innerHTML = slides[index].querySelector('.notes')?.innerHTML.trim() ?? 'Không có ghi chú cho slide này.';
+    if (location.hash !== `#${index + 1}`) history.replaceState(null, '', `#${index + 1}`);
+  };
+
+  const go = (i) => {
+    index = Math.max(0, Math.min(slides.length - 1, i));
+    render();
+  };
+
+  const next = () => { if (index < slides.length - 1) go(index + 1); };
+  const prev = () => { if (index > 0) go(index - 1); };
+
+  document.getElementById('next').addEventListener('click', next);
+  document.getElementById('prev').addEventListener('click', prev);
+
+  const toggleNotes = () => {
+    notesPanel.hidden = !notesPanel.hidden;
+    document.getElementById('toggle-notes').setAttribute('aria-pressed', String(!notesPanel.hidden));
+  };
+  document.getElementById('toggle-notes').addEventListener('click', toggleNotes);
+
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen?.();
+  };
+  document.getElementById('fullscreen').addEventListener('click', toggleFullscreen);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    const onButton = e.target instanceof HTMLElement && e.target.closest('button');
+    switch (e.key) {
+      case 'ArrowRight': case 'ArrowDown': case 'PageDown': e.preventDefault(); next(); break;
+      case ' ': if (onButton) return; e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': e.preventDefault(); prev(); break;
+      case 'Home': e.preventDefault(); go(0); break;
+      case 'End': e.preventDefault(); go(slides.length - 1); break;
+      case 'n': case 'N': toggleNotes(); break;
+      case 'f': case 'F': toggleFullscreen(); break;
+      default:
+    }
+  });
+
+  // Touch Swipe
+  let touchX = null;
+  document.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') touchX = e.clientX; });
+  document.addEventListener('pointerup', (e) => {
+    if (touchX === null) return;
+    const dx = e.clientX - touchX;
+    if (Math.abs(dx) > 50) {
+      if (dx < 0) next();
+      else prev();
+    }
+    touchX = null;
+  });
+
+  // Init from URL hash
+  const initialHash = Number(location.hash.slice(1));
+  if (initialHash >= 1 && initialHash <= slides.length) {
+    index = initialHash - 1;
+  }
+  render();
+})();
+</script>
+</body>
+</html>

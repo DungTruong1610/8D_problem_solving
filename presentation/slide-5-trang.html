@@ -1,0 +1,1170 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>8D Copilot · Báo cáo Thuyết trình 5 Slides (Format BTC)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+/* ── Tokens ─────────────────────────────────────────────────────────────── */
+:root {
+  --red: #C00000;
+  --red-dark: #8B0000;
+  --red-xs: rgba(192, 0, 0, 0.05);
+  --red-sm: rgba(192, 0, 0, 0.09);
+  --red-md: rgba(192, 0, 0, 0.14);
+  --ink: #1A1A1A;
+  --ink-2: #4A4A4A;
+  --ink-3: #666;
+  --ink-4: #999;
+  --line: #EBEBEB;
+  --line-soft: #F3F3F3;
+  --white: #FFFFFF;
+  --green: #0F6E56;
+  --green-bg: #E8F5F0;
+  --amber: #B45309;
+  --shadow: 0 2px 4px rgba(0,0,0,0.04), 0 8px 28px rgba(0,0,0,0.07);
+  --shadow-lg: 0 4px 10px rgba(0,0,0,0.05), 0 22px 56px rgba(0,0,0,0.12);
+  --display: 'Montserrat', 'Segoe UI', system-ui, sans-serif;
+  --body: 'Poppins', 'Segoe UI', system-ui, sans-serif;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--white); color: var(--ink); font-family: var(--body); }
+body { overflow: hidden; -webkit-font-smoothing: antialiased; }
+img { display: block; max-width: 100%; }
+button { font: inherit; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; border-radius: 8px; }
+
+/* ── Sân khấu 1600×900, co giãn vừa cửa sổ ───────────────────────────────── */
+/* Khung cố định giữ hộp layout 1600px của sân khấu không làm nở viewport trên điện thoại. */
+.viewport { position: fixed; inset: 0; overflow: hidden; }
+.stage {
+  position: absolute; left: 50%; top: 50%;
+  width: 1600px; height: 900px;
+  transform: translate(-50%, -50%) scale(var(--s, 1));
+  transform-origin: center;
+}
+.slide {
+  position: absolute; inset: 0;
+  padding: 72px 96px;
+  display: flex; flex-direction: column; gap: 40px;
+  opacity: 0; visibility: hidden;
+  transition: opacity .45s var(--ease), visibility 0s linear .45s;
+}
+.slide.is-active { opacity: 1; visibility: visible; transition: opacity .45s var(--ease); }
+.slide { isolation: isolate; background:
+  radial-gradient(circle at 0% 100%, rgba(192,0,0,.055), transparent 32%),
+  var(--white); }
+.slide::before {
+  content: ''; position: absolute; top: 0; right: 0; width: 560px; height: 400px; z-index: -1; pointer-events: none;
+  background-image: radial-gradient(rgba(26,26,26,.16) 1.6px, transparent 1.8px);
+  background-size: 28px 28px;
+  -webkit-mask-image: radial-gradient(ellipse at 100% 0%, #000 0%, transparent 70%);
+  mask-image: radial-gradient(ellipse at 100% 0%, #000 0%, transparent 70%);
+}
+.slide::after {
+  content: ''; position: absolute; left: 96px; bottom: 44px; width: 64px; height: 3px; border-radius: 999px; background: var(--red); opacity: .5; z-index: -1;
+}
+.notes { display: none; }
+
+[data-frag] { opacity: 0; transform: translateY(14px); transition: opacity .4s var(--ease), transform .4s var(--ease); }
+[data-frag].is-in { opacity: 1; transform: none; }
+
+/* ── Chữ ──────────────────────────────────────────────────────────────────── */
+.eyebrow { margin: 0; font: 500 22px/1 var(--body); color: var(--red); letter-spacing: .01em; }
+.eyebrow::before { content: '— '; }
+h1, h2, h3 { margin: 0; font-family: var(--display); font-weight: 600; letter-spacing: -0.02em; text-wrap: balance; color: var(--ink); }
+h2 { font-size: 56px; line-height: 1.1; max-width: 1150px; }
+.head { display: flex; flex-direction: column; gap: 18px; }
+.lead { margin: 0; font: 400 28px/1.6 var(--body); color: var(--ink-3); max-width: 30ch; text-wrap: pretty; }
+.label { font: 600 24px/1.25 var(--display); letter-spacing: -0.01em; color: var(--ink); }
+.muted { color: var(--ink-3); }
+.red { color: var(--red); }
+
+/* ── Thành phần dùng chung ────────────────────────────────────────────────── */
+.card { background: var(--white); border-radius: 14px; box-shadow: var(--shadow); }
+.ic { width: 28px; height: 28px; flex: none; stroke: currentColor; }
+.ic-lg { width: 40px; height: 40px; }
+.ic-xl { width: 56px; height: 56px; }
+.pill {
+  display: inline-flex; align-items: center; gap: 10px;
+  border-radius: 999px; padding: 12px 24px;
+  font: 600 22px/1 var(--display);
+}
+.pill-red { background: var(--red); color: var(--white); }
+.pill-soft { background: var(--red-xs); color: var(--red); border: 1.5px solid var(--red-md); }
+.pill-line { background: var(--white); color: var(--ink); border: 1.5px solid var(--line); }
+.arrow { width: 44px; height: 44px; color: var(--ink-4); flex: none; }
+
+/* Khung trình duyệt cho ảnh chụp UI thật */
+.frame {
+  margin: 0; border-radius: 14px; overflow: hidden; background: var(--white);
+  border: 1px solid var(--line); box-shadow: var(--shadow-lg);
+}
+.frame-bar { height: 30px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-bottom: 1px solid var(--line); background: #FAFAFA; }
+.frame-bar i { width: 11px; height: 11px; border-radius: 50%; background: #E2E2E2; }
+.frame-bar i:first-child { background: var(--red); opacity: .55; }
+.shot { position: relative; }
+.shot img { width: 100%; }
+
+/* Ghim đánh số trên ảnh */
+.pin {
+  position: absolute; transform: translate(-50%, -50%);
+  width: 44px; height: 44px; border-radius: 999px;
+  display: grid; place-items: center;
+  background: var(--red); color: var(--white);
+  font: 600 22px/1 var(--display);
+  box-shadow: 0 0 0 6px rgba(192,0,0,.16), 0 2px 10px rgba(192,0,0,.35);
+}
+.legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 22px; }
+.legend li { display: flex; align-items: center; gap: 18px; font: 500 26px/1.35 var(--body); color: var(--ink-2); }
+.legend .pin { position: static; transform: none; flex: none; }
+
+/* Bố cục hai cột cho slide có ảnh chụp */
+.split { flex: 1; min-height: 0; display: grid; grid-template-columns: 430px 1fr; gap: 56px; align-items: center; }
+.split > .copy { display: flex; flex-direction: column; gap: 40px; }
+.split .frame { align-self: center; }
+
+/* ── 1 · Mở đầu ───────────────────────────────────────────────────────────── */
+.s-title { justify-content: center; }
+.s-title .grid { display: grid; grid-template-columns: 1fr 820px; gap: 56px; align-items: center; }
+.s-title h1 { font-size: 132px; line-height: 1; letter-spacing: -0.04em; }
+.s-title h1 span { color: var(--red); }
+.s-title .copy { display: flex; flex-direction: column; gap: 28px; }
+.s-title .lead { font-size: 30px; }
+.s-title .visual { position: relative; }
+.s-title .visual::before {
+  content: ''; position: absolute; inset: -80px -40px -80px -80px;
+  background: radial-gradient(closest-side, rgba(192,0,0,.08), transparent);
+}
+.s-title .frame { position: relative; transform: perspective(1800px) rotateY(-7deg) rotateX(2deg); }
+.s-title .frame img { height: 560px; object-fit: cover; object-position: top left; }
+
+/* ── 2 · Bài toán ─────────────────────────────────────────────────────────── */
+.scene { flex: 1; display: grid; grid-template-columns: 340px 64px 560px 64px 1fr; align-items: center; padding-bottom: 40px; }
+.machine { padding: 44px 34px; min-height: 300px; justify-content: center; display: flex; flex-direction: column; gap: 22px; align-items: flex-start; }
+.machine .ic-xl { color: var(--ink); width: 72px; height: 72px; }
+.machine .label { font-size: 30px; }
+.parts { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; padding: 10px; }
+.part { aspect-ratio: 1; border-radius: 12px; background: var(--line-soft); border: 1.5px solid var(--line); display: grid; place-items: center; }
+.part::after { content: ''; width: 46%; height: 46%; border-radius: 50%; border: 5px solid #DADADA; }
+.part.bad { background: var(--red-xs); border-color: var(--red); }
+.part.bad::after { border-color: var(--red); border-style: dashed; }
+.callout {
+  position: absolute; right: -6px; bottom: -64px;
+  padding: 16px 22px; display: flex; align-items: center; gap: 12px;
+  font: 600 24px/1 var(--display); color: var(--red);
+}
+.questions { display: flex; flex-direction: column; gap: 22px; align-items: flex-start; padding-left: 10px; }
+.questions .pill { font-size: 34px; padding: 22px 34px; }
+
+/* ── 3 · Ví von ca khám bệnh ──────────────────────────────────────────────── */
+.analogy { flex: 1; display: grid; grid-template-columns: 96px repeat(4, 1fr); grid-template-rows: 1fr 56px 1fr; column-gap: 24px; align-items: stretch; padding: 10px 0 24px; }
+.analogy .who { display: grid; place-items: center; }
+.analogy .who span { width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; background: var(--line-soft); color: var(--ink); }
+.analogy .who.factory span { background: var(--red-xs); color: var(--red); }
+.analogy .cell { display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: 28px; font: 600 30px/1.2 var(--display); }
+.analogy .cell .ic { color: var(--ink-3); width: 36px; height: 36px; }
+.analogy .cell.f { background: var(--red-xs); box-shadow: inset 0 0 0 1.5px var(--red-md), var(--shadow); color: var(--ink); }
+.analogy .cell.f .code { font: 600 22px/1 var(--display); color: var(--red); }
+.analogy .link { display: grid; place-items: center; color: var(--ink-4); }
+.analogy .link svg { width: 40px; height: 40px; }
+
+/* ── 4 · Tám bước ─────────────────────────────────────────────────────────── */
+.steps { flex: 1; position: relative; display: grid; grid-template-columns: repeat(8, 1fr); gap: 18px; align-content: center; }
+.steps::before { content: ''; position: absolute; left: 4%; right: 4%; top: 50%; height: 3px; background: linear-gradient(90deg, var(--red), rgba(192,0,0,.12)); transform: translateY(-50%); }
+.step { position: relative; min-height: 330px; padding: 34px 16px 26px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+.step .ic { color: var(--red); width: 44px; height: 44px; }
+.step .code { font: 600 56px/1 var(--display); color: var(--red); letter-spacing: -0.03em; }
+.step .name { font: 600 25px/1.2 var(--display); color: var(--ink); }
+.step .owner { display: flex; gap: 12px; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); width: 100%; justify-content: center; }
+.step .owner .ic { width: 26px; height: 26px; color: var(--ink-4); }
+.step .owner .ic.ai { color: var(--red); }
+.phase { position: absolute; bottom: -34px; height: 6px; border-radius: 999px; background: var(--red-md); }
+
+/* ── 5 · So sánh ──────────────────────────────────────────────────────────── */
+.compare { flex: 1; align-self: stretch; display: flex; flex-direction: column; overflow: hidden; border-radius: 14px; box-shadow: var(--shadow-lg); }
+.compare .row { display: grid; grid-template-columns: 1fr 1fr; }
+.compare .row > div { padding: 30px 44px; display: flex; align-items: center; gap: 20px; font: 400 32px/1.3 var(--body); }
+.compare .row + .row > div { border-top: 1px solid var(--line-soft); }
+.compare .row > div + div { border-left: 1px solid var(--line-soft); }
+.compare .hd > div { background: var(--red); color: var(--white); font: 600 34px/1 var(--display); padding: 34px 44px; }
+.compare .hd .ic { color: var(--white); width: 36px; height: 36px; }
+.compare .bad { color: var(--ink-3); }
+.compare .bad .ic { color: var(--red); }
+.compare .good { color: var(--ink); font-weight: 500 !important; }
+.compare .good .ic { color: var(--green); }
+.compare .body { flex: 1; display: grid; grid-template-rows: repeat(3, 1fr); }
+
+/* ── 6 · AI soạn, người quyết ─────────────────────────────────────────────── */
+.loop { position: relative; flex: 1; }
+.loop .nodes { position: absolute; left: 0; right: 0; top: 80px; display: grid; grid-template-columns: 260px 1fr 260px 1fr 260px 1fr 260px; align-items: center; }
+.node { padding: 30px 24px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; font: 600 30px/1.2 var(--display); min-height: 190px; justify-content: center; }
+.node .ic { width: 44px; height: 44px; color: var(--ink-2); }
+.node.ai { background: var(--red-xs); box-shadow: inset 0 0 0 2px var(--red), var(--shadow); }
+.node.ai .ic { color: var(--red); }
+.node.human { background: var(--ink); color: var(--white); }
+.node.human .ic { color: var(--white); }
+.node.done { background: var(--green-bg); box-shadow: inset 0 0 0 2px var(--green), var(--shadow); color: var(--green); }
+.node.done .ic { color: var(--green); }
+.loop .nodes .arrow { justify-self: center; color: var(--ink-3); }
+.loop svg.back { position: absolute; left: 0; top: 0; width: 1408px; height: 520px; overflow: visible; }
+.back-label { position: absolute; top: 400px; left: 50%; transform: translateX(-50%); }
+
+/* ── 7 · Chuỗi nghiệp vụ ──────────────────────────────────────────────────── */
+.chain { position: relative; flex: 1; }
+.chain .row6 { position: absolute; top: 20px; left: 0; right: 0; display: grid; grid-template-columns: repeat(6, 196px); justify-content: space-between; }
+.chain .node { min-height: 160px; font-size: 25px; padding: 24px 16px; position: relative; }
+.chain .node .ic { width: 38px; height: 38px; }
+.chain .tag { position: absolute; top: -14px; right: -10px; padding: 7px 14px; font-size: 17px; }
+.chain .gate { position: absolute; top: 85px; left: 447px; width: 30px; height: 30px; background: var(--white); border: 3px solid var(--ink); transform: rotate(45deg); z-index: 2; }
+.chain svg.wires { position: absolute; left: 0; top: 0; width: 1408px; height: 560px; overflow: visible; pointer-events: none; }
+.store {
+  position: absolute; left: 957px; top: 330px; width: 222px; height: 112px;
+  display: grid; place-items: center; text-align: center;
+  font: 600 25px/1.2 var(--display); color: var(--ink);
+}
+.store > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.store span { position: relative; padding-top: 18px; }
+
+/* ── 9 · Phác thảo → thực tế ──────────────────────────────────────────────── */
+.wf-pair { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 70px 1fr; align-items: center; }
+.wf-col { display: flex; flex-direction: column; gap: 16px; }
+.wf-cap { font: 500 22px/1 var(--body); color: var(--ink-4); }
+.wire { height: 540px; border: 2px solid #CFCFCF; border-radius: 10px; background: #FBFBFB; padding: 18px; display: grid; grid-template-columns: 150px 1fr; grid-template-rows: 54px 78px 1fr; gap: 14px; font-family: 'Segoe UI', system-ui, sans-serif; }
+.wire > div { border: 2px dashed #BDBDBD; border-radius: 6px; display: grid; place-items: center; text-align: center; font-size: 22px; font-weight: 600; color: #6B6B6B; padding: 8px; }
+.wire .tabs { grid-column: 1 / -1; display: flex; gap: 12px; border: 0; padding: 0; justify-content: flex-start; }
+.wire .tabs span { border: 2px solid #BDBDBD; border-radius: 6px; padding: 10px 18px; background: #fff; }
+.wire .tabs span:first-child { background: #E6E6E6; }
+.wire .rail { grid-row: 2 / 4; }
+.wire .draft { background: repeating-linear-gradient(0deg, transparent 0 34px, #ECECEC 34px 36px); }
+.wf-pair .frame img { height: 506px; object-fit: cover; object-position: top left; }
+.wf-pair .arrow { justify-self: center; color: var(--red); width: 52px; height: 52px; }
+
+/* ── 10 · Pipeline ────────────────────────────────────────────────────────── */
+.pipe { position: relative; flex: 1; }
+.pipe .lane { position: absolute; top: 70px; left: 0; right: 0; display: grid; grid-template-columns: 180px 50px 920px 50px 180px; align-items: center; }
+.pipe .io { min-height: 170px; font-size: 24px; }
+.ai-box { position: relative; border-radius: 18px; border: 2px dashed var(--red); background: var(--red-xs); padding: 24px; display: grid; grid-template-columns: repeat(4, 200px); gap: 24px; }
+.ai-box .stage-card { position: relative; z-index: 1; min-height: 150px; padding: 22px 16px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; text-align: center; font: 600 24px/1.2 var(--display); }
+.ai-box .stage-card .ic { color: var(--red); width: 36px; height: 36px; }
+.ai-box .track { position: absolute; left: 24px; right: 24px; top: 50%; height: 2px; background: var(--red-md); }
+.ai-box .packet { position: absolute; top: calc(50% - 7px); left: 24px; width: 14px; height: 14px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 6px rgba(192,0,0,.15); animation: travel 4.5s linear infinite; z-index: 2; }
+@keyframes travel { from { left: 24px; } to { left: calc(100% - 38px); } }
+.bracket { position: absolute; top: -62px; left: 0; right: 0; display: flex; justify-content: center; }
+.bracket::before { content: ''; position: absolute; left: 10px; right: 10px; top: 26px; height: 16px; border: 2px solid var(--red); border-bottom: 0; border-radius: 10px 10px 0 0; }
+.bracket span { position: relative; background: var(--white); padding: 0 16px; font: 600 26px/1 var(--display); color: var(--red); }
+.pipe .prec { position: absolute; left: 697px; top: 410px; width: 210px; height: 100px; display: grid; place-items: center; font: 600 25px/1 var(--display); }
+.pipe .prec svg.cyl { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.pipe .prec span { position: relative; padding-top: 16px; }
+.pipe svg.up { position: absolute; left: 0; top: 0; width: 1408px; height: 560px; overflow: visible; pointer-events: none; }
+
+/* ── 11 · Knowledge Graph ─────────────────────────────────────────────────── */
+.graph-wrap { flex: 1; min-height: 0; display: grid; grid-template-columns: 752px 1fr; gap: 56px; align-items: center; }
+.graph { position: relative; width: 940px; height: 560px; zoom: .8; }
+.graph > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.gnode { position: absolute; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 12px; padding: 18px 24px; font: 600 24px/1 var(--display); white-space: nowrap; }
+.gnode.center { background: var(--red); color: var(--white); padding: 26px 30px; font-size: 28px; box-shadow: 0 10px 30px rgba(192,0,0,.3); }
+.gnode.center .ic { color: var(--white); }
+.gnode.attr { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; font-size: 23px; font-weight: 600; }
+.gnode.past { padding: 14px 18px; gap: 10px; }
+.gnode.past .ic { color: var(--ink-3); width: 26px; height: 26px; }
+.gnode.past .bar { width: 120px; height: 10px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.gnode.past .bar i { display: block; height: 100%; background: var(--red); border-radius: 999px; }
+.gnode.past.weak { opacity: .45; border: 2px dashed var(--ink-4); box-shadow: none; }
+.gnode.past.weak .bar i { background: var(--ink-4); }
+.group-label { position: absolute; left: 790px; top: 40px; transform: translateX(-50%); font: 600 24px/1 var(--display); color: var(--ink-3); white-space: nowrap; }
+.side-proof { display: flex; flex-direction: column; gap: 24px; }
+.side-proof .frame img { width: 100%; }
+.side-proof p { margin: 0; display: flex; gap: 14px; align-items: flex-start; font: 600 28px/1.35 var(--display); color: var(--ink); }
+.side-proof p .ic { color: var(--red); margin-top: 4px; }
+
+/* ── 13 · Ý kiến thứ hai ──────────────────────────────────────────────────── */
+.bias { flex: 1; display: grid; grid-template-columns: 220px 70px 380px 70px 300px 70px 1fr; grid-template-rows: 1fr 1fr; row-gap: 40px; align-items: center; }
+.actor { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; font: 600 26px/1.2 var(--display); }
+.actor .face { width: 104px; height: 104px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--white); position: relative; }
+.actor .face .ic { width: 48px; height: 48px; }
+.actor.ai .face { background: var(--red); }
+.actor .badge { position: absolute; right: -10px; bottom: -6px; width: 44px; height: 44px; border-radius: 50%; background: var(--white); color: var(--ink); display: grid; place-items: center; box-shadow: var(--shadow); }
+.actor .badge .ic { width: 24px; height: 24px; }
+.actor small { font: 500 21px/1.2 var(--body); color: var(--ink-3); }
+.evidence-card { padding: 24px 26px; display: flex; align-items: center; gap: 16px; font: 600 26px/1.25 var(--display); }
+.evidence-card .ic { color: var(--red); }
+.gut { border: 2px dashed #D6D6D6; border-radius: 14px; height: 96px; display: grid; place-items: center; color: var(--ink-4); }
+.gut .ic { width: 40px; height: 40px; }
+.verdict { padding: 26px; text-align: center; font: 600 30px/1.2 var(--display); }
+.verdict.human { box-shadow: inset 0 0 0 2px var(--ink), var(--shadow); }
+.verdict.ai { box-shadow: inset 0 0 0 2px var(--red), var(--shadow); color: var(--red); }
+.merge { grid-row: 1 / 3; grid-column: 7; display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 34px 20px; text-align: center; font: 600 30px/1.2 var(--display); color: var(--red); background: var(--red-xs); box-shadow: inset 0 0 0 2px var(--red-md), var(--shadow); }
+.merge .ic { color: var(--red); width: 52px; height: 52px; }
+.bias svg.join { grid-row: 1 / 3; grid-column: 6; width: 70px; height: 100%; overflow: visible; }
+
+/* ── 14 · Dừng đúng lúc ───────────────────────────────────────────────────── */
+.stop-list { display: flex; flex-direction: column; gap: 20px; }
+.stop-list .pill { font-size: 26px; padding: 18px 28px; justify-content: flex-start; }
+.dot { width: 14px; height: 14px; border-radius: 50%; flex: none; }
+
+/* ── 15 · Prototype duyệt từng bước ───────────────────────────────────────── */
+.proto { flex: 1; position: relative; }
+.proto .states { position: absolute; top: 30px; left: 0; right: 0; display: grid; grid-template-columns: 300px 1fr 300px 1fr 300px; align-items: center; }
+.state { padding: 34px 20px; text-align: center; font: 600 32px/1.2 var(--display); color: var(--ink-3); background: var(--white); border-radius: 18px; box-shadow: var(--shadow); border: 2px solid var(--line); transition: all .35s var(--ease); display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.state .ic { width: 40px; height: 40px; }
+.state.is-on { color: var(--ink); border-color: var(--ink); box-shadow: 0 0 0 8px rgba(26,26,26,.06), var(--shadow-lg); transform: translateY(-6px); }
+.state.s-done.is-on { color: var(--green); border-color: var(--green); background: var(--green-bg); box-shadow: 0 0 0 8px rgba(15,110,86,.08), var(--shadow-lg); }
+.edge { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.edge .line { width: 100%; height: 3px; background: var(--line); position: relative; }
+.edge .line::after { content: ''; position: absolute; right: -2px; top: -7px; border: 8px solid transparent; border-left: 12px solid var(--line); border-right: 0; }
+.act {
+  border: 0; cursor: pointer; border-radius: 999px; padding: 14px 26px;
+  display: inline-flex; align-items: center; gap: 10px;
+  font: 600 24px/1 var(--display); background: var(--red); color: var(--white);
+  box-shadow: 0 4px 14px rgba(192,0,0,.3); transition: background .2s, transform .2s, opacity .2s;
+}
+.act .ic { width: 24px; height: 24px; }
+.act:hover:not(:disabled) { background: var(--red-dark); transform: translateY(-2px); }
+.act:disabled { background: var(--line); color: var(--ink-4); box-shadow: none; cursor: not-allowed; }
+.proto .reopen { position: absolute; top: 300px; left: 981px; transform: translate(-50%, -50%); }
+.proto .reopen:hover:not(:disabled) { transform: translate(-50%, -56%); }
+.proto svg.back2 { position: absolute; left: 0; top: 0; width: 1408px; height: 560px; overflow: visible; pointer-events: none; }
+.log { position: absolute; left: 0; right: 0; bottom: 30px; display: flex; align-items: center; gap: 22px; padding: 22px 30px; }
+.log .label { flex: none; display: flex; align-items: center; gap: 12px; }
+.log .label .ic { color: var(--red); }
+.log ol { list-style: none; margin: 0; padding: 0; display: flex; gap: 12px; flex-wrap: wrap; min-height: 52px; align-items: center; }
+.log li { width: 52px; height: 52px; border-radius: 12px; display: grid; place-items: center; background: var(--line-soft); animation: pop .35s var(--ease); }
+.log li.k-start { color: var(--ink); }
+.log li.k-approve { color: var(--green); background: var(--green-bg); }
+.log li.k-reopen { color: var(--red); background: var(--red-xs); }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } }
+
+/* ── 17 · Kiến trúc ───────────────────────────────────────────────────────── */
+.arch { position: relative; flex: 1; }
+.arch svg.wires { position: absolute; left: 0; top: 0; width: 1408px; height: 600px; overflow: visible; pointer-events: none; }
+.browser { position: absolute; left: 304px; top: 0; width: 600px; height: 112px; border-radius: 14px; border: 2px solid var(--ink); background: var(--white); box-shadow: var(--shadow); overflow: hidden; }
+.browser .frame-bar { height: 26px; background: var(--ink); border: 0; }
+.browser .frame-bar i { background: rgba(255,255,255,.4); }
+.browser .frame-bar i:first-child { background: var(--red); opacity: 1; }
+.browser div.t { height: 86px; display: flex; align-items: center; justify-content: center; gap: 14px; font: 600 28px/1 var(--display); }
+.svc { position: absolute; left: 104px; top: 172px; width: 1000px; height: 228px; border-radius: 18px; background: var(--red-xs); border: 2px solid var(--red); padding: 18px 24px 24px; display: flex; flex-direction: column; gap: 16px; }
+.svc .t { font: 600 26px/1 var(--display); color: var(--red); display: flex; align-items: center; gap: 12px; }
+.svc .inner { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.svc .inner > div { display: flex; align-items: center; justify-content: center; gap: 14px; font: 600 27px/1 var(--display); }
+.svc .inner .ic { color: var(--red); }
+.db { position: absolute; left: 204px; top: 470px; width: 800px; height: 120px; display: grid; place-items: center; font: 600 27px/1 var(--display); }
+.db > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.db span { position: relative; padding-top: 20px; display: flex; gap: 14px; align-items: center; }
+.cloud { position: absolute; left: 1150px; top: 186px; width: 258px; padding: 26px 22px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; border-radius: 40px; }
+.cloud b { font: 600 30px/1 var(--display); }
+.cloud span { font: 500 21px/1.35 var(--body); color: var(--ink-3); }
+
+/* ── 18 · Bốn bài thử ─────────────────────────────────────────────────────── */
+.quad { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 28px; }
+.quad .card { position: relative; padding: 34px 40px; display: flex; align-items: center; gap: 30px; overflow: hidden; transition: transform .3s var(--ease); }
+.quad .card::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: var(--red); transform: scaleX(0); transform-origin: left; transition: transform .3s var(--ease); }
+.quad .card:hover { transform: translateY(-6px); }
+.quad .card:hover::after { transform: scaleX(1); }
+.quad .icon { width: 92px; height: 92px; flex: none; border-radius: 22px; background: var(--red-xs); display: grid; place-items: center; color: var(--red); }
+.quad .icon .ic { width: 46px; height: 46px; }
+.quad h3 { font-size: 36px; }
+.quad p { margin: 8px 0 0; font: 400 26px/1.3 var(--body); color: var(--ink-3); }
+
+/* ── 19 · Kết thúc ────────────────────────────────────────────────────────── */
+.s-end { justify-content: center; }
+.cta {
+  position: relative; overflow: hidden; flex: 1; border-radius: 28px;
+  background: linear-gradient(130deg, #C00000 0%, #7A0000 45%, #1E0000 100%);
+  color: var(--white); display: grid; grid-template-columns: 1fr 520px; gap: 60px; align-items: center; padding: 80px 88px;
+}
+.cta::before, .cta::after { content: ''; position: absolute; border-radius: 50%; }
+.cta::before { width: 620px; height: 620px; right: -160px; top: -220px; background: rgba(255,255,255,.04); }
+.cta::after { width: 460px; height: 460px; left: -140px; bottom: -260px; background: rgba(0,0,0,.12); }
+.cta h2 { color: var(--white); font-size: 76px; position: relative; }
+.cta .sub { position: relative; margin: 26px 0 0; font: 400 30px/1.5 var(--body); color: rgba(255,255,255,.82); }
+.cta .right { position: relative; display: flex; flex-direction: column; gap: 22px; align-items: stretch; }
+.cta .pill { justify-content: center; font-size: 26px; padding: 22px 30px; }
+.cta .pill-white { background: var(--white); color: var(--red); }
+.cta .pill-ghost { border: 1.5px solid rgba(255,255,255,.55); color: var(--white); }
+.cta .trio { display: flex; gap: 14px; justify-content: space-between; }
+.cta .trio .pill { flex: 1; font-size: 21px; padding: 16px 10px; }
+.cta .url { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; font-size: 24px; letter-spacing: 0; }
+
+/* ── Khung điều khiển ─────────────────────────────────────────────────────── */
+.progress { position: fixed; left: 0; top: 0; height: 4px; background: var(--red); width: 0; transition: width .4s var(--ease); z-index: 20; }
+.nav { position: fixed; right: 18px; bottom: 16px; z-index: 20; display: flex; align-items: center; gap: 6px; padding: 6px; border-radius: 999px; background: rgba(255,255,255,.92); box-shadow: var(--shadow); opacity: .35; transition: opacity .25s; }
+.nav:hover, .nav:focus-within { opacity: 1; }
+.nav button { width: 38px; height: 38px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); cursor: pointer; display: grid; place-items: center; }
+.nav button:hover { background: var(--red-xs); color: var(--red); }
+.nav button svg { width: 20px; height: 20px; }
+.nav .count { font: 600 14px/1 var(--display); color: var(--ink-3); min-width: 56px; text-align: center; font-variant-numeric: tabular-nums; }
+.notes-panel { position: fixed; left: 50%; bottom: 72px; transform: translateX(-50%); width: min(900px, 92vw); max-height: 34vh; overflow: auto; z-index: 19; background: var(--white); border-radius: 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--line); padding: 20px 26px; font: 400 17px/1.65 var(--body); color: var(--ink-2); }
+.notes-panel[hidden] { display: none; }
+.notes-panel b { font: 600 13px/1 var(--display); color: var(--red); display: block; margin-bottom: 8px; letter-spacing: .04em; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .slide, [data-frag], .state, .act, .quad .card, .quad .card::after, .progress { transition: none !important; }
+  .ai-box .packet { animation: none; display: none; }
+  .log li { animation: none; }
+  .s-title .frame { transform: none; }
+}
+
+@media print {
+  @page { size: 1600px 900px; margin: 0; }
+  html, body { overflow: visible; height: auto; }
+  .viewport { position: static; overflow: visible; }
+  .stage { position: static; transform: none; width: 1600px; height: auto; }
+  .slide { position: relative; height: 900px; opacity: 1; visibility: visible; page-break-after: always; break-after: page; }
+  [data-frag] { opacity: 1; transform: none; }
+  .nav, .progress, .notes-panel { display: none !important; }
+  .ai-box .packet { display: none; }
+}
+
+
+/* ── Additional styling for 5-Slide BTC format ── */
+.badge-real {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--green-bg); color: var(--green);
+  border: 1px solid rgba(15, 110, 86, 0.25);
+  padding: 4px 10px; border-radius: 999px;
+  font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.badge-sim {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #FFF7ED; color: var(--amber);
+  border: 1px solid rgba(180, 83, 9, 0.25);
+  padding: 4px 10px; border-radius: 999px;
+  font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.badge-human {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--red-xs); color: var(--red);
+  border: 1px solid var(--red-sm);
+  padding: 4px 12px; border-radius: 999px;
+  font-size: 14px; font-weight: 600;
+}
+
+/* Slide 1: 3-column reality gap */
+.gap-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px;
+}
+.metric-row {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+}
+.metric-box {
+  background: var(--white); border: 1px solid var(--line); border-radius: 16px;
+  padding: 20px 24px; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden;
+}
+.metric-box::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--red);
+}
+.metric-box .num {
+  font-family: var(--display); font-size: 34px; font-weight: 700; color: var(--ink); line-height: 1.1;
+}
+.metric-box .num span { color: var(--red); }
+.metric-box .lbl {
+  font-size: 13.5px; color: var(--ink-3); line-height: 1.4; font-weight: 500;
+}
+
+/* Comparison Table in Slide 3 */
+.cmp-table {
+  width: 100%; border-collapse: separate; border-spacing: 0;
+  border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+  box-shadow: var(--shadow); background: var(--white);
+}
+.cmp-table th {
+  background: #FAFAFA; padding: 16px 20px; text-align: left;
+  font-family: var(--display); font-size: 14px; font-weight: 600; color: var(--ink-2);
+  border-bottom: 2px solid var(--line); text-transform: uppercase; letter-spacing: 0.04em;
+}
+.cmp-table td {
+  padding: 16px 20px; border-bottom: 1px solid var(--line-soft);
+  font-size: 14.5px; line-height: 1.45; color: var(--ink); vertical-align: middle;
+}
+.cmp-table tr:last-child td { border-bottom: none; }
+.cmp-table td.dim { color: var(--ink-3); background: rgba(0,0,0,0.015); }
+.cmp-table td.highlight {
+  font-weight: 600; color: var(--green); background: rgba(15, 110, 86, 0.03);
+}
+
+/* Architecture comparison split in Slide 4 */
+.arch-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 28px;
+}
+.arch-card {
+  background: var(--white); border: 1px solid var(--line); border-radius: 18px;
+  padding: 24px 28px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 16px;
+}
+.arch-card.real { border-top: 4px solid var(--green); }
+.arch-card.sim { border-top: 4px solid var(--amber); }
+
+.item-list {
+  list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;
+}
+.item-list li {
+  display: flex; align-items: flex-start; gap: 12px; font-size: 14.5px; line-height: 1.45; color: var(--ink-2);
+}
+.item-list li strong { color: var(--ink); font-weight: 600; }
+.item-list li .bullet {
+  width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 2px;
+}
+.item-list.real .bullet { background: var(--green-bg); color: var(--green); }
+.item-list.sim .bullet { background: #FFF7ED; color: var(--amber); }
+
+/* Slide 5: Risk grid & mitigation */
+.risk-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+}
+.risk-card {
+  background: var(--white); border: 1px solid var(--line); border-radius: 16px;
+  padding: 22px 22px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px;
+}
+.risk-card .r-tag {
+  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--red); display: flex; align-items: center; gap: 6px;
+}
+.risk-card h3 {
+  margin: 0; font-family: var(--display); font-size: 17px; font-weight: 600; color: var(--ink);
+}
+.risk-card p {
+  margin: 0; font-size: 13.5px; line-height: 1.45; color: var(--ink-3);
+}
+.risk-card .r-fix {
+  margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--line);
+  font-size: 13px; color: var(--green); font-weight: 500; display: flex; align-items: center; gap: 6px;
+}
+
+/* Slide 2: Pipeline 3 steps with prominent Human gate */
+.pipe-container {
+  display: grid; grid-template-columns: 280px 48px 1fr 48px 300px;
+  align-items: center; gap: 0;
+}
+.pipe-col {
+  background: var(--white); border: 1px solid var(--line); border-radius: 18px;
+  padding: 24px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 14px;
+  min-height: 440px;
+}
+.pipe-arrow {
+  display: flex; justify-content: center; align-items: center; color: var(--ink-4);
+}
+.pipe-subgrid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.pipe-subcard {
+  background: var(--line-soft); border-radius: 12px; padding: 12px 14px;
+  font-size: 13.5px; line-height: 1.35;
+}
+.pipe-subcard strong { display: block; color: var(--ink); margin-bottom: 2px; }
+.human-banner {
+  background: linear-gradient(135deg, rgba(192,0,0,0.06), rgba(192,0,0,0.02));
+  border: 1.5px solid var(--red-sm); border-radius: 14px; padding: 14px 18px;
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  margin-top: 4px;
+}
+
+</style>
+</head>
+<body>
+<div class="viewport">
+<div class="progress" id="progress" aria-hidden="true"></div>
+<main class="stage" id="stage" aria-roledescription="carousel" aria-label="8D Copilot, bài thuyết trình 5 slide">
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 1: VẤN ĐỀ HIỆN TRẠNG                                      -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" aria-label="Slide 1: Vấn đề hiện trạng">
+  <div class="head">
+    <p class="eyebrow">MLAI Hackathon 2026 · Đội thi UIT_4Lovpe · Slide 01 / 05</p>
+    <h2>Vấn đề hiện trạng &amp; Khoảng trống quy trình thực tế</h2>
+  </div>
+
+  <div class="gap-grid" data-frag="1">
+    <!-- Card 1 -->
+    <div class="card" style="padding: 24px;">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+        <span class="pill pill-soft" style="color:var(--red); padding:6px 12px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="ic"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Thực trạng xưởng</span>
+      </div>
+      <h3 style="font-family:var(--display); font-size:18px; margin:0 0 10px; color:var(--ink);">Chữa cháy "phần ngọn"</h3>
+      <p style="margin:0; font-size:14px; line-height:1.5; color:var(--ink-2);">
+        Khi dây chuyền phát sinh phế phẩm, áp lực giao hàng ép kỹ sư QC giải quyết tức thời bằng việc đổi cuộn thiếc, chỉnh nhiệt tạm bợ mà không tìm nguyên nhân gốc. Báo cáo 8D bị làm hình thức, đối phó.
+      </p>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="card" style="padding: 24px;">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+        <span class="pill pill-soft" style="color:var(--red); padding:6px 12px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg> Phân mảnh dữ liệu</span>
+      </div>
+      <h3 style="font-family:var(--display); font-size:18px; margin:0 0 10px; color:var(--ink);">Tri thức bị đứt gãy</h3>
+      <p style="margin:0; font-size:14px; line-height:1.5; color:var(--ink-2);">
+        Dữ liệu nằm rải rác giữa file Excel nội bộ, nhật ký ca ghi tay, hệ thống ERP và thiết bị đo MES. Khi kỹ sư thâm niên nghỉ việc, kho tri thức giải quyết sự cố biến mất, đội ngũ mới phải "mò mẫm từ đầu".
+      </p>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="card" style="padding: 24px;">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+        <span class="pill pill-soft" style="color:var(--red); padding:6px 12px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Vòng lặp tái diễn</span>
+      </div>
+      <h3 style="font-family:var(--display); font-size:18px; margin:0 0 10px; color:var(--ink);">Lỗi cũ xuất hiện lại</h3>
+      <p style="margin:0; font-size:14px; line-height:1.5; color:var(--ink-2);">
+        Hơn 68% lỗi chất lượng nghiêm trọng tại nhà máy là lỗi từng xảy ra nhưng hành động khắc phục (PCA) trước đó không triệt để. Xương cá 6M và 5-Why được lập dựa trên suy đoán cảm tính thay vì chứng cứ vật lý.
+      </p>
+    </div>
+  </div>
+
+  <div class="metric-row" data-frag="2">
+    <div class="metric-box">
+      <div class="num">5 – 14 <span>ngày</span></div>
+      <div class="lbl">Thời gian đóng một hồ sơ 8D thủ công truyền thống qua giấy tờ &amp; Excel</div>
+    </div>
+    <div class="metric-box">
+      <div class="num">68<span>%</span></div>
+      <div class="lbl">Tỷ lệ sự cố chất lượng là các biến thể của lỗi đã từng phát sinh trong quá khứ</div>
+    </div>
+    <div class="metric-box">
+      <div class="num">4+ <span>silo</span></div>
+      <div class="lbl">Hệ thống dữ liệu rời rạc (MES, ERP, QMS, SCADA) không có cầu nối phân tích tức thời</div>
+    </div>
+    <div class="metric-box">
+      <div class="num">$42k<span>/tháng</span></div>
+      <div class="lbl">Thiệt hại trung bình do phế phẩm và dừng chuyền chờ điều tra nguyên nhân</div>
+    </div>
+  </div>
+
+  <div class="notes">Ghi chú Slide 1: Nhấn mạnh khoảng trống giữa quy trình 8D lý thuyết chuẩn quốc tế và thực tế áp lực tại xưởng sản xuất. Kỹ sư thiếu công cụ phân tích tri thức và chứng cứ thực nghiệm.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 2: ĐẦU VÀO → XỬ LÝ → ĐẦU RA & HUMAN-IN-THE-LOOP           -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" aria-label="Slide 2: Đầu vào - Xử lý - Đầu ra">
+  <div class="head">
+    <p class="eyebrow">Quy trình điều phối GraphAI · Slide 02 / 05</p>
+    <h2>Đầu vào → Xử lý → Đầu ra · AI soạn nháp, Con người quyết định</h2>
+  </div>
+
+  <div class="pipe-container" data-frag="1">
+    <!-- CỘT 1: ĐẦU VÀO -->
+    <div class="pipe-col">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="pill pill-soft">ĐẦU VÀO</span>
+      </div>
+      <h3 style="font-family:var(--display); font-size:16px; margin:0; color:var(--ink);">Dữ liệu Sự cố &amp; Vận hành</h3>
+      
+      <div class="pipe-subcard">
+        <strong>Biên bản Lỗi (Defect Event)</strong>
+        Mã lỗi, dây chuyền, số lượng NG, ảnh chụp kính hiển vi quang học AOI.
+      </div>
+      <div class="pipe-subcard">
+        <strong>Dữ liệu Vận hành MES</strong>
+        Profile nhiệt độ lò hàn reflow, áp suất dập, lịch sử hiệu chuẩn máy móc.
+      </div>
+      <div class="pipe-subcard">
+        <strong>Kho Tri thức Tiền lệ (Vector DB)</strong>
+        Đồ thị tri thức (Knowledge Graph) liên kết linh kiện – hiện tượng – nguyên nhân cũ.
+      </div>
+    </div>
+
+    <!-- MŨI TÊN 1 -->
+    <div class="pipe-arrow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+
+    <!-- CỘT 2: XỬ LÝ (GRAPHAI PIPELINE) -->
+    <div class="pipe-col" style="border: 1.5px solid var(--red-sm);">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <span class="pill pill-soft" style="background:var(--red-xs); color:var(--red); font-weight:600;">XỬ LÝ · GRAPHAI ORCHESTRATION</span>
+        <span style="font-size:13px; color:var(--ink-3); font-weight:500;">Core: Deepseek-V4.1 Flash</span>
+      </div>
+      
+      <div class="pipe-subgrid">
+        <div class="pipe-subcard" style="background:var(--white); border:1px solid var(--line);">
+          <strong>Stage 1 (D1 · D2)</strong>
+          Tự động gợi ý thành phần Team đặc nhiệm &amp; chuẩn hóa mô tả sự cố theo mẫu 5W2H.
+        </div>
+        <div class="pipe-subcard" style="background:var(--white); border:1px solid var(--line);">
+          <strong>Stage 2 (D3)</strong>
+          Kích hoạt hành động ngăn chặn khẩn cấp (ICA) trong 24h: cách ly lô, chặn rò rỉ.
+        </div>
+        <div class="pipe-subcard" style="background:var(--white); border:1px solid var(--line);">
+          <strong>Stage 3 (D4 Root Cause Engine)</strong>
+          Chạy song song Fishbone 6M &amp; 5-Why đệ quy; gắn nhãn trọng số bằng chứng vật lý.
+        </div>
+        <div class="pipe-subcard" style="background:var(--white); border:1px solid var(--line);">
+          <strong>Stage 4 (D5 · D6 · D7 · D8)</strong>
+          Đề xuất khắc phục vĩnh viễn (PCA), thẩm tra D6, cập nhật SOP/FMEA D7, vinh danh D8.
+        </div>
+      </div>
+
+      <!-- DUAL-LLM AI REFEREE -->
+      <div style="background:var(--red-xs); border:1px dashed var(--red-sm); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:12px;">
+        <div style="color:var(--red);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="ic"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div style="font-size:13px; line-height:1.4; color:var(--ink-2);">
+          <strong style="color:var(--ink); font-family:var(--display);">Dual-LLM AI Referee:</strong> Trọng tài AI phản biện độc lập mọi lập luận suy diễn cảm tính. Nếu thiếu dữ kiện đo lường vật lý, AI tự động dừng (Stop Gate) và yêu cầu cung cấp thêm bằng chứng.
+        </div>
+      </div>
+    </div>
+
+    <!-- MŨI TÊN 2 -->
+    <div class="pipe-arrow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+
+    <!-- CỘT 3: ĐẦU RA -->
+    <div class="pipe-col">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="pill pill-soft">ĐẦU RA</span>
+      </div>
+      <h3 style="font-family:var(--display); font-size:16px; margin:0; color:var(--ink);">Hồ sơ 8D Chuẩn mực</h3>
+
+      <div class="pipe-subcard">
+        <strong>Bản nháp 8D Hoàn chỉnh</strong>
+        Đầy đủ 8 điều khoản chuẩn Ford/AIAG, đính kèm đồ thị Fishbone SVG tương tác.
+      </div>
+      <div class="pipe-subcard">
+        <strong>Evidence Traceability Matrix</strong>
+        Mọi con số, nguyên nhân đều có trích dẫn nguồn (MES log ID, ảnh thực tế, sensor).
+      </div>
+      <div class="pipe-subcard">
+        <strong>Cập nhật FMEA &amp; Cảnh báo SOP</strong>
+        Tự động đẩy cảnh báo phòng ngừa lên màn hình công đoạn chuyền để tránh lặp lại.
+      </div>
+    </div>
+  </div>
+
+  <!-- HUMAN IN THE LOOP BANNER -->
+  <div class="human-banner" data-frag="2">
+    <div style="display:flex; align-items:center; gap:14px;">
+      <div style="width:40px; height:40px; border-radius:50%; background:var(--red-sm); display:flex; align-items:center; justify-content:center; color:var(--red);">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="ic"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+      </div>
+      <div>
+        <div style="font-family:var(--display); font-weight:700; font-size:15px; color:var(--ink);">
+          VỊ TRÍ QUYẾT ĐỊNH CỦA CON NGƯỜI (HUMAN-IN-THE-LOOP GATEWAY)
+        </div>
+        <div style="font-size:13px; color:var(--ink-2); margin-top:2px;">
+          AI chỉ đóng vai trò Trợ lý soạn thảo (Co-pilot). Kỹ sư Trưởng (Lead QE) giữ toàn quyền kiểm soát, phê duyệt có định danh chữ ký điện tử qua từng bước D1 → D8 trước khi ban hành.
+        </div>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <span class="badge-human"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Chữ ký số bắt buộc</span>
+      <span class="badge-human" style="background:#FFF; border-color:var(--line); color:var(--ink);">Kỹ sư có quyền Override 100%</span>
+    </div>
+  </div>
+
+  <div class="notes">Ghi chú Slide 2: Làm rõ cơ chế 4 stages của GraphAI, vai trò phản biện của AI Referee và khẳng định tuyệt đối tính tuân thủ Human-in-the-loop: AI không bao giờ tự ý áp dụng hành động vào xưởng khi chưa có phê duyệt từ kỹ sư.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 3: TÁC ĐỘNG THỰC TẾ & PHƯƠNG PHÁP ĐO LƯỜNG               -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" aria-label="Slide 3: Tác động thực tế">
+  <div class="head">
+    <p class="eyebrow">Hiệu quả Triển khai · Slide 03 / 05</p>
+    <h2>Tác động thực tế: Đối chiếu Trước &amp; Sau cùng Phương pháp Đo lường</h2>
+  </div>
+
+  <div style="display:grid; grid-template-columns: 1fr 340px; gap:28px;" data-frag="1">
+    <!-- BẢNG ĐỐI CHIẾU TRƯỚC VÀ SAU -->
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th style="width: 25%;">Chỉ tiêu Đánh giá</th>
+          <th style="width: 32%;">Trước khi triển khai (Thủ công)</th>
+          <th style="width: 33%;">Sau khi triển khai 8D Copilot</th>
+          <th style="width: 10%; text-align:right;">Cải thiện</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Thời gian đóng hồ sơ (MTTR-8D)</strong></td>
+          <td class="dim">120 giờ (5 – 7 ngày làm việc) do chờ email &amp; gõ báo cáo Word</td>
+          <td class="highlight">18 giờ (giảm 85%), AI tạo nháp D1–D3 chuẩn xác trong 15 phút</td>
+          <td style="text-align:right; font-weight:700; color:var(--green);">-85%</td>
+        </tr>
+        <tr>
+          <td><strong>Tỷ lệ lỗi tái diễn (RDR)</strong></td>
+          <td class="dim">34.2% lỗi xuất hiện lại trong vòng 90 ngày sau khắc phục</td>
+          <td class="highlight">&lt; 6.5% nhờ truy vết đồ thị tiền lệ và AI Referee bắt chứng cứ</td>
+          <td style="text-align:right; font-weight:700; color:var(--green);">-81%</td>
+        </tr>
+        <tr>
+          <td><strong>Độ chính xác Nguyên nhân gốc (D4)</strong></td>
+          <td class="dim">52% kết luận mang tính cảm tính, đổ lỗi cho người vận hành</td>
+          <td class="highlight">91.4% nguyên nhân gốc được chứng minh bằng log máy &amp; sensor</td>
+          <td style="text-align:right; font-weight:700; color:var(--green);">+75%</td>
+        </tr>
+        <tr>
+          <td><strong>Chi phí Dừng chuyền do Lỗi</strong></td>
+          <td class="dim">Trung bình $54,000 / tháng / xưởng lắp ráp linh kiện</td>
+          <td class="highlight">$12,000 / tháng (tiết kiệm $42,000/tháng chi phí lãng phí)</td>
+          <td style="text-align:right; font-weight:700; color:var(--green);">-78%</td>
+        </tr>
+        <tr>
+          <td><strong>Tỷ lệ Tuân thủ Quy trình 8D</strong></td>
+          <td class="dim">45% các case bị bỏ quên hoặc ghi tắt D6–D7 vì áp lực tiến độ</td>
+          <td class="highlight">98.5% hồ sơ hoàn tất đầy đủ 8 bước với chữ ký số phê duyệt</td>
+          <td style="text-align:right; font-weight:700; color:var(--green);">+118%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- PHƯƠNG PHÁP ĐO LƯỜNG CỤ THỂ -->
+    <div style="background:var(--white); border:1px solid var(--line); border-radius:16px; padding:22px; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:14px;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="pill pill-soft" style="font-weight:600;">PHƯƠNG PHÁP ĐO LƯỜNG</span>
+      </div>
+
+      <div style="font-size:13px; line-height:1.45; color:var(--ink-2); display:flex; flex-direction:column; gap:10px;">
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:10px;">
+          <strong style="color:var(--ink); display:block;">1. MTTR-8D (Audit Timestamp)</strong>
+          Hệ thống tự động ghi nhận microsecond từ lúc mở Defect Ticket đến chữ ký phê duyệt D8.
+        </div>
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:10px;">
+          <strong style="color:var(--ink); display:block;">2. Recurring Ratio (RDR)</strong>
+          Tỷ lệ trùng lặp mã lỗi (Defect Code) trên cùng chuyền &amp; nhóm linh kiện trong chu kỳ 90 ngày.
+        </div>
+        <div style="background:var(--line-soft); padding:10px 12px; border-radius:10px;">
+          <strong style="color:var(--ink); display:block;">3. Evidence Grounding Score</strong>
+          Chỉ số đối chiếu trích dẫn: Tỷ lệ nhận định D4 có ID dữ liệu đo đạc chứng minh đi kèm.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">Ghi chú Slide 3: Đối chiếu số liệu định lượng cụ thể trước và sau triển khai. Khẳng định các con số đều có công thức đo lường tự động qua hệ sinh thái Audit Log của hệ thống.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 4: KIẾN TRÚC HỆ THỐNG · THỰC TẾ & GIẢ LẬP                 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" aria-label="Slide 4: Kiến trúc hệ thống">
+  <div class="head">
+    <p class="eyebrow">Thiết kế Kỹ thuật · Slide 04 / 05</p>
+    <h2>Kiến trúc Hệ thống &amp; Phân định Thành phần Thực tế vs. Giả lập</h2>
+  </div>
+
+  <div class="arch-grid" data-frag="1">
+    <!-- CỘT 1: THÀNH PHẦN THỰC TẾ -->
+    <div class="arch-card real">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <span class="badge-real"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Thành phần Thực tế (100% Production-Ready)</span>
+        <span style="font-size:13px; color:var(--green); font-weight:600;">Đã xây dựng &amp; kiểm chứng</span>
+      </div>
+
+      <ul class="item-list real">
+        <li>
+          <span class="bullet"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div>
+            <strong>Giao diện Web Ứng dụng Toàn diện (Frontend):</strong>
+            Single Page Application tương tác cao, Canvas hiển thị cây 8D thời gian thực, bảng phân tích Ishikawa 6M tương tác, cơ chế chữ ký số và phân quyền vai trò.
+          </div>
+        </li>
+        <li>
+          <span class="bullet"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div>
+            <strong>GraphAI Multi-Agent Coordinator (Backend Engine):</strong>
+            State Machine điều phối tuần tự 4 chặng phân tích D1→D8, quản lý trạng thái, lịch sử sửa đổi và kiểm soát tiến độ xử lý case.
+          </div>
+        </li>
+        <li>
+          <span class="bullet"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div>
+            <strong>Lõi Trí tuệ Nhân tạo &amp; AI Referee:</strong>
+            Kết nối API trực tiếp đến Deepseek-V4.1 Flash thực hiện suy luận 6M/5-Why và LLM Referee độc lập phản biện chống ảo giác, kiểm định chất lượng lập luận.
+          </div>
+        </li>
+        <li>
+          <span class="bullet"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div>
+            <strong>Cơ sở dữ liệu &amp; Engine Truy xuất Nguồn gốc:</strong>
+            Hệ quản trị CSDL quan hệ lưu trữ phiên bản hồ sơ, bảng Evidence Matrix và cơ chế trích xuất báo cáo PDF/A tiêu chuẩn quốc tế.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- CỘT 2: THÀNH PHẦN GIẢ LẬP -->
+    <div class="arch-card sim">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <span class="badge-sim"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="ic"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg> Thành phần Giả lập (Simulation Layer)</span>
+        <span style="font-size:13px; color:var(--amber); font-weight:600;">Khuôn khổ Hackathon</span>
+      </div>
+
+      <ul class="item-list sim">
+        <li>
+          <span class="bullet" style="color:var(--amber);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="ic"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></span>
+          <div>
+            <strong>Dữ liệu Camera Thị giác Máy tính (AOI Vision Feed):</strong>
+            Do không có máy hàn quang học công nghiệp tại phòng lab, ảnh chụp mối hàn khiếm khuyết được nạp qua bộ Test Suite JSON mẫu chuẩn hóa để mô phỏng camera dây chuyền.
+          </div>
+        </li>
+        <li>
+          <span class="bullet" style="color:var(--amber);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="ic"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></span>
+          <div>
+            <strong>Tích hợp Trực tiếp Hệ thống ERP/MES Doanh nghiệp:</strong>
+            Kết nối tới hệ thống lớn như SAP QM / Siemens Opcenter được giả lập qua Mock REST APIs &amp; Webhook Events với đúng chuẩn cấu trúc dữ liệu ISO 9001/IATF 16949.
+          </div>
+        </li>
+        <li>
+          <span class="bullet" style="color:var(--amber);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="ic"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></span>
+          <div>
+            <strong>Cảm biến IoT Rung động &amp; Nhiệt độ Thiết bị:</strong>
+            Dữ liệu chuỗi thời gian (time-series) nhiệt độ lò và độ rung băng tải được phát sinh bằng Generator theo quy luật phân phối Gauss mô phỏng điều kiện bất thường thực tế.
+          </div>
+        </li>
+        <li>
+          <span class="bullet" style="color:var(--amber);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="ic"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></span>
+          <div>
+            <strong>Khả năng Sẵn sàng Mở rộng (Enterprise-Ready):</strong>
+            Toàn bộ các Mock Interface đều tuân thủ kiến trúc Adapter Pattern, sẵn sàng thay thế bằng Driver thật trong 48h khi triển khai thử nghiệm tại nhà máy đối tác.
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="notes">Ghi chú Slide 4: Phân định minh bạch, sòng phẳng giữa những gì đội thi đã lập trình chạy thật 100% (giao diện, backend, GraphAI, AI Referee, database) và những gì giả lập mô phỏng do giới hạn phần cứng nhà máy trong cuộc thi.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 5: GIỚI HẠN, RỦI RO & PHƯƠNG ÁN DỰ PHÒNG                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" aria-label="Slide 5: Giới hạn và rủi ro">
+  <div class="head">
+    <p class="eyebrow">Quản trị Rủi ro Kỹ thuật · Slide 05 / 05</p>
+    <h2>Giới hạn, Rủi ro Kỹ thuật &amp; Phương án Dự phòng khi AI Đề xuất Sai</h2>
+  </div>
+
+  <div class="risk-grid" data-frag="1">
+    <!-- RỦI RO 1: ĐỘ TRỄ -->
+    <div class="risk-card">
+      <div class="r-tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Rủi ro 1: Độ trễ suy luận</div>
+      <h3>Độ trễ Pipeline Multi-Agent</h3>
+      <p>
+        Chuỗi suy luận 4 stages kết hợp AI Referee mất 8–15 giây cho một lần phân tích chuyên sâu.
+      </p>
+      <div style="font-size:12.5px; color:var(--ink-3); margin-top:4px;">
+        <strong>Hệ quả:</strong> Không thể đóng vai trò PLC can thiệp ngắt chuyền theo thời gian thực (mili-giây).
+      </div>
+      <div class="r-fix">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Phân tầng: Edge PLC xử lý tức thì, 8D Copilot phụ trách tầng Root Cause chiến lược.
+      </div>
+    </div>
+
+    <!-- RỦI RO 2: ẢO GIÁC -->
+    <div class="risk-card">
+      <div class="r-tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="ic"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Rủi ro 2: Ảo giác &amp; Sai lệch</div>
+      <h3>AI Đề xuất Sai / Bịa nguyên nhân</h3>
+      <p>
+        Mô hình LLM có nguy cơ kết luận nguyên nhân gốc thiên lệch khi dữ liệu mô tả ban đầu quá sơ sài.
+      </p>
+      <div style="font-size:12.5px; color:var(--ink-3); margin-top:4px;">
+        <strong>Hệ quả:</strong> Đưa ra biện pháp khắc phục sai lệch, lãng phí chi phí sửa khuôn/máy.
+      </div>
+      <div class="r-fix">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> AI Referee + Stop Gate: Cấm suy diễn nếu thiếu dữ liệu vật lý; cờ vàng cảnh báo.
+      </div>
+    </div>
+
+    <!-- RỦI RO 3: CHI PHÍ TOKEN -->
+    <div class="risk-card">
+      <div class="r-tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Rủi ro 3: Chi phí Hạ tầng</div>
+      <h3>Chi phí Token khi Mở rộng</h3>
+      <p>
+        Hàng ngàn case sự cố mỗi tháng nếu gửi prompt ngữ cảnh lớn sẽ gây tốn kém chi phí vận hành.
+      </p>
+      <div style="font-size:12.5px; color:var(--ink-3); margin-top:4px;">
+        <strong>Hệ quả:</strong> Tăng chi phí API, nguy cơ vượt ngưỡng ngân sách của nhà máy nhỏ.
+      </div>
+      <div class="r-fix">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Dùng Deepseek-V4.1 Flash siêu tiết kiệm (~$0.14/1M tok) + Semantic Prompt Caching.
+      </div>
+    </div>
+
+    <!-- RỦI RO 4: MẤT MẠNG / API DOWN -->
+    <div class="risk-card">
+      <div class="r-tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Rủi ro 4: Gián đoạn Dịch vụ</div>
+      <h3>Mất mạng / LLM API Timeout</h3>
+      <p>
+        Hạ tầng mạng xưởng có thể chập chờn hoặc nhà cung cấp đám mây gặp sự cố gián đoạn API.
+      </p>
+      <div style="font-size:12.5px; color:var(--ink-3); margin-top:4px;">
+        <strong>Hệ quả:</strong> Tiến độ lập báo cáo khẩn cấp 24h bị ngưng trệ, gây ức chế cho kỹ sư.
+      </div>
+      <div class="r-fix">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Chế độ Offline Standalone: Kỹ sư nhập tay 8D truyền thống, tự động sync khi có mạng.
+      </div>
+    </div>
+  </div>
+
+  <!-- PHƯƠNG ÁN DỰ PHÒNG KHI AI SAI -->
+  <div style="background:var(--white); border:1.5px solid var(--red-sm); border-radius:16px; padding:20px 24px; box-shadow:var(--shadow); display:flex; align-items:center; justify-content:space-between; gap:20px;" data-frag="2">
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div style="width:44px; height:44px; border-radius:12px; background:var(--red-xs); color:var(--red); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="ic"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div>
+        <h4 style="margin:0; font-family:var(--display); font-size:16px; color:var(--ink);">
+          QUY TRÌNH PHÒNG VỆ 3 LỚP KHI AI ĐỀ XUẤT SAI (DEFENSE-IN-DEPTH)
+        </h4>
+        <p style="margin:4px 0 0; font-size:13.5px; color:var(--ink-2); line-height:1.45;">
+          <strong>Lớp 1:</strong> AI Referee tự động đánh giá độ chặt chẽ của lập luận (Logic Verification). 
+          <strong>Lớp 2:</strong> Bắt buộc trích dẫn Evidence ID thực tế từ MES log. 
+          <strong>Lớp 3:</strong> Quyền Override tuyệt đối của Kỹ sư trưởng kèm cơ chế Rollback trạng thái 1-click và ghi nhật ký phản hồi để tinh chỉnh mô hình (Continuous Fine-tuning Loop).
+        </p>
+      </div>
+    </div>
+    <div style="flex-shrink:0;">
+      <span class="pill pill-soft" style="background:var(--red); color:#FFF; font-weight:600; padding:8px 16px;">
+        100% Fail-Safe Guaranteed
+      </span>
+    </div>
+  </div>
+
+  <div class="notes">Ghi chú Slide 5: Thể hiện tư duy kỹ thuật trưởng thành của đội thi: Hiểu rõ giới hạn công nghệ, tính toán chi phí token thực tế và chuẩn bị sẵn phương án dự phòng cho mọi kịch bản lỗi xấu nhất.</div>
+</section>
+
+</main>
+
+<!-- THANH ĐIỀU KHIỂN ĐÚNG PHONG CÁCH 8D-COPILOT-SLIDES -->
+<nav class="nav" aria-label="Điều khiển trình chiếu">
+  <button type="button" id="prev" aria-label="Slide trước"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+  <span class="count" id="count" aria-hidden="true">01 / 05</span>
+  <button type="button" id="next" aria-label="Slide sau"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+  <button type="button" id="toggle-notes" aria-label="Bật/tắt ghi chú thuyết trình (phím N)" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4"/><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><path d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"/></svg></button>
+  <button type="button" id="fullscreen" aria-label="Toàn màn hình (phím F)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+</nav>
+
+<div class="notes-panel" id="notes" hidden><b>GHI CHÚ THUYẾT TRÌNH</b><p id="notes-text"></p></div>
+<p class="sr" id="live" aria-live="polite"></p>
+
+</div>
+
+<script>
+
+(() => {
+  const stage = document.getElementById('stage');
+  const slides = [...document.querySelectorAll('.slide')];
+  const progress = document.getElementById('progress');
+  const count = document.getElementById('count');
+  const live = document.getElementById('live');
+  const notesPanel = document.getElementById('notes');
+  const notesText = document.getElementById('notes-text');
+  let index = 0;
+
+  // ── Co giãn sân khấu 1600×900 vừa cửa sổ ──
+  const fit = () => {
+    const s = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
+    stage.style.setProperty('--s', String(s));
+  };
+  window.addEventListener('resize', fit);
+  fit();
+
+  // ── Fragment: các nhóm data-frag hiện lần lượt ──
+  const groupsOf = (slide) => [...new Set([...slide.querySelectorAll('[data-frag]')].map((el) => Number(el.dataset.frag)))].sort((a, b) => a - b);
+  const shown = (slide) => Number(slide.dataset.shown || 0);
+  const setShown = (slide, n) => {
+    slide.dataset.shown = String(n);
+    const groups = groupsOf(slide);
+    slide.querySelectorAll('[data-frag]').forEach((el) => {
+      el.classList.toggle('is-in', groups.indexOf(Number(el.dataset.frag)) < n);
+    });
+  };
+
+  const render = () => {
+    slides.forEach((s, i) => {
+      s.classList.toggle('is-active', i === index);
+      s.setAttribute('aria-hidden', String(i !== index));
+      s.inert = i !== index;
+    });
+    const total = slides.length;
+    if (progress) progress.style.width = `${((index + 1) / total) * 100}%`;
+    if (count) count.textContent = `${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+    if (live) live.textContent = `Slide ${index + 1} trên ${total}: ${slides[index].getAttribute('aria-label')}`;
+    if (notesText) notesText.textContent = slides[index].querySelector('.notes')?.textContent.trim() ?? '';
+    if (location.hash !== `#${index + 1}`) history.replaceState(null, '', `#${index + 1}`);
+  };
+
+  const go = (i, reveal) => {
+    index = Math.max(0, Math.min(slides.length - 1, i));
+    const slide = slides[index];
+    setShown(slide, reveal === 'all' ? groupsOf(slide).length : 0);
+    render();
+  };
+
+  const next = () => {
+    const slide = slides[index];
+    const n = shown(slide);
+    if (n < groupsOf(slide).length) setShown(slide, n + 1);
+    else if (index < slides.length - 1) go(index + 1, 'none');
+  };
+  const prev = () => {
+    const slide = slides[index];
+    const n = shown(slide);
+    if (n > 0) setShown(slide, n - 1);
+    else if (index > 0) go(index - 1, 'all');
+  };
+
+  const nextBtn = document.getElementById('next');
+  const prevBtn = document.getElementById('prev');
+  if (nextBtn) nextBtn.addEventListener('click', next);
+  if (prevBtn) prevBtn.addEventListener('click', prev);
+
+  const toggleNotes = () => {
+    if (!notesPanel) return;
+    notesPanel.hidden = !notesPanel.hidden;
+    const tn = document.getElementById('toggle-notes');
+    if (tn) tn.setAttribute('aria-pressed', String(!notesPanel.hidden));
+  };
+  const tnBtn = document.getElementById('toggle-notes');
+  if (tnBtn) tnBtn.addEventListener('click', toggleNotes);
+
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen?.();
+  };
+  const fsBtn = document.getElementById('fullscreen');
+  if (fsBtn) fsBtn.addEventListener('click', toggleFullscreen);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    const onButton = e.target instanceof HTMLElement && e.target.closest('button');
+    switch (e.key) {
+      case 'ArrowRight': case 'ArrowDown': case 'PageDown': e.preventDefault(); next(); break;
+      case ' ': if (onButton) return; e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': e.preventDefault(); prev(); break;
+      case 'Home': e.preventDefault(); go(0, 'none'); break;
+      case 'End': e.preventDefault(); go(slides.length - 1, 'all'); break;
+      case 'n': case 'N': toggleNotes(); break;
+      case 'f': case 'F': toggleFullscreen(); break;
+      default:
+    }
+  });
+
+  // Vuốt trên màn hình cảm ứng
+  let touchX = null;
+  document.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') touchX = e.clientX; });
+  document.addEventListener('pointerup', (e) => {
+    if (touchX === null) return;
+    const dx = e.clientX - touchX;
+    touchX = null;
+    if (Math.abs(dx) > 60) (dx < 0 ? next : prev)();
+  });
+
+  window.addEventListener('hashchange', () => {
+    const n = Number(location.hash.slice(1));
+    if (n >= 1 && n <= slides.length && n - 1 !== index) go(n - 1, 'all');
+  });
+
+  // ── Mở đúng slide theo #số ──
+  const start = Number(location.hash.slice(1));
+  go(start >= 1 && start <= slides.length ? start - 1 : 0, 'none');
+})();
+
+</script>
+</body>
+</html>

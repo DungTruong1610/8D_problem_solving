@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Nhật Ký Phát Triển (Build Log) — 8D Copilot</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 6mm 10mm 6mm 10mm;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1a1a1a;
+    line-height: 1.25;
+    font-size: 8.2pt;
+    background: #fff;
+    padding: 0;
+  }
+  .header {
+    border-bottom: 2px solid #0f4c81;
+    padding-bottom: 2px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .header h1 {
+    font-size: 11.8pt;
+    font-weight: 700;
+    color: #0f4c81;
+    letter-spacing: -0.2px;
+    text-transform: uppercase;
+  }
+  .header .meta {
+    font-size: 7.6pt;
+    color: #444;
+    text-align: right;
+    line-height: 1.15;
+  }
+  .section {
+    margin-bottom: 4px;
+  }
+  .section-title {
+    font-size: 8.7pt;
+    font-weight: 700;
+    color: #0f4c81;
+    border-left: 3px solid #0f4c81;
+    padding-left: 5px;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+  }
+  ul {
+    list-style-type: disc;
+    padding-left: 14px;
+    margin: 0;
+  }
+  li {
+    margin-bottom: 1.5px;
+  }
+  li:last-child {
+    margin-bottom: 0;
+  }
+  strong {
+    color: #111;
+  }
+  code {
+    font-family: Consolas, Monaco, monospace;
+    font-size: 7.7pt;
+    background: #f1f5f9;
+    padding: 1px 3px;
+    border-radius: 2px;
+    color: #0f172a;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Nhật Ký Phát Triển (Build Log)</h1>
+    <div style="font-size: 8.2pt; color: #222; margin-top: 1px;"><strong>Hệ thống:</strong> 8D Copilot — Trợ lý Giám sát & Điều phối Quy trình Sự cố Chất lượng</div>
+  </div>
+  <div class="meta">
+    <strong>Đội thi:</strong> UIT_4Lovpe | <strong>Đề bài:</strong> OrganizationAI
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">1. Công cụ AI sử dụng & Phương thức áp dụng</div>
+  <ul>
+    <li><strong>Công cụ phát triển:</strong> Sử dụng Claude 5.5 Opus và GPT 6.1 Sol để tái cấu trúc mã nguồn, thiết kế khung dịch vụ Backend theo chuẩn SAP Cloud Application Programming Model (CAP), sinh các bộ xử lý OData/REST và xây dựng hơn 40 tệp kiểm thử tự động (<code>__tests__/</code>) bao phủ toàn bộ logic D1–D8.</li>
+    <li><strong>Lõi vận hành hệ thống:</strong> DeepSeek-V4.1 Flash là mô hình suy luận chính, chịu trách nhiệm trích xuất thông số đo kiểm thực tế, suy luận logic 8 bước (D1–D8), dựng cây 6M Ishikawa và chuỗi 5-Why. Kết hợp Jina Embeddings v3 vector hóa triệu chứng lỗi truy xuất tiền lệ lịch sử và Gemini 2.0 Flash dự phòng khi gặp sự cố mạng.</li>
+    <li><strong>Phương thức cốt lõi:</strong> (1) <em>In-Context Learning có ràng buộc:</em> Kiểm soát chặt chẽ bằng JSON Schema (schema dictionary) ràng buộc Master Data thực tế (vật tư <code>MAT-10247</code>, máy <code>WC-MILL-07</code>, danh bạ nhân sự). (2) <em>Hybrid RAG & AI Referee:</em> Kết hợp vector cosine và lọc 6M. AI thực hiện <strong>Chẩn đoán mù (Blind Diagnosis)</strong> theo nguyên lý vật lý (First-Principles) để đối chứng và phản biện thiên kiến con người.</li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-title">2. Quá trình phát triển nâng cấp GraphAI và luồng điều phối suy luận (AI Flow)</div>
+  <ul>
+    <li><strong>Luồng điều phối tuần tự 4 chặng:</strong> (1) Tiếp nhận dữ liệu kiểm tra chất lượng và bóc tách thông số kỹ thuật; (2) Chẩn đoán mù dựng cây 6M Ishikawa theo nguyên lý vật lý hoàn toàn độc lập với ghi chú cảm tính của con người; (3) Kích hoạt GraphAI truy hồi tiền lệ tương đồng từ kho tri thức lịch sử; (4) Tổng hợp đề xuất biện pháp khoanh vùng (D3), khắc phục triệt để (D5) và cập nhật phòng ngừa FMEA (D7).</li>
+    <li><strong>Mô hình liên kết thực thể GraphAI:</strong> Xây dựng đồ thị quan hệ đa chiều ánh xạ giữa Mã vật tư, Tổ máy gia công, Mã lỗi, Thông số đo kiểm thực tế và Hồ sơ tiền lệ lịch sử nhằm phân tích chính xác mối tương quan giữa hiện tượng lỗi và điều kiện vận hành.</li>
+    <li><strong>Cơ chế Re-ranking đa tầng:</strong> Kết hợp tính toán độ tương đồng vector Cosine với trọng số phân loại thuộc tính 6M và độ lệch dung sai thực tế, giúp xếp hạng chính xác các ca sự cố tương đồng nhất mà không phụ thuộc vào từ khóa đơn thuần.</li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-title">3. Hiệu quả thực tế & Cải tiến sản phẩm từ phản hồi người dùng</div>
+  <ul>
+    <li><strong>Rút ngắn 85–90% thời gian:</strong> Giảm thời gian điều tra và lập hồ sơ sơ bộ từ 2–4 giờ thủ công xuống <strong>15–30 giây</strong>, hỗ trợ kích hoạt biện pháp khoanh vùng (D3) ngay trong ca sản xuất.</li>
+    <li><strong>Xử lý xuất sắc dữ liệu thô bị bẩn (<code>mock-data/dirty/</code>):</strong> Tự động chuẩn hóa số đo, dung sai, đơn vị từ các thông báo lỗi SAP QM tiếng Đức viết tắt mà regex truyền thống không thể xử lý.</li>
+    <li><strong>Phản biện định kiến con người (Case <code>TC-02</code>):</strong> Bác bỏ nhận định cảm tính của kỹ sư (đổ lỗi công nhân - Man) khi số liệu áp lực thủy lực đồ gá F1 chỉ ra nguyên nhân gốc là thiết bị (Machine).</li>
+    <li><strong>Cải tiến trải nghiệm người dùng từ phản hồi thực tế:</strong> Ban đầu tài liệu hướng dẫn (User Guide) dạng trang dài chứa nhiều thuật ngữ kỹ thuật chuyên sâu gây khó sử dụng và khó tiếp cận cho người dùng mới; tiếp thu phản hồi, nhóm đã tái cấu trúc User Guide thành dạng tab chuyên biệt và bổ sung tính năng <strong>Interactive Walkthrough Tour (Spotlight WalkMe)</strong> hướng dẫn tương tác trực quan 1-click qua toàn bộ luồng D1–D8 chỉ trong 2 phút.</li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-title">4. Điểm nghẽn kỹ thuật & Chi phí phát sinh ngoài dự kiến</div>
+  <ul>
+    <li><strong>Ảo giác thực thể dữ liệu gốc:</strong> LLM ban đầu tự suy diễn mã vật tư lạ và tên nhân sự ảo. Đội ngũ mất 2 ngày xây dựng bộ kiểm định <code>datasetValidator.ts</code> và seed danh bạ nhân sự thực tế của nhà máy.</li>
+    <li><strong>Độ trễ tích lũy và lỗi quá thời gian:</strong> Gọi LLM liên tục qua 8 bước mất 40–90 giây, gây lỗi timeout (10s) trên Vercel Serverless. Nhóm đã chia pipeline thành 4 chặng độc lập, bổ sung bộ nhớ đệm cache reranker (<code>8311bf4</code>) và kích hoạt theo thao tác người dùng.</li>
+    <li><strong>Phân mảnh nhà cung cấp dịch vụ:</strong> DeepSeek thiếu endpoint embedding native, buộc tích hợp thêm Jina API, làm tăng độ phức tạp trong quản lý khóa xác thực, xử lý lỗi mạng kép và cân bằng hạn mức truy cập.</li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-title">5. Quyết định cắt giảm tính năng & Lý do đánh đổi thiết kế</div>
+  <ul>
+    <li><strong>Cắt giảm Cụm Đồ thị Độc lập (Neo4j / pgvector) chuyển sang In-Process SQLite Graph + Vector Search:</strong><br>
+      <em>Lý do:</em> Cụm Neo4j/pgvector tiêu tốn trên 2GB RAM, dễ làm sập môi trường Cloud (Render/Vercel) trong thời gian chấm thi. Chuyển sang SQLite in-process kết hợp vector hóa nội bộ giúp hệ thống khởi động tức thì, độ trễ truy vấn giảm xuống <strong>dưới 200ms</strong>, đáp ứng 100% mục tiêu nghiệp vụ với chi phí vận hành bằng 0.
+    </li>
+    <li><strong>Cắt giảm cơ chế Tự động phê duyệt & Đóng ca (Full Auto-Approval):</strong><br>
+      <em>Lý do:</em> Tuân thủ nghiêm ngặt tiêu chuẩn an toàn công nghiệp ô tô (IATF 16949 / VDA 6.3) và tiêu chí <em>Human-in-the-loop</em>. Quyết định cách ly lô hàng (D3) hay nghiệm thu giải pháp (D6/D8) bắt buộc phải do Kỹ sư trưởng ký duyệt. Hệ thống đã đưa vào các điểm dừng bắt buộc (Stop Conditions) và nhật ký kiểm toán (Audit Trail), định vị AI thuần túy ở vai trò Trợ lý (Copilot) & Trọng tài phản biện (Referee).
+    </li>
+  </ul>
+</div>
+
+</body>
+</html>
