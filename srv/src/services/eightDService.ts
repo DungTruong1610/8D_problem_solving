@@ -17,7 +17,8 @@
  *      có cách nào bọc pipeline dài trong transaction mà vẫn giữ app phản hồi.
  *
  * Nên: handler tạo bản ghi rồi trả về ngay, còn pipeline chạy ở nền bằng
- * `cds.spawn`. Client theo dõi qua trường `status` của Reports.
+ * `runDetached` — không có transaction bao quanh, mỗi bước commit riêng. Client
+ * theo dõi qua trường `status` của Reports và thấy từng bước ngay khi nó xong.
  *
  * ── Vì sao hâm nóng cache cấu hình AI trước khi spawn ──
  * `llmClient` đọc cấu hình model chung từ DB ở mỗi lời gọi. Nếu lần đọc đó rơi
@@ -104,25 +105,45 @@ function isFlatCasePayload(raw: any): boolean {
 }
 
 /**
+ * Chạy một job nền SAU khi handler đã trả về, không có transaction bao quanh.
+ *
+ * ── Vì sao không dùng `cds.spawn` ──
+ * `cds.spawn` dựng ĐÚNG MỘT transaction cho cả job và chỉ commit khi job xong.
+ * Job phân tích đọc DB ngay từ đầu (lô kiểm tra, FMEA, tiền lệ), nên transaction
+ * đó chiếm connection SQLite duy nhất suốt 1-3 phút. Request GET của trang report
+ * xếp hàng sau nó: trang đứng ở "Loading report…" rồi tám bước hiện ra cùng lúc,
+ * và mọi bước "đã lưu" thật ra chưa commit.
+ *
+ * Ở đây `cds.context` bị xoá, nên mỗi câu lệnh DB trong job là một transaction
+ * tự commit, và chỗ nào cần ghi nhiều câu cùng nhau thì tự mở `cds.tx` ngắn.
+ * Connection được nhả giữa các câu, nên trang report đọc được từng bước ngay khi
+ * nó được lưu. `cds.tx` an toàn ở đây vì job không giữ transaction nào khác —
+ * đúng điều kiện mà cảnh báo đầu `eightDRepository.ts` đòi hỏi.
+ */
+function runDetached(job: () => Promise<void>): void {
+    setImmediate(() => {
+        cds.context = undefined;
+        job().catch((e) => LOG.error('Job nền dừng ngoài dự kiến:', e));
+    });
+}
+
+/**
  * Chạy pipeline ở nền rồi ghi kết quả.
  *
- * `cds.spawn` cấp cho job một transaction tách rời, chạy sau khi handler đã trả
- * về. Nhờ vậy transaction của request đóng lại và nhả connection SQLite trước
- * khi lời gọi AI bắt đầu.
+ * Mỗi bước được lưu trong transaction riêng ngay khi xong, nên UI hiện D1 trước
+ * rồi các bước sau lần lượt hiện ra (xem `runDetached`).
  *
  * Không ném lỗi ra ngoài: không còn ai đứng đó mà nhận. Lỗi được ghi vào bản ghi
  * để người dùng đọc được ở UI.
  */
 function runInBackground(reportID: string, payload: string): void {
-    // Tham số đầu là options của job nền; `{}` nghĩa là chạy một lần, ngay lập
-    // tức. `cds.spawn` dựng một root transaction tách rời cho mỗi lượt chạy.
-    cds.spawn({}, async () => {
+    runDetached(async () => {
         try {
             let savedContext = false;
             let dbQueue = Promise.resolve();
 
             const outcome = await analyze(payload, async (stepOutcome) => {
-                await (dbQueue = dbQueue.then(async () => {
+                await (dbQueue = dbQueue.then(() => cds.tx(async () => {
                     if (!savedContext) {
                         await saveReportContext(
                             reportID,
@@ -130,12 +151,13 @@ function runInBackground(reportID: string, payload: string): void {
                             stepOutcome.independent,
                             stepOutcome.precedents,
                         );
-                        savedContext = true;
                     }
                     await savePartialDiscipline(reportID, {
                         discipline: stepOutcome.discipline,
                         runtime: stepOutcome.runtimeInfo,
                     });
+                })).then(() => {
+                    savedContext = true;
                     LOG.info(`Report ${reportID}: step ${stepOutcome.discipline.code} đã commit.`);
                 }).catch((err) => {
                     LOG.error(`Report ${reportID}: lỗi lưu partial discipline ${stepOutcome.discipline.code}:`, err);
@@ -143,7 +165,7 @@ function runInBackground(reportID: string, payload: string): void {
             });
 
             await dbQueue;
-            await saveResult(reportID, outcome);
+            await cds.tx(() => saveResult(reportID, outcome));
 
             LOG.info(
                 `Report ${reportID} xong trong ${(outcome.durationMs / 1000).toFixed(1)}s, ` +
@@ -154,7 +176,7 @@ function runInBackground(reportID: string, payload: string): void {
             LOG.error(`Report ${reportID} thất bại:`);
             LOG.error(e?.response?.data ?? e);
             try {
-                await markFailed(reportID, describe(e));
+                await cds.tx(() => markFailed(reportID, describe(e)));
             } catch (writeErr: any) {
                 // Ghi lỗi mà cũng hỏng thì bản ghi kẹt ở `Analyzing`. Lần khởi
                 // động sau `sweepStuckAnalyzing` sẽ dọn.
@@ -173,7 +195,7 @@ function runDownstreamInBackground(
     existingDisciplines: any[],
     fromStep: string = 'D5',
 ): void {
-    cds.spawn({}, async () => {
+    runDetached(async () => {
         try {
             const fromCode = (DISCIPLINE_CODES.includes(fromStep as DisciplineCode) ? fromStep : 'D5') as DisciplineCode;
             const fromIndex = STEP_CODES.indexOf(fromCode);
@@ -185,11 +207,10 @@ function runDownstreamInBackground(
                 existingDisciplines,
                 fromCode,
                 async (stepOutcome) => {
-                    await (dbQueue = dbQueue.then(async () => {
-                        await savePartialDiscipline(reportID, {
-                            discipline: stepOutcome.discipline,
-                            runtime: stepOutcome.runtimeInfo,
-                        });
+                    await (dbQueue = dbQueue.then(() => cds.tx(() => savePartialDiscipline(reportID, {
+                        discipline: stepOutcome.discipline,
+                        runtime: stepOutcome.runtimeInfo,
+                    }))).then(() => {
                         LOG.info(`Report ${reportID}: downstream step ${stepOutcome.discipline.code} đã commit.`);
                     }).catch((err) => {
                         LOG.error(`Report ${reportID}: lỗi lưu downstream step ${stepOutcome.discipline.code}:`, err);
@@ -198,7 +219,7 @@ function runDownstreamInBackground(
             );
 
             await dbQueue;
-            await saveDownstreamResult(reportID, outcome, downstreamCodes);
+            await cds.tx(() => saveDownstreamResult(reportID, outcome, downstreamCodes));
             LOG.info(
                 `Report ${reportID} downstream (từ ${fromStep}) xong trong ${(outcome.durationMs / 1000).toFixed(1)}s, ` +
                 `${outcome.tokensUsed} token` +
@@ -207,7 +228,7 @@ function runDownstreamInBackground(
         } catch (e: any) {
             LOG.error(`Report ${reportID} reanalyzeDownstream thất bại:`, e);
             try {
-                await markFailed(reportID, describe(e));
+                await cds.tx(() => markFailed(reportID, describe(e)));
             } catch (writeErr: any) {
                 LOG.error(`Không ghi được trạng thái Failed cho ${reportID}:`, writeErr?.message);
             }
