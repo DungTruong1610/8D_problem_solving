@@ -68,7 +68,7 @@ export function PdfPreviewDialog({
                                     <span>•</span>
                                     <span>Uploaded by <strong>{file.uploadedBy || 'User'}</strong></span>
                                     <span>•</span>
-                                    <span>{file.uploadedAt ? new Date(file.uploadedAt).toLocaleString('en-GB') : '—'}</span>
+                                    <span>{file.uploadedAt ? new Date(file.uploadedAt).toLocaleString('en-GB') : '-'}</span>
                                     {file.disciplineCode && (
                                         <>
                                             <span>•</span>
@@ -212,11 +212,11 @@ export function TaskEvidenceSection({
     };
 
     return (
-        <div className="space-y-2 rounded-lg border bg-muted/10 p-3.5">
+        <div className="space-y-3 rounded-xl border bg-card p-4 shadow-sm">
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 text-base font-semibold text-foreground">
-                    <Paperclip className="h-4 w-4 text-teal-600 dark:text-teal-400" />
-                    <span>Completion Evidence</span>
+                <div className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                    <Paperclip className="h-4 w-4 text-muted-foreground" />
+                    <span>Completion evidence</span>
                 </div>
                 {taskEvidences.length > 0 && (
                     <span className="text-sm font-medium text-success">
@@ -259,7 +259,7 @@ export function TaskEvidenceSection({
                                     </div>
                                     <p className="text-sm text-muted-foreground">
                                         {formatFileSize(file.fileSize)} · by {file.uploadedBy || 'User'} ·{' '}
-                                        {file.uploadedAt ? new Date(file.uploadedAt).toLocaleString('en-GB') : '—'}
+                                        {file.uploadedAt ? new Date(file.uploadedAt).toLocaleString('en-GB') : '-'}
                                     </p>
                                 </div>
                             </div>
@@ -293,6 +293,10 @@ export function TaskEvidenceSection({
                 </div>
             )}
 
+            {readOnly && canUpload && !isLoading && taskEvidences.length === 0 && (
+                <p className="text-sm italic text-muted-foreground">No evidence uploaded for this task.</p>
+            )}
+
             {!canUpload && taskEvidences.length === 0 && (
                 <p className="text-sm italic text-muted-foreground">
                     {isActionDiscipline
@@ -303,7 +307,7 @@ export function TaskEvidenceSection({
 
             {/* Upload Box */}
             {!readOnly && canUpload && (
-                <div className="rounded-lg border border-dashed border-border/80 bg-background/50 p-4 text-center">
+                <div className="rounded-lg border border-dashed border-border bg-muted/30 p-5 text-center transition-colors hover:border-primary/40 hover:bg-primary/5">
                     <input
                         ref={fileInputRef}
                         type="file"
@@ -450,7 +454,7 @@ export function EvidenceArchivePanel({ reportID }: { reportID: string }) {
                                             <p className="text-sm text-muted-foreground">
                                                 Task: <strong className="font-medium text-foreground">{file.taskId}</strong> ·{' '}
                                                 {formatFileSize(file.fileSize)} · by {file.uploadedBy || 'User'} ·{' '}
-                                                {file.uploadedAt ? new Date(file.uploadedAt).toLocaleString('en-GB') : '—'}
+                                                {file.uploadedAt ? new Date(file.uploadedAt).toLocaleString('en-GB') : '-'}
                                             </p>
                                         </div>
                                     </div>
