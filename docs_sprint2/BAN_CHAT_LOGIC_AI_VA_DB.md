@@ -78,11 +78,11 @@ Câu trả lời của bạn: **"Không, vì chúng tôi trói AI bằng 2 chi�
 #### Chiếc vòng 2: First-Principles (Suy luận từ nguyên lý vật lý gốc)
 - **Nguyên tắc vàng:** "Chỉ tin vào số đo vật lý lệch dung sai, không tin vào lời nói mồm."
 - Ví dụ: Kỹ sư bảo *"Máy chạy bình thường, chắc do công nhân"*.  
-  $ightarrow$ AI không nghe câu đó. AI đi tìm bảng `Inspections` và `Telemetry`:
+  → AI không nghe câu đó. AI đi tìm bảng `Inspections` và `Telemetry`:
   - Bản vẽ quy định độ bavia tối đa: `0.10 mm`.
   - Thước cặp đo thực tế: `0.26 mm`.
   - Lực kẹp dao: tụt từ `12 bar` xuống `9.5 bar`.
-  $ightarrow$ AI kết luận: Mòn dao và tụt áp gá kẹp (nhánh Machine), dựa trên độ lệch dung sai `+0.16 mm` và `-2.5 bar`.
+  → AI kết luận: Mòn dao và tụt áp gá kẹp (nhánh Machine), dựa trên độ lệch dung sai `+0.16 mm` và `-2.5 bar`.
 
 ### 2.2. Luồng chạy 4 chặng (Execution Pipeline) ngoài đời thực
 
