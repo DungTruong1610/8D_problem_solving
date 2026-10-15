@@ -17,6 +17,7 @@
     "db:down": "docker compose down",
     "deploy:graph": "cds deploy --to hana --profile graph --for graph",
     "seed:graph": "cds bind --exec --profile graph -- node --import ./node_modules/tsx/dist/loader.mjs scripts/seed-graph-library.mjs",
+    "predev": "npm run bundle:library",
     "dev": "concurrently -k -p \"[{name}]\" -c \"cyan.bold,magenta.bold\" -n \"BE,FE\" \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:local": "concurrently -k -p \"[{name}]\" -c \"cyan.bold,magenta.bold\" -n \"BE,FE\" \"npm run dev:backend:local\" \"npm run dev:frontend\"",
     "dev:pg": "concurrently -k -p \"[{name}]\" -c \"cyan.bold,magenta.bold\" -n \"BE,FE\" \"npm run dev:backend:pg\" \"npm run dev:frontend\"",
