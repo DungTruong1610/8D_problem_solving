@@ -1,48 +1,59 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$testCaseId": "TC-04",
-  "$title": "New Chassis Frame Welding Defect (Safe Escalation & Precedent Refusal)",
+  "$title": "Wire Harness Crimp Defect (Safe Escalation & Precedent Refusal)",
   "$category": "Quadrant 4 — Safe Refusal & Escalation",
   "$expectedOutcome": {
     "status": "PASS",
     "precedentFound": false,
-    "maxSimilarityScore": 0.31,
-    "refusalDecision": "No matching precedents in current library (Score < 0.60)",
+    "refusalDecision": "No closed case in the library shares the work centre, part, defect code or failure description, so D4 cites no precedent",
     "escalated": true,
-    "escalationTarget": "Welding SME / Quality Director",
-    "specificInquiryGenerated": "Specific technical questions regarding welding arc current, shielding gas flow, and pre-heat temperatures"
+    "escalationTarget": "Wire harness / crimping SME",
+    "specificInquiryGenerated": "Specific technical questions regarding crimp die wear, applicator height setting and wire strip length"
   },
   "notificationId": "8D-10049003",
   "origin": "Q3 - Internal Defect",
-  "symptomShortText": "Laser welding porosity on machined housing cover flange",
+  "symptomShortText": "Terminal pullout on WH-22 harness - undercrimped barrel on conductor strands",
   "status": "In Process",
-  "foundDate": "2026-08-12",
+  "foundDate": "2026-10-10",
   "completionDate": null,
-  "quantityExtent": "4 units scrapped",
+  "quantityExtent": "240 harnesses on hold",
   "teamSize": null,
   "material": {
-    "materialId": "MAT-10247",
-    "description": "Housing Cover Machined",
-    "materialGroup": "MG-CASTING"
+    "materialId": "MAT-13310",
+    "description": "Wire Harness WH-22",
+    "materialGroup": "MG-HARNESS"
   },
   "batch": {
-    "batchId": "B-49172",
-    "materialId": "MAT-10247"
+    "batchId": "B-61204",
+    "materialId": "MAT-13310"
   },
   "defect": {
-    "defectCode": "DEF-0910",
-    "defectCodeGroup": "QM-MAT",
-    "defectText": "Internal porosity in robotic fiber laser welded lap joint"
+    "defectCode": "DEF-2210",
+    "defectCodeGroup": "QM-ELE",
+    "defectText": "Undercrimped terminal barrel"
   },
   "workCenter": {
-    "workCenterId": "WC-MILL-07",
-    "description": "CNC 5-Axis Milling Cell 07"
+    "workCenterId": "WC-CRIMP-03",
+    "description": "Wire Harness Crimping Cell 3"
   },
   "inspections": [
     {
-      "characteristic": "Weld penetration depth",
-      "measuredValue": "2.1mm",
-      "specValue": "min 3.5mm"
+      "characteristic": "Crimp height",
+      "measuredValue": "1.52mm",
+      "specLowerLimit": 1.60,
+      "specUpperLimit": 1.70,
+      "specUom": "mm",
+      "valuation": "Rejected",
+      "specValue": "1.60-1.70mm"
+    },
+    {
+      "characteristic": "Terminal pull-out force",
+      "measuredValue": "41N",
+      "specLowerLimit": 60,
+      "specUom": "N",
+      "valuation": "Rejected",
+      "specValue": "min 60N"
     }
   ],
   "causesIshikawa": [],

@@ -11,7 +11,7 @@
     "contestedReason": "Zero metrics on Man claim + mechanical drift 0.9mm vs 0.2mm on tool changer + multi-shift occurrence",
     "humanOverrideRequired": true
   },
-  "notificationId": "8D-10048880",
+  "notificationId": "8D-10049004",
   "origin": "Q3 - Internal Defect",
   "symptomShortText": "Bracket housing pocket depth varying unit to unit",
   "status": "Completed",
