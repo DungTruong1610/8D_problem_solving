@@ -14,7 +14,7 @@ Hệ thống quản lý sự cố chất lượng và tự động hóa quy trì
 | 🌐 **Trải nghiệm trực tuyến (Live Web)** | 👉 **[https://8-d-problem-solving.vercel.app](https://8-d-problem-solving.vercel.app)** | Vận hành thật 100% trên Vercel, không cần tài khoản, không cần cài đặt |
 | 🎬 **Video Demo sản phẩm (3 phút)** | 👉 **[Xem Video Demo tại đây](https://drive.google.com/drive/folders/1EMNPvJtuusw9Dh1NjabfNLnO5E_v8n-h)** | Video demo web |
 | 📦 **Kho mã nguồn (GitHub Repo)** | 👉 **[DungTruong1610/8D_problem_solving](https://github.com/DungTruong1610/8D_problem_solving)** | Nhánh `main`, đầy đủ commit history minh bạch |
-| 📊 **Slide thuyết trình** | 👉 **[Slide](https://drive.google.com/file/d/1L1WfLCbpMJxRpsIr45puTv2WzfOvzjfL/view?usp=sharing)** | Slide chuẩn format BTC |
+| 📊 **Slide thuyết trình** | 👉 **[Slide](https://drive.google.com/file/d/1MnYTZFrnOwkrmN3ThGfhsBjA8gm-xlBP/view?usp=sharing)** | Slide chuẩn format BTC |
 | 🧪 **Bộ 25 Testcase mẫu (Golden Dataset)** | 👉 **[Xem chi tiết 25 Testcase bên dưới](#-danh-mục-25-test-case-mẫu-golden-dataset--benchmark-suites)** | Thư mục `mock-data/clean` & `mock-data/dirty`, nạp sẵn trên Web |
 | 📝 **Nhật ký phát triển (Build Log)** | 👉 **[Nhật Ký Phát Triển (Build Log) — 8D Copilot.pdf](<Nhật Ký Phát Triển (Build Log) — 8D Copilot.pdf>)** | Độ dài 1 trang chuẩn yêu cầu BTC (Mục 3.f), chi tiết công cụ AI & cắt giảm tính năng |
 
