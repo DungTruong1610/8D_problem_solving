@@ -270,6 +270,40 @@ Bộ dữ liệu gồm 2 cặp đối chứng $1:1$ (tổng cộng 50 file JSON)
    - Thư mục dữ liệu thô SAP QM: [`mock-data/dirty/`](mock-data/dirty/) (25 ca tương ứng từ `case-8D-90048412.json` đến `case-8D-90049120.json`).
    - Tài liệu giải trình kỹ thuật bộ dữ liệu: [`mock-data/README.md`](mock-data/README.md).
 
+3. **Chạy kiểm thử 4 Test Case trọng tâm (Automated Test Harness & Web Evaluation Dashboard)**:
+   Bộ 4 Test Case đại diện cho 4 góc phần tư kiểm thử khắt khe (Happy path, Messy real-world data, Confirmation bias, Safe refusal & escalation).
+
+   - **Cách A: Chạy 1-Click trên Web UI (Tab `User & Judge Guide` ➔ `4. Evaluation` - Khuyên dùng cho BGK)**:
+     1. Mở web: `http://localhost:5544` (hoặc [Live Web](https://8-d-problem-solving.vercel.app)).
+     2. Vào menu bên trái chọn **`User & Judge Guide`** $\rightarrow$ chọn tab **`4. Evaluation`**.
+     3. Bấm nút xanh **`▶ Run verification`** ở góc trên bên phải: Hệ thống tự động kích hoạt Test Harness chạy ngầm toàn bộ 4 Test Case và hiển thị kết quả `PASS` kèm thời gian xử lý (dưới 5 giây).
+     4. Bấm **`Summary`** ở từng dòng để xem popup bằng chứng kỹ thuật, hoặc **`Open case ➔`** để nhảy thẳng tới hồ sơ 8D tương ứng.
+     5. Thử nghiệm **`Judge sandbox`** (khung bên dưới): Bấm 3 nút mẫu `[Valid defect]` (lỗi hợp lệ), `[Out of domain]` (lỗi ngoài phạm vi), `[Junk invoice]` (hóa đơn rác bị từ chối an toàn), hoặc dán bất kỳ file JSON nào để AI đánh giá trực tiếp.
+
+   - **Cách B: Chạy tự động qua Command Line (CLI Automated Test Harness)**:
+     Tại thư mục gốc dự án, chạy lệnh:
+     ```bash
+     npm run verify:sprint1
+     ```
+     *(hoặc: `npx tsx scripts/verify-sprint1-harness.ts` — toàn bộ 4 Test Case được đối soát và in bảng kết quả Pass/Fail trong dưới 5 giây).*
+
+     *Kiểm thử với file dữ liệu JSON riêng của Giám khảo qua CLI:*
+     ```bash
+     npm run verify:sprint1 -- --judge-input <đường-dẫn-file-json-của-BGK>
+     ```
+
+   ---
+
+   #### 🎯 Bảng tóm tắt 4 Trường hợp kiểm thử mẫu (Chuẩn tiêu chí đánh giá BTC):
+
+   | Mã TC & Kịch bản | Dữ liệu đầu vào (Input Data) | Hành vi kỳ vọng (Expected Behavior) | Cách thực thi (Execution Method) |
+   | :--- | :--- | :--- | :--- |
+   | **TC-01: Milling burr defect**<br>• *Góc 1: Happy path*<br>• *Mã ca: `8D-10049001`* | • Tổ máy: `WC-MILL-07` (CNC Line 7)<br>• Vật tư: Nhôm `MAT-10247`<br>• Mã lỗi: `DEF-0489` (Bavia mép)<br>• Số đo: `0.26mm` (Max `0.10mm`)<br>• Dữ liệu sạch chuẩn SAP QM | • Đồ thị GraphAI quét trúng tiền lệ gốc `8D-10048412`<br>• Tự động hoàn thành chuỗi D1 $\rightarrow$ D8, suy luận nguyên nhân gốc do mòn dao phay (`Machine`)<br>• Không có cổng dừng nào bị chặn (`no blocking stop`), ca đủ điều kiện nghiệm thu | **Web UI:** Vào `User & Judge Guide` $\rightarrow$ Tab `4. Evaluation` $\rightarrow$ Bấm `▶ Run verification`<br><br>**CLI:** `npm run verify:sprint1` |
+   | **TC-02: Dirty SAP QM export**<br>• *Góc 2: Messy real-world data*<br>• *Mã ca: `8D-90048412`* | • Mã vật tư bị chèn khoảng trắng rác: `"  MAT-10247 "`<br>• Số đo viết tự do tiếng Đức: `"Flange burr height: gemessen 0,32mm, Sollwert max 0,10mm"`<br>• Bị thiếu một số trường quy trình | • Không bị crash/lỗi runtime<br>• Tự làm sạch mã vật tư về `'MAT-10247'`, bóc tách số đo thực `0.32` từ chuỗi text tự do<br>• Báo cáo khoảng trống dữ liệu (`data gaps`)<br>• **Kích hoạt cổng dừng D4** (`unverified-facts`), khóa ca chờ QE xác nhận số đo | **Web UI:** Vào `User & Judge Guide` $\rightarrow$ Tab `4. Evaluation` $\rightarrow$ Bấm `▶ Run verification`<br><br>**CLI:** `npm run verify:sprint1` |
+   | **TC-03: Pocket depth deviation**<br>• *Góc 3: Confirmation bias*<br>• *Mã ca: `8D-10049004`* | • Kỹ sư kết luận đổ lỗi: Công nhân ca C gá ẩu (`Man`, `isRootCause = 'Y'`) không có số liệu chứng minh<br>• Cảm biến đo thực tế: Độ rơ trục kẹp dao là `0.9mm` (Dung sai max `0.2mm`) | • AI kích hoạt **Chẩn đoán mù (Blind Diagnosis)**: Cắt bỏ lời khai kỹ sư, chỉ đọc số đo vật lý `0.9mm`<br>• AI kết luận nguyên nhân gốc do Thiết bị (`Machine`)<br>• **AI Referee tuýt còi khóa cổng dừng D4** (`unverified-facts`), bảo vệ công nhân khỏi bị kỷ luật oan | **Web UI:** Vào `User & Judge Guide` $\rightarrow$ Tab `4. Evaluation` $\rightarrow$ Bấm `▶ Run verification`<br><br>**CLI:** `npm run verify:sprint1` |
+   | **TC-04: Crimp defect on a new harness line**<br>• *Góc 4: Safe refusal & escalation*<br>• *Mã ca: `8D-10049003`* | • Sự cố bấm cos dây điện phát sinh trên dây chuyền hoàn toàn mới (`WC-HARNESS-01`, phôi `MAT-WIRE-01`)<br>• Toàn bộ kho tiền lệ chưa từng có dữ liệu về tổ máy hay mã lỗi này | • AI quét đồ thị và xác nhận không có tiền lệ (`precedentFound = false`)<br>• **Hành vi từ chối an toàn:** AI từ chối suy đoán bậy, không trích dẫn tiền lệ sai lệch<br>• **Kích hoạt cổng dừng leo thang D4** (`outside-scope`), tạo 3 câu hỏi kỹ thuật chuyển giao cho chuyên gia con người | **Web UI:** Vào `User & Judge Guide` $\rightarrow$ Tab `4. Evaluation` $\rightarrow$ Bấm `▶ Run verification`<br><br>**CLI:** `npm run verify:sprint1` |
+
+
 
 
 ---
