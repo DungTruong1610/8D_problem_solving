@@ -90,6 +90,8 @@ export function MaintenancePanel({ report, discipline }: { report: Report8D; dis
             setRefusal(plan.refusal);
             if (!plan.refusal) toast.success(`Generated ${plan.proposals.length} proposal${plan.proposals.length === 1 ? '' : 's'}`);
             void queryClient.invalidateQueries({ queryKey: ['8d'] });
+            // Tạo lại thay nội dung của cả đề xuất đã duyệt — lịch sử đọc từ đó.
+            void queryClient.invalidateQueries({ queryKey: ['maintenance-history'] });
         },
         onError: (e) => toast.error(`Could not generate proposals: ${errorText(e)}`),
     });
