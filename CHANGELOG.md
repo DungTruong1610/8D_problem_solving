@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 ### Added
-- Preventive maintenance proposal on D7 (panel "Đề xuất bảo trì phòng ngừa").
+- Preventive maintenance proposal on D7 (panel "Preventive Maintenance Proposals", English UI).
   - Rule-based, in `srv/src/domain/eightd/maintenance/`. Input is the approved D4 root cause plus closed cases with the same defect code and work center.
   - The marked 6M category picks the control type: maintenance, calibration, error-proofing, work instruction, incoming inspection or condition monitoring.
   - An interval or limit is only taken from measured text. If none is found, the interval is left empty and an `unverified-facts` stop is raised.

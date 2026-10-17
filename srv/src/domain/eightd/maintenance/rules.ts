@@ -56,13 +56,13 @@ export const CATEGORY_CONTROL: Record<Category, ControlType> = {
 const NEEDS_INTERVAL = new Set<ControlType>(['preventive-maintenance', 'calibration', 'condition-monitoring']);
 
 const CONTROL_LABEL: Record<ControlType, string> = {
-    'preventive-maintenance': 'Bảo trì phòng ngừa / giới hạn tuổi thọ dụng cụ',
-    calibration: 'Hiệu chuẩn thiết bị đo',
-    'error-proofing': 'Chống sai (poka-yoke)',
-    'work-instruction': 'Sửa hướng dẫn công việc',
-    'incoming-inspection': 'Kiểm tra đầu vào / hành động với nhà cung cấp',
-    'condition-monitoring': 'Giám sát điều kiện môi trường',
-    'inspection-frequency': 'Tăng tần suất kiểm tra',
+    'preventive-maintenance': 'Preventive maintenance / tool-life limit',
+    calibration: 'Calibrate the measuring equipment',
+    'error-proofing': 'Error-proofing (poka-yoke)',
+    'work-instruction': 'Revise the work instruction',
+    'incoming-inspection': 'Incoming inspection / supplier action',
+    'condition-monitoring': 'Monitor environmental conditions',
+    'inspection-frequency': 'Increase inspection frequency',
 };
 
 /**
@@ -179,8 +179,8 @@ export function classifyControl(rootCause: RootCauseInput): ControlClassificatio
         return {
             controllable: false, category: rootCause.category, controlType: null, whyStepUsed: null, whyText: null,
             reason: rootCause.whyChain.length
-                ? 'Mọi câu trong chuỗi 5-Why đều chỉ ra nguyên nhân ngoài tầm kiểm soát của nhà máy.'
-                : 'Chuỗi 5-Why trống — không có nguyên nhân kiểm soát được để dựa vào.',
+                ? 'Every answer in the 5-Why chain points to a cause outside what the plant controls.'
+                : 'The 5-Why chain is empty - there is no controllable cause to build on.',
         };
     }
     const deepest = controllable[controllable.length - 1];
@@ -192,7 +192,7 @@ export function classifyControl(rootCause: RootCauseInput): ControlClassificatio
                 return {
                     controllable: true, category: hit[0], controlType: CATEGORY_CONTROL[hit[0]],
                     whyStepUsed: w.step, whyText: w.answer,
-                    reason: `Bề mặt là Man; why #${w.step} chỉ ra nguyên nhân hệ thống nhóm ${hit[0]}.`,
+                    reason: `Surface cause is Man; why #${w.step} points to a ${hit[0]} system cause.`,
                 };
             }
         }
@@ -201,13 +201,13 @@ export function classifyControl(rootCause: RootCauseInput): ControlClassificatio
     if (!rootCause.category) {
         return {
             controllable: true, category: null, controlType: null, whyStepUsed: deepest.step, whyText: deepest.answer,
-            reason: 'D4 chưa đánh dấu nhóm nguyên nhân gốc (Ishikawa Y).',
+            reason: 'D4 has no 6M category marked as the root cause (Ishikawa Y).',
         };
     }
     return {
         controllable: true, category: rootCause.category, controlType: CATEGORY_CONTROL[rootCause.category],
         whyStepUsed: deepest.step, whyText: deepest.answer,
-        reason: `Nhóm ${rootCause.category} được đánh dấu là nguyên nhân gốc; dùng why sâu nhất #${deepest.step}.`,
+        reason: `${rootCause.category} is marked as the root cause; using the deepest why #${deepest.step}.`,
     };
 }
 
@@ -404,7 +404,7 @@ export function buildMaintenancePlan(input: PlanInput, now = new Date().toISOStr
     };
 
     if (!input.d4Approved) {
-        return { ...base, refusal: 'D4 chưa được duyệt — chỉ đề xuất trên nguyên nhân gốc đã có người duyệt.' };
+        return { ...base, refusal: 'D4 is not approved yet - proposals are only made on a root cause a person has approved.' };
     }
 
     const rootCause = normalizeRootCause(input.d4Result, input.recordedRootCauseCategory);
@@ -417,7 +417,7 @@ export function buildMaintenancePlan(input: PlanInput, now = new Date().toISOStr
             proposals: [{
                 id: 'inspection-frequency:0',
                 controlType: 'inspection-frequency',
-                task: `${CONTROL_LABEL['inspection-frequency']} cho loại lỗi này cho tới khi có người xác định được nguyên nhân nhà máy kiểm soát được.`,
+                task: `${CONTROL_LABEL['inspection-frequency']} for this defect type until someone identifies a cause the plant controls.`,
                 interval: null,
                 owner: null,
                 rootCauseCategory: rootCause.category,
@@ -427,7 +427,7 @@ export function buildMaintenancePlan(input: PlanInput, now = new Date().toISOStr
             }],
             stops: [planStop('outside-scope', 'maintenance-no-controllable-cause', {
                 reason: cls.reason,
-                questionForHuman: 'Nguyên nhân này có thật sự nằm ngoài tầm kiểm soát? Nếu không, cần bổ sung câu why chỉ ra nguyên nhân nhà máy kiểm soát được.',
+                questionForHuman: 'Is this cause really outside what the plant controls? If not, add a why that points to a cause the plant controls.',
                 requiredRole: 'Quality Manager',
                 facts: rootCause.whyChain.map((w) => `why #${w.step}: ${w.answer}`),
             })],
@@ -439,7 +439,7 @@ export function buildMaintenancePlan(input: PlanInput, now = new Date().toISOStr
             ...base,
             stops: [planStop('unverified-facts', 'maintenance-no-root-category', {
                 reason: cls.reason,
-                questionForHuman: 'Nhóm 6M nào là nguyên nhân gốc? Đánh dấu trên Ishikawa của D4 rồi tạo lại đề xuất.',
+                questionForHuman: 'Which 6M category is the root cause? Mark it on the D4 Ishikawa, then regenerate the proposals.',
                 requiredRole: 'Quality Engineer',
                 facts: rootCause.statement ? [rootCause.statement] : [],
             })],
@@ -458,7 +458,7 @@ export function buildMaintenancePlan(input: PlanInput, now = new Date().toISOStr
     const drafts: Omit<MaintenanceProposal, 'status' | 'owner' | 'rootCauseCategory' | 'whyStepUsed' | 'sourceCaseIds'>[] = [{
         id: `${cls.controlType}:${cls.whyStepUsed ?? 0}`,
         controlType: cls.controlType,
-        task: `${CONTROL_LABEL[cls.controlType]} — xử lý nguyên nhân: ${cls.whyText}`,
+        task: `${CONTROL_LABEL[cls.controlType]} - addresses: ${cls.whyText}`,
         interval: NEEDS_INTERVAL.has(cls.controlType) ? extractInterval(evidence) : null,
     }];
     if (cls.controlType === 'error-proofing') {
@@ -466,7 +466,7 @@ export function buildMaintenancePlan(input: PlanInput, now = new Date().toISOStr
         drafts.push({
             id: `preventive-maintenance:poka-yoke:${cls.whyStepUsed ?? 0}`,
             controlType: 'preventive-maintenance',
-            task: 'Thêm mục vào checklist bảo trì: kiểm tra thiết bị chống sai (poka-yoke) còn hoạt động.',
+            task: 'Add a maintenance checklist item: verify the error-proofing (poka-yoke) device still works.',
             interval: extractInterval(evidence),
         });
     }
@@ -483,8 +483,8 @@ export function buildMaintenancePlan(input: PlanInput, now = new Date().toISOStr
     const stops = proposals
         .filter((p) => !p.interval && (NEEDS_INTERVAL.has(p.controlType)))
         .map((p) => planStop('unverified-facts', `maintenance-interval-missing:${p.id}`, {
-            reason: `Bằng chứng không có số đo chu kỳ / ngưỡng cho "${CONTROL_LABEL[p.controlType]}".`,
-            questionForHuman: 'Chu kỳ hoặc ngưỡng là bao nhiêu? Cần người nhập từ số đo thật — hệ thống không tự đặt số.',
+            reason: `The evidence has no measured interval or limit for "${CONTROL_LABEL[p.controlType]}".`,
+            questionForHuman: 'What is the interval or limit? A person must enter it from a real measurement - the system does not set numbers.',
             requiredRole: 'Maintenance Engineer',
             facts: evidence.filter(Boolean).slice(0, 5),
         }));
