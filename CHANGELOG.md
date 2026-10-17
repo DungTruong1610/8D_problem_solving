@@ -3,6 +3,18 @@
 ## [Unreleased]
 
 ### Added
+- Preventive maintenance proposal on D7 (panel "Đề xuất bảo trì phòng ngừa").
+  - Rule-based, in `srv/src/domain/eightd/maintenance/`. Input is the approved D4 root cause plus closed cases with the same defect code and work center.
+  - The marked 6M category picks the control type: maintenance, calibration, error-proofing, work instruction, incoming inspection or condition monitoring.
+  - An interval or limit is only taken from measured text. If none is found, the interval is left empty and an `unverified-facts` stop is raised.
+  - If no cause in the 5-Why chain is one the plant controls, the only proposal is "increase inspection frequency", with an `outside-scope` stop.
+  - Every proposal cites its source case IDs.
+- New service operations:
+  - `proposeMaintenancePlan` builds the proposals.
+  - `decideMaintenanceProposal` approves or rejects one proposal. It writes a `maintenance-decision` row to `ReviewEvents`, and the actor comes from the server, not the client.
+  - `getMaintenanceHistory` returns the approved proposals for one defect type.
+- New D7 field `preventive.maintenancePlan`.
+- The panel shows real day gaps between occurrences of the same defect type, before and after the preventive action. It makes no forecast.
 - `mock-data/happycase-full/`: 10 open 8D cases (8D-10049401..410) for import via
   Create 8D Report → JSON. Each one carries the team, inspection lot history,
   Is/Is-Not, Ishikawa, 5-Why, actions, FMEA and closure data, so D1–D8 all find
