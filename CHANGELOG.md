@@ -3,6 +3,11 @@
 ## [Unreleased]
 
 ### Added
+- Master Data now has a read-only "Maintenance History" tab, backed by the new function `listMaintenanceHistory`.
+  - It lists every approved D7 maintenance proposal, grouped by defect type (defect code + work center), with links to the source cases.
+  - Each group shows its occurrence count and the latest gap in days between occurrences. Both are computed from real found dates; with fewer than 2 occurrences the gap shows "Insufficient data".
+  - A missing interval shows "No measurement available".
+  - Approving or rejecting proposals still happens only in D7.
 - Preventive maintenance proposal on D7 (panel "Preventive Maintenance Proposals", English UI).
   - Rule-based, in `srv/src/domain/eightd/maintenance/`. Input is the approved D4 root cause plus closed cases with the same defect code and work center.
   - The marked 6M category picks the control type: maintenance, calibration, error-proofing, work instruction, incoming inspection or condition monitoring.

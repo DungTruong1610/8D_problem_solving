@@ -6,11 +6,12 @@ import {
     TabsTrigger,
     cn,
 } from '@cnma/react-ui';
-import { ClipboardList, Database, FolderKanban, Layers, Tags } from 'lucide-react';
+import { ClipboardList, Database, FolderKanban, Layers, Tags, Wrench } from 'lucide-react';
 import { CodeCataloguesTab } from './CodeCataloguesTab';
 import { DefectsTab } from './DefectsTab';
 import { HistoricalDefectsTab } from './HistoricalDefectsTab';
 import { InspectionLotsTab } from './InspectionLotsTab';
+import { MaintenanceHistoryTab } from './MaintenanceHistoryTab';
 import { useTourControl } from '@/components/walkthrough';
 
 /**
@@ -25,6 +26,7 @@ const TAB_CAPTIONS = {
     'inspection-lots': 'Inspection History - the comparison population behind D2\'s Is / Is-Not analysis. One row is one characteristic measured on one lot, not the full inspection lot object.',
     'defects': 'Defect Records - every quality defect recorded, whether or not it warrants an 8D. Most defects are closed here; opening an 8D is a separate, deliberate decision made on this list.',
     'historical-cases': 'Closed Case Library - the precedent store the AI retrieves from. Completed and closed cases only; an open case has no proven lesson to reuse.',
+    'maintenance-history': 'Maintenance History - every preventive-maintenance proposal an engineer approved in D7, grouped by defect type. Read-only: approval stays in D7.',
     'code-catalogues': 'Master Data & Catalogues - centralized reference catalogs and value helps: defect codes, quality tasks, material batches, departments, coordinators, plants, and master data.',
 } as const;
 
@@ -60,7 +62,7 @@ export function MasterDataPage() {
                 onValueChange={(v) => setActiveTab(v as MasterDataTab)}
                 className="w-full space-y-4"
             >
-                <TabsList data-tour="master-tabs" className="grid w-full grid-cols-4 max-w-3xl bg-muted/60 p-1 rounded-xl border border-border/80 h-11 shadow-xs">
+                <TabsList data-tour="master-tabs" className="grid w-full grid-cols-5 max-w-5xl bg-muted/60 p-1 rounded-xl border border-border/80 h-11 shadow-xs">
                     <TabsTrigger
                         value="inspection-lots"
                         className={cn(
@@ -98,6 +100,18 @@ export function MasterDataPage() {
                         <span>Closed Case Library</span>
                     </TabsTrigger>
                     <TabsTrigger
+                        value="maintenance-history"
+                        className={cn(
+                            'inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all h-9 cursor-pointer border-0 outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0',
+                            'hover:text-foreground text-muted-foreground hover:bg-black/[0.03] dark:hover:bg-white/[0.04]',
+                            'data-[state=active]:bg-black/[0.05] dark:data-[state=active]:bg-white/[0.08] data-[state=active]:!shadow-none data-[state=active]:!text-black dark:data-[state=active]:!text-white data-[state=active]:border-transparent',
+                            activeTab === 'maintenance-history' && '!text-black dark:!text-white !bg-black/[0.05] dark:!bg-white/[0.08] !shadow-none',
+                        )}
+                    >
+                        <Wrench className={cn('h-4 w-4 transition-colors', activeTab === 'maintenance-history' ? 'text-black dark:text-white' : 'text-muted-foreground')} />
+                        <span>Maintenance History</span>
+                    </TabsTrigger>
+                    <TabsTrigger
                         value="code-catalogues"
                         className={cn(
                             'inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all h-9 cursor-pointer border-0 outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0',
@@ -130,7 +144,12 @@ export function MasterDataPage() {
                     <HistoricalDefectsTab />
                 </TabsContent>
 
-                {/* Tab 4: Code Catalogues — hai danh mục mã QM đứng cạnh nhau */}
+                {/* Tab 4: Maintenance History — góc nhìn chỉ đọc trên đề xuất D7 đã duyệt */}
+                <TabsContent value="maintenance-history" className="mt-0 outline-none space-y-4">
+                    <MaintenanceHistoryTab />
+                </TabsContent>
+
+                {/* Tab 5: Code Catalogues — hai danh mục mã QM đứng cạnh nhau */}
                 <TabsContent value="code-catalogues" className="mt-0 outline-none space-y-4">
                     <CodeCataloguesTab />
                 </TabsContent>

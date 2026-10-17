@@ -1034,6 +1034,22 @@ export async function getMaintenanceHistory(defectCode: string, workCenterId: st
     return parseValue(response.data)?.history ?? [];
 }
 
+export interface MaintenanceHistoryGroup {
+    defectCode: string;
+    defectText: string | null;
+    workCenterId: string;
+    workCenterDesc: string | null;
+    occurrenceCount: number;
+    /** null = fewer than 2 occurrences; never an estimate. */
+    latestGapDays: number | null;
+    proposals: MaintenanceHistoryRow[];
+}
+
+export async function listMaintenanceHistory(): Promise<MaintenanceHistoryGroup[]> {
+    const response = await axiosInstance.get('api/cnma/EIGHTD_SRV/listMaintenanceHistory()');
+    return parseValue(response.data)?.groups ?? [];
+}
+
 export async function getReviewTrail(
     reportID: string,
 ): Promise<{ gate: ClosureGate; trail: ReviewEvent[] }> {

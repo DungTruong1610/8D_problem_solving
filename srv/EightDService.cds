@@ -337,6 +337,15 @@ service EightDService {
     function getMaintenanceHistory(defectCode : String, workCenterId : String) returns String;
 
     /**
+     * Toàn bộ lịch sử bảo trì đã duyệt, gom theo loại lỗi (mã lỗi + work center) —
+     * nguồn của tab "Maintenance History" ở Master Data. Chỉ đọc.
+     *
+     * @returns JSON { groups: [{ defectCode, defectText, workCenterId, workCenterDesc,
+     *          occurrenceCount, latestGapDays | null, proposals[] }] }, nhóm mới duyệt nhất trước.
+     */
+    function listMaintenanceHistory() returns String;
+
+    /**
      * Danh sách toàn bộ bằng chứng hoàn thành của một report (không kèm content).
      * Phục vụ hiển thị trên tab Evidence của panel lưu trữ.
      */

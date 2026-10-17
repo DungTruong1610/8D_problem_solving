@@ -14,9 +14,15 @@ import { normalizeStatus } from '../review';
 import { HISTORICAL_CASES, fetchActions } from '../precedent/precedentRepository';
 import {
     applyDecision,
+    approvedProposalsOf,
     buildMaintenancePlan,
     carryDecisions,
+    groupMaintenanceHistory,
     type HistoryCase,
+    type HistoryOccurrence,
+    type HistoryReport,
+    type MaintenanceHistoryEntry,
+    type MaintenanceHistoryGroup,
     type MaintenancePlan,
     type MaintenanceProposal,
 } from './rules';
@@ -149,28 +155,34 @@ export async function decideMaintenanceProposal(
     return proposal;
 }
 
-export interface MaintenanceHistoryRow extends MaintenanceProposal {
-    reportID: string;
-    notificationId: string;
-}
-
-/** Đề xuất đã DUYỆT của một loại lỗi trên mọi report, mới nhất trước. */
-export async function getMaintenanceHistory(defectCode: string, workCenterId: string): Promise<MaintenanceHistoryRow[]> {
-    const reports = await SELECT.from(REPORTS)
-        .columns('ID', 'notificationId')
-        .where({ defectCode, workCenterId }) as { ID: string; notificationId: string }[];
+/** Report kèm kế hoạch đã lưu trên D7 — nguồn chung của cả hai cách đọc lịch sử. */
+async function reportsWithPlans(where?: { defectCode: string; workCenterId: string }): Promise<HistoryReport[]> {
+    const query = SELECT.from(REPORTS)
+        .columns('ID', 'notificationId', 'defectCode', 'defectText', 'workCenterId', 'workCenterDesc', 'foundDate');
+    const reports = await (where ? query.where(where) : query) as Omit<HistoryReport, 'plan'>[];
     if (!reports.length) return [];
     const d7s = await SELECT.from(DISCIPLINES)
         .columns('report_ID', 'resultJson')
         .where({ report_ID: { in: reports.map((r) => r.ID) }, code: 'D7' }) as { report_ID: string; resultJson: string | null }[];
-    const byId = new Map(reports.map((r) => [r.ID, r.notificationId]));
+    const planBy = new Map(d7s.map((d) => [d.report_ID, storedPlanOf(d.resultJson)]));
+    return reports.map((r) => ({ ...r, plan: planBy.get(r.ID) ?? null }));
+}
 
-    return d7s
-        .flatMap((d) => {
-            const plan = storedPlanOf(d.resultJson) as { proposals?: MaintenanceProposal[] } | null;
-            return (Array.isArray(plan?.proposals) ? plan.proposals : [])
-                .filter((p) => p?.status === 'Approved')
-                .map((p) => ({ ...p, reportID: d.report_ID, notificationId: byId.get(d.report_ID) ?? '' }));
-        })
+/** Đề xuất đã DUYỆT của một loại lỗi trên mọi report, mới nhất trước. */
+export async function getMaintenanceHistory(defectCode: string, workCenterId: string): Promise<MaintenanceHistoryEntry[]> {
+    return (await reportsWithPlans({ defectCode, workCenterId }))
+        .flatMap((r) => approvedProposalsOf(r.plan).map((p) => ({ ...p, reportID: r.ID, notificationId: r.notificationId })))
         .sort((a, b) => String(b.decidedAt ?? '').localeCompare(String(a.decidedAt ?? '')));
+}
+
+/**
+ * Mọi đề xuất đã duyệt, gom theo loại lỗi — tab "Maintenance History" ở Master Data.
+ * Là một góc nhìn TÍNH RA trên D7 đã duyệt, không phải bảng: duyệt thêm là tự dày lên.
+ */
+export async function listMaintenanceHistory(): Promise<MaintenanceHistoryGroup[]> {
+    const reports = await reportsWithPlans();
+    const closedCases = await SELECT.from(HISTORICAL_CASES)
+        .columns('notificationId', 'defectCode', 'workCenterId', 'foundDate')
+        .where({ sapStatus: { in: CLOSED_STATUSES } }) as HistoryOccurrence[];
+    return groupMaintenanceHistory(reports, closedCases);
 }

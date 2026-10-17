@@ -72,6 +72,7 @@ import { findPrecedents as findPrecedentsWithEngine } from '../domain/eightd/gra
 import {
     decideMaintenanceProposal,
     getMaintenanceHistory,
+    listMaintenanceHistory,
     proposeMaintenancePlan,
 } from '../domain/eightd/maintenance/maintenanceStore';
 import { clearLibrary, embedLibrary, seedLibrary } from '../domain/eightd/precedent/librarySeeder';
@@ -717,6 +718,14 @@ export function registerEightDHandlers(srv: any): void {
         if (!defectCode || !workCenterId) return req.error(400, 'defectCode and workCenterId are required.');
         try {
             return JSON.stringify({ history: await getMaintenanceHistory(defectCode, workCenterId) });
+        } catch (e: any) {
+            return req.error(500, describe(e));
+        }
+    });
+
+    srv.on('listMaintenanceHistory', async (req: any) => {
+        try {
+            return JSON.stringify({ groups: await listMaintenanceHistory() });
         } catch (e: any) {
             return req.error(500, describe(e));
         }

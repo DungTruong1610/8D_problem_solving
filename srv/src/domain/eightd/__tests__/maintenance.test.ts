@@ -11,6 +11,7 @@ import {
     carryDecisions,
     classifyControl,
     extractInterval,
+    groupMaintenanceHistory,
     normalizeRootCause,
     recurrenceIntervals,
     type PlanInput,
@@ -127,6 +128,54 @@ describe('maintenance rules', () => {
         expect(result.proposals[0].sourceCaseIds).toEqual(['8D-1', '8D-A']);
         expect(result.intervals.actionDate).toBe('2026-07-20');
         expect(result.intervals.after).toEqual([92]);
+    });
+
+    describe('groupMaintenanceHistory', () => {
+        const proposal = (id: string, status: 'Proposed' | 'Approved' | 'Rejected', decidedAt: string | null) => ({
+            id, controlType: 'preventive-maintenance', task: `task ${id}`, interval: null, owner: null,
+            rootCauseCategory: 'Machine', whyStepUsed: 1, sourceCaseIds: ['8D-X'], status, decidedBy: 'qe', decidedAt,
+        });
+        const report = (ID: string, defectCode: string, workCenterId: string, foundDate: string, proposals: unknown[]) => ({
+            ID, notificationId: `8D-${ID}`, defectCode, defectText: `text ${defectCode}`, workCenterId, workCenterDesc: null, foundDate,
+            plan: { proposals },
+        });
+
+        it('groups approved proposals by defect type and drops Proposed / Rejected ones', () => {
+            const groups = groupMaintenanceHistory([
+                report('1', 'DEF-A', 'WC-1', '2026-01-01', [proposal('a', 'Approved', '2026-02-01'), proposal('b', 'Rejected', '2026-02-02'), proposal('c', 'Proposed', null)]),
+                report('2', 'DEF-A', 'WC-1', '2026-03-01', [proposal('d', 'Approved', '2026-04-01')]),
+                report('3', 'DEF-B', 'WC-2', '2026-01-05', [proposal('e', 'Rejected', '2026-02-05')]),
+            ], []);
+            expect(groups).toHaveLength(1);
+            expect(groups[0]).toMatchObject({ defectCode: 'DEF-A', workCenterId: 'WC-1', occurrenceCount: 2, latestGapDays: 59 });
+            expect(groups[0].proposals.map((p) => p.id)).toEqual(['d', 'a']);
+            expect(groups[0].proposals[0].reportID).toBe('2');
+        });
+
+        it('latestGapDays is null with fewer than 2 occurrences; closed cases count, duplicates do not', () => {
+            const [single] = groupMaintenanceHistory([report('1', 'DEF-A', 'WC-1', '2026-01-01', [proposal('a', 'Approved', '2026-02-01')])], []);
+            expect(single.occurrenceCount).toBe(1);
+            expect(single.latestGapDays).toBeNull();
+
+            const [withLibrary] = groupMaintenanceHistory(
+                [report('1', 'DEF-A', 'WC-1', '2026-03-01', [proposal('a', 'Approved', '2026-04-01')])],
+                [
+                    { notificationId: '8D-1', defectCode: 'DEF-A', workCenterId: 'WC-1', foundDate: '2026-03-01' },
+                    { notificationId: '8D-OLD', defectCode: 'DEF-A', workCenterId: 'WC-1', foundDate: '2026-02-19' },
+                    { notificationId: '8D-OTHER', defectCode: 'DEF-A', workCenterId: 'WC-9', foundDate: '2026-02-01' },
+                ],
+            );
+            expect(withLibrary.occurrenceCount).toBe(2);
+            expect(withLibrary.latestGapDays).toBe(10);
+        });
+
+        it('sorts groups by their most recent approval, newest first', () => {
+            const groups = groupMaintenanceHistory([
+                report('1', 'DEF-OLD', 'WC-1', '2026-01-01', [proposal('a', 'Approved', '2026-02-01')]),
+                report('2', 'DEF-NEW', 'WC-1', '2026-01-01', [proposal('b', 'Approved', '2026-05-01')]),
+            ], []);
+            expect(groups.map((g) => g.defectCode)).toEqual(['DEF-NEW', 'DEF-OLD']);
+        });
     });
 
     it('decisions survive regeneration and carry the server-side actor', () => {

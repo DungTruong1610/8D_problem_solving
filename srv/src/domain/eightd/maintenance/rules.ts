@@ -546,3 +546,96 @@ export function applyDecision(
         fromStatus: target.status ?? 'Proposed',
     };
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Lịch sử bảo trì theo loại lỗi (Master Data)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Đề xuất ĐÃ DUYỆT trong một kế hoạch đã lưu trên D7. Chỗ DUY NHẤT đọc kế hoạch
+ * thành danh sách lịch sử — tab Master Data và panel D7 phải thấy cùng một tập.
+ */
+export function approvedProposalsOf(storedPlan: unknown): MaintenanceProposal[] {
+    const plan = parseObject(storedPlan);
+    return (Array.isArray(plan.proposals) ? plan.proposals : [])
+        .filter((p: MaintenanceProposal | null) => p?.status === 'Approved');
+}
+
+export interface HistoryReport {
+    ID: string;
+    notificationId: string;
+    defectCode: string | null;
+    defectText: string | null;
+    workCenterId: string | null;
+    workCenterDesc: string | null;
+    foundDate: string | null;
+    /** `preventive.maintenancePlan` trên D7 của report, nếu có. */
+    plan: unknown;
+}
+
+export interface HistoryOccurrence {
+    notificationId: string;
+    defectCode: string | null;
+    workCenterId: string | null;
+    foundDate: string | null;
+}
+
+export interface MaintenanceHistoryEntry extends MaintenanceProposal {
+    reportID: string;
+    notificationId: string;
+}
+
+export interface MaintenanceHistoryGroup {
+    defectCode: string;
+    defectText: string | null;
+    workCenterId: string;
+    workCenterDesc: string | null;
+    /** Số case thật (có ngày phát hiện) của loại lỗi này — report và case đã đóng, không đếm trùng. */
+    occurrenceCount: number;
+    /** Khoảng ngày giữa hai lần xảy ra gần nhất. null khi chưa đủ 2 lần — không bao giờ ước lượng. */
+    latestGapDays: number | null;
+    proposals: MaintenanceHistoryEntry[];
+}
+
+const typeKey = (defectCode: string | null, workCenterId: string | null) => `${defectCode ?? ''}|${workCenterId ?? ''}`;
+
+/**
+ * Gom đề xuất đã duyệt theo loại lỗi (mã lỗi + work center). Chỉ loại lỗi có ít
+ * nhất một đề xuất đã duyệt mới thành nhóm; nhóm có quyết định mới nhất đứng đầu.
+ */
+export function groupMaintenanceHistory(reports: readonly HistoryReport[], closedCases: readonly HistoryOccurrence[]): MaintenanceHistoryGroup[] {
+    const groups = new Map<string, MaintenanceHistoryGroup>();
+    for (const r of reports) {
+        if (!r.defectCode || !r.workCenterId) continue;
+        const approved = approvedProposalsOf(r.plan);
+        if (!approved.length) continue;
+        const key = typeKey(r.defectCode, r.workCenterId);
+        const group = groups.get(key) ?? {
+            defectCode: r.defectCode,
+            defectText: r.defectText,
+            workCenterId: r.workCenterId,
+            workCenterDesc: r.workCenterDesc,
+            occurrenceCount: 0,
+            latestGapDays: null,
+            proposals: [],
+        };
+        group.proposals.push(...approved.map((p) => ({ ...p, reportID: r.ID, notificationId: r.notificationId })));
+        groups.set(key, group);
+    }
+
+    for (const [key, group] of groups) {
+        // Một case có thể nằm ở cả `Reports` lẫn kho case đóng (case đóng trong app
+        // được ghi bù vào kho) — đếm theo mã case, không theo dòng.
+        const foundBy = new Map<string, string>();
+        for (const o of [...closedCases, ...reports]) {
+            if (typeKey(o.defectCode, o.workCenterId) === key && o.foundDate) foundBy.set(o.notificationId, String(o.foundDate).slice(0, 10));
+        }
+        const { gaps } = recurrenceIntervals([...foundBy.values()], null);
+        group.occurrenceCount = foundBy.size;
+        group.latestGapDays = gaps.length ? gaps[gaps.length - 1].days : null;
+        group.proposals.sort((a, b) => String(b.decidedAt ?? '').localeCompare(String(a.decidedAt ?? '')));
+    }
+
+    return [...groups.values()].sort((a, b) =>
+        String(b.proposals[0]?.decidedAt ?? '').localeCompare(String(a.proposals[0]?.decidedAt ?? '')));
+}
