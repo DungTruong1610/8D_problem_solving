@@ -89,7 +89,7 @@ export interface ReviewEvent {
      * Có từ Sprint 2. Null ở dòng ghi trước đó — UI nói "không lưu lúc đó",
      * không dựng lại từ trạng thái hiện tại.
      */
-    eventType?: 'approve' | 'request-change' | 'reopen' | 'task-done' | 'stop-resolved' | null;
+    eventType?: 'approve' | 'request-change' | 'reopen' | 'task-done' | 'stop-resolved' | 'maintenance-decision' | null;
     subjectId?: string | null;
     reason?: string | null;
     /** JSON: dữ kiện quyết định dựa vào, chụp đúng lúc quyết định. */
@@ -956,6 +956,82 @@ export async function resolveStop(reportID: string, stopId: string, note: string
     const raw = response.data?.value ?? response.data;
     const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
     return parsed?.stops ?? [];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Đề xuất bảo trì phòng ngừa (D7) — hình dạng khớp `srv/.../maintenance/rules.ts`
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const MAINTENANCE_PLAN_KEY = 'preventive.maintenancePlan';
+
+export interface MaintenanceInterval {
+    limit: number;
+    actual: number | null;
+    unit: string;
+    sourceText: string;
+}
+
+export interface MaintenanceProposal {
+    id: string;
+    controlType: string;
+    task: string;
+    interval: MaintenanceInterval | null;
+    owner: string | null;
+    rootCauseCategory: string | null;
+    whyStepUsed: number | null;
+    sourceCaseIds: string[];
+    status: 'Proposed' | 'Approved' | 'Rejected';
+    decidedBy?: string | null;
+    decidedAt?: string | null;
+    note?: string | null;
+}
+
+export interface MaintenancePlan {
+    defectType: { defectCode: string | null; workCenterId: string | null };
+    refusal: string | null;
+    occurrences: { notificationId: string; foundDate: string; current: boolean }[];
+    intervals: {
+        actionDate: string | null;
+        gaps: { from: string; to: string; days: number; phase: 'before' | 'after' }[];
+        before: number[];
+        after: number[];
+    };
+    pastPreventiveActions: { caseId: string; text: string }[];
+    proposals: MaintenanceProposal[];
+    stops: CaseStop[];
+    generatedAt: string;
+}
+
+export interface MaintenanceHistoryRow extends MaintenanceProposal {
+    reportID: string;
+    notificationId: string;
+}
+
+const parseValue = (data: any) => {
+    const raw = data?.value ?? data;
+    return typeof raw === 'string' ? JSON.parse(raw) : raw;
+};
+
+export async function proposeMaintenancePlan(reportID: string): Promise<MaintenancePlan> {
+    const response = await axiosInstance.post('api/cnma/EIGHTD_SRV/proposeMaintenancePlan', { reportID });
+    return parseValue(response.data);
+}
+
+export async function decideMaintenanceProposal(
+    reportID: string,
+    proposalId: string,
+    decision: 'approve' | 'reject',
+    note: string,
+): Promise<MaintenanceProposal> {
+    const response = await axiosInstance.post('api/cnma/EIGHTD_SRV/decideMaintenanceProposal', { reportID, proposalId, decision, note });
+    return parseValue(response.data)?.proposal;
+}
+
+export async function getMaintenanceHistory(defectCode: string, workCenterId: string): Promise<MaintenanceHistoryRow[]> {
+    const response = await axiosInstance.get(
+        `api/cnma/EIGHTD_SRV/getMaintenanceHistory(defectCode='${encodeURIComponent(defectCode)}',workCenterId='${encodeURIComponent(workCenterId)}')`,
+    );
+    return parseValue(response.data)?.history ?? [];
 }
 
 export async function getReviewTrail(

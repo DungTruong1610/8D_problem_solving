@@ -43,6 +43,7 @@ import { AuditTrailPanel } from './audit-trail-panel';
 import { StopsButton } from './stops-panel';
 import { export8DToExcel } from './export-8d-excel';
 import { CaseProvenanceProvider } from './ai-provenance-info';
+import { MaintenancePanel } from './maintenance-panel';
 import { useTourControl } from '@/components/walkthrough';
 
 /**
@@ -407,6 +408,8 @@ export function EightDDetailPage() {
                                                             />
                                                             : <DisciplineCard discipline={selected} />
                                                     )}
+
+                                                    {selected.code === 'D7' && <MaintenancePanel report={report} discipline={selected} />}
 
                                                     {selected.code === 'D6' && (() => {
                                                         const d4 = disciplines.find((d) => d.code === 'D4');

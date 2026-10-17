@@ -17,7 +17,7 @@
  * Module thuần: không import cds, test được bằng dữ liệu bảng.
  */
 
-export const AUDIT_EVENT_TYPES = ['approve', 'request-change', 'reopen', 'task-done', 'stop-resolved'] as const;
+export const AUDIT_EVENT_TYPES = ['approve', 'request-change', 'reopen', 'task-done', 'stop-resolved', 'maintenance-decision'] as const;
 export type AuditEventType = typeof AUDIT_EVENT_TYPES[number];
 
 /** Trần kích thước của mỗi cột JSON — đủ cho vài chục dữ kiện, không đủ để chép cả report. */

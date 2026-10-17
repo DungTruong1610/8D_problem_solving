@@ -69,6 +69,11 @@ import {
 } from '../domain/eightd/review';
 import { DISCIPLINE_CODES, STEP_CODES, PipelineError, type CaseContext, type DisciplineCode } from '../domain/eightd/types';
 import { findPrecedents as findPrecedentsWithEngine } from '../domain/eightd/graph/engine';
+import {
+    decideMaintenanceProposal,
+    getMaintenanceHistory,
+    proposeMaintenancePlan,
+} from '../domain/eightd/maintenance/maintenanceStore';
 import { clearLibrary, embedLibrary, seedLibrary } from '../domain/eightd/precedent/librarySeeder';
 import { tokenizeDefectText } from '../domain/eightd/precedent/scoring';
 import { allocateNumber, numericPart, raiseNumberRange, peekNextNumber } from '../domain/numberRange';
@@ -676,6 +681,44 @@ export function registerEightDHandlers(srv: any): void {
             return JSON.stringify({ stops });
         } catch (e: any) {
             return req.error(e?.code === 404 ? 404 : e?.code === 400 ? 400 : 500, describe(e));
+        }
+    });
+
+    // ── Đề xuất bảo trì phòng ngừa (D7) — luật ở domain/eightd/maintenance ──
+    srv.on('proposeMaintenancePlan', async (req: any) => {
+        const reportID = String(req.data?.reportID ?? '').trim();
+        if (!reportID) return req.error(400, 'reportID is required.');
+        try {
+            return JSON.stringify(await proposeMaintenancePlan(reportID));
+        } catch (e: any) {
+            return req.error(e?.code === 404 ? 404 : 500, describe(e));
+        }
+    });
+
+    srv.on('decideMaintenanceProposal', async (req: any) => {
+        const reportID = String(req.data?.reportID ?? '').trim();
+        const proposalId = String(req.data?.proposalId ?? '').trim();
+        const decision = String(req.data?.decision ?? '').trim();
+        if (!reportID || !proposalId) return req.error(400, 'reportID and proposalId are required.');
+        if (decision !== 'approve' && decision !== 'reject') return req.error(400, "decision must be 'approve' or 'reject'.");
+        // Danh tính từ ngữ cảnh xác thực, không từ payload.
+        const actor = String(req.user?.id ?? 'anonymous');
+        try {
+            const proposal = await decideMaintenanceProposal(reportID, proposalId, decision, String(req.data?.note ?? ''), actor);
+            return JSON.stringify({ proposal });
+        } catch (e: any) {
+            return req.error(e?.code === 404 ? 404 : e?.code === 400 ? 400 : 500, describe(e));
+        }
+    });
+
+    srv.on('getMaintenanceHistory', async (req: any) => {
+        const defectCode = String(req.data?.defectCode ?? '').trim();
+        const workCenterId = String(req.data?.workCenterId ?? '').trim();
+        if (!defectCode || !workCenterId) return req.error(400, 'defectCode and workCenterId are required.');
+        try {
+            return JSON.stringify({ history: await getMaintenanceHistory(defectCode, workCenterId) });
+        } catch (e: any) {
+            return req.error(500, describe(e));
         }
     });
 

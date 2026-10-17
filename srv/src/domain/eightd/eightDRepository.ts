@@ -631,7 +631,7 @@ const HUMAN_WRITABLE_FIELDS: Readonly<Record<string, ReadonlySet<string>>> = Obj
     ]),
     D5: new Set(['corrective.actions', 'corrective.assignedActions', 'actionItems', 'actions']),
     D6: new Set(['verification.plan', 'verification.assignedActions', 'implementation.actions', 'implementation.assignedActions', 'actionItems', 'actions']),
-    D7: new Set(['preventive.actions', 'preventive.assignedActions', 'preventive.fmea', 'prevention.actions', 'prevention.assignedActions', 'actionItems', 'actions']),
+    D7: new Set(['preventive.actions', 'preventive.assignedActions', 'preventive.fmea', 'preventive.maintenancePlan', 'prevention.actions', 'prevention.assignedActions', 'actionItems', 'actions']),
     D8: new Set(['closure.notes', 'closure.teamRecognition', 'closure.lessonsWhatWorked', 'closure.lessonsWhatDidNot']),
 });
 

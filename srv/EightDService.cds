@@ -310,6 +310,33 @@ service EightDService {
     action resolveStop(reportID : String, stopId : String, note : String) returns String;
 
     /**
+     * Đề xuất kiểm soát / bảo trì phòng ngừa cho D7, suy ra từ nguyên nhân gốc D4
+     * ĐÃ DUYỆT và case đã đóng cùng mã lỗi + work center. Luật ở
+     * `srv/src/domain/eightd/maintenance/rules.ts`.
+     *
+     * KHÔNG ghi gì: UI lưu kết quả vào `preventive.maintenancePlan` bằng
+     * `saveDisciplineField`. Quyết định đã có trên D7 được giữ khi tạo lại.
+     *
+     * @returns JSON { defectType, refusal, occurrences[], intervals, proposals[], stops[] }
+     */
+    action proposeMaintenancePlan(reportID : String) returns String;
+
+    /**
+     * Duyệt / từ chối MỘT đề xuất bảo trì đã lưu trên D7.
+     *
+     * Action riêng chứ không qua `saveDisciplineField`: `decidedBy` phải lấy từ
+     * `req.user`, và mỗi quyết định để lại một dòng `maintenance-decision` trong
+     * `ReviewEvents` — đường ghi trường chung không làm được cả hai.
+     *
+     * @param decision 'approve' | 'reject'
+     * @param note     Ghi chú tuỳ chọn.
+     */
+    action decideMaintenanceProposal(reportID : String, proposalId : String, decision : String, note : String) returns String;
+
+    /** Lịch sử bảo trì của một loại lỗi: các đề xuất Approved trên mọi report, mới nhất trước. */
+    function getMaintenanceHistory(defectCode : String, workCenterId : String) returns String;
+
+    /**
      * Danh sách toàn bộ bằng chứng hoàn thành của một report (không kèm content).
      * Phục vụ hiển thị trên tab Evidence của panel lưu trữ.
      */

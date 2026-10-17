@@ -28,6 +28,10 @@ function describe(event: ReviewEvent): string {
         case 'reopen': return `Reopened ${step}`;
         case 'task-done': return `Completed task ${event.subjectId ?? ''} in ${step}`.replace('  ', ' ');
         case 'stop-resolved': return `Resolved an AI stop on ${step}`;
+        // Phải có nhãn riêng: rơi xuống nhánh `toStatus` bên dưới thì một đề xuất
+        // được duyệt sẽ đọc thành "Approved D7" — tức là duyệt cả bước.
+        case 'maintenance-decision':
+            return `${event.toStatus === 'Approved' ? 'Approved' : 'Rejected'} maintenance proposal ${event.subjectId ?? ''} on ${step}`;
         default:
             break;
     }
