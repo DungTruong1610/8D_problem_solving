@@ -1,4 +1,6 @@
-﻿# GraphAI Stage 2 — Lộ trình nâng cấp retrieval 8D local
+# GraphAI Stage 2 — Lộ trình nâng cấp retrieval 8D local
+
+> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](../AI4BIZ.md), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
 
 **Mục tiêu:** tiếp tục hoàn thiện truy hồi tiền lệ 8D thành pipeline local chạy trên dữ liệu nhóm tự seed, có chất lượng đo được, giải thích được và có giới hạn độ trễ/chi phí.
 **Không phụ thuộc:** SAP HANA Cloud, graph database riêng hoặc dịch vụ managed retrieval.

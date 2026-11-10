@@ -1,5 +1,7 @@
 # D1-D4 Step Prompt Configuration
 
+> **Historical reference — not current competition rules.** Original dates, observations and results below belong to an earlier development stage. Current competition: [AI4Biz 2026 — LIKELION Vietnam](../../AI4BIZ.md). These records are not a new verification run or an AI4Biz score.
+
 AI Settings provides configurable editor screens for D1, D2, D3, and D4 through `/ai-settings/step-prompts/:stepCode`. D5-D8 remain read-only/planned.
 
 The editor route is outside the standard application `MainLayout`, matching the `ref/ai-agent-extraction` Schema Editor shell: it has its own header, Back/Save actions, sticky tab navigation, and full-width editing canvas.

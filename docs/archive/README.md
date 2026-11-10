@@ -1,5 +1,7 @@
 # Archive — Tài Liệu Lịch Sử Đã Hoàn Thành & Lỗi Thời
 
+> **Historical reference — not current competition rules.** Original dates, observations and results below belong to an earlier development stage. Current competition: [AI4Biz 2026 — LIKELION Vietnam](../../AI4BIZ.md). These records are not a new verification run or an AI4Biz score.
+
 Thư mục này lưu trữ các kế hoạch triển khai, biên bản nghiệm thu (verification logs), và tài liệu phân tích kỹ thuật đã hoàn thành hoặc đã bị thay thế (superseded) trong các giai đoạn trước của dự án `8d-copilot`.
 
 ---
@@ -17,3 +19,9 @@ Thư mục này lưu trữ các kế hoạch triển khai, biên bản nghiệm 
 | `AI-SETTINGS-D1-CONFIGURATION.md` | Hướng dẫn cấu hình cũ | Lỗi thời (Superseded) | Tài liệu khi mới hỗ trợ D1-D4; đã bị thay thế hoàn toàn bởi `8D-DISCIPLINE-PIPELINE-AND-CREATE-DEFECT-GUIDE.md` (chuẩn 5-tab cho cả D1-D8). |
 | `GRAPH-RETRIEVAL-AND-RERANK.md` | Kỹ thuật GraphDB | Trùng lặp (Bản EN) | Bản dịch tiếng Anh của `GRAPH-RETRIEVAL-AND-RERANK.vi.md`. |
 
+
+## Competition migration
+
+- [Previous competition brief](Challenge_Brief_OrganizationAI_VN.docx.md): source history only.
+- [Previous Sprint 2 plan](SPRINT2-PLAN-2026-10.md): detailed technical backlog and historical milestones.
+- [Current AI4Biz reference](../../AI4BIZ.md): current competition rules and roster.

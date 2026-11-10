@@ -1,8 +1,8 @@
 # 📖 User & Judge Guide — Autonomous 8D Problem Solving Copilot
 
-> **MLAI Hackathon 2026**  
-> **Track 1:** OrganizationAI  
-> **Challenge B:** The Whole Workflow (Autonomous 8D Copilot)  
+> **AI4Biz 2026 — AI FOR BUSINESS INNOVATION**<br>
+> **Organizer:** LIKELION Vietnam · **Team:** UIT_4Lovpe<br>
+> **Competition requirements:** [AI4BIZ.md](../AI4BIZ.md)<br>
 > **Database:** PostgreSQL 16 + pgvector (`localhost:5432` via Docker, standalone with zero SAP HANA dependency)
 
 ---
@@ -16,7 +16,7 @@
    - [Reference JSON Template](#reference-json-template)
    - [4-Quadrant Test Strategy](#4-quadrant-test-strategy)
 5. [Sprint 1 Evaluation Suite & Defense Sandbox](#5-sprint-1-evaluation-suite--defense-sandbox)
-   - [Scoring Rubric & Sprint 1 Criteria](#scoring-rubric--sprint-1-criteria)
+   - [AI4Biz Criteria & Internal Checks](#ai4biz-criteria--internal-checks)
    - [90-Second Verify Harness Execution (1-Click Run)](#90-second-verify-harness-execution-1-click-run)
    - [Testing Arbitrary Judge Benchmark Test Cases](#testing-arbitrary-judge-benchmark-test-cases)
 6. [Quick Command-Line Reference (CLI)](#6-quick-command-line-reference-cli)
@@ -25,7 +25,7 @@
 
 ## 1. Introduction & WalkMe Tour
 
-The **8D Problem Solving Copilot** is a specialized AI assistant engineered for precision manufacturing and automotive production. It fully automates the eight-discipline root cause resolution methodology adhering to the international **8D standard (Ford / AIAG / VDA)**.
+The **8D Problem Solving Copilot** is a specialized AI assistant engineered for precision manufacturing and automotive production. It assists with evidence retrieval and D1–D8 drafting. Engineers validate the evidence, approve actions and decide when an incident can be closed; a generated draft is not a verified root cause or a resolved incident.
 
 ### 🚀 WalkMe Guided Tour (5-Minute Interactive Onboarding):
 From the Web UI (`/#/guide`), click **"Start WalkMe Tour (5 Min)"** to launch an interactive, step-by-step walkthrough covering 5 core operational stations:
@@ -169,10 +169,13 @@ The D4 retrieval profile (`diagnosis`) requires **8 points** (Configuration → 
 
 ## 5. Sprint 1 Evaluation Suite & Defense Sandbox
 
-### Scoring Rubric & Sprint 1 Criteria:
-* **Criterion 2 (12 Points):** Automated execution of the 4 strategic test cases in < 90 seconds (typical runtime: a few seconds).
-* **Criterion 3 (8 Points):** The judge sandbox evaluates any pasted JSON with the same validation, precedent engine and stop rules, and either processes it, stops for a person, or refuses it.
-* **Mandatory Rule 3.b:** When no closed case qualifies as a precedent, no precedent is cited and the case is escalated to a person.
+### AI4Biz Criteria & Internal Checks:
+
+The official summary table lists Problem 25%, Idea & Creativity 30%, Feasibility 20% and Presentation 25%. The detailed headings swap the last two weights; see the unresolved discrepancy in [AI4BIZ.md](../AI4BIZ.md).
+
+The four-case suite and arbitrary JSON sandbox are internal technical evidence. Their legacy 90-second target, Sprint 1 labels and old point scores are not AI4Biz requirements. They test validation, precedent lookup and stop rules, not LLM drafting or business impact.
+
+Prepare an English PDF of at most 15 slides and a demo video of at most 2 minutes. The final pitch is at most 15 minutes with 5 minutes of Q&A; at least 3 members must attend and present. Use a clearly labeled sample case to show sources, a stop when evidence is insufficient, human approval and the audit trail.
 
 If the backend cannot be reached, the Evaluation tab shows an error and **no results**. It never falls back to pre-written PASS rows. The **Summary** button opens a summary of the run that just happened: expected vs actual, every stop, and what was measured.
 
@@ -201,8 +204,8 @@ If the backend cannot be reached, the Evaluation tab shows an error and **no res
 | **Test Judge Benchmark Case** | `npm run verify:sprint1 -- --judge-input <file.json>` |
 | **Export Verify Output as Raw JSON** | `npm run verify:sprint1 -- --json` |
 | **Start Postgres Database via Docker** | `docker compose up -d` |
-| **Run Full Automated Unit Test Suite (1230 tests)** | `npm test` |
+| **Run Automated Test Suite (count depends on revision)** | `npm test` |
 | **Perform Full TypeScript Verification** | `npm run typecheck && npx tsc -b app/8D_hackathon_ui` |
 
 ---
-*Maintained and verified by the Autonomous 8D Copilot Engineering Team — MLAI Hackathon 2026.*
+*Maintained by UIT_4Lovpe for AI4Biz 2026. Run the checks to verify the version being demonstrated.*

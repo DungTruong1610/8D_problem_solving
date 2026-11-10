@@ -1,5 +1,7 @@
 # UX đề xuất: làm nổi bật AI Referee trong phân tích nguyên nhân gốc rễ
 
+> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](../AI4BIZ.md), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+
 ## Mục tiêu
 
 Giúp kỹ sư hoặc giám khảo nhận ra trong vài giây rằng AI đã **tự phân tích bằng chứng độc lập**, kết luận của AI **giống hay khác** đánh giá đang có, và người dùng cần làm gì tiếp theo.

@@ -1,5 +1,7 @@
 # D1 + D2 — Why D2 Looks Broken, and How We Fix Both
 
+> **Historical reference — not current competition rules.** Original dates, observations and results below belong to an earlier development stage. Current competition: [AI4Biz 2026 — LIKELION Vietnam](../../AI4BIZ.md). These records are not a new verification run or an AI4Biz score.
+
 **Prepared by:** Duy (Lead).
 **Status:** Ready to implement · **Version:** v2 — see *Revision note* below if you read the earlier copy
 **Scope:** D1 (Team) and D2 (Describe the Problem), plus the Record Defect popup

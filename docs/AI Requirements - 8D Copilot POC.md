@@ -1,5 +1,7 @@
 # AI Requirements — 8D Copilot POC
 
+> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](../AI4BIZ.md), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+
 **Prepared by:** Quyen (BA) **For:** AI Team (Dung, Thien, Minh)
 **Purpose:** Define what the AI must do, on what data, and how we'll know the POC proves it — so today's build has a clear, testable target instead of an open-ended "make AI suggestions" brief.
 

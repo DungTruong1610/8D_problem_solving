@@ -1,5 +1,7 @@
 # 📘 Hướng Dẫn Toàn Diện: Pipeline Cấu Hình 8D Từng Bước & Phân Hệ Create Defect
 
+> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](../AI4BIZ.md), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+
 > **Tài liệu Kỹ thuật & Hướng dẫn Vận hành**
 > **Dự án**: CNMA Proresolve (`8d-copilot`)
 > **Phiên bản cập nhật**: Kiến trúc Pipeline 5 Tab Hợp Nhất & Giao Diện Create Defect

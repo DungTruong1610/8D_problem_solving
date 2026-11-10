@@ -1,5 +1,7 @@
 # QM Chain Alignment — End-to-End Implementation Plan
 
+> **Historical reference — not current competition rules.** Original dates, observations and results below belong to an earlier development stage. Current competition: [AI4Biz 2026 — LIKELION Vietnam](../../AI4BIZ.md). These records are not a new verification run or an AI4Biz score.
+
 **Date:** 2026-09-01 (rev 2 — decisions recorded)
 **Status:** Accepted — Phase 0 answered, handed to dev. **Frozen (INDEX Rule 2) — do not edit.** What actually got built, and where the build deviated, is logged in `CHAIN-ALIGNMENT-VERIFICATION.md`.
 **Owner:** Duy (Lead)

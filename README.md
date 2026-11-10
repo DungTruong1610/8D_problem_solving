@@ -1,5 +1,7 @@
 # 🚀 8D Copilot — UIT_4Lovpe
 
+> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](AI4BIZ.md), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+
 Hệ thống quản lý sự cố chất lượng và tự động hóa quy trình **8D (Eight Disciplines of Problem Solving)** kết hợp trợ lý AI thông minh:
 - 🔍 **Tự động phân tích nguyên nhân gốc rễ**: Dựng sơ đồ 6M Ishikawa & chuỗi 5-Why từ dữ liệu đo kiểm thực tế.
 - 📚 **Đối chuẩn tiền lệ lịch sử**: Tìm kiếm các ca lỗi tương đồng trong kho tri thức để tái sử dụng kinh nghiệm giải quyết.
@@ -7,16 +9,24 @@ Hệ thống quản lý sự cố chất lượng và tự động hóa quy trì
 
 ---
 
+## Cuộc thi và đội ngũ
+
+**AI4Biz 2026 — AI FOR BUSINESS INNOVATION**, do **LIKELION Vietnam** tổ chức. Đội **UIT_4Lovpe** gồm **Trần Hoàng Đức, Việt Dũng, Đình Duy, Trung Dũng**.
+
+Hạn nộp: **23:59 13/11/2026**. Hồ sơ: **PDF tiếng Anh ≤15 slide**. Chung kết **19/11/2026**: pitch tiếng Anh **≤15 phút**, video **≤2 phút**, Q&A **5 phút**, ít nhất **3 thành viên trình bày**. Xem [quy định và ghi chú rubric](AI4BIZ.md), [kế hoạch](docs/HACKATHON-ACTION-PLAN.md) và [danh mục tài liệu](docs/INDEX.md).
+
+AI hỗ trợ soạn nháp và tìm bằng chứng; kỹ sư xác minh, duyệt hành động và đóng ca. Các test nội bộ không phải thang điểm chính thức của cuộc thi.
+
 ## 🔗 Liên kết quan trọng (Quick Links)
 
 | Hạng mục | Đường dẫn truy cập | Ghi chú |
 | :--- | :--- | :--- |
-| 🌐 **Trải nghiệm trực tuyến (Live Web)** | 👉 **[https://8-d-problem-solving.vercel.app](https://8-d-problem-solving.vercel.app)** | Vận hành thật 100% trên Vercel, không cần tài khoản, không cần cài đặt |
-| 🎬 **Video Demo sản phẩm (3 phút)** | 👉 **[Xem Video Demo tại đây](https://drive.google.com/drive/folders/1EMNPvJtuusw9Dh1NjabfNLnO5E_v8n-h)** | Video demo web |
+| 🌐 **Trải nghiệm trực tuyến (Live Web)** | 👉 **[https://8-d-problem-solving.vercel.app](https://8-d-problem-solving.vercel.app)** | Liên kết demo hiện có; kiểm tra khả dụng và cấu hình trước khi trình bày |
+| 🎬 **Video demo tham khảo** | 👉 **[Xem Video Demo tại đây](https://drive.google.com/drive/folders/1EMNPvJtuusw9Dh1NjabfNLnO5E_v8n-h)** | Bản tham khảo; video nộp AI4Biz phải ≤2 phút |
 | 📦 **Kho mã nguồn (GitHub Repo)** | 👉 **[DungTruong1610/8D_problem_solving](https://github.com/DungTruong1610/8D_problem_solving)** | Nhánh `main`, đầy đủ commit history minh bạch |
-| 📊 **Slide thuyết trình** | 👉 **[Slide](https://drive.google.com/file/d/1MnYTZFrnOwkrmN3ThGfhsBjA8gm-xlBP/view?usp=sharing)** | Slide chuẩn format BTC |
+| 📊 **Slide thuyết trình** | 👉 **[Slide](https://drive.google.com/file/d/1MnYTZFrnOwkrmN3ThGfhsBjA8gm-xlBP/view?usp=sharing)** | Bản tham khảo; cần xuất PDF tiếng Anh ≤15 slide cho AI4Biz |
 | 🧪 **Bộ 25 Testcase mẫu (Golden Dataset)** | 👉 **[Xem chi tiết 25 Testcase bên dưới](#-danh-mục-25-test-case-mẫu-golden-dataset--benchmark-suites)** | Thư mục `mock-data/clean` & `mock-data/dirty`, nạp sẵn trên Web |
-| 📝 **Nhật ký phát triển (Build Log)** | 👉 **[Nhật Ký Phát Triển (Build Log) — 8D Copilot.pdf](<Nhật Ký Phát Triển (Build Log) — 8D Copilot.pdf>)** | Độ dài 1 trang chuẩn yêu cầu BTC (Mục 3.f), chi tiết công cụ AI & cắt giảm tính năng |
+| 📝 **Nhật ký phát triển (Build Log)** | 👉 **[Nhật Ký Phát Triển (Build Log) — 8D Copilot.pdf](<Nhật Ký Phát Triển (Build Log) — 8D Copilot.pdf>)** | Lịch sử phát triển; AI4Biz không yêu cầu build log một trang |
 
 ---
 
@@ -175,7 +185,7 @@ Bạn có thể lựa chọn trải nghiệm ứng dụng theo 2 cách:
 
 - 🌐 **Cách 1: Trải nghiệm trực tuyến (Khuyên dùng cho BGK - Không cần cài đặt)**:
   - 👉 **Link Website**: **[https://8-d-problem-solving.vercel.app](https://8-d-problem-solving.vercel.app)**
-  - 🎬 **Link Video Demo (3 phút)**: **[Xem Video Demo tại đây](https://drive.google.com/drive/folders/1EMNPvJtuusw9Dh1NjabfNLnO5E_v8n-h)**
+  - 🎬 **Video tham khảo (bản nộp AI4Biz phải ≤2 phút)**: **[Xem Video Demo tại đây](https://drive.google.com/drive/folders/1EMNPvJtuusw9Dh1NjabfNLnO5E_v8n-h)**
 
 - 💻 **Cách 2: Chạy cục bộ trên máy cá nhân (Localhost)**:
   - Mở trình duyệt web và truy cập địa chỉ: 👉 **[http://localhost:5544](http://localhost:5544)**
@@ -294,7 +304,7 @@ Bộ dữ liệu gồm 2 cặp đối chứng $1:1$ (tổng cộng 50 file JSON)
 
    ---
 
-   #### 🎯 Bảng tóm tắt 4 Trường hợp kiểm thử mẫu (Chuẩn tiêu chí đánh giá BTC):
+   #### 🎯 Bảng tóm tắt 4 Trường hợp kiểm thử mẫu (Kiểm thử kỹ thuật nội bộ):
 
    | Mã TC & Kịch bản | Dữ liệu đầu vào (Input Data) | Hành vi kỳ vọng (Expected Behavior) | Cách thực thi (Execution Method) |
    | :--- | :--- | :--- | :--- |

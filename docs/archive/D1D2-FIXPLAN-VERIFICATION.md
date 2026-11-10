@@ -1,5 +1,7 @@
 # Did the team actually build what the D1/D2 fix plan asked for?
 
+> **Historical reference — not current competition rules.** Original dates, observations and results below belong to an earlier development stage. Current competition: [AI4Biz 2026 — LIKELION Vietnam](../../AI4BIZ.md). These records are not a new verification run or an AI4Biz score.
+
 **Checked on:** 2026-08-30 ·
 **Plan being checked:** `docs/D1D2FIXPLAN - 11PM (1).md`
 

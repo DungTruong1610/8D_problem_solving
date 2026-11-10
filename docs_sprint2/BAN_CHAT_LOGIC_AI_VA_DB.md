@@ -1,4 +1,6 @@
 # BẢN CHẤT HỆ THỐNG 8D COPILOT: LOGIC AI & CƠ SỞ DỮ LIỆU
+
+> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](../AI4BIZ.md), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
 > **Dành cho thành viên đội thi UIT_4Lovpe**  
 > *Tài liệu này được viết bằng văn nói đời thường của dân kỹ thuật, giải thích bản chất "tại sao lại làm như vậy", không dùng từ ngữ sáo rỗng để bạn đọc là hiểu ngay và tự tin thuyết trình trước Ban Giám Khảo (BGK).*
 
@@ -308,4 +310,4 @@ Hãy tưởng tượng bạn đang cầm mic đứng trước BGK. Đừng đọ
 *"Dạ, đây là quyết định thiết kế có chủ đích của nhóm sau khi nghiên cứu kỹ tiêu chuẩn ô tô IATF 16949 và VDA 6.3. Một quyết định nghiệm thu hành động D6 hay đóng ca D8 liên quan trực tiếp đến tính mạng người lái xe và trách nhiệm pháp lý hàng triệu USD. AI không thể chịu trách nhiệm pháp lý trước tòa án. Vì vậy, AI chỉ làm 80% công việc tính toán, làm trợ lý và trọng tài; 20% quyền bấm nút phê duyệt cuối cùng bắt buộc phải thuộc về Kỹ sư trưởng ạ."*
 
 ---
-*(Tài liệu lưu hành nội bộ — Đội thi UIT_4Lovpe — MLAI Hackathon 2026)*
+*(Tài liệu lưu hành nội bộ — Đội thi UIT_4Lovpe — AI4Biz 2026 — LIKELION Vietnam)*

@@ -1,5 +1,7 @@
 # Was the QM chain-alignment plan actually built?
 
+> **Historical reference — not current competition rules.** Original dates, observations and results below belong to an earlier development stage. Current competition: [AI4Biz 2026 — LIKELION Vietnam](../../AI4BIZ.md). These records are not a new verification run or an AI4Biz score.
+
 **Status:** Living log — append-only
 **Owner:** Duy (Lead)
 **Audience:** Dev team / Process owner / Reviewers

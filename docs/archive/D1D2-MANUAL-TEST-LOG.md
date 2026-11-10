@@ -1,5 +1,7 @@
 # D1 → D2 Manual Test & Audit Log
 
+> **Historical reference — not current competition rules.** Original dates, observations and results below belong to an earlier development stage. Current competition: [AI4Biz 2026 — LIKELION Vietnam](../../AI4BIZ.md). These records are not a new verification run or an AI4Biz score.
+
 **Status:** Living — one section per run
 **Owner:** Duy
 **Audience:** BA (executing), dev team (receiving findings)

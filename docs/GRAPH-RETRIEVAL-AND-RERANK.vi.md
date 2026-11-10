@@ -1,5 +1,7 @@
 # Truy hồi bằng Graph, Re-rank và Chain-of-Thought — đã làm gì, áp ở đâu, test thế nào
 
+> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](../AI4BIZ.md), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+
 **Ngày:** 2026-09-03
 **Nhánh:** `feat/graph-retrieval` 
 **Trạng thái:** đã implement · **tắt mặc định** — nhánh này không đổi hành vi gì cho tới khi có người sửa một giá trị cấu hình

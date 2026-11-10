@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Documentation — AI4Biz (2026-11-10)
+- Standardized competition documentation for AI4Biz / AI FOR BUSINESS INNOVATION, organized by LIKELION Vietnam.
+- Updated the team roster to include Trần Hoàng Đức; kept the other members unchanged.
+- Centralized deadlines, English submission/pitch limits and the unresolved rubric discrepancy in `AI4BIZ.md`.
+- Separated historical competition rules and test logs from current AI4Biz requirements.
+
 ### Added
 - Master Data now has a read-only "Maintenance History" tab, backed by the new function `listMaintenanceHistory`.
   - It lists every approved D7 maintenance proposal, grouped by defect type (defect code + work center), with links to the source cases.

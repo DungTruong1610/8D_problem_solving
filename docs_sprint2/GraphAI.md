@@ -1,5 +1,7 @@
 # GraphAI — Kế hoạch nâng cấp truy hồi tiền lệ 8D
 
+> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](../AI4BIZ.md), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+
 **Mục đích:** định hướng nâng cấp retrieval để kết quả đúng cơ chế lỗi/hành động hơn và phản hồi nhanh trên dữ liệu nhóm tự định nghĩa, seed sẵn trong repo.  
 **Ràng buộc:** không phụ thuộc SAP HANA Cloud, dịch vụ graph cloud, hoặc phải có database graph riêng. Ưu tiên chạy trên SQLite hiện có; giữ đường tương thích PostgreSQL nếu nhóm cần.  
 **Trạng thái tài liệu:** đề xuất thiết kế; chưa phải thay đổi đã triển khai.

@@ -1,5 +1,7 @@
 # Chạy local
 
+> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](AI4BIZ.md), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+
 Mọi lệnh trong file này đã chạy thử thật, không phải chép từ tài liệu.
 
 ---

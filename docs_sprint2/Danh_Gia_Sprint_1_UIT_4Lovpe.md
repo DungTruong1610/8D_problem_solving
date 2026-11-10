@@ -1,5 +1,7 @@
 # ĐÁNH GIÁ KỸ THUẬT SPRINT 1 — BAN GIÁM KHẢO HACKATHON
 
+> **Historical reference — not current competition rules.** Original dates, observations and results below belong to an earlier development stage. Current competition: [AI4Biz 2026 — LIKELION Vietnam](../AI4BIZ.md). These records are not a new verification run or an AI4Biz score.
+
 ---
 
 # Team UIT_4Lovpe (Dự án: 8D Incident Referee)

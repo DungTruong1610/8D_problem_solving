@@ -1,5 +1,7 @@
 # Precedent Retrieval — Review of the Matching Engine
 
+> **Historical reference — not current competition rules.** Original dates, observations and results below belong to an earlier development stage. Current competition: [AI4Biz 2026 — LIKELION Vietnam](../../AI4BIZ.md). These records are not a new verification run or an AI4Biz score.
+
 **Date:** 2026-08-31 · **Revised 2026-09-01** — prerequisite scheduled, ownership restated
 **Status:** review — **owned by the AI / retrieval workstream**, not the chain-alignment plan
 **Audience:** whoever tunes **AI Settings → Similarity**; process owner for R1

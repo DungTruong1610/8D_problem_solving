@@ -1,5 +1,7 @@
 # NHẬT KÝ PHÁT TRIỂN (BUILD LOG) — 8D COPILOT
-**Đội thi:** UIT_4Lovpe | **Hệ thống:** 8D Incident & Quality Assurance Referee | **Quy chuẩn:** Báo cáo 1 trang A4
+
+> **Historical reference — not current competition rules.** Original dates, observations and results below belong to an earlier development stage. Current competition: [AI4Biz 2026 — LIKELION Vietnam](../AI4BIZ.md). These records are not a new verification run or an AI4Biz score.
+**Đội thi:** UIT_4Lovpe | **Hệ thống:** 8D Incident & Quality Assurance Referee | **Định dạng lịch sử:** bản tóm tắt một trang; không phải yêu cầu AI4Biz
 
 ---
 
@@ -15,7 +17,9 @@
 
 ---
 
-### 2. Những điểm công cụ mang lại hiệu quả thực tế
+### 2. Nhận định của giai đoạn trước — cần đo lại trước khi dùng trong bài thi
+
+Các số về thời gian, tỷ lệ tiết kiệm, chi phí và hiệu năng dưới đây chưa kèm bộ đo tái lập trong tài liệu này. Không dùng chúng làm kết quả pilot hoặc cam kết AI4Biz; giữ lại để truy nguyên và kiểm chứng.
 * **Tiết kiệm 85–90% thời gian:** Rút ngắn thời gian thu thập dữ liệu và dựng khung phân tích sơ bộ từ 2–4 giờ thủ công xuống còn **15–30 giây**, kích hoạt biện pháp khoanh vùng (D3) ngay trong ca sản xuất.
 * **Xử lý xuất sắc dữ liệu thô bị bẩn (`mock-data/dirty/`):** Tự động chuẩn hóa số đo, dung sai, đơn vị từ các thông báo lỗi SAP QM tiếng Đức viết tắt mà regex truyền thống không xử lý được.
 * **Phản biện khách quan định kiến con người (Case `TC-02`):** Bác bỏ nhận định cảm tính của kỹ sư (đổ lỗi công nhân - Man) khi phân tích số liệu áp lực thủy lực đồ gá F1 chỉ ra nguyên nhân gốc là thiết bị (Machine).
