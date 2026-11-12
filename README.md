@@ -1,348 +1,322 @@
-# 🚀 8D Copilot — UIT_4Lovpe
+# 8D Copilot - UIT_4Lovpe
 
-> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](AI4BIZ.md), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+An AI assistant for manufacturing quality teams that connects defect records, inspection evidence and previous cases to help engineers prepare and review 8D reports.
 
-Hệ thống quản lý sự cố chất lượng và tự động hóa quy trình **8D (Eight Disciplines of Problem Solving)** kết hợp trợ lý AI thông minh:
-- 🔍 **Tự động phân tích nguyên nhân gốc rễ**: Dựng sơ đồ 6M Ishikawa & chuỗi 5-Why từ dữ liệu đo kiểm thực tế.
-- 📚 **Đối chuẩn tiền lệ lịch sử**: Tìm kiếm các ca lỗi tương đồng trong kho tri thức để tái sử dụng kinh nghiệm giải quyết.
-- 🛡️ **Đề xuất hành động khắc phục**: Tự động gợi ý các biện pháp khoanh vùng (D3 Containment), khắc phục triệt để (D5 Corrective) và phòng ngừa tái diễn (D7 Preventive).
+8D Copilot supports the Eight Disciplines of Problem Solving, from team formation to incident closure. AI retrieves relevant precedents and drafts suggestions. Engineers verify the evidence, approve actions and decide whether a case can be closed.
 
----
+## Quick Links
 
-## Cuộc thi và đội ngũ
+- [Web demo](https://8-d-problem-solving.vercel.app) - Check availability and the active configuration before presenting.
+- [Source repository](https://github.com/DungTruong1610/8D_problem_solving) - Project source and commit history.
+- [Reference video folder](https://drive.google.com/drive/folders/1EMNPvJtuusw9Dh1NjabfNLnO5E_v8n-h) - Existing recordings, not a verified final AI4Biz submission.
+- [Reference presentation](https://drive.google.com/file/d/1MnYTZFrnOwkrmN3ThGfhsBjA8gm-xlBP/view?usp=sharing) - Existing slides that need a separate submission review.
+- [AI4Biz competition reference](AI4BIZ.md) - Requirements, deadlines, team information and the rubric discrepancy.
+- [Documentation index](docs/INDEX.md) - Product requirements, technical guides and historical records.
 
-**AI4Biz 2026 — AI FOR BUSINESS INNOVATION**, do **LIKELION Vietnam** tổ chức. Đội **UIT_4Lovpe** gồm **Trần Hoàng Đức, Việt Dũng, Đình Duy, Trung Dũng**.
+## AI4Biz 2026
 
-Hạn nộp: **23:59 13/11/2026**. Hồ sơ: **PDF tiếng Anh ≤15 slide**. Chung kết **19/11/2026**: pitch tiếng Anh **≤15 phút**, video **≤2 phút**, Q&A **5 phút**, ít nhất **3 thành viên trình bày**. Xem [quy định và ghi chú rubric](AI4BIZ.md), [kế hoạch](docs/HACKATHON-ACTION-PLAN.md) và [danh mục tài liệu](docs/INDEX.md).
+8D Copilot is being prepared for **AI4Biz - AI FOR BUSINESS INNOVATION**, organized by **LIKELION Vietnam**, under the theme **Solve Real Business Problems with AI**.
 
-AI hỗ trợ soạn nháp và tìm bằng chứng; kỹ sư xác minh, duyệt hành động và đóng ca. Các test nội bộ không phải thang điểm chính thức của cuộc thi.
+The project focuses on Manufacturing and Operations, with quality engineers at automotive component suppliers as the initial target users. The business objective is to reduce the effort spent finding evidence and preparing reports while retaining human responsibility for quality decisions.
 
-## 🔗 Liên kết quan trọng (Quick Links)
+### Team
 
-| Hạng mục | Đường dẫn truy cập | Ghi chú |
-| :--- | :--- | :--- |
-| 🌐 **Trải nghiệm trực tuyến (Live Web)** | 👉 **[https://8-d-problem-solving.vercel.app](https://8-d-problem-solving.vercel.app)** | Liên kết demo hiện có; kiểm tra khả dụng và cấu hình trước khi trình bày |
-| 🎬 **Video demo tham khảo** | 👉 **[Xem Video Demo tại đây](https://drive.google.com/drive/folders/1EMNPvJtuusw9Dh1NjabfNLnO5E_v8n-h)** | Bản tham khảo; video nộp AI4Biz phải ≤2 phút |
-| 📦 **Kho mã nguồn (GitHub Repo)** | 👉 **[DungTruong1610/8D_problem_solving](https://github.com/DungTruong1610/8D_problem_solving)** | Nhánh `main`, đầy đủ commit history minh bạch |
-| 📊 **Slide thuyết trình** | 👉 **[Slide](https://drive.google.com/file/d/1MnYTZFrnOwkrmN3ThGfhsBjA8gm-xlBP/view?usp=sharing)** | Bản tham khảo; cần xuất PDF tiếng Anh ≤15 slide cho AI4Biz |
-| 🧪 **Bộ 25 Testcase mẫu (Golden Dataset)** | 👉 **[Xem chi tiết 25 Testcase bên dưới](#-danh-mục-25-test-case-mẫu-golden-dataset--benchmark-suites)** | Thư mục `mock-data/clean` & `mock-data/dirty`, nạp sẵn trên Web |
-| 📝 **Nhật ký phát triển (Build Log)** | 👉 **[Nhật Ký Phát Triển (Build Log) — 8D Copilot.pdf](<Nhật Ký Phát Triển (Build Log) — 8D Copilot.pdf>)** | Lịch sử phát triển; AI4Biz không yêu cầu build log một trang |
+**UIT_4Lovpe**, University of Information Technology, Vietnam National University Ho Chi Minh City:
 
----
+- Trần Hoàng Đức
+- Trương Đình Việt Dũng
+- Trần Đình Duy
+- Nguyễn Trung Dũng
 
-## 📋 Yêu cầu hệ thống (Prerequisites)
+### Submission Requirements
 
-Trước khi bắt đầu, hãy đảm bảo máy tính của bạn đã cài đặt:
-- **Node.js**: Phiên bản `v18` hoặc `v20+` (khuyên dùng Node.js LTS v20 hoặc v22).
-  - Kiểm tra bằng lệnh: `node -v`
-- **npm**: Phiên bản `v9+` (đi kèm sẵn với Node.js).
-  - Kiểm tra bằng lệnh: `npm -v`
-- **Git**: Đã cài đặt Git để clone mã nguồn.
-- *(Không bắt buộc)*: Không cần cài đặt Docker hay bất kỳ phần mềm Database server nào (hệ thống có sẵn SQLite tích hợp chạy ngay).
+- Submission deadline: **23:59 on November 13, 2026**, Vietnam time.
+- Submission document: **an English PDF with at most 15 slides**.
+- Submission folder: `AI4Biz_UIT_4Lovpe_2026`.
+- Submit the PDF's Google Drive link through the organizer's form with **Anyone with the link can view** access.
+- A prototype or MVP link is optional and can strengthen the submission.
+- Final pitch: **November 19, 2026**, in English, lasting at most **15 minutes**.
+- Final presentation materials: slides and a demo video lasting at most **2 minutes**.
+- Q&A: **5 minutes**.
+- At least **3 team members** must attend and present at the final.
 
----
+See the [official challenge](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21) and [submission form](https://docs.google.com/forms/d/e/1FAIpQLScoXGsQEvo_-kofEcYXvuQz8NrTdBCPS1HCIytfocO6EY8QyQ/viewform). The official page's summary table and detailed headings disagree on the Feasibility and Presentation weights; [AI4BIZ.md](AI4BIZ.md) records both versions.
 
-## ⚡ Hướng dẫn cài đặt và chạy ứng dụng từ A đến Z
+Markdown updates do not rebuild existing HTML decks, PDFs, DOCX files or videos. Review the competition name, team roster, language, slide count and video duration in the exported submission assets.
 
-### 1. Clone mã nguồn về máy
+## The Business Problem
 
-Mở terminal (PowerShell, Command Prompt hoặc Git Bash) và chạy lệnh:
+Quality investigations require engineers to reconcile defect notifications, inspection measurements, production context and reports from earlier incidents. When these records are scattered, the team spends time reconstructing information before it can evaluate a corrective action.
 
-```bash
-# Clone repository (nhánh main)
+8D Copilot brings that information into one workflow:
+
+- Retrieve previous cases using the manufacturing context and configured similarity criteria.
+- Draft structured explanations and proposed actions from available evidence.
+- Highlight missing information, conflicting evidence and decisions that need human review.
+- Record approvals and review history so the basis of a decision can be inspected later.
+
+The intended benefit is lower report preparation and evidence retrieval effort. Any claimed savings need a defined comparison that includes review time and corrections. Draft generation time is not incident resolution time.
+
+## Core Capabilities
+
+- **Structured case intake:** Create an 8D report from a defect record or supported JSON input.
+- **Precedent retrieval:** Find related closed cases and inspect the sources behind suggestions. The active engine and semantic capabilities depend on configuration.
+- **AI drafting:** Prepare suggestions across D1 through D8, including problem descriptions, cause analysis and proposed actions.
+- **Root cause analysis:** Work with 6M Ishikawa diagrams, 5-Why chains and supporting inspection evidence.
+- **AI Referee:** Compare explanations with evidence to help engineers identify unsupported conclusions.
+- **Stop conditions:** Request clarification or escalation when facts are unverified, evidence is insufficient or a decision exceeds the permitted scope.
+- **Human approval and audit history:** Review each discipline and retain the recorded decisions.
+- **Prevention and maintenance history:** Connect preventive measures with approved causes and inspect the history of approved maintenance proposals.
+
+## The Eight Disciplines
+
+1. **D1 - Team:** Define the people and responsibilities needed to investigate the issue.
+2. **D2 - Problem:** Describe the defect, measurements and scope, including Is / Is-Not analysis.
+3. **D3 - Containment:** Propose immediate measures to limit the impact of the defect.
+4. **D4 - Root Cause:** Investigate causes using evidence, Ishikawa analysis, 5-Why chains and precedents.
+5. **D5 - Corrective Actions:** Select actions that address the verified root cause.
+6. **D6 - Verification:** Record evidence that the corrective actions are effective.
+7. **D7 - Prevention:** Propose changes that reduce recurrence and update relevant process controls.
+8. **D8 - Closure:** Review completion, capture lessons learned and close the case when authorized.
+
+## Run Locally
+
+### Prerequisites
+
+- Node.js 22 and npm.
+- Git.
+- Windows with PowerShell for the commands below. The current development scripts include Windows shell behavior.
+- Access to the package registries configured for this repository if installation requests authentication.
+- Docker only for the optional PostgreSQL setup. The default SQLite setup does not require a database server.
+
+### 1. Clone and Install
+
+```powershell
 git clone https://github.com/DungTruong1610/8D_problem_solving.git
-
-# Di chuyển vào thư mục dự án
 cd 8D_problem_solving
-```
-
----
-
-### 2. Cài đặt các gói thư viện (Dependencies)
-
-Cài đặt đầy đủ các thư viện cho cả phần **Backend** và **Frontend**:
-
-```bash
-# 1. Cài đặt thư viện Backend (tại thư mục gốc)
 npm install
-
-# 2. Cài đặt thư viện Frontend
-npm install --prefix app/8D_hackathon_ui
+cd app/8D_hackathon_ui
+npm install
+cd ../..
 ```
 
----
+### 2. Configure the Environment
 
-### 3. Cấu hình biến môi trường (`.env`)
+For a new checkout without an existing `.env` file:
 
-Tạo file `.env` từ file mẫu có sẵn:
-
-```bash
-# Trên Windows (PowerShell):
-copy .env.example .env
-
-# Hoặc trên Linux / macOS / Git Bash:
-cp .env.example .env
+```powershell
+Copy-Item .env.example .env
 ```
 
-Mở file `.env` vừa tạo và cấu hình AI:
+For local development without live model calls, edit `.env` and set:
 
-#### 👉 Cách A: DeepSeek (khuyên dùng)
-1. Lấy API Key: [DeepSeek Platform](https://platform.deepseek.com) (chính hãng, rẻ hơn) hoặc [OpenCode](https://opencode.ai/auth) (gói Go/Zen).
-2. Lấy thêm key embedding miễn phí tại [Jina AI](https://jina.ai/embeddings/) — DeepSeek không có API embedding, thiếu key này thì tìm kiếm ngữ nghĩa sẽ bị bỏ qua (không báo lỗi).
-3. Điền vào file `.env`:
-   - **Tùy chọn 1: DeepSeek chính hãng (Platform API)**:
-     ```env
-     DEEPSEEK_API_KEY=sk-your-key
-     DEEPSEEK_BASE_URL=https://api.deepseek.com
-     DEEPSEEK_MODEL=deepseek-flash
-     JINA_API_KEY=jina-your-key
-     ```
-   - **Tùy chọn 2: OpenCode Go / Zen**:
-     ```env
-     DEEPSEEK_API_KEY=sk-your-key
-     DEEPSEEK_BASE_URL=https://opencode.ai/zen/go/v1
-     DEEPSEEK_MODEL=deepseek-v4.1-flash
-     JINA_API_KEY=jina-your-key
-     ```
-
-#### 👉 Cách B: Google Gemini (vẫn dùng được)
-```env
-GEMINI_API_KEY=AIzaSyYourActualApiKeyHere
-GEMINI_MODEL=gemini-2.5-flash
-```
-
-#### 👉 Cách C: Chế độ chạy thử không cần mạng (Mock AI)
-Nếu bạn chưa có API Key ngay hoặc chỉ muốn kiểm tra giao diện:
 ```env
 MOCK_LLM=true
 ```
 
-Kiểm tra nhanh cấu hình AI trước khi chạy app:
-```bash
-npx tsx scripts/probe-ai.ts
-```
-Script sẽ in ra provider đang dùng, chạy thử JSON/tool/thinking, và nhúng thử 2 câu để xác nhận key embedding hoạt động.
+Mock mode returns test responses. It does not demonstrate the quality of a real AI model. See [AI Configuration](#ai-configuration) to enable a live provider.
 
----
+### 3. Initialize SQLite
 
-### 4. Khởi tạo Database & Sử dụng Dữ liệu mẫu (Sample Database)
+Run these commands from the repository root for a new local database:
 
-Hệ thống sử dụng cơ sở dữ liệu SQLite cục bộ (lưu trong file `db.sqlite` ngay tại thư mục gốc, **hoàn toàn không cần cài đặt thêm MySQL, PostgreSQL hay Docker**).
-
-Bạn có thể lựa chọn 1 trong 2 cách sau:
-
-#### 👉 Cách 1: Tự động khởi tạo và nạp toàn bộ dữ liệu mẫu từ mã nguồn (Khuyên dùng)
-Nếu bạn vừa mới clone dự án về, chỉ cần chạy 1 dòng lệnh duy nhất để tạo database và nạp sẵn toàn bộ kho dữ liệu:
-
-```bash
-npm run deploy:sqlite && npm run seed:sqlite
+```powershell
+npm run deploy:sqlite
+npm run seed:sqlite
 ```
 
-> **Lệnh trên sẽ tự động nạp sẵn vào `db.sqlite`:**
-> - 📚 **25 ca bệnh sự cố 8D hoàn chỉnh** từ `mock-data/clean/` (bao gồm đầy đủ dữ liệu từ D1 → D8, sơ đồ 6M Ishikawa, chuỗi 5-Why, hành động khoanh vùng D3, hành động khắc phục D5 và phòng ngừa D7).
-> - ⚠️ **15 ca lỗi kiểm thử mẫu** được phân loại rõ ràng theo 3 nhóm chuẩn công nghiệp:
->   - **Q1 — Customer Complaint**: Lỗi từ khiếu nại khách hàng.
->   - **Q2 — Supplier Defect**: Lỗi linh kiện/phôi nhập từ nhà cung cấp.
->   - **Q3 — Internal Defect**: Lỗi phát hiện tại các công đoạn nội bộ nhà máy (phay, tiện, mài, lắp ráp).
-> - 👥 **Danh bạ 21 nhân sự chuyên gia mẫu** (chức danh, email, số điện thoại) phục vụ phân công đội ngũ D1.
-> - 📊 **Bộ đặc tính đo kiểm, dung sai kỹ thuật, mã lỗi và danh mục vật tư chuẩn**.
+The local configuration uses `db.sqlite`. Seeding supplies demonstration records and supporting reference data. These commands change the database; back up any data you need before reinitializing or reseeding it.
 
-#### 👉 Cách 2: Sử dụng trực tiếp file `db.sqlite` có sẵn
-Nếu bạn được đồng đội gửi sẵn file `db.sqlite` hoặc tải về từ bản sao lưu:
-1. Copy file `db.sqlite` đặt trực tiếp vào thư mục gốc của dự án (`8D_problem_solving/db.sqlite`).
-2. **Không cần chạy lệnh deploy hay seed nào nữa**, chuyển thẳng sang **Bước 5** bên dưới để khởi động app!
+If a teammate provides an existing database compatible with this code revision, place it at the configured database path and skip initialization.
 
-> 💡 **Mẹo: Muốn Reset hoặc khôi phục lại dữ liệu mẫu ban đầu?**  
-> Bất kỳ lúc nào trong quá trình test mà dữ liệu bị thay đổi, bạn chỉ cần chạy lại lệnh:  
-> `npm run deploy:sqlite && npm run seed:sqlite`  
-> Database sẽ tự động được làm mới và đưa về trạng thái dữ liệu mẫu chuẩn ban đầu.
+### 4. Start the Application
 
----
-
-### 5. Khởi động ứng dụng (Run Application)
-
-Chạy cả Backend và Frontend cùng lúc bằng **1 lệnh duy nhất**:
-
-```bash
+```powershell
 npm run dev
 ```
 
-*(Hoặc nếu bạn thích mở 2 cửa sổ terminal riêng biệt):*
-- **Terminal 1 (Backend - Cổng 4008)**:
-  ```bash
-  npm run dev:backend
-  ```
-- **Terminal 2 (Frontend - Cổng 5544)**:
-  ```bash
-  npm run dev --prefix app/8D_hackathon_ui
-  ```
+The current development scripts start:
 
----
+- Frontend: [http://localhost:5544](http://localhost:5544).
+- Backend: [http://localhost:4008](http://localhost:4008).
 
-### 6. Mở và trải nghiệm ứng dụng
+To run the services separately, start the backend from the repository root in one terminal:
 
-Bạn có thể lựa chọn trải nghiệm ứng dụng theo 2 cách:
-
-- 🌐 **Cách 1: Trải nghiệm trực tuyến (Khuyên dùng cho BGK - Không cần cài đặt)**:
-  - 👉 **Link Website**: **[https://8-d-problem-solving.vercel.app](https://8-d-problem-solving.vercel.app)**
-  - 🎬 **Video tham khảo (bản nộp AI4Biz phải ≤2 phút)**: **[Xem Video Demo tại đây](https://drive.google.com/drive/folders/1EMNPvJtuusw9Dh1NjabfNLnO5E_v8n-h)**
-
-- 💻 **Cách 2: Chạy cục bộ trên máy cá nhân (Localhost)**:
-  - Mở trình duyệt web và truy cập địa chỉ: 👉 **[http://localhost:5544](http://localhost:5544)**
-  - **Địa chỉ Backend API**: [http://localhost:4008](http://localhost:4008)
-  - **Tài khoản đăng nhập**: Hệ thống chạy local đã tự động đăng nhập sẵn với quyền **Local Developer (Admin)**, bạn không cần nhập mật khẩu.
-
----
-
-## 💡 Hướng dẫn kiểm tra tính năng trên giao diện
-
-Sau khi mở web [http://localhost:5544](http://localhost:5544), bạn sẽ thấy bảng danh sách **8D Reports** với 27+ hồ sơ mẫu sẵn có:
-
-### 👉 Cách 1: Tạo và phân tích một hồ sơ 8D mới từ danh mục lỗi kiểm thử
-1. **Bước 1**: Nhấn nút **"Create 8D Report"** màu vàng ở góc trên bên phải bảng báo cáo.
-2. **Bước 2**: Hộp thoại sẽ hiển thị danh mục các lỗi kiểm thử có sẵn, được lọc theo các tab:
-   - **All**: Tất cả các lỗi sẵn sàng xử lý.
-   - **Q1 Customer**: Khiếu nại từ khách hàng (ví dụ: bavia, bong tróc sơn, rò rỉ đúc...).
-   - **Q2 Supplier**: Lỗi từ nhà cung cấp linh kiện (ví dụ: phôi rỗ khí, phôi thép nứt mép, trục rèn bị đảo...).
-   - **Q3 Internal**: Lỗi phát hiện nội bộ chuyền sản xuất (ví dụ: cháy mài, tuôn ren siết ốc, sai lệch kích thước tiện/phay...).
-3. **Bước 3**: Nhấp chọn một lỗi bất kỳ để xem trước chi tiết thông số đo kiểm thực tế ở panel bên phải.
-4. **Bước 4**: Nhấn **"Create & Analyze"**:
-   - Hệ thống tự động tạo hồ sơ 8D và kích hoạt AI phân tích toàn diện.
-   - AI sẽ tự động đọc dữ liệu đo kiểm thực tế, tìm kiếm ca bệnh tương đồng từ kho tiền lệ và điền tự động 8 bước (D1 → D8), dựng cây nguyên nhân gốc rễ 6M Ishikawa và chuỗi 5-Why.
-
-### 👉 Cách 2: Trải nghiệm các hồ sơ 8D mẫu đã có sẵn
-1. Bấm trực tiếp vào bất kỳ dòng nào trong bảng danh sách **8D Reports** (ví dụ các ca có trạng thái *Signed off*, *In process*, hoặc *Awaiting approval*).
-2. Xem chi tiết từng bước quy trình chất lượng:
-   - **D1 Team**: Đội ngũ xử lý với các nhân sự chuyên môn được gợi ý.
-   - **D2 Problem**: Mô tả sự cố chi tiết và ma trận phân định *Is / Is-Not*.
-   - **D3 Containment**: Các biện pháp khoanh vùng và cách ly lô hàng lỗi.
-   - **D4 Root Cause**: Sơ đồ xương cá 6M Ishikawa tương tác trực quan, chuỗi 5-Why tìm nguyên nhân gốc, và panel **Precedent Cases** đối chuẩn các ca tương đồng trong lịch sử.
-   - **D5 Corrective Actions**: Hành động khắc phục triệt để.
-   - **D6 Verification**: Bằng chứng nghiệm thu hiệu quả.
-   - **D7 Prevention**: Cập nhật FMEA và biện pháp ngăn ngừa tái diễn.
-   - **D8 Closure**: Đóng hồ sơ và ghi nhận bài học kinh nghiệm.
-
----
-
-## 🧪 Danh mục 25 Test Case Mẫu (Golden Dataset & Benchmark Suites)
-
-Hệ thống được trang bị bộ dữ liệu chuẩn công nghiệp **25 Test Case thực tế** từ dây chuyền sản xuất cơ khí chính xác, ô tô, điện tử và đúc áp lực (được lưu tại thư mục [`mock-data/`](mock-data/)). 
-
-### 🎯 Điểm đặc biệt của Bộ Test Case: Đối chứng "Sạch vs Bẩn" (Clean vs Dirty)
-Bộ dữ liệu gồm 2 cặp đối chứng $1:1$ (tổng cộng 50 file JSON):
-1. **`mock-data/clean/` (25 ca)**: Dữ liệu đã chuẩn hóa hoàn chỉnh (Golden Dataset) có đầy đủ 6 nhánh Ishikawa, chuỗi 5-Why, hành động D3/D5/D7 và thông số đo kiểm (Ground Truth).
-2. **`mock-data/dirty/` (25 ca tương ứng)**: Dữ liệu ghi nhận thô thực tế từ hệ thống của nhà máy để kiểm chứng:
-   - Khả năng **chẩn đoán mù (Blind Diagnosis)** của AI dựa trên nguyên lý đo kiểm vật lý (First-Principles) mà không bị phụ thuộc vào cờ có sẵn.
-   - Năng lực **phản biện nhận định chủ quan của con người** (ví dụ: công nhân đổ lỗi cho [Man], nhưng dữ liệu máy chỉ ra hao mòn đồ gá [Machine]).
-
----
-
-### 📊 Bảng tổng hợp 25 Test Case Mẫu
-
-| STT | Mã Hồ Sơ | Nguồn Gốc | Linh Kiện & Bộ Phận | Mô Tả Hiện Tượng Sự Cố | Nhóm 6M (Ground Truth) |
-| :---: | :--- | :--- | :--- | :--- | :---: |
-| 1 | `8D-10048412` | Q3 Internal | Bracket Housing X240 | Flange edge burr above limit after milling | ⚙️ **Machine** |
-| 2 | `8D-10048420` | Q3 Internal | Sprocket Hub H22 | Raised metal ridge at bore mouth | ⚙️ **Machine** |
-| 3 | `8D-10048577` | Q1 Customer | Pump Housing P90 | Porosity at sealing flange face | 🧱 **Material** |
-| 4 | `8D-10048603` | Q3 Internal | Drive Shaft S150 | Shaft diameter below lower tolerance | 📐 **Method** |
-| 5 | `8D-10048651` | Q1 Customer | Housing Cover C80 | Coating layer peeling after salt spray test | ⚙️ **Machine** |
-| 6 | `8D-10048702` | Q3 Internal | Gearbox End Cap G45 | Bolt torque below specification | 👷 **Man** |
-| 7 | `8D-10048745` | Q1 Customer | Sensor Mount Bracket S22 | Adhesive bond failure under thermal shock | 🌡️ **Environment** |
-| 8 | `8D-10048788` | Q3 Internal | Rotor Shaft R60 | Chatter marks on ground surface | ⚙️ **Machine** |
-| 9 | `8D-10048811` | Q1 Customer | Manifold Block M12 | Port thread depth insufficient | 📐 **Method** |
-| 10 | `8D-10048834` | Q3 Internal | Spring Retainer SR8 | Retainer cracking during forming | 🧱 **Material** |
-| 11 | `8D-10048857` | Q1 Customer | Bearing Cap BC14 | Bore position out of true position | ⚙️ **Machine** |
-| 12 | `8D-10048880` | Q3 Internal | Bracket Housing X240 | Pocket depth inconsistent across units | 👷 **Man** |
-| 13 | `8D-10048903` | Q1 Customer | Trim Panel T18 | Paint gloss out of specification | 📐 **Method** |
-| 14 | `8D-10049010` | Q3 Internal | Bracket Housing X240 | Chatter marks and surface waviness on milled flange | ⚙️ **Machine** |
-| 15 | `8D-10049020` | Q1 Customer | Bushing Sleeve B45 | Outer diameter taper out of tolerance on CNC lathe | 📏 **Measurement** |
-| 16 | `8D-10049030` | Q3 Internal | Stamping Bracket SB-12 | Excessive burr and edge micro-cracks on stamped sheet | ⚙️ **Machine** |
-| 17 | `8D-10049040` | Q1 Customer | Electronic Enclosure EE-50 | Sink mark and internal void on cosmetic injection molded surface | 📐 **Method** |
-| 18 | `8D-10049050` | Q3 Internal | Control Board PCBA-900 | Solder bridging short circuit on fine-pitch QFN package | 🧱 **Material** |
-| 19 | `8D-10049060` | Q3 Internal | Pump Motor Assembly PMA-30 | Stripped plastic thread boss during automated screwdriving | 👷 **Man** |
-| 20 | `8D-10049070` | Q1 Customer | Bezel Frame BF-10 | Pitting corrosion and dark discoloration on anodized aluminum bezel | 🌡️ **Environment** |
-| 21 | `8D-10049080` | Q3 Internal | Drive Shaft S150 | Insufficient case depth after induction hardening | ⚙️ **Machine** |
-| 22 | `8D-10049090` | Q1 Customer | Exhaust Flange EF-80 | Internal porosity in robotic fiber laser welded lap joint | 📐 **Method** |
-| 23 | `8D-10049100` | Q3 Internal | Pump Housing P90 | Hydraulic pressure test leak due to O-ring seal extrusion | 🧱 **Material** |
-| 24 | `8D-10049110` | Q3 Internal | Guide Rail GR-200 | Grinding burn and micro-cracks on precision linear guideway | 📐 **Method** |
-| 25 | `8D-10049120` | Q3 Internal | Bracket Housing X240 | Coordinate Measuring Machine false rejection on bolt circle true position | 📏 **Measurement** |
-
----
-
-### 🔍 3 Kênh để Ban Giám Khảo (BGK) kiểm chứng 25 Test Case
-
-1. **Trực tiếp trên Giao diện Web (Live Web & Localhost)**:
-   - **Tạo hồ sơ mới từ kho defect**: Bấm nút **"Create 8D Report"** (góc trên bên phải màn hình danh sách) $\rightarrow$ Duyệt chọn bất kỳ sự cố nào theo các tab `All`, `Q1 Customer`, `Q2 Supplier`, `Q3 Internal` $\rightarrow$ Xem thông số đo kiểm thực tế $\rightarrow$ Bấm **"Create & Analyze"** để AI thực hiện phân tích tự động.
-   - **Xem các hồ sơ đã giải quyết sẵn**: Trên Dashboard chính, nhấp chọn các hồ sơ có trạng thái *Signed off* hoặc *In process* để kiểm tra kết quả phân tích D1 $\rightarrow$ D8, cây Ishikawa 6M trực quan và bảng đối chuẩn tiền lệ **Precedent Cases**.
-
-2. **Duyệt file dữ liệu gốc trong mã nguồn (Raw JSON Datasets)**:
-   - Thư mục dữ liệu chuẩn hóa: [`mock-data/clean/`](mock-data/clean/) (25 ca từ `case-8D-10048412.json` đến `case-8D-10049120.json`).
-   - Thư mục dữ liệu thô SAP QM: [`mock-data/dirty/`](mock-data/dirty/) (25 ca tương ứng từ `case-8D-90048412.json` đến `case-8D-90049120.json`).
-   - Tài liệu giải trình kỹ thuật bộ dữ liệu: [`mock-data/README.md`](mock-data/README.md).
-
-3. **Chạy kiểm thử 4 Test Case trọng tâm (Automated Test Harness & Web Evaluation Dashboard)**:
-   Bộ 4 Test Case đại diện cho 4 góc phần tư kiểm thử khắt khe (Happy path, Messy real-world data, Confirmation bias, Safe refusal & escalation).
-
-   - **Cách A: Chạy 1-Click trên Web UI (Tab `User & Judge Guide` ➔ `4. Evaluation` - Khuyên dùng cho BGK)**:
-     1. Mở web: `http://localhost:5544` (hoặc [Live Web](https://8-d-problem-solving.vercel.app)).
-     2. Vào menu bên trái chọn **`User & Judge Guide`** $\rightarrow$ chọn tab **`4. Evaluation`**.
-     3. Bấm nút xanh **`▶ Run verification`** ở góc trên bên phải: Hệ thống tự động kích hoạt Test Harness chạy ngầm toàn bộ 4 Test Case và hiển thị kết quả `PASS` kèm thời gian xử lý (dưới 5 giây).
-     4. Bấm **`Summary`** ở từng dòng để xem popup bằng chứng kỹ thuật, hoặc **`Open case ➔`** để nhảy thẳng tới hồ sơ 8D tương ứng.
-     5. Thử nghiệm **`Judge sandbox`** (khung bên dưới): Bấm 3 nút mẫu `[Valid defect]` (lỗi hợp lệ), `[Out of domain]` (lỗi ngoài phạm vi), `[Junk invoice]` (hóa đơn rác bị từ chối an toàn), hoặc dán bất kỳ file JSON nào để AI đánh giá trực tiếp.
-
-   - **Cách B: Chạy tự động qua Command Line (CLI Automated Test Harness)**:
-     Tại thư mục gốc dự án, chạy lệnh:
-     ```bash
-     npm run verify:sprint1
-     ```
-     *(hoặc: `npx tsx scripts/verify-sprint1-harness.ts` — toàn bộ 4 Test Case được đối soát và in bảng kết quả Pass/Fail trong dưới 5 giây).*
-
-     *Kiểm thử với file dữ liệu JSON riêng của Giám khảo qua CLI:*
-     ```bash
-     npm run verify:sprint1 -- --judge-input <đường-dẫn-file-json-của-BGK>
-     ```
-
-   ---
-
-   #### 🎯 Bảng tóm tắt 4 Trường hợp kiểm thử mẫu (Kiểm thử kỹ thuật nội bộ):
-
-   | Mã TC & Kịch bản | Dữ liệu đầu vào (Input Data) | Hành vi kỳ vọng (Expected Behavior) | Cách thực thi (Execution Method) |
-   | :--- | :--- | :--- | :--- |
-   | **TC-01: Milling burr defect**<br>• *Góc 1: Happy path*<br>• *Mã ca: `8D-10049001`* | • Tổ máy: `WC-MILL-07` (CNC Line 7)<br>• Vật tư: Nhôm `MAT-10247`<br>• Mã lỗi: `DEF-0489` (Bavia mép)<br>• Số đo: `0.26mm` (Max `0.10mm`)<br>• Dữ liệu sạch chuẩn SAP QM | • Đồ thị GraphAI quét trúng tiền lệ gốc `8D-10048412`<br>• Tự động hoàn thành chuỗi D1 $\rightarrow$ D8, suy luận nguyên nhân gốc do mòn dao phay (`Machine`)<br>• Không có cổng dừng nào bị chặn (`no blocking stop`), ca đủ điều kiện nghiệm thu | **Web UI:** Vào `User & Judge Guide` $\rightarrow$ Tab `4. Evaluation` $\rightarrow$ Bấm `▶ Run verification`<br><br>**CLI:** `npm run verify:sprint1` |
-   | **TC-02: Dirty SAP QM export**<br>• *Góc 2: Messy real-world data*<br>• *Mã ca: `8D-90048412`* | • Mã vật tư bị chèn khoảng trắng rác: `"  MAT-10247 "`<br>• Số đo viết tự do tiếng Đức: `"Flange burr height: gemessen 0,32mm, Sollwert max 0,10mm"`<br>• Bị thiếu một số trường quy trình | • Không bị crash/lỗi runtime<br>• Tự làm sạch mã vật tư về `'MAT-10247'`, bóc tách số đo thực `0.32` từ chuỗi text tự do<br>• Báo cáo khoảng trống dữ liệu (`data gaps`)<br>• **Kích hoạt cổng dừng D4** (`unverified-facts`), khóa ca chờ QE xác nhận số đo | **Web UI:** Vào `User & Judge Guide` $\rightarrow$ Tab `4. Evaluation` $\rightarrow$ Bấm `▶ Run verification`<br><br>**CLI:** `npm run verify:sprint1` |
-   | **TC-03: Pocket depth deviation**<br>• *Góc 3: Confirmation bias*<br>• *Mã ca: `8D-10049004`* | • Kỹ sư kết luận đổ lỗi: Công nhân ca C gá ẩu (`Man`, `isRootCause = 'Y'`) không có số liệu chứng minh<br>• Cảm biến đo thực tế: Độ rơ trục kẹp dao là `0.9mm` (Dung sai max `0.2mm`) | • AI kích hoạt **Chẩn đoán mù (Blind Diagnosis)**: Cắt bỏ lời khai kỹ sư, chỉ đọc số đo vật lý `0.9mm`<br>• AI kết luận nguyên nhân gốc do Thiết bị (`Machine`)<br>• **AI Referee tuýt còi khóa cổng dừng D4** (`unverified-facts`), bảo vệ công nhân khỏi bị kỷ luật oan | **Web UI:** Vào `User & Judge Guide` $\rightarrow$ Tab `4. Evaluation` $\rightarrow$ Bấm `▶ Run verification`<br><br>**CLI:** `npm run verify:sprint1` |
-   | **TC-04: Crimp defect on a new harness line**<br>• *Góc 4: Safe refusal & escalation*<br>• *Mã ca: `8D-10049003`* | • Sự cố bấm cos dây điện phát sinh trên dây chuyền hoàn toàn mới (`WC-HARNESS-01`, phôi `MAT-WIRE-01`)<br>• Toàn bộ kho tiền lệ chưa từng có dữ liệu về tổ máy hay mã lỗi này | • AI quét đồ thị và xác nhận không có tiền lệ (`precedentFound = false`)<br>• **Hành vi từ chối an toàn:** AI từ chối suy đoán bậy, không trích dẫn tiền lệ sai lệch<br>• **Kích hoạt cổng dừng leo thang D4** (`outside-scope`), tạo 3 câu hỏi kỹ thuật chuyển giao cho chuyên gia con người | **Web UI:** Vào `User & Judge Guide` $\rightarrow$ Tab `4. Evaluation` $\rightarrow$ Bấm `▶ Run verification`<br><br>**CLI:** `npm run verify:sprint1` |
-
-
-
-
----
-
-## 🛠️ Xử lý sự cố thường gặp (Troubleshooting)
-
-| Vấn đề | Nguyên nhân | Cách khắc phục |
-|---|---|---|
-| Báo lỗi `Cannot find table ...` | Chưa tạo database SQLite | Chạy lệnh: `npm run deploy:sqlite && npm run seed:sqlite` |
-| Cổng 4008 hoặc 5544 bị báo đang được sử dụng | Còn tiến trình cũ đang chạy ngầm | Đóng terminal cũ, hoặc khởi động lại bằng lệnh `npm run dev:all` |
-| Bấm "Analyze with AI" báo lỗi API | Chưa cấu hình hoặc sai API Key | Kiểm tra `DEEPSEEK_API_KEY` trong `.env` (hoặc `GEMINI_API_KEY`), chạy `npx tsx scripts/probe-ai.ts` để xem provider nào đang chạy, hoặc bật `MOCK_LLM=true` để test thử |
-| Tìm tiền lệ không bao giờ khớp theo ngữ nghĩa | Chưa có nhà cung cấp embedding | Thêm `JINA_API_KEY` vào `.env` (DeepSeek không có API embedding). Log khởi động sẽ báo `Embedding: KHÔNG CÓ` nếu thiếu |
-| `npm install` báo lỗi peer dependencies | Thiếu cờ bỏ qua xung đột phiên bản | Chạy `npm install --legacy-peer-deps` |
-
----
-
-## 📁 Cấu trúc thư mục dự án
-
-```text
-├── app/
-│   └── 8D_hackathon_ui/       # Mã nguồn giao diện người dùng React (Vite, TailwindCSS, Shadcn/UI)
-├── srv/                       # Mã nguồn Backend CAP (Express, AI Services, OData Handlers)
-│   ├── server.ts              # Custom Bootstrap Server
-│   └── src/
-│       ├── core/ai/           # Logic kết nối các nhà cung cấp AI (DeepSeek, Gemini, LLM local, Mock)
-│       └── domain/eightd/     # Logic nghiệp vụ 8D, AI Prompts, Precedent Search
-├── packages/                  # Các thư viện nội bộ (.tgz)
-├── scripts/                   # Các script seed database, test AI và migration
-├── .env.example               # File mẫu cấu hình biến môi trường
-├── vercel.json                # Cấu hình sẵn sàng triển khai Frontend lên Vercel
-└── package.json               # Quản lý script và dependencies của dự án
+```powershell
+npm run dev:backend
 ```
+
+Start the frontend in another terminal:
+
+```powershell
+cd app/8D_hackathon_ui
+npm run dev
+```
+
+The local Vite proxy supplies development authentication to the backend. This configuration is intended for local development, not production access control.
+
+### Optional PostgreSQL Setup
+
+With Docker available, review the database settings in `.env`, then run from the repository root:
+
+```powershell
+npm run db:up
+npm run deploy:pg
+npm run seed:pg
+npm run dev:pg
+```
+
+Deployment and seed commands modify the selected database. Use the profile that matches the environment you intend to demonstrate.
+
+## AI Configuration
+
+The [environment template](.env.example) documents the supported chat and embedding settings. Model identifiers and endpoints must match the provider account you use.
+
+- **DeepSeek:** Configure `DEEPSEEK_API_KEY`, `DEEPSEEK_BASE_URL` and `DEEPSEEK_MODEL`.
+- **Google Gemini:** Configure `GEMINI_API_KEY` and the corresponding model settings.
+- **Local models:** Configure `LOCAL_LLM_URL`, `LOCAL_LLM_MODEL` and any required endpoint credentials.
+- **SAP AI Core:** Use the service key or individual AI Core settings in the environment template.
+- **Embeddings:** Configure `JINA_API_KEY` or the explicit embedding endpoint, key and model settings. Semantic retrieval requires a configured embedding provider.
+
+Set `MOCK_LLM=false` when testing a live provider, save `.env` and restart the application. Inspect the startup logs to confirm which chat model, embedding provider and retrieval configuration are active.
+
+To verify the configured endpoints:
+
+```powershell
+npx tsx scripts/probe-ai.ts
+```
+
+The probe can make requests to the configured providers. When embeddings are unavailable or disabled, semantic matching is skipped. Keep credentials in local environment configuration, outside source files and submission materials.
+
+## Try the Demo
+
+1. Open the application and go to **8D Reports**.
+2. Select **Create 8D Report**.
+3. Choose a defect from **All**, **Q1 Customer**, **Q2 Supplier** or **Q3 Internal**, or use the supported JSON import flow.
+4. Review the defect context and measurements, then select **Create & Analyze**.
+5. Inspect the draft, retrieved precedents and supporting evidence. A populated draft is not an approved discipline.
+6. Open D4 to examine the Ishikawa diagram, 5-Why chain and AI Referee observations.
+7. Review stop conditions and provide the required clarification or decision.
+8. Inspect preventive actions and the audit trail before progressing toward closure.
+
+You can also open an existing sample report to inspect its disciplines and review state. Use **User & Judge Guide** for the guided walkthrough and internal evaluation tools.
+
+For an AI4Biz demonstration, show one understandable case, the source of a suggestion, a situation requiring human review and the resulting audit record. Label sample data clearly.
+
+## Sample Data and Verification
+
+The repository includes demonstration fixtures for manufacturing defects, clean and dirty inputs, and regression checks. They support repeatable demonstrations; they are not evidence of a completed customer pilot or measured production savings.
+
+- [Clean case fixtures](mock-data/clean/) - Structured reference inputs.
+- [Dirty case fixtures](mock-data/dirty/) - Inputs used to exercise normalization and evidence review.
+- [Dataset documentation](mock-data/README.md) - Context for the sample library.
+- [Verification runbook](docs/SPRINT1-VERIFY-RUNBOOK.md) - Commands, coverage and limitations.
+
+### Reference Case Catalog
+
+The existing demonstration catalog covers these 25 cases. Expected outcomes belong to the fixtures and must not be treated as conclusions about a new incident.
+
+- `8D-10048412` - Bracket Housing X240: Flange edge burr above limit after milling.
+- `8D-10048420` - Sprocket Hub H22: Raised metal ridge at bore mouth.
+- `8D-10048577` - Pump Housing P90: Porosity at sealing flange face.
+- `8D-10048603` - Drive Shaft S150: Shaft diameter below lower tolerance.
+- `8D-10048651` - Housing Cover C80: Coating layer peeling after salt spray test.
+- `8D-10048702` - Gearbox End Cap G45: Bolt torque below specification.
+- `8D-10048745` - Sensor Mount Bracket S22: Adhesive bond failure under thermal shock.
+- `8D-10048788` - Rotor Shaft R60: Chatter marks on ground surface.
+- `8D-10048811` - Manifold Block M12: Port thread depth insufficient.
+- `8D-10048834` - Spring Retainer SR8: Retainer cracking during forming.
+- `8D-10048857` - Bearing Cap BC14: Bore position out of true position.
+- `8D-10048880` - Bracket Housing X240: Pocket depth inconsistent across units.
+- `8D-10048903` - Trim Panel T18: Paint gloss out of specification.
+- `8D-10049010` - Bracket Housing X240: Chatter marks and surface waviness on milled flange.
+- `8D-10049020` - Bushing Sleeve B45: Outer diameter taper out of tolerance on CNC lathe.
+- `8D-10049030` - Stamping Bracket SB-12: Excessive burr and edge micro-cracks on stamped sheet.
+- `8D-10049040` - Electronic Enclosure EE-50: Sink mark and internal void on cosmetic injection molded surface.
+- `8D-10049050` - Control Board PCBA-900: Solder bridging short circuit on fine-pitch QFN package.
+- `8D-10049060` - Pump Motor Assembly PMA-30: Stripped plastic thread boss during automated screwdriving.
+- `8D-10049070` - Bezel Frame BF-10: Pitting corrosion and dark discoloration on anodized aluminum bezel.
+- `8D-10049080` - Drive Shaft S150: Insufficient case depth after induction hardening.
+- `8D-10049090` - Exhaust Flange EF-80: Internal porosity in robotic fiber laser welded lap joint.
+- `8D-10049100` - Pump Housing P90: Hydraulic pressure test leak due to O-ring seal extrusion.
+- `8D-10049110` - Guide Rail GR-200: Grinding burn and micro-cracks on precision linear guideway.
+- `8D-10049120` - Bracket Housing X240: Coordinate Measuring Machine false rejection on bolt circle true position.
+
+### Internal Regression Harness
+
+Run the four-scenario harness from the repository root:
+
+```powershell
+npm run verify:sprint1
+```
+
+It exercises a valid case, dirty data, conflicting evidence and a case without a qualifying precedent. It checks validation, mapping, precedent retrieval and stop rules. It does **not** call LLM drafting and does not measure complete AI workflow latency or business impact.
+
+The `sprint1` command name, 90-second target and legacy competition labels are retained from earlier development. They are not AI4Biz scoring rules.
+
+### Additional Development Checks
+
+Run the backend tests and type checks from the repository root:
+
+```powershell
+npm test
+npm run typecheck
+```
+
+Build the frontend from its own directory:
+
+```powershell
+cd app/8D_hackathon_ui
+npm run build
+```
+
+Record the code revision, environment and actual output when reporting a result. Historical PASS records do not verify a later revision.
+
+## Project Structure
+
+- `app/8D_hackathon_ui/` - React and Vite frontend, report workspace, configuration screens and guided tours.
+- `srv/` - SAP CAP services, application bootstrap and backend handlers.
+- `srv/src/core/ai/` - Chat and embedding provider integration.
+- `srv/src/domain/eightd/` - 8D logic, retrieval, drafting, stop conditions and review workflows.
+- `db/` - Data model and database resources.
+- `scripts/` - Development, database seeding, verification and export tools.
+- `mock-data/` - Demonstration fixtures and sample datasets.
+- `docs/` - Product requirements, user guides, verification guidance and archives.
+- `docs_sprint2/` - Development notes, technical plans and build history.
+- `presentation/` - Presentation sources, research and rehearsal material.
+- `AI4BIZ.md` - Shared competition reference.
+- `.env.example` - Environment configuration template.
+- `package.json` - Backend dependencies, CAP profiles and project commands.
+
+## Documentation
+
+- [AI4Biz reference](AI4BIZ.md) - Competition requirements and roster.
+- [AI4Biz action plan](docs/HACKATHON-ACTION-PLAN.md) - Submission preparation and business evidence.
+- [Implementation priorities](docs_sprint2/plan.md) - Tasks and acceptance conditions.
+- [User and judge guide](docs/USER-AND-JUDGE-GUIDE.md) - Product walkthrough and evaluation tools.
+- [AI requirements](<docs/AI Requirements - 8D Copilot POC.md>) - POC scope, input data and acceptance criteria.
+- [End-to-end guide](docs/8D-COPILOT-E2E-GUIDE.md) - Business and technical workflow.
+- [Discipline pipeline guide](docs/8D-DISCIPLINE-PIPELINE-AND-CREATE-DEFECT-GUIDE.md) - Step configuration and defect creation.
+- [Testing matrix](docs/8D-TESTING-PLAN-AND-VALIDATION-MATRIX.md) - Scenarios and validation coverage.
+- [Graph retrieval and reranking](docs/GRAPH-RETRIEVAL-AND-RERANK.vi.md) - Retrieval architecture and configuration.
+- [Build log](docs_sprint2/BUILD_LOG.md) - Historical development notes, not a required AI4Biz submission document.
+- [Archived documents](docs/archive/README.md) - Earlier plans, decisions and verification records.
+
+Some detailed guides are written in Vietnamese. Historical documents retain their original context. Use the current competition reference for submission requirements and the checked-in configuration for runtime commands.
+
+## Troubleshooting
+
+- **Missing database tables:** Check the selected database profile. Initialize a new SQLite database with `npm run deploy:sqlite` and load sample data with `npm run seed:sqlite` when needed.
+- **Frontend cannot reach the backend:** Confirm that the backend started on port `4008` and that the Vite proxy uses the same address.
+- **Port already in use:** Stop the conflicting local process or update the service and proxy configuration together.
+- **Live AI request fails:** Check the endpoint, credentials and model identifier, inspect the logs, then run `scripts/probe-ai.ts` through `npx tsx`.
+- **No semantic matches:** Check embedding settings and startup logs. Semantic matching is skipped when embeddings are unavailable or disabled.
+- **Unexpected mock responses:** Check `MOCK_LLM` and the active provider configuration, then restart the application.
+- **Dependency installation fails:** Resolve the specific registry, package or peer dependency error. Check registry access when authentication is required.
+- **A draft cannot progress:** Inspect stop conditions, missing evidence and review requirements. A blocked step may be an expected control.
+
+## Evidence and Limitations
+
+This repository is a prototype with demonstration data and configurable integrations. A deployed instance's behavior depends on its database, provider access, configuration and code revision.
+
+AI output requires review. A suggested root cause is not a verified cause, and an approved draft does not prove that a physical corrective action has been carried out. Business results should distinguish measured observations, sample data, assumptions and future pilot targets.
