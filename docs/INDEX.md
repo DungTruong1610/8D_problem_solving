@@ -33,7 +33,6 @@
 
 - [8D step prompts](8d-step-prompts.md) là snapshot sinh từ cấu hình; cập nhật bằng `npm run export:prompts`, không sửa tay để đổi tên cuộc thi.
 - [Archive](archive/README.md) lưu các quyết định, kế hoạch và kết quả cũ. Ngày lịch sử được giữ nguyên.
-- [Đề bài cuộc thi trước](archive/Challenge_Brief_OrganizationAI_VN.docx.md) chỉ để truy nguyên, không áp dụng cho AI4Biz.
 - [Kế hoạch Sprint 2 cũ](archive/SPRINT2-PLAN-2026-10.md) giữ nội dung kỹ thuật chi tiết, không dùng lịch hoặc rubric của nó cho bài nộp mới.
 - Tài liệu nghiên cứu và kịch bản trong `presentation/` là tài liệu chuẩn bị. Bản HTML/PDF/DOCX/video phải được xuất và rà riêng trước khi nộp.
 - `graphify-out/` là dữ liệu phân tích cục bộ; graph đã tạo trước đợt chuẩn hóa có thể còn nhãn cũ. Dùng Markdown nguồn hiện hành khi hai bên khác nhau.

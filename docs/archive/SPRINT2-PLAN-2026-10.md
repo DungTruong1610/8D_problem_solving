@@ -76,7 +76,7 @@ BGK Sprint 1 nhận xét sản phẩm; rubric B và Sprint 2 yêu cầu chứng 
 2. **Quy trình mới chạy được đầu-cuối:** một ca bình thường và một ca ngoại lệ; con người có quyền duyệt, trả sửa, dừng/ghi đè; hành động có thể giải thích và tra cứu.
 3. **Bằng chứng thực tế:** thử với ít nhất 3 nhân sự trực tiếp làm công việc; lưu phản hồi nguyên văn do chính họ xác nhận; đo trước/sau và công bố cả lợi ích lẫn gánh nặng phát sinh.
 
-Các mục này bám [Challenge Brief](../Challenge_Brief_OrganizationAI_VN.docx.md): mục 2.B, mục 3–4 và lịch Sprint 2. Đề bài chấm cao quy trình vận hành, Verify, đầu vào mới, người dùng thật và human-in-the-loop; phần slide 3 và 5 bắt buộc có phương pháp đo và giới hạn cụ thể.
+Các yêu cầu trong phần này thuộc giai đoạn trước, không phải tiêu chí nộp AI4Biz. Xem [quy định AI4Biz hiện hành](../../AI4BIZ.md) khi chuẩn bị bài thi mới.
 
 ## 2. Đích sản phẩm đến ngày khóa bài
 
@@ -330,8 +330,6 @@ Không gộp uptime/latency backend với thời gian xử lý nghiệp vụ; kh
 
 ## Tài liệu đối chiếu trong repo
 
-- [Challenge Brief — OrganizationAI](../Challenge_Brief_OrganizationAI_VN.docx.md)
-- [Đánh giá kỹ thuật Sprint 1 — UIT_4Lovpe](../../docs_sprint2/Danh_Gia_Sprint_1_UIT_4Lovpe.md)
 - [HACKATHON-ACTION-PLAN](../HACKATHON-ACTION-PLAN.md)
 - [Hướng dẫn nghiệp vụ và AI 8D](../TAI_LIEU_NGHIEP_VU_VA_HA_TANG_AI_8D.md)
 - [Testing plan và validation matrix](../8D-TESTING-PLAN-AND-VALIDATION-MATRIX.md)

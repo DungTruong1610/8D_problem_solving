@@ -8,9 +8,8 @@ Thư mục này tổng hợp toàn bộ tài liệu nghiên cứu, kiến trúc 
 |:---:|:---|:---:|:---|
 | 1 | [BAN_CHAT_LOGIC_AI_VA_DB.md](BAN_CHAT_LOGIC_AI_VA_DB.md) | Markdown | Cẩm nang giải thích bản chất logic AI & DB bằng văn nói bình dân dễ hiểu nhất để thuyết trình cho BTC |
 | 2 | [BAN_CHAT_LOGIC_AI_VA_DB.pdf](BAN_CHAT_LOGIC_AI_VA_DB.pdf) | PDF | Bản PDF in ấn của tài liệu Bản chất Logic AI & DB |
-| 3 | [Danh_Gia_Sprint_1_UIT_4Lovpe.md](Danh_Gia_Sprint_1_UIT_4Lovpe.md) | Markdown | Báo cáo đánh giá và phân tích kết quả Sprint 1 |
-| 4 | [GraphAI.md](GraphAI.md) | Markdown | Tài liệu thiết kế kỹ thuật kiến trúc GraphAI |
-| 5 | [GraphAI_Implementation_Summary.md](GraphAI_Implementation_Summary.md) | Markdown | Tóm tắt các module đã hiện thực hóa của GraphAI |
-| 6 | [GraphAI_Stage2.md](GraphAI_Stage2.md) | Markdown | Lộ trình và kiến trúc nâng cấp retrieval của GraphAI Stage 2 |
-| 7 | [plan.md](plan.md) | Markdown | Kế hoạch thực hiện AI4Biz và điều kiện hoàn thành |
-| 8 | [UX.md](UX.md) | Markdown | Thiết kế trải nghiệm người dùng và hành trình tương tác trên giao diện |
+| 3 | [GraphAI.md](GraphAI.md) | Markdown | Tài liệu thiết kế kỹ thuật kiến trúc GraphAI |
+| 4 | [GraphAI_Implementation_Summary.md](GraphAI_Implementation_Summary.md) | Markdown | Tóm tắt các module đã hiện thực hóa của GraphAI |
+| 5 | [GraphAI_Stage2.md](GraphAI_Stage2.md) | Markdown | Lộ trình và kiến trúc nâng cấp retrieval của GraphAI Stage 2 |
+| 6 | [plan.md](plan.md) | Markdown | Kế hoạch thực hiện AI4Biz và điều kiện hoàn thành |
+| 7 | [UX.md](UX.md) | Markdown | Thiết kế trải nghiệm người dùng và hành trình tương tác trên giao diện |

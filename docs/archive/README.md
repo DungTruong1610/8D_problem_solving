@@ -22,6 +22,5 @@ Thư mục này lưu trữ các kế hoạch triển khai, biên bản nghiệm 
 
 ## Competition migration
 
-- [Previous competition brief](Challenge_Brief_OrganizationAI_VN.docx.md): source history only.
 - [Previous Sprint 2 plan](SPRINT2-PLAN-2026-10.md): detailed technical backlog and historical milestones.
 - [Current AI4Biz reference](../../AI4BIZ.md): current competition rules and roster.
