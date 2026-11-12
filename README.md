@@ -8,8 +8,7 @@ An AI assistant for manufacturing quality teams that connects defect records, in
 
 - [Web demo](https://8-d-problem-solving.vercel.app) - Check availability and the active configuration before presenting.
 - [Source repository](https://github.com/DungTruong1610/8D_problem_solving) - Project source and commit history.
-- [Reference video folder](https://drive.google.com/drive/folders/1EMNPvJtuusw9Dh1NjabfNLnO5E_v8n-h) - Existing recordings, not a verified final AI4Biz submission.
-- [Reference presentation](https://drive.google.com/file/d/1MnYTZFrnOwkrmN3ThGfhsBjA8gm-xlBP/view?usp=sharing) - Existing slides that need a separate submission review.
+- [Presentation and demo materials](https://drive.google.com/drive/folders/1ZnBpoWzBxXvv8eobXfoleg5ysYx4y-nm) - Shared Google Drive folder for AI4Biz slides, demo videos and supporting documents.
 - [AI4Biz competition reference](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21) - Official competition requirements, deadlines and judging criteria.
 - [Documentation index](docs/INDEX.md) - Product, workflow, architecture and verification references.
 
