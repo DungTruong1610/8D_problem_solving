@@ -6,7 +6,7 @@
 ## Thứ tự tham chiếu
 
 1. [Đề bài chính thức](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21) quyết định thể lệ cuộc thi.
-2. [AI4BIZ.md](../AI4BIZ.md) thống nhất tên cuộc thi, đơn vị tổ chức, thành viên, lịch, định dạng và ghi chú rubric.
+2. [README](../README.md) giới thiệu đội, sản phẩm và các yêu cầu chuẩn bị; thể lệ hiện hành được đối chiếu với đề bài chính thức ở trên.
 3. Yêu cầu sản phẩm quy định hành vi cần có; mã nguồn, cấu hình và kiểm tra thực tế xác định hành vi đang chạy. Kế hoạch không phải bằng chứng triển khai.
 4. Nhật ký và tài liệu lưu trữ chỉ phản ánh giai đoạn được ghi; không dùng làm kết quả kiểm thử hiện tại.
 

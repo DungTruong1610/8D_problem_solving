@@ -1,6 +1,6 @@
 # 📘 Hướng Dẫn Toàn Tập Nghiệp Vụ, Kiến Trúc AI & Test End-to-End (E2E) — 8D Copilot
 
-> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](../AI4BIZ.md), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
 
 Tài liệu này cung cấp chi tiết toàn bộ kiến thức nghiệp vụ, kiến trúc xử lý AI, các màn hình cấu hình (`Similarity`, `Step Prompts`, `Model Registry`) và kịch bản **Test End-to-End (E2E)** từng bước cho ứng dụng **8D Copilot (CNMA Proresolve)**.
 

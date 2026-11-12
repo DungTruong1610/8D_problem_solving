@@ -2,7 +2,7 @@
 
 > **AI4Biz 2026 — AI FOR BUSINESS INNOVATION**<br>
 > **Organizer:** LIKELION Vietnam · **Team:** UIT_4Lovpe<br>
-> **Competition requirements:** [AI4BIZ.md](../AI4BIZ.md)<br>
+> **Competition requirements:** [Official AI4Biz challenge](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21)<br>
 > **Database:** PostgreSQL 16 + pgvector (`localhost:5432` via Docker, standalone with zero SAP HANA dependency)
 
 ---
@@ -171,7 +171,7 @@ The D4 retrieval profile (`diagnosis`) requires **8 points** (Configuration → 
 
 ### AI4Biz Criteria & Internal Checks:
 
-The official summary table lists Problem 25%, Idea & Creativity 30%, Feasibility 20% and Presentation 25%. The detailed headings swap the last two weights; see the unresolved discrepancy in [AI4BIZ.md](../AI4BIZ.md).
+The official summary table lists Problem 25%, Idea & Creativity 30%, Feasibility 20% and Presentation 25%. The detailed headings swap the last two weights; see the unresolved discrepancy in [Official AI4Biz challenge](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21).
 
 The four-case suite and arbitrary JSON sandbox are internal technical evidence. Their legacy 90-second target, Sprint 1 labels and old point scores are not AI4Biz requirements. They test validation, precedent lookup and stop rules, not LLM drafting or business impact.
 

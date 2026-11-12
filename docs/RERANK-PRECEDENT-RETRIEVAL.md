@@ -1,6 +1,6 @@
 # Precedent Re-ranking (Stage-2 LLM Pass) — D4 & D5
 
-> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](../AI4BIZ.md), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
 
 > Feature documentation for the two-stage precedent retrieval introduced for D4 (Root Cause)
 > and D5 (Corrective Actions). Covers motivation, architecture, scoring semantics, the admin

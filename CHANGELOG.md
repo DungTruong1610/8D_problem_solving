@@ -5,7 +5,7 @@
 ### Documentation — AI4Biz (2026-11-10)
 - Standardized competition documentation for AI4Biz / AI FOR BUSINESS INNOVATION, organized by LIKELION Vietnam.
 - Updated the team roster to include Trần Hoàng Đức; kept the other members unchanged.
-- Centralized deadlines, English submission/pitch limits and the unresolved rubric discrepancy in `AI4BIZ.md`.
+- Centralized deadlines, English submission/pitch limits and the unresolved rubric discrepancy in the competition documentation.
 - Separated historical competition rules and test logs from current AI4Biz requirements.
 
 ### Added

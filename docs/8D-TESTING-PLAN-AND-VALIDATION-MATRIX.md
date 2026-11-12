@@ -1,6 +1,6 @@
 # 🧪 Kế Hoạch Kiểm Thử Toàn Diện & Ma Trận Validation: 8D Copilot
 
-> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](../AI4BIZ.md), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
 
 > **Tài liệu Kế Hoạch & Kịch Bản Kiểm Thử Chuyên Sâu (End-to-End Test Plan & Validation Matrix)**
 > **Dự án**: CNMA Proresolve (`8d-copilot`)

@@ -10,7 +10,7 @@ An AI assistant for manufacturing quality teams that connects defect records, in
 - [Source repository](https://github.com/DungTruong1610/8D_problem_solving) - Project source and commit history.
 - [Reference video folder](https://drive.google.com/drive/folders/1EMNPvJtuusw9Dh1NjabfNLnO5E_v8n-h) - Existing recordings, not a verified final AI4Biz submission.
 - [Reference presentation](https://drive.google.com/file/d/1MnYTZFrnOwkrmN3ThGfhsBjA8gm-xlBP/view?usp=sharing) - Existing slides that need a separate submission review.
-- [AI4Biz competition reference](AI4BIZ.md) - Requirements, deadlines, team information and the rubric discrepancy.
+- [AI4Biz competition reference](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21) - Official competition requirements, deadlines and judging criteria.
 - [Documentation index](docs/INDEX.md) - Product requirements, technical guides and historical records.
 
 ## AI4Biz 2026
@@ -40,7 +40,7 @@ The project focuses on Manufacturing and Operations, with quality engineers at a
 - Q&A: **5 minutes**.
 - At least **3 team members** must attend and present at the final.
 
-See the [official challenge](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21) and [submission form](https://docs.google.com/forms/d/e/1FAIpQLScoXGsQEvo_-kofEcYXvuQz8NrTdBCPS1HCIytfocO6EY8QyQ/viewform). The official page's summary table and detailed headings disagree on the Feasibility and Presentation weights; [AI4BIZ.md](AI4BIZ.md) records both versions.
+See the [official challenge](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21) and [submission form](https://docs.google.com/forms/d/e/1FAIpQLScoXGsQEvo_-kofEcYXvuQz8NrTdBCPS1HCIytfocO6EY8QyQ/viewform). The official page's summary table and detailed headings disagree on the Feasibility and Presentation weights.
 
 Markdown updates do not rebuild existing HTML decks, PDFs, DOCX files or videos. Review the competition name, team roster, language, slide count and video duration in the exported submission assets.
 
@@ -284,13 +284,12 @@ Record the code revision, environment and actual output when reporting a result.
 - `docs/` - Product requirements, user guides, verification guidance and archives.
 - `docs_sprint2/` - Development notes, technical plans and implementation summaries.
 - `presentation/` - Presentation sources, research and rehearsal material.
-- `AI4BIZ.md` - Shared competition reference.
 - `.env.example` - Environment configuration template.
 - `package.json` - Backend dependencies, CAP profiles and project commands.
 
 ## Documentation
 
-- [AI4Biz reference](AI4BIZ.md) - Competition requirements and roster.
+- [AI4Biz reference](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21) - Official competition requirements.
 - [AI4Biz action plan](docs/HACKATHON-ACTION-PLAN.md) - Submission preparation and business evidence.
 - [Implementation priorities](docs_sprint2/plan.md) - Tasks and acceptance conditions.
 - [User and judge guide](docs/USER-AND-JUDGE-GUIDE.md) - Product walkthrough and evaluation tools.

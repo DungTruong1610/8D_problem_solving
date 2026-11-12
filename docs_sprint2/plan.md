@@ -1,7 +1,7 @@
 # Kế hoạch thực hiện AI4Biz — UIT_4Lovpe
 
 **Cập nhật:** 10/11/2026 · **Cuộc thi:** AI4Biz 2026 · **Tổ chức:** LIKELION Vietnam<br>
-**Nguồn quy định:** [AI4BIZ.md](../AI4BIZ.md)<br>
+**Nguồn quy định:** [Official AI4Biz challenge](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21)<br>
 **Lịch và hồ sơ:** [Kế hoạch AI4Biz](../docs/HACKATHON-ACTION-PLAN.md)
 
 ## Mục tiêu và trạng thái

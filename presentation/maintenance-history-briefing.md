@@ -2,7 +2,7 @@
 
 > **AI4Biz submission status:** This is preparation/reference material, not a confirmed final submission. Slides and presentation must be in English; PDF ≤15 slides, demo video ≤2 minutes, final pitch ≤15 minutes plus 5-minute Q&A, with at least 3 presenting members. Any longer Vietnamese script is a rehearsal reference and must be adapted before submission.
 
-> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](../AI4BIZ.md), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
 
 > **Dành cho:** người thuyết trình vòng chung kết (17/10/2026).
 > **Mục đích:** giúp bạn hiểu tận gốc tính năng mới: nó sinh ra để giải bài toán nào, dữ liệu đi qua những bước nào, ở mỗi bước hệ thống quyết định ra sao, làm được gì và chưa làm được gì. Đây không phải kịch bản nói. Hiểu xong, bạn tự trả lời giám khảo bằng lời của mình.

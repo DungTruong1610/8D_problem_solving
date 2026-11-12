@@ -1,6 +1,6 @@
 # BẢN CHẤT HỆ THỐNG 8D COPILOT: LOGIC AI & CƠ SỞ DỮ LIỆU
 
-> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](../AI4BIZ.md), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
 > **Dành cho thành viên đội thi UIT_4Lovpe**  
 > *Tài liệu này được viết bằng văn nói đời thường của dân kỹ thuật, giải thích bản chất "tại sao lại làm như vậy", không dùng từ ngữ sáo rỗng để bạn đọc là hiểu ngay và tự tin thuyết trình trước Ban Giám Khảo (BGK).*
 

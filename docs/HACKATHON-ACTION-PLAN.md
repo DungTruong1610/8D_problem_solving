@@ -1,7 +1,7 @@
 # Kế hoạch AI4Biz 2026 — 8D Copilot
 
 **Đội:** UIT_4Lovpe · **Đơn vị tổ chức:** LIKELION Vietnam · **Cập nhật:** 10/11/2026<br>
-**Quy định tham chiếu:** [AI4BIZ.md](../AI4BIZ.md)
+**Quy định tham chiếu:** [Official AI4Biz challenge](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21)
 
 ## Mục tiêu bài thi
 
@@ -52,6 +52,6 @@ Harness bốn tình huống là bằng chứng kiểm thử nội bộ. Nó khô
 
 ## Rà theo rubric
 
-Theo bảng tổng hợp của đề bài: Problem 25%, Idea & Creativity 30%, Feasibility 20%, Presentation 25%. Nguồn có chênh lệch 20/25 ở hai tiêu chí cuối; xem [ghi chú rubric](../AI4BIZ.md#3-rubric-và-điểm-chưa-thống-nhất-trong-nguồn).
+Theo bảng tổng hợp của đề bài: Problem 25%, Idea & Creativity 30%, Feasibility 20%, Presentation 25%. Nguồn có chênh lệch 20/25 ở hai tiêu chí cuối; xem [rubric trong đề bài chính thức](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21).
 
 Không đưa thêm nhiều tính năng trước hạn nộp nếu chưa giúp chứng minh vấn đề, giá trị hoặc khả năng vận hành. Kế hoạch kỹ thuật chi tiết nằm tại [docs_sprint2/plan.md](../docs_sprint2/plan.md).

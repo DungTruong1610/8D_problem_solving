@@ -1,6 +1,6 @@
 # Kế hoạch Sprint 2 — UIT_4Lovpe / 8D Incident Referee
 
-> **Historical reference — not current competition rules.** Original dates, observations and results below belong to an earlier development stage. Current competition: [AI4Biz 2026 — LIKELION Vietnam](../../AI4BIZ.md). These records are not a new verification run or an AI4Biz score.
+> **Historical reference — not current competition rules.** Original dates, observations and results below belong to an earlier development stage. Current competition: [AI4Biz 2026 — LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21). These records are not a new verification run or an AI4Biz score.
 
 **Thời gian:** 28/09/2026–18/10/2026 (3 tuần làm việc và tổng duyệt); khóa bài BTC 15/10; Demo Day 17/10; báo cáo kết quả nội bộ 19/10.<br>
 **Quy mô:** 4 thành viên.<br>
@@ -76,7 +76,7 @@ BGK Sprint 1 nhận xét sản phẩm; rubric B và Sprint 2 yêu cầu chứng 
 2. **Quy trình mới chạy được đầu-cuối:** một ca bình thường và một ca ngoại lệ; con người có quyền duyệt, trả sửa, dừng/ghi đè; hành động có thể giải thích và tra cứu.
 3. **Bằng chứng thực tế:** thử với ít nhất 3 nhân sự trực tiếp làm công việc; lưu phản hồi nguyên văn do chính họ xác nhận; đo trước/sau và công bố cả lợi ích lẫn gánh nặng phát sinh.
 
-Các yêu cầu trong phần này thuộc giai đoạn trước, không phải tiêu chí nộp AI4Biz. Xem [quy định AI4Biz hiện hành](../../AI4BIZ.md) khi chuẩn bị bài thi mới.
+Các yêu cầu trong phần này thuộc giai đoạn trước, không phải tiêu chí nộp AI4Biz. Xem [quy định AI4Biz hiện hành](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21) khi chuẩn bị bài thi mới.
 
 ## 2. Đích sản phẩm đến ngày khóa bài
 

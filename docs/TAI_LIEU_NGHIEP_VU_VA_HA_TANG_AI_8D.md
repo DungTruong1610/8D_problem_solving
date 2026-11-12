@@ -1,6 +1,6 @@
 # TÀI LIỆU TOÀN DIỆN VỀ NGHIỆP VỤ 8D VÀ HẠ TẦNG AI
 
-> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](../AI4BIZ.md), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
 
 **Dự án:** 8D Copilot (CNMA Proresolve)
 **Môi trường:** Enterprise Cloud Platform

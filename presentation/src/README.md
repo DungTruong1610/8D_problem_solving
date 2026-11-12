@@ -1,6 +1,6 @@
 # 8D Copilot slides: source
 
-> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](../../AI4BIZ.md), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
 
 `../8d-copilot-slides.html` is a build output. Edit the files here, then rebuild.
 
@@ -17,7 +17,7 @@ python presentation/src/build.py
 
 ## AI4Biz export requirements
 
-The source assets described here may exist only in the local working tree. Publishing this Markdown does not publish or rebuild the HTML, images or video. Before submission, update the deck for AI4Biz / LIKELION Vietnam, use the roster in [AI4BIZ.md](../../AI4BIZ.md), export an English PDF of at most 15 slides, and verify a demo video of at most 2 minutes. At least 3 members must present in the final pitch. The older slide outline below is an editing reference, not a confirmed AI4Biz submission.
+The source assets described here may exist only in the local working tree. Publishing this Markdown does not publish or rebuild the HTML, images or video. Before submission, update the deck for AI4Biz / LIKELION Vietnam, use the roster in [README](../../README.md#team), export an English PDF of at most 15 slides, and verify a demo video of at most 2 minutes. At least 3 members must present in the final pitch. The older slide outline below is an editing reference, not a confirmed AI4Biz submission.
 
 ## Story and slides
 

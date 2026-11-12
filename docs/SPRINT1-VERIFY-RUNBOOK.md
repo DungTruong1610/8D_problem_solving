@@ -1,7 +1,7 @@
 # 8D Copilot — Internal Verification Runbook for AI4Biz
 
 **Competition:** AI4Biz 2026 · **Organizer:** LIKELION Vietnam · **Team:** UIT_4Lovpe<br>
-**Competition reference:** [AI4BIZ.md](../AI4BIZ.md)
+**Competition reference:** [Official AI4Biz challenge](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21)
 
 ## Purpose and limits
 
@@ -46,4 +46,4 @@ For the AI4Biz demo, additionally run actual drafting and inspect the retrieved 
 - Human review notes: missing evidence, corrections and whether the proposed next step is usable.
 - Business measurements with the same task, input and acceptance criteria on both sides of a comparison.
 
-No test result is generated or asserted by this documentation migration. Use the [AI4Biz rubric](../AI4BIZ.md#3-rubric-và-điểm-chưa-thống-nhất-trong-nguồn) for competition preparation.
+No test result is generated or asserted by this documentation migration. Use the [AI4Biz rubric](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21) for competition preparation.
