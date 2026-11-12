@@ -1,4 +1,4 @@
-# 8D Copilot — Internal Verification Runbook for AI4Biz
+# 8D Copilot - Internal Verification Runbook for AI4Biz
 
 **Competition:** AI4Biz 2026 · **Organizer:** LIKELION Vietnam · **Team:** UIT_4Lovpe<br>
 **Competition reference:** [Official AI4Biz challenge](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21)
@@ -24,7 +24,7 @@ Read the actual result of the run. Record the date, commit, database mode, input
 ## Coverage
 
 | Scenario | What to inspect |
-|---|---|
+| - | - |
 | Happy path | Valid input maps successfully and retrieves the expected qualifying precedent |
 | Dirty data | Normalization is visible; uncertain facts require confirmation |
 | Conflicting evidence | Contradictions trigger the appropriate review/stop |

@@ -1,42 +1,46 @@
-# Danh mục tài liệu — 8D Copilot / AI4Biz
+# Documentation - 8D Copilot
 
-**Đội:** UIT_4Lovpe · **Cuộc thi:** AI4Biz 2026 · **Tổ chức:** LIKELION Vietnam<br>
-**Cập nhật:** 10/11/2026
+**Team:** UIT_4Lovpe - **Competition:** AI4Biz 2026 - **Organizer:** LIKELION Vietnam
 
-## Thứ tự tham chiếu
+## Start here
 
-1. [Đề bài chính thức](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21) quyết định thể lệ cuộc thi.
-2. [README](../README.md) giới thiệu đội, sản phẩm và các yêu cầu chuẩn bị; thể lệ hiện hành được đối chiếu với đề bài chính thức ở trên.
-3. Yêu cầu sản phẩm quy định hành vi cần có; mã nguồn, cấu hình và kiểm tra thực tế xác định hành vi đang chạy. Kế hoạch không phải bằng chứng triển khai.
-4. Nhật ký và tài liệu lưu trữ chỉ phản ánh giai đoạn được ghi; không dùng làm kết quả kiểm thử hiện tại.
+- [Project README](../README.md) - Product overview, team, submission requirements and quick start.
+- [Local setup](../RUNNING-LOCAL.md) - Installation, database initialization, provider configuration and troubleshooting.
+- [User and judge guide](USER-AND-JUDGE-GUIDE.md) - Product navigation, guided tours and the review workflow.
+- [Official AI4Biz challenge](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21) - The organizer's competition rules.
 
-## Tài liệu hiện hành
+## Product and workflow
 
-| Tài liệu | Vai trò |
-|---|---|
-| [README](../README.md) | Giới thiệu, liên kết và khởi động |
-| [Chạy local](../RUNNING-LOCAL.md) | Cài đặt và vận hành |
-| [Kế hoạch AI4Biz](HACKATHON-ACTION-PLAN.md) | Lịch chuẩn bị, hồ sơ và giá trị kinh doanh |
-| [Kế hoạch thực hiện](../docs_sprint2/plan.md) | Ưu tiên và điều kiện hoàn thành |
-| [User & Judge Guide](USER-AND-JUDGE-GUIDE.md) | Thử MVP và hiểu luồng người dùng |
-| [Internal verification runbook](SPRINT1-VERIFY-RUNBOOK.md) | Harness nội bộ; không phải điểm AI4Biz |
-| [AI Requirements](<AI Requirements - 8D Copilot POC.md>) | Yêu cầu POC và dữ liệu đầu vào |
-| [Nghiệp vụ và hạ tầng AI](TAI_LIEU_NGHIEP_VU_VA_HA_TANG_AI_8D.md) | Bối cảnh nghiệp vụ và kiến trúc |
-| [E2E guide](8D-COPILOT-E2E-GUIDE.md) | Luồng nghiệp vụ và kiểm tra đầu cuối |
-| [Discipline pipeline](8D-DISCIPLINE-PIPELINE-AND-CREATE-DEFECT-GUIDE.md) | Cấu hình từng bước và tạo lỗi |
-| [Testing matrix](8D-TESTING-PLAN-AND-VALIDATION-MATRIX.md) | Kịch bản kiểm chứng |
-| [Graph retrieval & rerank](GRAPH-RETRIEVAL-AND-RERANK.vi.md) | Thiết kế retrieval; đối chiếu engine thực tế khi demo |
-| [Rerank specification](RERANK-PRECEDENT-RETRIEVAL.md) | Xếp hạng lại tiền lệ D4/D5 |
-| [Danh mục phát triển](../docs_sprint2/README.md) | Thiết kế, tổng kết triển khai và nghiên cứu kỹ thuật |
+- [AI requirements](<AI Requirements - 8D Copilot POC.md>) - POC scope, input data, step requirements and acceptance criteria.
+- [End-to-end guide](8D-COPILOT-E2E-GUIDE.md) - Business workflow, configuration and end-to-end checks.
+- [Discipline pipeline and defect creation](8D-DISCIPLINE-PIPELINE-AND-CREATE-DEFECT-GUIDE.md) - Per-step AI settings and defect input.
+- [Business process and AI infrastructure](BUSINESS-AND-AI-INFRASTRUCTURE.md) - D1 to D8 responsibilities, data flow and supporting services.
+- [Maintenance history briefing](../presentation/maintenance-history-briefing.md) - Preventive proposals, human decisions and recurrence history.
 
-## Tài liệu sinh tự động và lịch sử
+## Architecture and configuration
 
-- [8D step prompts](8d-step-prompts.md) là snapshot sinh từ cấu hình; cập nhật bằng `npm run export:prompts`, không sửa tay để đổi tên cuộc thi.
-- [Archive](archive/README.md) lưu các quyết định, kế hoạch và kết quả cũ. Ngày lịch sử được giữ nguyên.
-- [Kế hoạch Sprint 2 cũ](archive/SPRINT2-PLAN-2026-10.md) giữ nội dung kỹ thuật chi tiết, không dùng lịch hoặc rubric của nó cho bài nộp mới.
-- Tài liệu nghiên cứu và kịch bản trong `presentation/` là tài liệu chuẩn bị. Bản HTML/PDF/DOCX/video phải được xuất và rà riêng trước khi nộp.
-- `graphify-out/` là dữ liệu phân tích cục bộ; graph đã tạo trước đợt chuẩn hóa có thể còn nhãn cũ. Dùng Markdown nguồn hiện hành khi hai bên khác nhau.
+- [AI and database architecture](AI-AND-DATABASE-ARCHITECTURE.md) - Data organization, retrieval, analysis and review controls.
+- [Graph retrieval and reranking](GRAPH-RETRIEVAL-AND-RERANK.md) - Retrieval architecture, scoring and configuration.
+- [Precedent reranking](RERANK-PRECEDENT-RETRIEVAL.md) - The second-stage reranker and its evidence contract.
+- [D1 to D4 prompt configuration](AI-SETTINGS-D1-CONFIGURATION.md) - Configuration areas and runtime fallback behavior.
+- [Generated step prompts](8d-step-prompts.md) - Prompt and schema reference generated from the application defaults with `npm run export:prompts`.
 
-## Quy ước ghi bằng chứng
+## Verification
 
-Gắn nhãn dữ liệu mẫu, giả thuyết, mục tiêu, kết quả đo hoặc kết quả lịch sử. Tách thời gian soạn nháp khỏi thời gian xử lý/đóng ca. Không ghi một thiết kế, model hoặc tích hợp là đang chạy nếu chưa kiểm tra cấu hình thực tế. Khi thay yêu cầu, ghi ngày và phạm vi; không sửa kết quả kiểm thử cũ thành kết quả mới.
+- [Testing and validation matrix](8D-TESTING-AND-VALIDATION-MATRIX.md) - Functional scenarios, expected behavior and validation coverage.
+- [Internal verification runbook](SPRINT1-VERIFY-RUNBOOK.md) - Commands, harness coverage and the limits of internal checks.
+
+## Presentation references
+
+Presentation research, scripts and feature briefings are maintained in English. HTML decks, PDFs, DOCX files and videos are separate artifacts and must be reviewed before submission. Available references:
+
+- [Presentation source guide](../presentation/src/README.md) - HTML source and export conventions.
+- [Presentation script](../presentation/PRESENTATION-SCRIPT.md) - English speaking notes and handoffs.
+- [Demo walkthrough script](../presentation/DEMO-WALKTHROUGH-SCRIPT.md) - Video narration and rehearsal detail.
+- [Intro video storyboard](../presentation/video-intro/STORYBOARD.md) - Scenes, captions and screenshot references.
+- [Cycle-time evidence summary](../presentation/8D-CYCLE-TIME-SUMMARY.md) - Measured results, deadlines and corrections to earlier research.
+- [Cycle-time research](<../presentation/8D Process Cycle Time Research.md>) - The detailed source compilation, read together with the evidence summary.
+
+## Reading evidence
+
+Product requirements describe intended behavior. Current source code, configuration and observed checks establish what a particular revision actually does. Distinguish measured results, historical observations, demo data, assumptions and proposed pilot metrics. Draft preparation time is different from investigation or case-closure time. A documented scenario is not evidence that the scenario has passed.

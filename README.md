@@ -11,7 +11,7 @@ An AI assistant for manufacturing quality teams that connects defect records, in
 - [Reference video folder](https://drive.google.com/drive/folders/1EMNPvJtuusw9Dh1NjabfNLnO5E_v8n-h) - Existing recordings, not a verified final AI4Biz submission.
 - [Reference presentation](https://drive.google.com/file/d/1MnYTZFrnOwkrmN3ThGfhsBjA8gm-xlBP/view?usp=sharing) - Existing slides that need a separate submission review.
 - [AI4Biz competition reference](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21) - Official competition requirements, deadlines and judging criteria.
-- [Documentation index](docs/INDEX.md) - Product requirements, technical guides and historical records.
+- [Documentation index](docs/INDEX.md) - Product, workflow, architecture and verification references.
 
 ## AI4Biz 2026
 
@@ -281,8 +281,7 @@ Record the code revision, environment and actual output when reporting a result.
 - `db/` - Data model and database resources.
 - `scripts/` - Development, database seeding, verification and export tools.
 - `mock-data/` - Demonstration fixtures and sample datasets.
-- `docs/` - Product requirements, user guides, verification guidance and archives.
-- `docs_sprint2/` - Development notes, technical plans and implementation summaries.
+- `docs/` - Product requirements, user guides, architecture references and verification guidance.
 - `presentation/` - Presentation sources, research and rehearsal material.
 - `.env.example` - Environment configuration template.
 - `package.json` - Backend dependencies, CAP profiles and project commands.
@@ -290,17 +289,18 @@ Record the code revision, environment and actual output when reporting a result.
 ## Documentation
 
 - [AI4Biz reference](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21) - Official competition requirements.
-- [AI4Biz action plan](docs/HACKATHON-ACTION-PLAN.md) - Submission preparation and business evidence.
-- [Implementation priorities](docs_sprint2/plan.md) - Tasks and acceptance conditions.
+- [Documentation index](docs/INDEX.md) - English product, architecture and verification references.
 - [User and judge guide](docs/USER-AND-JUDGE-GUIDE.md) - Product walkthrough and evaluation tools.
 - [AI requirements](<docs/AI Requirements - 8D Copilot POC.md>) - POC scope, input data and acceptance criteria.
 - [End-to-end guide](docs/8D-COPILOT-E2E-GUIDE.md) - Business and technical workflow.
 - [Discipline pipeline guide](docs/8D-DISCIPLINE-PIPELINE-AND-CREATE-DEFECT-GUIDE.md) - Step configuration and defect creation.
-- [Testing matrix](docs/8D-TESTING-PLAN-AND-VALIDATION-MATRIX.md) - Scenarios and validation coverage.
-- [Graph retrieval and reranking](docs/GRAPH-RETRIEVAL-AND-RERANK.vi.md) - Retrieval architecture and configuration.
-- [Archived documents](docs/archive/README.md) - Earlier plans, decisions and verification records.
+- [Testing matrix](docs/8D-TESTING-AND-VALIDATION-MATRIX.md) - Scenarios and validation coverage.
+- [Graph retrieval and reranking](docs/GRAPH-RETRIEVAL-AND-RERANK.md) - Retrieval architecture and configuration.
+- [AI and database architecture](docs/AI-AND-DATABASE-ARCHITECTURE.md) - Data organization and the AI analysis workflow.
+- [Business process and AI infrastructure](docs/BUSINESS-AND-AI-INFRASTRUCTURE.md) - The eight disciplines and supporting services.
+- [Verification runbook](docs/SPRINT1-VERIFY-RUNBOOK.md) - Reproducible internal checks and their limits.
 
-Some detailed guides are written in Vietnamese. Historical documents retain their original context. Use the current competition reference for submission requirements and the checked-in configuration for runtime commands.
+Project documentation is maintained in English. Use the official competition reference for submission requirements and the checked-in configuration for runtime commands. Examples and research findings are labeled separately from current verification results.
 
 ## Troubleshooting
 

@@ -1,42 +1,37 @@
-# 📘 Hướng Dẫn Toàn Tập Nghiệp Vụ, Kiến Trúc AI & Test End-to-End (E2E) — 8D Copilot
+# 📘 Complete Business, AI Architecture, and End-to-End (E2E) Testing Guide - 8D Copilot
 
-> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+> **Competition context:** [AI4Biz 2026 - LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
 
-Tài liệu này cung cấp chi tiết toàn bộ kiến thức nghiệp vụ, kiến trúc xử lý AI, các màn hình cấu hình (`Similarity`, `Step Prompts`, `Model Registry`) và kịch bản **Test End-to-End (E2E)** từng bước cho ứng dụng **8D Copilot (CNMA Proresolve)**.
+This document describes the business domain, AI processing architecture, configuration screens (`Similarity`, `Step Prompts`, and `Model Registry`), and step-by-step **end-to-end (E2E) test scenarios** for **8D Copilot (CNMA Proresolve)**.
 
----
+## 📋 Contents
 
-## 📋 Mục Lục
-
-1. [Tổng Quan Nghiệp Vụ 8D Copilot](#1-tổng-quan-nghiệp-vụ-8d-copilot)
-2. [Cấu Trúc Dữ Liệu Đầu Vào (Deep Structure JSON)](#2-cấu-trúc-dữ-liệu-đầu-vào-deep-structure-json)
-3. [Hệ Thống Quản Trị AI (AI Settings / Governance)](#3-hệ-thống-quản-trị-ai-ai-settings--governance)
+1. [8D Copilot Business Overview](#1-8d-copilot-business-overview)
+2. [Input Data Structure (Deep Structure JSON)](#2-input-data-structure-deep-structure-json)
+3. [AI Configuration Screens](#3-ai-configuration-screens)
    - [Model Registry & General Settings](#31-model-registry--general-settings)
-   - [Trang Similarity (Tìm Kiếm Tiền Lệ)](#32-trang-similarity-tìm-kiếm-tiền-lệ)
-   - [Trang Step Prompts (Quản Lý Prompt D1-D8)](#33-trang-step-prompts-quản-lý-prompt-d1-d8)
-4. [Luồng Xử Lý Pipeline AI (4-Step Pipeline)](#4-luồng-xử-lý-pipeline-ai-4-step-pipeline)
-5. [Kịch Bản Test End-to-End (E2E Test Steps)](#5-kịch-bản-test-end-to-end-e2e-test-steps)
-6. [Xử Lý Lỗi Thường Gặp (Troubleshooting)](#6-xử-lý-lỗi-thường-gặp-troubleshooting)
+   - [Similarity (Precedent Search)](#32-similarity-precedent-search)
+   - [Step Prompts (D1-D8 Prompt Management)](#33-step-prompts-d1-d8-prompt-management)
+4. [AI Processing Flow (4-Step Pipeline)](#4-ai-processing-flow-4-step-pipeline)
+5. [End-to-End Test Scenarios](#5-end-to-end-test-scenarios)
+6. [Troubleshooting](#6-troubleshooting)
 
----
+## 1. 8D Copilot Business Overview
 
-## 1. Tổng Quan Nghiệp Vụ 8D Copilot
+In manufacturing Quality Management (QM), a product incident or defect case requires Quality Engineers to investigate and prepare an **8D (8 Disciplines)** report that identifies the root cause and defines permanent corrective actions.
 
-Trong quản lý chất lượng sản xuất (Quality Management - QM), khi phát sinh sự cố/lỗi sản phẩm (Defect Case), các kỹ sư chất lượng (Quality Engineers) phải tiến hành điều tra và lập báo cáo **8D (8 Disciplines)** để tìm nguyên nhân gốc rễ và đưa ra giải pháp khắc phục triệt để.
+### 🎯 What problems does 8D Copilot address?
 
-### 🎯 8D Copilot giải quyết vấn đề gì?
-- **Tự động bóc tách & phân tích**: Nhận dữ liệu case sự cố từ hệ thống QM, phân tích dữ liệu đo đạc, thiết bị, quy trình.
-- **Chẩn đoán mù độc lập (Independent/Blind Diagnosis)**: AI tự tìm nguyên nhân gốc khi **CẮT TOÀN BỘ ĐÁP ÁN** của kỹ sư (chuỗi 5-Why, Ishikawa, FMEA), sau đó so sánh kết luận của AI và Kỹ sư (Same conclusion / Different conclusion).
-- **Tra cứu tiền lệ tương đồng (Precedent Search)**: Tra cứu các case quá khứ có đặc điểm lỗi/thiết bị tương tự để học hỏi giải pháp thật, chống bịa đặt (hallucination).
-- **Dự thảo 8D Disciplines (D1 ➔ D8)** và viết 2 bản tóm tắt riêng biệt:
-  - **Internal Summary**: Bản tóm tắt nội bộ (có tên thiết bị, lô sản xuất, nhân sự).
-  - **Customer Summary**: Bản tóm tắt gửi khách hàng cho case `Q1 - Customer Complaint` (đã lọc bỏ thông tin nhạy cảm).
+- **Automated extraction and analysis**: Accept incident data from the QM system and analyze measurements, equipment, and processes.
+- **Independent/Blind Diagnosis**: AI identifies a root cause with **ALL ENGINEER ANSWERS REMOVED** (the 5-Why chain, Ishikawa analysis, and FMEA), then compares its conclusion with the engineer's conclusion (Same conclusion / Different conclusion).
+- **Precedent Search**: Retrieve historical cases with similar defect or equipment characteristics to learn from actual solutions and reduce hallucination.
+- **Draft the 8D disciplines (D1 to D8)** and prepare two separate summaries:
+  - **Internal Summary**: An internal summary that includes equipment, production batch, and personnel details.
+  - **Customer Summary**: A customer-facing summary for a `Q1 - Customer Complaint` case, with sensitive information removed.
 
----
+## 2. Input Data Structure (Deep Structure JSON)
 
-## 2. Cấu Trúc Dữ Liệu Đầu Vào (Deep Structure JSON)
-
-Đầu vào cho 8D Copilot là **1 Case Notification** (Hồ sơ sự cố chất lượng QM - bảng `QMEL`), chứa các thành phần lồng nhau (Deep Structure):
+The input to 8D Copilot is **one Case Notification** (a QM quality-incident record in table `QMEL`) with nested components (Deep Structure):
 
 ```json
 {
@@ -121,138 +116,126 @@ Trong quản lý chất lượng sản xuất (Quality Management - QM), khi ph�
 }
 ```
 
----
+## 3. AI Configuration Screens
 
-## 3. Giải Thích Các Trang Cấu Hình AI
+The system provides an **AI Settings** administration page at `/#/ai-settings` with four main tabs:
 
-Hệ thống cung cấp trang quản trị **AI Settings** (đường dẫn: `/#/ai-settings`) gồm 4 tab chính:
-
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                               AI Settings                              │
-├───────────────────┬────────────────┬─────────────────┬─────────────────┤
-│ General Settings  │ Model Registry │   Similarity    │  Step Prompts   │
-└───────────────────┴────────────────┴─────────────────┴─────────────────┘
-```
+1. General Settings
+2. Model Registry
+3. Similarity
+4. Step Prompts
 
 ### 3.1 Model Registry & General Settings
-- **Model Registry**: Quản lý danh mục các Foundation Model được hỗ trợ và bật/tắt từng model.
-- **General Settings**: Cho phép gán model riêng cho từng Activity:
-  - `parseData`: Chọn model cho bước đọc & cấu trúc hóa dữ liệu (ví dụ: `gemini-2.5-flash`).
-  - `analyzeDefect`: Chọn model cho bước suy luận 8D & viết báo cáo (ví dụ: `gemini-2.5-pro`).
-  - `reviewQuality`: Chọn model cho bước chẩn đoán mù độc lập.
-  - `ThinkingBudget`: Cấu hình dung lượng token suy luận (Extended Thinking).
 
-### 3.2 Trang Similarity (Tìm Kiếm Tiền Lệ)
-- **Mục đích**: Cấu hình thuật toán & trọng số khi tìm kiếm case quá khứ tương đồng (Precedent Search). Admin chỉnh trọng số trực tiếp trên UI mà **không cần sửa code hay deploy lại server**.
-- **Bảng Tiêu chí (`SimilarityCriteria`)**:
-  - `workCenter` (+4đ): So sánh trùng trạm máy / dây chuyền.
-  - `defectCode` (+4đ / fallback trùng từ khóa +2đ): So sánh trùng mã lỗi.
-  - `material` (+3đ / fallback trùng nhóm vật tư +1đ): So sánh trùng mã vật tư.
-  - `semantic` (+3đ): Chấm điểm khoảng cách vector (Cosine Similarity) giữa văn bản mô tả lỗi với ngưỡng `minSimilarity >= 0.70`.
-- **Cấu hình Ngưỡng (`RetrievalSettings`)**:
-  - `minScore` (mặc định $\ge 3$ điểm): Nếu case cũ có tổng điểm $< 3$ thì không lấy làm tiền lệ (tránh gợi ý sai).
-  - `topN` (mặc định `3`): Lấy tối đa N case tiền lệ tương đồng nhất.
-  - `closedOnly` (`true`): Chỉ chọn các case đã đóng (`Completed`/`Closed`).
+- **Model Registry**: Manage the catalog of supported foundation models and enable or disable each model.
+- **General Settings**: Assign a separate model to each activity:
+  - `parseData`: Select the model for reading and structuring data, for example `gemini-2.5-flash`.
+  - `analyzeDefect`: Select the model for 8D reasoning and report writing, for example `gemini-2.5-pro`.
+  - `reviewQuality`: Select the model for independent blind diagnosis.
+  - `ThinkingBudget`: Configure the reasoning-token budget (Extended Thinking).
 
-### 3.3 Trang Step Prompts (Quản Lý Prompt D1-D8)
-- **Mục đích**: Cho phép Admin tùy chỉnh trực tiếp `systemPrompt` và `userTemplate` cho từng bước từ **D1 đến D8** trên giao diện.
-- **Cơ chế Fallback**: Nếu tắt (`enabled = false`) hoặc để trống, hệ thống sẽ tự động dùng Prompt mặc định chuẩn trong code (`srv/src/domain/eightd/prompts.ts`).
+### 3.2 Similarity (Precedent Search)
 
----
+- **Purpose**: Configure the algorithm and weights used to retrieve similar historical cases. Administrators adjust weights directly in the UI **without changing code or redeploying the server**.
+- **Criteria table (`SimilarityCriteria`)**:
+  - `workCenter` (+4 points): Match the workstation or production line.
+  - `defectCode` (+4 points, with a keyword-match fallback of +2): Match the defect code.
+  - `material` (+3 points, with a material-family fallback of +1): Match the material ID.
+  - `semantic` (+3 points): Score vector similarity (Cosine Similarity) between defect descriptions with a threshold of `minSimilarity >= 0.70`.
+- **Threshold configuration (`RetrievalSettings`)**:
+  - `minScore` (default: at least 3 points): A historical case with a total score below 3 is excluded as a precedent to avoid irrelevant recommendations.
+  - `topN` (default: `3`): Retrieve at most N of the most similar precedent cases.
+  - `closedOnly` (`true`): Select only cases with `Completed` or `Closed` status.
 
-## 4. Luồng Xử Lý Pipeline AI (4-Step Pipeline)
+### 3.3 Step Prompts (D1-D8 Prompt Management)
 
-Khi người dùng gửi JSON case (`analyzeFromJson`), backend xử lý theo 4 bước:
+- **Purpose**: Allow administrators to customize `systemPrompt` and `userTemplate` for each step from **D1 through D8** directly in the UI.
+- **Fallback**: When a configuration is disabled (`enabled = false`) or blank, the system automatically uses the standard default prompt in code (`srv/src/domain/eightd/prompts.ts`).
+
+## 4. AI Processing Flow (4-Step Pipeline)
+
+When a user submits case JSON (`analyzeFromJson`), the backend processes it in four steps:
 
 ```mermaid
 flowchart TD
-    A["Payload JSON đầu vào"] --> B["Step 1: enrichContext (parseData)"]
+    A["Input JSON payload"] --> B["Step 1: enrichContext (parseData)"]
     B --> C["Step 2: diagnoseIndependently (reviewQuality)"]
     C --> D["Step 3: generateReport (analyzeDefect)"]
-    D --> E["Step 4: postProcess (Lưới an toàn)"]
-    E --> F["Lưu vào Database (Status = Analyzed)"]
+    D --> E["Step 4: postProcess (Safety checks)"]
+    E --> F["Save to database (Status = Analyzed)"]
 ```
 
-1. **Step 1: enrichContext (`parseData`)**: Bóc tách dữ liệu, tính toán chỉ số, phát hiện lỗ hổng dữ liệu (`gaps`).
-2. **Step 2: diagnoseIndependently (`reviewQuality`)**: Chẩn đoán mù — Cắt bỏ đáp án của kỹ sư, cho AI tự lập luận chuỗi 5-Why và chọn nhánh Ishikawa.
-3. **Step 3: generateReport (`analyzeDefect`)**: Tổng hợp dữ liệu + kết quả chẩn đoán mù + các case tiền lệ để viết nội dung D1-D8, Internal Summary và Customer Summary.
-4. **Step 4: postProcess (Lưới an toàn)**: Kiểm tra lại các ràng buộc, sửa lỗi định dạng JSON, kiểm tra citation nguồn.
+1. **Step 1: enrichContext (`parseData`)**: Extract data, calculate metrics, and identify data gaps (`gaps`).
+2. **Step 2: diagnoseIndependently (`reviewQuality`)**: Perform blind diagnosis. Remove the engineer's answers and let AI independently reason through a 5-Why chain and select an Ishikawa branch.
+3. **Step 3: generateReport (`analyzeDefect`)**: Combine the data, blind-diagnosis result, and precedent cases to draft D1-D8, the Internal Summary, and the Customer Summary.
+4. **Step 4: postProcess (Safety checks)**: Recheck constraints, repair JSON formatting, and verify source citations.
 
----
+## 5. End-to-End Test Scenarios
 
-## 5. Kịch Bản Test End-to-End (E2E Test Steps)
+### 🚀 Step 1: Start the system
 
-### 🚀 Bước 1: Khởi động hệ thống
-1. Mở terminal tại thư mục dự án `8d-copilot`.
-2. Khởi động full-stack:
+1. Open a terminal in the `8d-copilot` project directory.
+2. Start the full stack:
    ```bash
    npm run dev:all
    ```
-   - **Backend**: `http://localhost:4004`
+   - **Backend**: `http://localhost:4008`
    - **Frontend UI**: `http://localhost:5544`
 
----
+### ⚙️ Step 2: Test AI Settings configuration
 
-### ⚙️ Bước 2: Test Cấu Hình AI Settings
-1. Truy cập browser: `http://localhost:5544/#/ai-settings`.
-2. **Test Tab Model Registry**:
-   - Bấm nút **Sync Models**.
-   - Xác nhận danh sách các model từ AI Core được tải về thành công.
-3. **Test Tab General Settings**:
-   - Gán `parseData` ➔ `gemini-2.5-flash`.
-   - Gán `analyzeDefect` ➔ `gemini-2.5-pro`.
-   - Bấm **Save configuration** ➔ Thấy thông báo *"AI configuration saved"*.
+1. Open `http://localhost:5544/#/ai-settings` in a browser.
+2. **Test the Model Registry tab**:
+   - Click **Sync Models**.
+   - Confirm that the model list from AI Core loads successfully.
+3. **Test the General Settings tab**:
+   - Assign `parseData` to `gemini-2.5-flash`.
+   - Assign `analyzeDefect` to `gemini-2.5-pro`.
+   - Click **Save configuration** and check for the message *"AI configuration saved"*.
 
----
+### 🔍 Step 3: Test Similarity & Step Prompts
 
-### 🔍 Bước 3: Test Trang Similarity & Step Prompts
-1. **Test Tab Similarity**:
-   - Chỉnh `minScore` = `3`, `topN` = `3`.
-   - Thử thay đổi trọng số của *Work Center* từ `4` ➔ `5`.
-   - Bấm **Save criteria**.
-2. **Test Tab Step Prompts**:
-   - Chọn bước **D4 (Root Cause)**.
-   - Thêm câu chỉ thị vào *System Prompt*: `Always check equipment calibration date.`
-   - Bấm **Save Step Prompts**.
+1. **Test the Similarity tab**:
+   - Set `minScore` to `3` and `topN` to `3`.
+   - Change the *Work Center* weight from `4` to `5`.
+   - Click **Save criteria**.
+2. **Test the Step Prompts tab**:
+   - Select **D4 (Root Cause)**.
+   - Add this instruction to the *System Prompt*: `Always check equipment calibration date.`
+   - Click **Save Step Prompts**.
 
----
+### 📄 Step 4: Test 8D case analysis from JSON
 
-### 📄 Bước 4: Test Phân Tích Case 8D từ JSON
-1. Mở trang **8D Reports**: `http://localhost:5544/#/8d`.
-2. Bấm nút **Analyze from JSON** (Icon ✨).
-3. Copy toàn bộ nội dung file Deep Structure JSON mẫu ([case-8D-10048651.json](file:///d:/Thien/Work/Hackathon/8d-copilot/mock-data/clean/case-8D-10048651.json)) và dán vào ô nhập.
-4. Bấm **Start Analysis**.
+1. Open **8D Reports** at `http://localhost:5544/#/8d`.
+2. Click **Analyze from JSON** (✨ icon).
+3. Copy the entire sample Deep Structure JSON file ([case-8D-10048651.json](../mock-data/clean/case-8D-10048651.json)) and paste it into the input field.
+4. Click **Start Analysis**.
 
----
+### 📊 Step 5: Inspect the report details
 
-### 📊 Bước 5: Kiểm Tra Kết Quả Chi Tiết Report
-1. Trình duyệt tự chuyển sang trang Chi tiết Report (`http://localhost:5544/#/8d/<ID>`).
-2. Trạng thái ban đầu: `Analyzing` (thông báo nền màu xanh).
-3. Sau khoảng 30–60 giây, trang tự động cập nhật sang trạng thái `Analyzed`.
-4. **Kiểm tra các phần hiển thị**:
-   - ✅ **Reasoning Panel (Chẩn đoán độc lập)**: Kiểm tra AI chọn nhánh nguyên nhân gốc (`Measurement`) và đối chiếu xem có trùng với Kỹ sư (`Same conclusion`) hay không.
-   - ✅ **Internal Summary & Customer Summary**: Kiểm tra nội dung tóm tắt cho case `Q1`.
-   - ✅ **Eight Disciplines (D1 ➔ D8)**: Kiểm tra nội dung D4 có tuân theo chỉ thị Prompt vừa sửa không.
-   - ✅ **AI Models Used (Footer)**: Kiểm tra thông tin vết chạy hiển thị đúng model đã gán:
+1. The browser navigates to Report Detail (`http://localhost:5544/#/8d/<ID>`).
+2. Initial status: `Analyzing` (a notification with a blue background).
+3. The documented example expects the page to update automatically to `Analyzed` after approximately 30-60 seconds; record the actual duration during the test.
+4. **Inspect the displayed sections**:
+   - ✅ **Reasoning Panel (Independent Diagnosis)**: Check that AI selects the root-cause branch (`Measurement`) and compare it with the engineer's conclusion (`Same conclusion`).
+   - ✅ **Internal Summary & Customer Summary**: Check the summaries for the `Q1` case.
+   - ✅ **Eight Disciplines (D1 to D8)**: Check whether D4 follows the prompt instruction just changed.
+   - ✅ **AI Models Used (Footer)**: Check that the execution trace shows the assigned models:
      - `Parse: gemini-2.5-flash`
      - `Analyze: gemini-2.5-pro`
-     - Số token và thời gian thực thi (seconds).
+     - Token count and execution duration in seconds.
 
----
+## 6. Troubleshooting
 
-## 6. Xử Lý Lỗi Thường Gặp (Troubleshooting)
+| Symptom | Cause | Resolution |
+| - | - | - |
+| **`SQLITE_ERROR: no such table`** | The `db.sqlite` schema has not been initialized | Run `npm run deploy:sqlite` |
+| **AI API call reports `timeout of 30000ms exceeded`** | The Axios client has a 30-second timeout | The documented fix sets `timeout: 0` in `axios-instance.ts` |
+| **Cannot select a model in AI Settings** | **Sync Models** has not run, or AI Core credentials are missing | Check `.env` for `AICORE_*` credentials and click **Sync** |
+| **The UI does not open on port 5544** | `vite.config.ts` was overwritten | Check `server.port = 5544` in `vite.config.ts` |
 
-| Hiện tượng | Nguyên nhân | Cách khắc phục |
-|:---|:---|:---|
-| **Lỗi `SQLITE_ERROR: no such table`** | File DB `sqlite.db` chưa được khởi tạo schema | Chạy lệnh `npm run deploy:sqlite` |
-| **API gọi AI báo `timeout of 30000ms exceeded`** | Client Axios bị dính giới hạn timeout 30s | Đã sửa `timeout: 0` trong `axios-instance.ts` |
-| **Trang AI Settings không chọn được model** | Chưa chạy **Sync Models** hoặc thiếu credential AI Core | Kiểm tra file `.env` chứa credential `AICORE_*` và bấm **Sync** |
-| **Giao diện không mở đúng cổng 5544** | File `vite.config.ts` bị đè | Kiểm tra `server.port = 5544` trong `vite.config.ts` |
+*Prepared for **8D Copilot (CNMA Proresolve)**.*
 
----
-
-*Tài liệu này được biên soạn cho dự án **8D Copilot (CNMA Proresolve)**.*
 # Flexible Configuration Verification
 
 1. In AI Settings, add a D2 Form Editor field with key `problemStatement`, a visible group, and a required constraint.

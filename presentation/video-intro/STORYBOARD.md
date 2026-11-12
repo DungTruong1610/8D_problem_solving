@@ -1,340 +1,331 @@
-# 8D Copilot: storyboard video intro
+# 8D Copilot - Intro Video Storyboard
 
-> **AI4Biz submission status:** This is preparation/reference material, not a confirmed final submission. Slides and presentation must be in English; PDF ≤15 slides, demo video ≤2 minutes, final pitch ≤15 minutes plus 5-minute Q&A, with at least 3 presenting members. Any longer Vietnamese script is a rehearsal reference and must be adapted before submission.
+> **AI4Biz submission status:** This is preparation material, not a confirmed final submission. Slides and the presentation must be in English. The submission PDF is limited to 15 slides, the demo video to 2 minutes, and the final pitch to 15 minutes plus 5 minutes of Q&A. At least 3 team members must present. Verify the exported assets separately.
 
-> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+> **Competition context:** [AI4Biz 2026 - LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21), team UIT_4Lovpe. Demo values below describe the captured sample case, not measured production outcomes or current test results.
 
-> **Tài sản dựng video cục bộ:** Các đường dẫn `images/` bên dưới trỏ tới ảnh và tọa độ trong workspace. Chúng không được đưa lên GitHub trong commit chỉ gồm Markdown này. Dựng video cần bộ tài sản gốc và kiểm tra lại tổng thời lượng ≤2 phút.
+> **Local production assets:** The `images/` paths below refer to screenshots and coordinates in the local workspace. Updating this Markdown does not publish those assets. Video production requires the original files and a separate duration check.
 
-17 cảnh chính và 1 cảnh tuỳ chọn, đi theo đúng thứ tự người dùng gặp trong app. Mỗi cảnh gồm:
+The storyboard contains 17 main scenes and one optional scene, following the order users encounter in the application. Each scene has:
 
-- **Ảnh sạch**: ảnh nền để dựng video (1920×1080, chụp từ app thật).
-- **Ảnh đánh số**: cùng ảnh đó, có khung đỏ và số tròn ở các box cần nói.
-- **Chữ trên video**: tiêu đề cảnh và một câu phụ đề ngắn.
-- **Bảng box**: mỗi số trong ảnh nối với một câu chú thích ngắn hiện cạnh box, và lời dẫn nếu có thuyết minh.
+- A clean screenshot: the 1920 x 1080 background captured from the application.
+- A numbered screenshot: the same image with red frames and numbered circles.
+- On-screen text: a scene title and a short subtitle.
+- A callout table: numbered boxes, nearby captions and optional narration.
 
-Toạ độ chính xác (pixel, ảnh 1920×1080) của từng box nằm trong `images/boxes.json` — `images/boxes.json`. Dùng file này để đặt khung highlight trong phần mềm dựng (Premiere, CapCut, After Effects) cho khớp từng điểm ảnh.
+Exact box coordinates are stored in `images/boxes.json` as pixels on a 1920 x 1080 image. Use them to align highlights in Premiere, CapCut or After Effects.
 
-Từ cảnh 9 trở đi, mọi ảnh là cùng một case **8D-10048788**: vết rung trên trục rotor sau khi mài, 88 sản phẩm hỏng, cụm mài tròn số 4. Case này đã xong D1–D6 theo đúng thứ tự và đang làm D7.
+From scene 9 onward, every screenshot shows the same demo case, **8D-10048788**: chatter marks on a rotor shaft after grinding, 88 defective units, cylindrical grinding unit 4. In the captured state, D1 to D6 have been completed in sequence and D7 is in progress.
 
-## Mục lục
+## Scene index
 
-| # | Cảnh | Màn hình | Thời lượng gợi ý |
-|---|---|---|---|
-| 1 | Danh sách 8D | 8D Reports | 6 s |
-| 2 | Tạo 8D từ lỗi đã ghi nhận | 8D Reports → Create 8D Report | 6 s |
-| 3 | Nhập case bằng JSON | Create 8D Report → JSON | 6 s |
-| 4 | Lịch sử kiểm tra | Master Data → Inspection History | 6 s |
-| 5 | Mở 8D là một quyết định | Master Data → Defect Records | 6 s |
-| 6 | Thư viện case đã đóng | Master Data → Closed Case Library | 5 s |
-| 7 | AI vào cuộc ở đâu | AI Configuration | 6 s |
-| 8 | Bộ máy tìm tiền lệ | AI Configuration | 6 s |
-| 9 | AI biết dừng | Case → AI Stops | 7 s |
-| 10 | Nhật ký kiểm toán | Case → Audit Log | 7 s |
-| 11 | Tám bước, đúng thứ tự | Case → 8D Disciplines | 6 s |
-| 12 | Người bấm, bước mới đi | Case → D7 | 6 s |
-| 13 | Bản nháp của AI | Case → D5 | 6 s |
-| 14 | D4: tìm nguyên nhân gốc | Case → D4 | 8 s |
-| 15 | AI Referee, ý kiến thứ hai | Case → D4 → AI Referee | 8 s |
-| 16 | Mỗi con số có nguồn | Case → Evidence | 6 s |
-| 17 | Học từ case cũ, nhưng không đoán | Case → Evidence → Precedents | 6 s |
-| 18 | Tổng quan case | Case → Case Overview | 5 s (tuỳ chọn) |
+| Scene | Topic | Screen | Suggested duration |
+| - | - | - | - |
+| 1 | 8D worklist | 8D Reports | 6 s |
+| 2 | Create an 8D from a recorded defect | 8D Reports -> Create 8D Report | 6 s |
+| 3 | Import a case as JSON | Create 8D Report -> JSON | 6 s |
+| 4 | Inspection history | Master Data -> Inspection History | 6 s |
+| 5 | Starting an 8D is a decision | Master Data -> Defect Records | 6 s |
+| 6 | Closed-case library | Master Data -> Closed Case Library | 5 s |
+| 7 | Where AI participates | AI Configuration | 6 s |
+| 8 | Precedent retrieval | AI Configuration | 6 s |
+| 9 | AI stop conditions | Case -> AI Stops | 7 s |
+| 10 | Decision audit trail | Case -> Audit Log | 7 s |
+| 11 | Eight disciplines in sequence | Case -> 8D Disciplines | 6 s |
+| 12 | Human-controlled progression | Case -> D7 | 6 s |
+| 13 | AI-generated draft | Case -> D5 | 6 s |
+| 14 | D4 root-cause analysis | Case -> D4 | 8 s |
+| 15 | AI Referee as a second assessment | Case -> D4 -> AI Referee | 8 s |
+| 16 | Traceable evidence | Case -> Evidence | 6 s |
+| 17 | Learning from qualified precedents | Case -> Evidence -> Precedents | 6 s |
+| 18 | Case overview | Case -> Case Overview | 5 s, optional |
 
-Tổng khoảng 1 phút 50 giây. Cảnh 18 là tuỳ chọn, cắt được nếu cần dưới 1 phút 45.
+The suggested durations total 107 seconds without scene 18 and 112 seconds with it. Leave room for transitions and verify the final export stays within 2 minutes. Accelerate or cut processing waits; this edited video does not measure end-to-end analysis latency.
 
----
+## Part 1. Open and create an 8D
 
-## Phần 1. Mở và tạo 8D
+### Scene 1. 8D worklist
 
-### Cảnh 1. Danh sách 8D
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/01-worklist.jpg` | `images/01-worklist-marked.jpg` |
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/01-worklist.jpg` | Ảnh cục bộ — `images/01-worklist-marked.jpg` |
+**Title:** Every 8D case, with urgent work first
+**Subtitle:** Prioritized by severity, customer commitments and case age.
 
-**Tiêu đề:** Mọi case 8D, case gấp nhất nằm trên cùng
-**Phụ đề:** Xếp theo mức nghiêm trọng, cam kết với khách hàng, rồi tuổi case.
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | Most urgent case | This customer complaint is 18 days overdue in the captured demo, so it appears first. |
+| 2 | Filter your work | My cases, overdue, critical and awaiting approval. Each chip displays its case count. |
+| 3 | Progress across eight steps | The count represents approved steps, not steps merely drafted by AI. |
+| 4 | Start a new 8D | Open the case-creation dialog. |
 
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | Case gấp nhất | Case khiếu nại của khách hàng đã quá hạn 18 ngày, nên nằm đầu danh sách. |
-| 2 | Lọc theo việc của bạn | Case của tôi, quá hạn, nghiêm trọng, chờ duyệt… Con số trên mỗi chip là số case. |
-| 3 | Tiến độ x/8 bước | Đếm số bước đã có người duyệt, không phải số bước AI đã viết. |
-| 4 | Bắt đầu một 8D mới | Mở hộp thoại tạo 8D. |
+### Scene 2. Create an 8D from a recorded defect
 
-### Cảnh 2. Tạo 8D từ lỗi đã ghi nhận
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/02-create-pick.jpg` | `images/02-create-pick-marked.jpg` |
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/02-create-pick.jpg` | Ảnh cục bộ — `images/02-create-pick-marked.jpg` |
+**Title:** Each 8D starts with a recorded defect
+**Subtitle:** Select an existing defect. A defect can have one linked 8D.
 
-**Tiêu đề:** Mỗi 8D bắt đầu từ một lỗi có thật
-**Phụ đề:** Chọn lỗi đã ghi nhận. Mỗi lỗi chỉ được mở một 8D.
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | Q1 customer - Q2 supplier - Q3 internal | Filter by defect origin. |
+| 2 | Defects without an 8D | Defects that already have a linked report are excluded from this selection. |
+| 3 | AI drafts in the background | Create & Analyze extracts the facts and prepares D1 to D8. The earlier demo took approximately 3 minutes; this is draft preparation, not case closure. |
 
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | Q1 khách hàng · Q2 nhà cung cấp · Q3 nội bộ | Lọc theo nguồn gốc lỗi. |
-| 2 | Chỉ lỗi chưa có 8D | Lỗi đã có 8D không xuất hiện ở đây. |
-| 3 | AI phân tích khoảng 3 phút | Bấm Create & Analyze là AI bóc tách dữ kiện và soạn D1–D8 ở nền. |
+### Scene 3. Import a case as JSON
 
-### Cảnh 3. Nhập case bằng JSON
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/03-create-json.jpg` | `images/03-create-json-marked.jpg` |
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/03-create-json.jpg` | Ảnh cục bộ — `images/03-create-json-marked.jpg` |
+**Title:** A case from another system? Import JSON
+**Subtitle:** Upload a file, select a sample or paste the data.
 
-**Tiêu đề:** Case từ hệ thống khác? Nhập JSON
-**Phụ đề:** Tải file, chọn case mẫu, hoặc dán trực tiếp.
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | Upload a JSON file | The browser checks the input, and the server validates it again. |
+| 2 | Select a sample case | The sample starts with symptoms and context, without a completed cause, action or team. |
+| 3 | Paste JSON directly | Cases created this way are labeled "Imported as JSON". |
 
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | Tải file .json | Trình duyệt kiểm tra trước, server kiểm tra lại. |
-| 2 | Case mẫu một chạm | Chỉ có triệu chứng và bối cảnh: chưa có nguyên nhân, hành động hay đội. |
-| 3 | Hoặc dán JSON | Case nhập theo đường này được ghi rõ "Imported as JSON". |
+## Part 2. Source data
 
----
+### Scene 4. Inspection history
 
-## Phần 2. Dữ liệu gốc
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/04-inspection-history.jpg` | `images/04-inspection-history-marked.jpg` |
 
-### Cảnh 4. Lịch sử kiểm tra
+**Title:** Base the analysis on measurements
+**Subtitle:** Four datasets follow the business workflow.
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/04-inspection-history.jpg` | Ảnh cục bộ — `images/04-inspection-history-marked.jpg` |
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | Inspections -> Defects -> Closed cases -> Catalogs | The tabs follow the business data chain. |
+| 2 | One characteristic, one lot, one result | D2 Is / Is-Not analysis compares failing lots with passing lots. |
+| 3 | Enter records or import JSON | Import inspection results in bulk. |
 
-**Tiêu đề:** AI không đoán. AI đọc số đo.
-**Phụ đề:** Bốn bộ dữ liệu, theo đúng chuỗi nghiệp vụ.
+### Scene 5. Starting an 8D is a decision
 
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | Kiểm tra → Lỗi → Case đã đóng → Danh mục | Thứ tự các tab là thứ tự của chuỗi nghiệp vụ. |
-| 2 | Mỗi dòng: một đặc tính, một lô, Đạt / Lỗi | Nền của phân tích Is / Is-Not ở D2: so lô hỏng với lô đạt. |
-| 3 | Thêm tay hoặc nhập JSON | Nhập hàng loạt kết quả kiểm tra. |
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/05-defect-records.jpg` | `images/05-defect-records-marked.jpg` |
 
-### Cảnh 5. Mở 8D là một quyết định
+**Title:** Recording a defect does not automatically open an 8D
+**Subtitle:** Escalating a defect to a structured investigation is a deliberate decision.
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/05-defect-records.jpg` | Ảnh cục bộ — `images/05-defect-records-marked.jpg` |
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | Record a new defect | Select the defect code, material, batch and equipment from the available catalogs. |
+| 2 | Start 8D | Create a report for this defect and start the analysis. |
+| 3 | Open 8D | When the defect already has a report, open that report instead of creating a duplicate. |
 
-**Tiêu đề:** Ghi nhận lỗi ≠ mở 8D
-**Phụ đề:** Phần lớn lỗi được đóng ngay. Mở 8D là quyết định có chủ đích.
+### Scene 6. Closed-case library
 
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | Ghi nhận lỗi mới | Mã lỗi, vật tư, lô, máy đều chọn từ danh mục chuẩn. |
-| 2 | Start 8D | Tạo 8D cho lỗi này và bắt đầu phân tích. |
-| 3 | Open 8D | Lỗi đã có 8D thì nút đổi thành mở 8D đó. Mỗi lỗi tối đa một 8D. |
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/06-closed-case-library.jpg` | `images/06-closed-case-library-marked.jpg` |
 
-### Cảnh 6. Thư viện case đã đóng
+**Title:** The system's case memory
+**Subtitle:** Completed cases become precedents for future investigations.
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/06-closed-case-library.jpg` | Ảnh cục bộ — `images/06-closed-case-library-marked.jpg` |
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | Completed cases | Open investigations do not yet provide a completed case outcome for this library. |
+| 2 | Import historical cases | Bring prior case records into the library in bulk. |
 
-**Tiêu đề:** Bộ nhớ của hệ thống
-**Phụ đề:** Case đóng xong trở thành tiền lệ cho lần sau.
+## Part 3. AI configuration
 
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | Chỉ case đã hoàn tất | Case đang mở chưa có bài học đã được chứng minh, nên không nằm ở đây. |
-| 2 | Nhập case cũ hàng loạt | Đưa kinh nghiệm từ hệ thống khác vào thư viện. |
+### Scene 7. Where AI participates
 
----
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/07-ai-chain.jpg` | `images/07-ai-chain-marked.jpg` |
 
-## Phần 3. AI được cấu hình thế nào
+**Title:** Two AI-supported stages in the displayed workflow
+**Subtitle:** People remain responsible for the input records and final decisions.
 
-### Cảnh 7. AI vào cuộc ở đâu
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | People inspect, record and open the case | The initial business actions supply the investigation context. |
+| 2 | Retrieve precedents and draft D1 to D8 | These highlighted stages use the configured retrieval and AI services. |
+| 3 | People review and close | A completed case can return to the precedent library. |
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/07-ai-chain.jpg` | Ảnh cục bộ — `images/07-ai-chain-marked.jpg` |
+### Scene 8. Precedent retrieval
 
-**Tiêu đề:** AI chỉ vào cuộc ở hai chỗ
-**Phụ đề:** Còn lại là dữ liệu và quyết định của con người.
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/08-retrieval-engine.jpg` | `images/08-retrieval-engine-marked.jpg` |
 
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | Con người: kiểm tra, ghi lỗi, mở 8D | Không có AI ở ba bước đầu. |
-| 2 | AI: tìm tiền lệ, soạn D1–D8 | Hai bước được tô đỏ là chỗ duy nhất AI làm việc. |
-| 3 | Con người: duyệt và đóng | Case đóng xong quay lại làm tiền lệ. |
+**Title:** Retrieve cases through recorded relationships
+**Subtitle:** Connect material, equipment and defect codes.
 
-### Cảnh 8. Bộ máy tìm tiền lệ
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | Knowledge Graph | The displayed configuration follows recorded relationships and exposes evidence paths. |
+| 2 | Alternative retrieval | Configured scoring and embedding criteria provide another retrieval path. |
+| 3 | Deployment-dependent fallback | Verify the active engine and fallback configuration before recording. The project also supports environments without SAP HANA. |
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/08-retrieval-engine.jpg` | Ảnh cục bộ — `images/08-retrieval-engine-marked.jpg` |
+## Part 4. Work through one case
 
-**Tiêu đề:** Tìm case cũ qua mối nối thật
-**Phụ đề:** Knowledge Graph: cùng vật tư, cùng máy, cùng mã lỗi.
+### Scene 9. AI stop conditions
 
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | Knowledge Graph (mặc định) | Đi theo các mối nối đã xác minh, nên mọi đường bằng chứng kiểm chứng được. |
-| 2 | Vector Search (dự phòng) | Cách cũ: so độ giống văn bản bằng embedding. |
-| 3 | Tự chuyển khi Graph không có | Chạy được cả trên môi trường không có SAP HANA. |
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/09-ai-stops.jpg` | `images/09-ai-stops-marked.jpg` |
 
----
+**Title:** Stop and ask the responsible person
+**Subtitle:** AI suggestions do not authorize controlled process changes.
 
-## Phần 4. Làm việc trên một case
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | Authority required | Changing a controlled SOP requires human authorization. This demo stop blocks D7 approval. |
+| 2 | Ask the process owner | Who approves this change, and for which document version? |
+| 3 | Resolve | Record the responsible person's response in the case audit trail. |
 
-### Cảnh 9. AI biết dừng
+### Scene 10. Decision audit trail
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/09-ai-stops.jpg` | Ảnh cục bộ — `images/09-ai-stops-marked.jpg` |
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/10-audit-log.jpg` | `images/10-audit-log-marked.jpg` |
 
-**Tiêu đề:** Không chắc thì dừng, hỏi đúng người
-**Phụ đề:** AI không vượt quyền con người.
+**Title:** Review decisions leave a trace
+**Subtitle:** Who acted, when, and with which recorded context.
 
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | Vượt thẩm quyền | Đổi một tài liệu có kiểm soát (SOP) là việc AI không được tự làm. Lần dừng này chặn duyệt D7. |
-| 2 | Câu hỏi cho chủ quy trình | Ai duyệt thay đổi này, và ở phiên bản nào? |
-| 3 | Resolve | Người có quyền trả lời. Câu trả lời đi vào nhật ký kiểm toán. |
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | Actor and timestamp | The demo record shows D4 approved by admin on October 14, 2026 at 15:33. |
+| 2 | Decision-time context | The saved snapshot includes selected root-cause, measurement and precedent information. |
+| 3 | Before and after | Draft -> Approved; InProgress -> Completed. |
+| 4 | Draft provenance | Trace the draft's recorded model and analysis timestamp. |
 
-### Cảnh 10. Nhật ký kiểm toán
+### Scene 11. Eight disciplines in sequence
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/10-audit-log.jpg` | Ảnh cục bộ — `images/10-audit-log-marked.jpg` |
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/11-eight-disciplines.jpg` | `images/11-eight-disciplines-marked.jpg` |
 
-**Tiêu đề:** Mọi quyết định đều để lại dấu vết
-**Phụ đề:** Ai, lúc nào, trên dữ liệu nào, vì sao.
+**Title:** Eight steps, unlocked in sequence
+**Subtitle:** Complete the preceding step before progressing.
 
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | Ai làm, lúc nào | Approved D4, bởi admin, 14/10/2026 15:33. |
-| 2 | Dữ liệu tại thời điểm duyệt | Nguyên nhân gốc, số đo, tiền lệ: đúng những gì người duyệt đã thấy. |
-| 3 | Trước / sau | Draft → Approved, InProgress → Completed. |
-| 4 | Lượt AI nào đã soạn | Truy được bản nháp đến từ mô hình nào, lúc nào. |
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | Six of eight steps complete | Overall progress for the captured case. |
+| 2 | D1 to D6 approved | Team, problem definition, containment, root cause, corrective action and verification. |
+| 3 | D7 in progress | The currently active step. |
+| 4 | D8 not started | Awaiting completion of D7. |
 
-### Cảnh 11. Tám bước, đúng thứ tự
+### Scene 12. Human-controlled progression
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/11-eight-disciplines.jpg` | Ảnh cục bộ — `images/11-eight-disciplines-marked.jpg` |
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/12-next-action.jpg` | `images/12-next-action-marked.jpg` |
 
-**Tiêu đề:** Tám bước, mở khoá theo thứ tự
-**Phụ đề:** Bước trước xong, bước sau mới được bắt đầu.
+**Title:** People control step progression
+**Subtitle:** The next-action button shows what comes next.
 
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | 6/8 bước hoàn tất | Thanh tiến độ của cả case. |
-| 2 | D1–D6: đã duyệt | Từ lập đội, mô tả, khoanh vùng, tìm gốc, khắc phục đến triển khai. |
-| 3 | D7: đang làm | Bước duy nhất đang mở để sửa. |
-| 4 | D8: chưa bắt đầu | Chờ D7 xong. |
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | Start before editing | A step begins read-only. Select "Start the process" to work on it. |
+| 2 | Approve | Approval depends on the required conditions. Inspect any unmet requirements shown by the interface. |
+| 3 | D7 in the stepper | The stepper and action button reflect the same case state. |
 
-### Cảnh 12. Người bấm, bước mới đi
+### Scene 13. AI-generated draft
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/12-next-action.jpg` | Ảnh cục bộ — `images/12-next-action-marked.jpg` |
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/13-ai-draft.jpg` | `images/13-ai-draft-marked.jpg` |
 
-**Tiêu đề:** Không bước nào tự chạy
-**Phụ đề:** Một nút luôn cho biết việc tiếp theo.
+**Title:** AI proposes; people accept
+**Subtitle:** D5 corrective actions build on the D4 root-cause assessment.
 
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | Đang làm, được sửa | Mỗi bước bắt đầu ở chế độ chỉ đọc. Người bấm "Start the process" thì mới sửa được. |
-| 2 | Approve | Mờ cho tới khi đủ điều kiện. Bấm sớm thì hệ thống liệt kê đúng những gì còn thiếu. |
-| 3 | D7 trên thanh tám bước | Trạng thái trên thanh tiến độ khớp với nút. |
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | Suggested actions | Each proposal names the required role. Accepting it creates an actionable task. |
+| 2 | Assigned tasks | Each task links to its cause category and has its own status. |
 
-### Cảnh 13. Bản nháp của AI
+### Scene 14. D4 root-cause analysis
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/13-ai-draft.jpg` | Ảnh cục bộ — `images/13-ai-draft-marked.jpg` |
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/14-d4-root-cause.jpg` | `images/14-d4-root-cause-marked.jpg` |
 
-**Tiêu đề:** AI soạn sẵn. Người chấp nhận.
-**Phụ đề:** D5, hành động khắc phục, từ chính nguyên nhân gốc ở D4.
+**Title:** D4: investigate the root cause
+**Subtitle:** Evaluate each category against evidence.
 
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | AI đề xuất hành động | Mỗi đề xuất ghi rõ vai trò cần làm. Người bấm Accept thì mới thành việc. |
-| 2 | Việc đã giao | Mỗi việc gắn với nguyên nhân gốc (Machine) và có trạng thái riêng. |
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | The 6M fishbone | People, Machine, Method, Material, Measurement and Environment. The sample explains why five categories were excluded. |
+| 2 | Machine as the selected cause | In this demo dataset, every failing record belongs to WHEEL1 and every WHEEL2 record passes. This is a case-specific observation. |
+| 3 | The 5-Why chain | The sample chain ends with WHEEL1 dynamic imbalance and mounting runout. |
+| 4 | AI Referee | Open a separate assessment of the available evidence. |
 
-### Cảnh 14. D4: tìm nguyên nhân gốc
+### Scene 15. AI Referee as a second assessment
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/14-d4-root-cause.jpg` | Ảnh cục bộ — `images/14-d4-root-cause-marked.jpg` |
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/15-ai-referee.jpg` | `images/15-ai-referee-marked.jpg` |
 
-**Tiêu đề:** D4: tìm nguyên nhân gốc
-**Phụ đề:** Loại trừ từng nhóm bằng số liệu, không bằng cảm tính.
+**Title:** A separate assessment
+**Subtitle:** The referee evaluates evidence without seeing the engineer's recorded conclusion.
 
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | Xương cá 6M | Người, Máy, Phương pháp, Vật liệu, Đo lường, Môi trường. Năm nhóm bị loại kèm lý do. |
-| 2 | Máy = nguyên nhân gốc | 100% lỗi nằm ở cụm đá mài WHEEL1. Cụm WHEEL2 đạt 100%. |
-| 3 | 5-Why kết thúc ở gốc | Đá mài WHEEL1 mất cân bằng động, đảo trục khi gá. |
-| 4 | AI Referee | Mở ý kiến thứ hai, độc lập. |
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | Independent hypothesis - displayed confidence 90% | The engineer's 5-Why chain and recorded root cause are withheld. The displayed confidence is model output, not measured accuracy. |
+| 2 | Compare the conclusions | A disagreement prompts the engineer to review the evidence. |
+| 3 | Sample hypothesis: Machine | WHEEL1 imbalance causes vibration during grinding. |
+| 4 | Human verification remains necessary | Check the hypothesis against the source records. |
 
-### Cảnh 15. AI Referee, ý kiến thứ hai
+### Scene 16. Traceable evidence
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/15-ai-referee.jpg` | Ảnh cục bộ — `images/15-ai-referee-marked.jpg` |
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/16-evidence.jpg` | `images/16-evidence-marked.jpg` |
 
-**Tiêu đề:** Ý kiến thứ hai, độc lập
-**Phụ đề:** AI tự kết luận khi bị giấu đáp án của kỹ sư.
+**Title:** Inspect the source behind each value
+**Subtitle:** The captured example shows 17 of 17 cited records available to inspect.
 
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | Giả thuyết độc lập · 90% | AI không được xem chuỗi 5-Why và nguyên nhân kỹ sư đã ghi. |
-| 2 | So với kết luận đã ghi | Lệch nhau thì hệ thống cảnh báo để kỹ sư xem lại. |
-| 3 | Kết luận của AI: Máy | Cụm đá mài WHEEL1 mất cân bằng, gây rung khi mài. |
-| 4 | Không quyết định thay ai | Ghi rõ: kiểm lại với bản ghi gốc. |
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | Three source categories | Recorded facts, external or assumed information, and AI inference. |
+| 2 | Label unsupported proposals | A proposed step is marked "Suggested by AI". |
+| 3 | Inspection measurements | The demo records surface roughness Ra of 2.8 micrometers against a 0.8-micrometer limit. |
 
-### Cảnh 16. Mỗi con số có nguồn
+### Scene 17. Learning from qualified precedents
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/16-evidence.jpg` | Ảnh cục bộ — `images/16-evidence-marked.jpg` |
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/17-precedents.jpg` | `images/17-precedents-marked.jpg` |
 
-**Tiêu đề:** Mỗi con số đều có nguồn
-**Phụ đề:** 17 trên 17 bản ghi AI trích dẫn đều mở được.
+**Title:** Return no precedent when none qualifies
+**Subtitle:** An explicit empty result is more useful than a weak match presented as evidence.
 
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | Ba loại nguồn | Dữ kiện thật · bên ngoài / giả định · AI suy luận. |
-| 2 | Không có dữ liệu thì gắn cờ | Bước nào chỉ là đề xuất thì ghi "Suggested by AI". |
-| 3 | Số đo thật từ hệ thống QM | Độ nhám Ra 2,8 µm, giới hạn 0,8 µm. |
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | Identify the retrieval engine | The interface records which engine retrieved candidates for this case. |
+| 2 | No qualifying case in the captured result | This screenshot reports 22 candidates and none meeting its configured 3-of-16 threshold. Thresholds depend on the active profile. |
 
-### Cảnh 17. Học từ case cũ, nhưng không đoán
+### Scene 18. Case overview, optional
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/17-precedents.jpg` | Ảnh cục bộ — `images/17-precedents-marked.jpg` |
+| Clean screenshot | Numbered screenshot |
+| - | - |
+| `images/18-case-overview.jpg` | `images/18-case-overview-marked.jpg` |
 
-**Tiêu đề:** Không đủ giống thì không đưa tiền lệ
-**Phụ đề:** Thà nói "không có" còn hơn đưa một tiền lệ yếu.
+**Title:** The whole case on one page
+**Subtitle:** Facts, commitments and a concise summary.
 
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | Bộ máy đã chạy | Luôn ghi rõ bộ máy nào đã tìm tiền lệ cho case này. |
-| 2 | 22 case đã xét, không case nào đạt 3/16 điểm | Hệ thống nói thẳng là không có. |
+| Box | On-screen caption | Narration |
+| - | - | - |
+| 1 | Case facts | Origin, material, batch, defect code, equipment and quantities. |
+| 2 | Editable commitments | Completion deadline and coordinator. The sample internal defect has no automatic customer SLA deadline. |
+| 3 | AI-drafted internal summary | A customer-complaint case can also include a customer-facing version for review. |
 
-### Cảnh 18. Tổng quan case (tuỳ chọn)
+## Editing notes
 
-| Ảnh sạch | Ảnh đánh số |
-|---|---|
-| Ảnh cục bộ — `images/18-case-overview.jpg` | Ảnh cục bộ — `images/18-case-overview-marked.jpg` |
-
-**Tiêu đề:** Cả case trong một trang
-**Phụ đề:** Dữ kiện, cam kết và bản tóm tắt.
-
-| Box | Chú thích trên video | Lời dẫn |
-|---|---|---|
-| 1 | Dữ kiện case | Nguồn gốc, vật tư, lô, mã lỗi, máy, số lượng. |
-| 2 | Hai cam kết sửa được | Hạn hoàn tất và người điều phối. Lỗi nội bộ không có SLA nên hệ thống không tự đặt hạn. |
-| 3 | Tóm tắt nội bộ do AI viết | Case khiếu nại có thêm một bản an toàn để gửi khách hàng. |
-
----
-
-## Ghi chú khi dựng
-
-- **Màu khung:** đỏ `#C00000` cho khung và số tròn, giống màu chủ đạo của app.
-- **Nhịp:** nên hiện từng box theo đúng số thứ tự (1 → 2 → 3), mỗi box khoảng 1,5–2 giây, chú thích hiện cạnh box rồi mờ dần.
-- **Ảnh sạch:** dùng làm nền cho hiệu ứng zoom vào box. Toạ độ trong `images/boxes.json` là pixel trên ảnh 1920×1080.
-- **Dữ liệu trong ảnh:** lấy từ cơ sở dữ liệu demo local. Cảnh 10 cố ý lọc riêng bước D4, vì một số dòng nhật ký khác còn ghi chú thử nghiệm.
+- Use red `#C00000` for highlight frames and numbered circles, matching the application accent color.
+- Reveal boxes in numeric order, with roughly 1.5 to 2 seconds per callout. Place the caption next to the box, then fade it out.
+- Use clean screenshots as zoom backgrounds. Coordinates in `images/boxes.json` are pixels on the original 1920 x 1080 canvas.
+- Screenshot data comes from the local demo database. Scene 10 filters the audit trail to D4 because other rows contain testing notes.
+- The case audit trail is a product feature, distinct from a project development journal.

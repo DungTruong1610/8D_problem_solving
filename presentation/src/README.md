@@ -1,11 +1,11 @@
 # 8D Copilot slides: source
 
-> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+> **Competition context:** [AI4Biz 2026 - LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
 
 `../8d-copilot-slides.html` is a build output. Edit the files here, then rebuild.
 
 | File | Purpose |
-|------|---------|
+| - | - |
 | `8d-copilot-slides.src.html` | Deck source: slides, CSS, step engine. Screenshots are `__IMGn__` placeholders, photos are `__PHOTO:name__`, photo credits are `__CREDIT:name__`, logos are `__LOGO:name__` (`img/logos/name.png`), and the intro video on slide 3 is `__VIDEO:name__`, read from `presentation/name.mp4`. The video is embedded as base64, so the built deck is about 36 MB. |
 | `img/shotN.jpg` | Real app screenshots, injected as base64 by the build. Captured from the live site at 2× scale, case 8D-10048788 (shot1 D4, shot3 D7). shot2, shot4, shot6 and shot7 are no longer used by the deck. When you replace one, re-measure its `zone` and `bd` positions. |
 | `img/photos/*.jpg` | Openly licensed photos (Wikimedia Commons). `credits.json` maps each file name to the credit line shown on the slide; `CREDITS.md` lists author, licence and source page. |
@@ -25,30 +25,30 @@ The problem part follows one real case family from the demo data: the P90 pump h
 (MAT-10318, die casting line WC-CAST-03, defect DEF-0512, porosity at the sealing face).
 
 | # | Slide | Content |
-|---|-------|---------|
-| 1 | Mở đầu | Cover |
-| 2 | 8D là gì | Definition, Ford 1987, IATF 16949, why suppliers must answer with 8D; the P90 example |
-| 3 | Một bản 8D mất bao lâu | Where 10–14 days go; the P90 leak recurring in May, Jul, Sep, Oct |
-| 4 | Tám bước | D1–D8 applied to the P90 case |
-| 5 | AI trong 8D | Four AI jobs and the steps they serve; real run of 8D-10049402 (75 s); why 8D suits AI |
-| 6 | Trước và sau | 10–14 days → ½–1 day, five-row comparison |
-| 7 | Sản phẩm | Wireframe vs real case screen (spotlight) |
-| 8 | AI chạy ở đâu | Four pipeline stages, LLM vs rules, stack, measured cost |
-| 9 | Tìm tiền lệ | Graph links MAT-10318 / WC-CAST-03 / DEF-0512 to the closed P90 cases |
-| 10 | Khó khăn | Five hard problems and how the product handles them |
-| 11 | Kiểm chứng | Four test scenarios |
-| 12 | Kết thúc | Closing |
+| - | - | - |
+| 1 | Opening | Cover |
+| 2 | What is 8D | Definition, Ford 1987, IATF 16949, why suppliers must answer with 8D; the P90 example |
+| 3 | How long an 8D report takes | Where 10-14 days go; the P90 leak recurring in May, Jul, Sep, Oct |
+| 4 | Eight steps | D1-D8 applied to the P90 case |
+| 5 | AI in 8D | Four AI jobs and the steps they serve; real run of 8D-10049402 (75 s); why 8D suits AI |
+| 6 | Before and after | 10-14 days → ½-1 day, five-row comparison |
+| 7 | Product | Wireframe vs real case screen (spotlight) |
+| 8 | Where AI runs | Four pipeline stages, LLM vs rules, stack, measured cost |
+| 9 | Finding precedents | Graph links MAT-10318 / WC-CAST-03 / DEF-0512 to the closed P90 cases |
+| 10 | Challenges | Five hard problems and how the product handles them |
+| 11 | Validation | Four test scenarios |
+| 12 | Closing | Closing |
 
 Figures from the demo database: 8D-10049140 closed in 24 days, 8D-10048577 in 26 days;
 the AI analysis of 8D-10049402 took 75 s and about 135k tokens (DeepSeek Flash).
-The "10–14 days" and "½–1 day" headline figures still need a cited source.
+The "10-14 days" and "½-1 day" headline figures still need a cited source.
 
 ## Click steps
 
 Each slide advances one click at a time. Attributes in the source drive it:
 
 | Attribute | Effect at step N |
-|-----------|------------------|
+| - | - |
 | `data-step="n"` | element appears (`.shown`) at step ≥ n, focused (`.now`) at step n |
 | `data-hl="n"` | highlighted (`.now`) only at step n |
 

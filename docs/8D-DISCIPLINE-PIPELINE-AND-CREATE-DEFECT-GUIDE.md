@@ -1,84 +1,74 @@
-# 📘 Hướng Dẫn Toàn Diện: Pipeline Cấu Hình 8D Từng Bước & Phân Hệ Create Defect
+# 📘 Complete Guide: Per-Step 8D Configuration Pipeline & Create Defect Module
 
-> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+> **Competition context:** [AI4Biz 2026 - LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
 
-> **Tài liệu Kỹ thuật & Hướng dẫn Vận hành**
-> **Dự án**: CNMA Proresolve (`8d-copilot`)
-> **Phiên bản cập nhật**: Kiến trúc Pipeline 5 Tab Hợp Nhất & Giao Diện Create Defect
+> **Technical Documentation & Operations Guide**
+> **Project**: CNMA Proresolve (`8d-copilot`)
+> **Revision scope**: Unified Five-Tab Pipeline Architecture & Create Defect Interface
 
----
+## 🌟 PART 1: OVERVIEW OF THE MAIN IMPROVEMENTS
 
-## 🌟 PHẦN 1: TỔNG QUAN CÁC ĐIỂM CẢI TIẾN MỚI
+The system has been extended from a standalone AI experiment into an **Enterprise Quality Management Copilot Platform (Enterprise 8D Copilot)**. Its three main improvements are:
 
-Hệ thống đã được nâng cấp toàn diện nhằm chuyển đổi từ một công cụ thử nghiệm AI đơn lẻ sang một **Nền tảng Copilot Quản lý Chất lượng Doanh nghiệp (Enterprise 8D Copilot)**. Ba cải tiến cốt lõi bao gồm:
-
-1. **Merge `Object Schema` trực tiếp vào trong từng bước D (`StepObjectSchemaEditor`)**:
-
-   - Trước đây, cấu hình tìm kiếm tương đồng (Similarity Search) nằm phân tán ở một trang bên ngoài, khiến người dùng khó hình dung bước D hiện tại đang lấy dữ liệu lịch sử như thế nào.
-   - Hiện tại, mỗi bước D (D1 $\rightarrow$ D8) sở hữu trực tiếp tab `Object Schema` với **3 bảng điều khiển (3-panel workbench)**:
-     - **Panel trái**: Toàn bộ từ điển trường dữ liệu hệ thống được quét từ các case thực tế.
-     - **Panel giữa**: Các trường dữ liệu bước D dùng để so sánh, phương thức so khớp (`exact`, `keyword`, `family`, `cosine`), trọng số (Weight) và sàn ngưỡng điểm (`minScore`, `minSimilarity`).
-     - **Panel phải (`StepScorePanel`)**: Thử nghiệm và chấm điểm trực tiếp 2 case thực tế từ kho dữ liệu lịch sử để kiểm chứng ngay lập tức: *"Bước D này có nhìn thấy case đó hay không?"*.
-2. **Chuẩn hóa Pipeline Cấu hình 5 Bước Tuần Tự Cho Từng Bước D**:
-
-   - Luồng cấu hình đi theo chu trình khép kín:
+1. **Integrating `Object Schema` directly into each D step (`StepObjectSchemaEditor`)**:
+   - Previously, Similarity Search configuration was on a separate page, making it difficult to understand how the current D step retrieved historical data.
+   - Each D step (D1 through D8) now has its own `Object Schema` tab with a **three-panel workbench**:
+     - **Left panel**: The complete system field dictionary, scanned from actual cases.
+     - **Center panel**: Fields used for comparison by the D step, match methods (`exact`, `keyword`, `family`, `cosine`), weights, and minimum thresholds (`minScore`, `minSimilarity`).
+     - **Right panel (`StepScorePanel`)**: Directly test and score two actual historical cases to answer immediately: *"Would this D step retrieve that case?"*
+2. **Standardizing a Sequential Five-Stage Configuration Pipeline for Each D Step**:
+   - Configuration follows a complete sequence:
      $$
      \text{Object Schema} \longrightarrow \text{Data Schema} \longrightarrow \text{Prompt Guide} \longrightarrow \text{Form Editor} \longrightarrow \text{Constraints}
      $$
-   - Đảm bảo tính nhất quán: **Nguồn tri thức quá khứ $\rightarrow$ Cấu trúc đầu vào hiện tại $\rightarrow$ Chỉ dẫn suy luận AI $\rightarrow$ Trình bày giao diện đầu ra $\rightarrow$ Lưới an toàn kiểm duyệt.**
-3. **Bổ sung Phân Hệ `Create Defect` (Giao Diện Tạo Sự Cố Trực Quan)**:
+   - This maintains consistency between **historical knowledge sources, current input structure, AI reasoning instructions, output presentation, and validation safeguards**.
+3. **Adding the `Create Defect` Module (Visual Incident Creation)**:
+   - Replaces the need to prepare and manually paste complex raw JSON.
+   - Provides a Visual Form with 1-Click Presets for common scenarios (Q3 Flange Burr, Q1 Coolant Leakage, Q3 Weld Porosity) and flexible switching to the JSON Editor.
+   - Automatically converts incident data into the Golden Dataset format and directly starts the `analyzeFromJson` AI pipeline.
 
-   - Thay thế việc người dùng phải chuẩn bị và dán thủ công chuỗi JSON thô phức tạp.
-   - Cung cấp giao diện biểu mẫu trực quan (Visual Form), hỗ trợ nạp nhanh các mẫu sự vụ kinh điển (1-Click Presets: Q3 Flange Burr, Q1 Coolant Leakage, Q3 Weld Porosity) và chuyển đổi linh hoạt sang JSON Editor.
-   - Tự động chuyển tiếp dữ liệu sự cố thành Golden Dataset và kích hoạt trực tiếp pipeline AI `analyzeFromJson`.
+## 🧭 PART 2: HOW THE FIVE CONFIGURATION TABS WORK IN EACH D STEP
 
----
+The five-tab model below describes the configuration concepts for each discipline. The structured-editor implementation explicitly limits configurable steps to D1-D4 in `srv/src/domain/eightd/eightDAnalyzer.ts`; the D5-D8 descriptions are discipline requirements and must not be read as confirmation that all five editor tabs are available.
 
-## 🧭 PHẦN 2: CƠ CHẾ HOẠT ĐỘNG CỦA 5 TAB CẤU HÌNH TRONG MỖI BƯỚC D
+**Schema terminology:** The examples below retain the original input-context design and its `inputSchemaJson` name. The structured runtime uses that field for the discipline output contract, generated by `outputDataSchemaFromForm` in `srv/src/domain/eightd/precedent/defaults.ts` and validated by `runtimeConfig.ts`. Current Form Editor paths must match that output contract; source-context examples are not drop-in output schemas.
 
-Mỗi bước D trong quy trình 8D đều có 5 tab cấu hình tương ứng. Dưới đây là ý nghĩa và tác động của từng tab:
+The configuration concepts appear in this order:
 
-```
-┌───────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                    5 TABS CẤU HÌNH CHO MỖI BƯỚC D (D1 - D8)                               │
-├───────────────────┬───────────────────┬───────────────────┬───────────────────┬───────────────────────────┤
-│ 1. Object Schema  │ 2. Data Schema    │ 3. Prompt Guide   │ 4. Form Editor    │ 5. Constraints            │
-│ (Precedent Rules) │ (Input Context)   │ (AI Reasoning)    │ (UI Layout)       │ (Quality Guardrails)      │
-└───────────────────┴───────────────────┴───────────────────┴───────────────────┴───────────────────────────┘
-```
+1. **Object Schema**: Precedent Rules
+2. **Data Schema**: Input Context
+3. **Prompt Guide**: AI Reasoning
+4. **Form Editor**: UI Layout
+5. **Constraints**: Quality Guardrails
 
-| Tab Cấu Hình             | User Thiết Lập Điều Gì?                                                                                                                                                                                                                                          | Tác Động Lên Output Khi Thực Thi Process                                                                                                                                                                                |
-| :------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1. Object Schema** | Kéo thả trường dữ liệu (Work Center, Defect Code, Material Group, Ishikawa...); chọn kiểu so khớp (`exact`, `keyword`, `family`, `cosine`); gán trọng số điểm; đặt ngưỡng lọc `minScore`.                                            | Quyết định**3 case tiền lệ lịch sử (`precedents#N`) nào** được nạp vào bộ nhớ AI cho bước này. Nếu đặt trọng số sai, AI sẽ tham khảo các sự cố không liên quan.                        |
-| **2. Data Schema**   | Định nghĩa cấu trúc JSON đầu vào (`inputSchemaJson`): Các trường thông tin bắt buộc/tùy chọn mà bước này cần đọc từ sự cố hiện tại (`x-source: qm_system`, `ai_enrichment`, `vector_search`).                                        | Đảm bảo AI**nhận đủ dữ liệu đầu vào sạch** để phân tích. Giúp LLM biết chính xác dữ liệu nào có sẵn và dữ liệu nào bị thiếu để tránh bịa đặt.                                     |
-| **3. Prompt Guide**  | Soạn thảo`systemPrompt` (vai trò, nguyên tắc làm việc) và `userTemplate` / `combinedPrompt` (hướng dẫn phương pháp luận, tích hợp các biến động `{{caseContext}}`, `{{precedents}}`).                                                  | Quyết định**phong cách hành văn, lập luận kỹ thuật, phương pháp suy luận** (ví dụ: áp dụng 5W2H, Ishikawa 6M, cách ly 24h, phân bổ vai trò nhân sự).                                           |
-| **4. Form Editor**   | Kéo thả nhóm trường (`groups`), căn chỉnh độ rộng cột (33%, 50%, 100%), chọn widget hiển thị (`textarea`, `input`, `tag-selector`, `checkbox`, `multiSelect`).                                                                              | Quyết định**kết quả AI trả về sẽ hiển thị thành giao diện Form như thế nào** trên trang chi tiết Báo cáo 8D để người dùng đọc và chỉnh sửa trực tiếp.                                   |
-| **5. Constraints**   | Thiết lập các quy tắc hậu kiểm duyệt (`rules`): Bắt buộc trích dẫn nguồn (`citationRequired`), khớp mẫu dẫn chứng (`sourcePattern`), cờ dữ liệu thực tế (`dataBackedWhenInputPresent`), công bố đối chiếu (`requiredDisclosure`). | Đóng vai trò là**lưới an toàn chống ảo giác (Anti-hallucination)**. Nếu kết luận của AI không có dẫn chứng hoặc vi phạm luật, hệ thống sẽ cảnh báo Warning hoặc chặn Error ngay lập tức. |
+| Configuration tab | What does the user configure? | Effect on output during execution |
+| - | - | - |
+| **1. Object Schema** | Drag and drop fields (Work Center, Defect Code, Material Group, Ishikawa, and others); select a match type (`exact`, `keyword`, `family`, `cosine`); assign weights; set `minScore`. | Determines **which three historical precedent cases (`precedents#N`)** are loaded into AI context for this step. Incorrect weights can lead AI to consult unrelated incidents. |
+| **2. Data Schema** | Define the input JSON structure (`inputSchemaJson`): required and optional fields that this step reads from the current incident (`x-source: qm_system`, `ai_enrichment`, `vector_search`). | Ensures AI **receives sufficient clean input** for analysis and knows exactly which data is available or missing, reducing invented facts. |
+| **3. Prompt Guide** | Write `systemPrompt` (role and working principles) and `userTemplate` / `combinedPrompt` (methodology instructions and dynamic variables such as `{{caseContext}}` and `{{precedents}}`). | Determines **writing style, technical argumentation, and reasoning methodology**, such as 5W2H, Ishikawa 6M, 24-hour containment, and personnel role assignment. |
+| **4. Form Editor** | Drag and drop field groups (`groups`), adjust column widths (33%, 50%, 100%), and select widgets (`textarea`, `input`, `tag-selector`, `checkbox`, `multiSelect`). | Determines **how the AI result appears as a form** on Report Detail so users can read and edit it directly. |
+| **5. Constraints** | Configure post-validation `rules`: source citations (`citationRequired`), evidence patterns (`sourcePattern`), factual-data flags (`dataBackedWhenInputPresent`), and comparison disclosures (`requiredDisclosure`). | Provides **anti-hallucination safeguards**. Unsupported AI conclusions or rule violations produce a Warning or a blocking Error. |
 
----
+## 🔍 PART 3: DETAILED 8D DISCIPLINES (D1 THROUGH D8)
 
-## 🔍 PHẦN 3: CHI TIẾT CHUYÊN SÂU TỪNG BƯỚC 8D (D1 ĐẾN D8)
+### 👥 D1: Establish the Team
 
----
+#### 1. Business purpose & AI responsibilities
 
-### 👥 D1: Establish the Team (Thành lập Đội ngũ Giải quyết Sự cố)
-
-#### 1. Mục đích nghiệp vụ & Trách nhiệm AI
-
-* **Mục đích**: Thành lập nhóm chuyên trách liên phòng ban (Cross-functional Team) gồm Trưởng nhóm (Team Leader), Điều phối viên (Champion/Sponsor), và các thành viên kỹ thuật/chất lượng phù hợp nhất với loại sự cố.
+* **Purpose**: Establish a cross-functional team with a Team Leader, Champion/Sponsor, and technical or quality specialists suited to the incident type.
 * **AI Copilot**:
-  * Nếu dữ liệu sự cố đã có danh sách nhân sự chính thức từ hệ thống QM $\rightarrow$ AI trích xuất và giải thích tính phù hợp của cơ cấu này.
-  * Nếu chưa có nhân sự $\rightarrow$ AI đối chiếu với các case tiền lệ (`precedents#N`) có cùng *Work Center* hoặc *Họ vật tư* để **đề xuất đích danh các kỹ sư từng xử lý thành công sự cố tương tự**.
+  * If the incident already includes official personnel from the QM system, extract the team and explain why its composition is appropriate.
+  * If personnel are missing, consult precedent cases (`precedents#N`) with the same *Work Center* or *material family* to **recommend named engineers who successfully handled similar incidents**.
 
-#### 2. Chi tiết 5 Tab Cấu Hình D1
+#### 2. The five D1 configuration tabs
 
 * **1. Object Schema**:
-  * *Trọng số chính*: `workCenter` (+4 điểm, `exact`), `materialFamily` (+3 điểm, `family` hoặc `keyword`).
-  * *Nguyên do*: Tìm người đã quen thuộc với dây chuyền/máy móc đó và am hiểu chủng loại vật tư đó.
+  * *Primary weights*: `workCenter` (+4 points, `exact`), `materialFamily` (+3 points, `family` or `keyword`).
+  * *Reason*: Find people familiar with that production line or equipment and that material category.
 * **2. Data Schema (`inputSchemaJson`)**:
-  * `teamMembers`: Danh sách nhân sự chính thức từ hệ thống QM (`x-source: qm_system`).
-  * `teamSize`: Số lượng nhân sự hiện tại (`x-source: ai_enrichment`).
-  * `precedentTeams`: Danh sách đội ngũ từ các case tiền lệ tương tự (`x-source: vector_search`).
+  * `teamMembers`: Official personnel list from the QM system (`x-source: qm_system`).
+  * `teamSize`: Current team size (`x-source: ai_enrichment`).
+  * `precedentTeams`: Teams from similar precedent cases (`x-source: vector_search`).
 * **3. Prompt Guide (`combinedPrompt`)**:
   ```text
   Extract the official team leader and members with their functions.
@@ -88,43 +78,41 @@ Mỗi bước D trong quy trình 8D đều có 5 tab cấu hình tương ứng. 
   ```
 * **4. Form Editor (`formSchemaJson`)**:
   * Group `team`:
-    * `content` (D1 team recommendation - `textarea`, 100% width, min 20 ký tự).
+    * `content` (D1 team recommendation - `textarea`, 100% width, minimum 20 characters).
     * `sources` (Evidence sources - `tag-selector`, 100% width).
-    * `confidence` (Độ tin cậy - `input`, 50% width).
-    * `dataBacked` (Dữ liệu thực chứng minh - `checkbox`, 50% width).
+    * `confidence` (Confidence - `input`, 50% width).
+    * `dataBacked` (Backed by factual data - `checkbox`, 50% width).
 * **5. Constraints (`constraintsJson`)**:
-  * `D1_GROUNDING`: `type: sourcePattern`, pattern `^(team\.|precedents#)`, mức độ `error`. Bắt buộc tên nhân sự phải xuất phát từ dữ liệu hệ thống hoặc case tiền lệ được trích dẫn.
-  * `D1_DATA_BACKED`: `type: dataBackedWhenInputPresent`, mức độ `warning`. Nếu cả dữ liệu hệ thống lẫn case tiền lệ đều không có nhân sự, cờ `dataBacked` bắt buộc phải chuyển sang `false`.
+  * `D1_GROUNDING`: `type: sourcePattern`, pattern `^(team\.|precedents#)`, severity `error`. Personnel names must come from system data or a cited precedent case.
+  * `D1_DATA_BACKED`: `type: dataBackedWhenInputPresent`, severity `warning`. If neither system data nor precedent cases contain personnel, `dataBacked` must be `false`.
 
-#### 3. Thay đổi trong Output khi thực thi
+#### 3. Effect on runtime output
 
-* **Khi có tiền lệ**: AI đề xuất danh sách nhân sự rõ ràng: *"Đề xuất Kỹ sư Nguyễn Văn A (QC Leader) và Kỹ sư Trần B (CNC Specialist) từ case tiền lệ #8D-10048992 do cùng vận hành máy CNC Milling Line 7"*.
-* **Bảo vệ Human-in-the-loop**: Kết quả đề xuất lưu tại `team.roster`, người dùng duyệt và chốt danh sách thực tế tại `team.assignedRoster` (lưu vết qua action `saveTeamRoster`).
+* **When precedents exist**: AI recommends named personnel, for example: *"Recommend Engineer Nguyễn Văn A (QC Leader) and Engineer Trần B (CNC Specialist) from precedent case #8D-10048992 because they operated the same CNC Milling Line 7."*
+* **Human-in-the-loop protection**: Recommendations are stored in `team.roster`. Users review and finalize the actual team in `team.assignedRoster`, with an audit trail through the `saveTeamRoster` action.
 
----
+### 📝 D2: Describe the Problem (5W2H / Is-IsNot Analysis)
 
-### 📝 D2: Describe the Problem (Mô tả Sự cố & Phân tích 5W2H / Is-IsNot)
+#### 1. Business purpose & AI responsibilities
 
-#### 1. Mục đích nghiệp vụ & Trách nhiệm AI
-
-* **Mục đích**: Mô tả sự cố một cách định lượng, chính xác, không suy đoán cảm tính. Xác định ranh giới sự cố qua bảng phân tích **5W2H** (What, Where, When, Who, Why, How, How many) và so sánh **Is / Is-Not**.
+* **Purpose**: Describe the incident quantitatively and precisely, without subjective speculation. Define its boundaries through **5W2H** (What, Where, When, Who, Why, How, How many) and **Is / Is-Not** comparisons.
 * **AI Copilot**:
-  * Trích xuất các số liệu đo lường thực tế so với giới hạn tiêu chuẩn (Measured vs Spec).
-  * Định lượng phạm vi ảnh hưởng (Extent of affected batches/units).
-  * Phân định rõ: Cái gì BỊ LỖI (Is) và Cái gì KHÔNG BỊ LỖI dù ở cùng điều kiện (Is-Not).
+  * Extract actual measurements and compare them with specification limits (Measured vs Spec).
+  * Quantify the extent of affected batches or units.
+  * Distinguish what IS defective from what IS NOT defective under the same conditions.
 
-#### 2. Chi tiết 5 Tab Cấu Hình D2
+#### 2. The five D2 configuration tabs
 
 * **1. Object Schema**:
-  * *Trọng số chính*: `defectCode` (+4 điểm, `exact`), `material` (+3 điểm, `exact`), `semantic` (Cosine $\ge 0.70$).
-  * *Nguyên do*: Cần tìm đúng các case mô tả cùng hiện tượng hư hỏng và cùng mã sản phẩm.
+  * *Primary weights*: `defectCode` (+4 points, `exact`), `material` (+3 points, `exact`), `semantic` (Cosine $\ge 0.70$).
+  * *Reason*: Retrieve cases describing the same failure symptom and product code.
 * **2. Data Schema (`inputSchemaJson`)**:
-  * `header`: Thông tin thông báo sự cố hệ thống (`notificationId`, `origin`, `foundDate`).
-  * `product`: Thông tin sản phẩm, mã vật tư, số lô (`batchId`).
-  * `defect`: Mã lỗi và diễn giải mô tả hiện trường (`defectCode`, `defectText`).
-  * `inspections`: Mảng kết quả đo lường (Thông số, giá trị thực đo, giá trị tiêu chuẩn).
-  * `isIsNot`: Dữ liệu phân tích Is/Is-Not.
-  * `derivedFacts`: Các số liệu định lượng suy ra từ AI Enrichment.
+  * `header`: System incident-notification details (`notificationId`, `origin`, `foundDate`).
+  * `product`: Product, material code, and batch details (`batchId`).
+  * `defect`: Defect code and on-site description (`defectCode`, `defectText`).
+  * `inspections`: Measurement results (characteristic, actual value, and specification).
+  * `isIsNot`: Is/Is-Not analysis data.
+  * `derivedFacts`: Quantitative facts derived through AI Enrichment.
 * **3. Prompt Guide (`combinedPrompt`)**:
   ```text
   Describe the problem with verified 5W2H facts.
@@ -135,36 +123,34 @@ Mỗi bước D trong quy trình 8D đều có 5 tab cấu hình tương ứng. 
 * **4. Form Editor (`formSchemaJson`)**:
   * Group `problem`:
     * `summary` (Problem summary - `textarea`, 100% width).
-    * `content` (5W2H and Is/Is-Not analysis - `textarea`, 100% width, min 50 ký tự).
+    * `content` (5W2H and Is/Is-Not analysis - `textarea`, 100% width, minimum 50 characters).
     * `sources` (`tag-selector`, 100% width).
     * `confidence` (`input`, 50% width) & `dataBacked` (`checkbox`, 50% width).
 * **5. Constraints (`constraintsJson`)**:
-  * `D2_CITATIONS`: `type: citationRequired`, mức độ `error`. Mọi thông số đo lường (ví dụ `0.26mm > max 0.10mm`) bắt buộc phải có nguồn trích dẫn từ bảng `inspections`.
+  * `D2_CITATIONS`: `type: citationRequired`, severity `error`. Every measurement, for example `0.26mm > max 0.10mm`, must cite the `inspections` table.
   * `D2_SOURCES`: `type: sourcePattern`, pattern `^(header|product|defect|inspections|isIsNot|derivedFacts)`.
 
-#### 3. Thay đổi trong Output khi thực thi
+#### 3. Effect on runtime output
 
-* AI sinh ra đoạn văn mô tả chuẩn ISO/IATF 16949: nêu rõ kích thước bavia đo được, vị trí phát hiện, số lượng lô bị chặn, và bảng so sánh ranh giới Is/Is-Not chi tiết.
+* AI drafts an ISO/IATF 16949-style description stating the measured burr dimensions, detection location, number of blocked batches, and detailed Is/Is-Not boundary comparisons.
 
----
+### 🛡️ D3: Interim Containment Actions
 
-### 🛡️ D3: Interim Containment Actions (Hành động Khoanh vùng Tạm thời)
+#### 1. Business purpose & AI responsibilities
 
-#### 1. Mục đích nghiệp vụ & Trách nhiệm AI
-
-* **Mục đích**: Đưa ra các biện pháp khẩn cấp (trong vòng 24h) để cô lập sự cố, bảo vệ khách hàng và chặn không cho sản phẩm lỗi tiếp tục lọt ra thị trường.
+* **Purpose**: Define emergency measures within 24 hours to isolate the incident, protect the customer, and prevent further defective products from reaching the market.
 * **AI Copilot**:
-  * Rà soát các hành động tạm thời đã được ghi nhận trong hệ thống QM.
-  * Nếu chưa có hành động nào được ghi nhận $\rightarrow$ tự động trích xuất các hành động khoanh vùng hiệu quả nhất từ các case tiền lệ (`precedents#N`) để đề xuất (ví dụ: Dừng chuyền, phong tỏa tồn kho 100%, bổ sung kiểm tra Sorting 100%).
+  * Review interim actions already recorded in the QM system.
+  * If no actions are recorded, extract effective containment actions from precedent cases (`precedents#N`) as recommendations, such as stopping the line, quarantining all stock, or adding 100% sorting inspection.
 
-#### 2. Chi tiết 5 Tab Cấu Hình D3
+#### 2. The five D3 configuration tabs
 
 * **1. Object Schema**:
-  * *Trọng số chính*: `defectCode` (+4, `exact`), `keyword` (+2, trùng từ khóa mô tả), `workCenter` (+3).
+  * *Primary weights*: `defectCode` (+4, `exact`), `keyword` (+2 for matching description keywords), `workCenter` (+3).
 * **2. Data Schema (`inputSchemaJson`)**:
-  * `actions`: Các hành động tức thời đang có trong hệ thống QM (`actions.containment`).
-  * `customer`: Tác động tới khách hàng & hàng đang trên đường vận chuyển.
-  * `precedents`: Các hành động khoanh vùng thành công trong quá khứ.
+  * `actions`: Existing immediate actions in the QM system (`actions.containment`).
+  * `customer`: Customer impact and goods in transit.
+  * `precedents`: Previously successful containment actions.
 * **3. Prompt Guide (`combinedPrompt`)**:
   ```text
   List immediate containment actions with owner and status when recorded.
@@ -173,123 +159,104 @@ Mỗi bước D trong quy trình 8D đều có 5 tab cấu hình tương ứng. 
   Clearly distinguish recorded actions from recommendations.
   ```
 * **4. Form Editor (`formSchemaJson`)**:
-  * Group `containment`: `summary`, `content`, `actionItems` (`multiSelect` - danh sách hành động đề xuất), `sources`, `confidence`, `dataBacked`.
+  * Group `containment`: `summary`, `content`, `actionItems` (`multiSelect` - proposed actions), `sources`, `confidence`, `dataBacked`.
 * **5. Constraints (`constraintsJson`)**:
-  * `D3_SOURCES`: `type: sourcePattern`, pattern `^(actions\.containment|customer|precedents#)`. Phân biệt rõ giữa hành động *đã thực tế triển khai* và hành động *mới chỉ đề xuất từ tiền lệ*.
+  * `D3_SOURCES`: `type: sourcePattern`, pattern `^(actions\.containment|customer|precedents#)`. Clearly distinguish actions *already implemented* from actions *only proposed from precedents*.
 
-#### 3. Thay đổi trong Output khi thực thi
+#### 3. Effect on runtime output
 
-* Tạo danh sách checklist các hành động cách ly tức thì kèm người phụ trách, thời hạn và đánh giá rủi ro tồn dư (Residual exposure).
+* Produce an immediate containment checklist with owners, deadlines, and residual-exposure assessments.
 
----
+### 🔬 D4: Root Cause Analysis
 
-  * `D4_SOURCES`: `type: sourcePattern`, pattern `^(fiveWhy|ishikawa|rootCause|independent|precedents#)`.
+* `D4_SOURCES`: `type: sourcePattern`, pattern `^(fiveWhy|ishikawa|rootCause|independent|precedents#)`.
 
-#### 3. Thay đổi trong Output khi thực thi
+#### 3. Effect on runtime output
 
-* Trình bày chuỗi 5-Why mạch lạc từng nấc, chứng minh nguyên nhân gốc bằng số liệu thực tế, chỉ rõ yếu tố Ishikawa kích hoạt và minh bạch hóa mức độ tin cậy thông qua phần kiểm chứng độc lập.
+* Present a coherent step-by-step 5-Why chain, substantiate the root cause with factual measurements, identify the contributing Ishikawa factor, and make confidence transparent through independent verification.
 
----
+### 🔧 D5: Permanent Corrective Actions
 
-### 🔧 D5: Permanent Corrective Actions (Hành động Khắc phục Vĩnh viễn)
+#### 1. Purpose & AI role
 
-#### 1. Mục đích & Vai trò AI
+* **Purpose**: Define permanent solutions that eliminate the root cause identified in D4.
+* **AI Copilot**: Map each corrective action directly to a link in the 5-Why chain and flag causal links without a corresponding countermeasure.
 
-* **Mục đích**: Đưa ra các giải pháp triệt để nhằm loại bỏ hoàn toàn nguyên nhân gốc đã xác định ở D4.
-* **AI Copilot**: Ánh xạ từng hành động khắc phục trực tiếp vào từng mắt xích của chuỗi 5-Why; cảnh báo nếu có mắt xích nguyên nhân nào chưa có biện pháp xử lý che chắn.
+#### 2. Configuration & output effects
 
-#### 2. Cấu hình & Tác động Output
+* **Data Schema**: Read the `actions` array (`x-source: qm_system`) and the D4 root-cause result.
+* **Prompt Guide**: Require AI to identify which actions address occurrence causes and which address escape causes.
+* **Output**: A long-term corrective-action table with an assessment of each action's ability to eliminate the root cause.
 
-* **Data Schema**: Đọc mảng `actions` (`x-source: qm_system`) và kết quả nguyên nhân từ D4.
-* **Prompt Guide**: Yêu cầu AI chỉ rõ hành động nào khắc phục nguyên nhân phát sinh (Occurrence) và hành động nào khắc phục nguyên nhân thoát lỗi (Escape).
-* **Output**: Bảng danh mục hành động khắc phục dài hạn kèm đánh giá khả năng loại trừ nguyên nhân gốc.
+### 📈 D6: Verify Effectiveness
 
----
+#### 1. Purpose & AI role
 
-### 📈 D6: Verify Effectiveness (Xác minh & Đánh giá Hiệu quả)
+* **Purpose**: Establish a measurement and monitoring program to demonstrate that D5 actions solve the problem without adverse side effects.
+* **AI Copilot**: Draft a quantitative verification program covering metrics, sample size, run-at-rate monitoring duration, and acceptance criteria.
 
-#### 1. Mục đích & Vai trò AI
+#### 2. Configuration & output effects
 
-* **Mục đích**: Thiết lập kế hoạch đo lường và theo dõi thực tế để chứng minh các hành động ở D5 đã thực sự giải quyết được vấn đề và không gây ra tác dụng phụ.
-* **AI Copilot**: Xây dựng kế hoạch xác minh định lượng (Metrics, cỡ mẫu kiểm tra Sample Size, thời gian theo dõi Run-at-rate, tiêu chí chấp nhận Acceptance Criteria).
+* **Data Schema**: Read technical specifications from `inspections`.
+* **Prompt Guide**: Draft an experimental validation matrix (Statistical Process Control / Cpk / Ppk).
+* **Output**: Detailed effectiveness-verification requirements: who measures, how many samples, for how long, and who signs off acceptance.
 
-#### 2. Cấu hình & Tác động Output
+### 🔄 D7: Prevent Recurrence (Prevention & FMEA Updates)
 
-* **Data Schema**: Đọc các thông số kỹ thuật tiêu chuẩn từ `inspections`.
-* **Prompt Guide**: Soạn thảo ma trận kiểm tra thực nghiệm (Statistical Process Control / Cpk / Ppk).
-* **Output**: Bản kế hoạch kiểm định hiệu quả chi tiết (Ai đo, đo bao nhiêu mẫu, đo trong bao lâu và ai ký duyệt nghiệm thu).
+#### 1. Purpose & AI role
 
----
+* **Purpose**: Standardize the process, update technical documents, FMEA (Failure Mode and Effects Analysis), and the Control Plan, and share lessons with similar lines or products.
+* **AI Copilot**: Identify documents requiring updates (SOP, Work Instructions, FMEA RPN score) and propose quality-management system changes.
 
-### 🔄 D7: Prevent Recurrence (Hành động Phòng ngừa Tái diễn & Cập nhật FMEA)
+#### 2. Configuration & output effects
 
-#### 1. Mục đích & Vai trò AI
+* **Data Schema**: Link FMEA (`fmea`, `x-source: qm_system`).
+* **Prompt Guide**: Propose systemic prevention at the management-system level, extending beyond individual operator actions.
+* **Output**: A list of SOP/FMEA document IDs requiring revision and broader preventive-action proposals.
 
-* **Mục đích**: Chuẩn hóa quy trình, cập nhật tài liệu kỹ thuật, cập nhật hồ sơ FMEA (Failure Mode and Effects Analysis), Control Plan và chia sẻ bài học kinh nghiệm cho các dây chuyền/sản phẩm tương tự.
-* **AI Copilot**: Trích xuất các tài liệu cần cập nhật (SOP, Work Instructions, FMEA RPN score) và đề xuất cập nhật hệ thống quản trị chất lượng.
+### 🏆 D8: Closure and Team Recognition
 
-#### 2. Cấu hình & Tác động Output
+#### 1. Purpose & AI role
 
-* **Data Schema**: Liên kết FMEA (`fmea`, `x-source: qm_system`).
-* **Prompt Guide**: Đề xuất cải tiến hệ thống ở mức quản trị (Systemic prevention) chứ không chỉ dừng lại ở thao tác công nhân.
-* **Output**: Danh sách mã tài liệu SOP/FMEA cần sửa đổi và đề xuất hành động phòng ngừa trên diện rộng.
+* **Purpose**: Assess the Closure Gate, summarize Lessons Learned, and recognize each 8D team member's contribution.
+* **AI Copilot**: Summarize D1-D7, state lessons from successes and failures, and draft recognition naming the participating people.
 
----
+#### 2. Configuration & output effects
 
-### 🏆 D8: Closure and Team Recognition (Tổng kết & Tuyên dương Đội ngũ)
+* **Data Schema**: Read `lessonsLearned` and `teamMembers`.
+* **Prompt Guide**: Review acceptance criteria before closure and draft a professional appreciation or recognition message.
+* **Output**: Complete 8D closure acceptance minutes and a lessons-learned summary for the company knowledge base.
 
-#### 1. Mục đích & Vai trò AI
+## 🚀 PART 4: `CREATE DEFECT` & THE 8D PROCESS TRIGGER
 
-* **Mục đích**: Đánh giá điều kiện đóng sự cố (Closure Gate), tổng kết bài học kinh nghiệm (Lessons Learned) và ghi nhận đóng góp của từng thành viên trong đội ngũ 8D.
-* **AI Copilot**: Tổng kết toàn bộ tiến trình D1–D7, nêu rõ bài học thành công/thất bại và soạn thảo nội dung tuyên dương đích danh các cá nhân tham gia.
+The [`Create Defect`](../app/8D_hackathon_ui/src/pages/create-defect/index.tsx) page provides a complete incident-creation experience:
 
-#### 2. Cấu hình & Tác động Output
+* **1-Click Presets**:
+  * Q3 Internal - Flange Burr
+  * Q1 Customer - Coolant Leak
+  * Q3 Internal - Weld Porosity
+* **Business Data Entry (Visual Form)**:
+  1. Notification details (Notification ID, Origin, Status).
+  2. Incident description (Symptom Text, Defect Code, Defect Text).
+  3. Material and production line (Material, Batch, Work Center).
+  4. Inspection measurements (Characteristic, Meas, Spec).
+  5. Customer and SLA (Complaint Ref, Contact, Due Date).
 
-* **Data Schema**: Đọc `lessonsLearned` và danh sách thành viên `teamMembers`.
-* **Prompt Guide**: Rà soát các tiêu chí nghiệm thu trước khi đóng case và viết thư cảm ơn/tuyên dương chuyên nghiệp.
-* **Output**: Biên bản nghiệm thu đóng case 8D hoàn chỉnh và bản tóm tắt bài học kinh nghiệm lưu vào cơ sở tri thức công ty.
+Click **Start 8D Analysis** to trigger the **backend AI pipeline (`EightDService.analyzeFromJson`)**:
 
----
+1. `validateDataset`: Reject schema-invalid data early.
+2. `mapCase`: Normalize facts into `CaseContext`.
+3. `enrichContext`: Perform AI Enrichment and measurement calculations.
+4. `diagnoseIndep...`: Perform AI Blind Diagnosis (objective independent diagnosis).
+5. `findPrecedents`: Score and retrieve three precedent cases using each D step's Object Schema.
+6. `generateReport`: Generate D1-D8 content using Prompt Guide and Data Schema.
+7. `postProcess`: Check Constraints rules, including citations and evidence grounding.
 
-## 🚀 PHẦN 4: PHÂN HỆ `CREATE DEFECT` & LUỒNG KÍCH HOẠT QUY TRÌNH 8D
+The **8D Report Detail View** then displays the result using the configured Form Editor layout.
 
-Trang [`Create Defect`](file:///d:/GitHub/8d-copilot/app/cnma_proresolve_ui/src/pages/create-defect/index.tsx) cung cấp trải nghiệm khởi tạo sự cố hoàn chỉnh:
+## 🎯 SUMMARY
 
-```
-┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                GIAO DIỆN TẠO SỰ CỐ (CREATE DEFECT)                               │
-├────────────────────────────────┬─────────────────────────────────────────────────────────────────┤
-│ [1-Click Presets]              │ [Biểu mẫu Nhập liệu Nghiệp vụ (Visual Form)]                     │
-│ ✦ Q3 Internal - Flange Burr    │  ├── 1. Thông tin Thông báo (Notification ID, Origin, Status)   │
-│ ✦ Q1 Customer - Coolant Leak   │  ├── 2. Mô tả Sự cố (Symptom Text, Defect Code, Defect Text)    │
-│ ✦ Q3 Internal - Weld Porosity  │  ├── 3. Vật tư & Dây chuyền (Material, Batch, Work Center)      │
-│                                │  ├── 4. Kết quả Đo lường Kiểm tra (Characteristic, Meas, Spec)  │
-│                                │  └── 5. Khách hàng & SLA (Complaint Ref, Contact, Due Date)     │
-└────────────────────────────────┴─────────────────────────────────────────────────────────────────┘
-                                                 │
-                                                 ▼ (Nhấn "Start 8D Analysis")
-┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ BACKEND AI PIPELINE (EightDService.analyzeFromJson)                                              │
-│  1. validateDataset   ──> Chặn sớm dữ liệu lỗi schema                                            │
-│  2. mapCase           ──> Chuẩn hóa facts thành CaseContext                                      │
-│  3. enrichContext     ──> AI Enrichment & Tính toán số liệu đo                                   │
-│  4. diagnoseIndep...  ──> AI Blind Diagnosis (Chẩn đoán độc lập khách quan)                     │
-│  5. findPrecedents    ──> Chấm điểm tìm 3 case tiền lệ theo Object Schema từng D                 │
-│  6. generateReport    ──> Sinh toàn bộ nội dung D1-D8 theo Prompt Guide & Data Schema            │
-│  7. postProcess       ──> Kiểm tra các luật trong Constraints (Citations, Evidence grounding)   │
-└────────────────────────────────────────────────┬─────────────────────────────────────────────────┘
-                                                 │
-                                                 ▼
-┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ 8D REPORT DETAIL VIEW: Hiển thị kết quả trực quan theo đúng Form Editor Layout đã cấu hình       │
-└──────────────────────────────────────────────────────────────────────────────────────────────────┘
-```
+Integrating **Object Schema into each D step**, standardizing the **five-tab pipeline**, and adding the **Create Defect Form** connects the full workflow:
 
----
-
-## 🎯 TỔNG KẾT
-
-Việc hợp nhất **Object Schema vào từng bước D**, chuẩn hóa **Pipeline 5 Tab**, và bổ sung **Create Defect Form** đã tạo nên một chu trình khép kín hoàn chỉnh:
-
-* **Người quản trị (Admin/Lead Engineer)**: Dễ dàng cấu hình và kiểm chứng độ chính xác của AI ở từng bước D một cách trực quan.
-* **Người dùng tác nghiệp (Quality Engineers)**: Chỉ cần nhập thông tin sự cố qua Form thân thiện, hệ thống AI sẽ tự động phân tích đa tầng, đối chiếu tiền lệ lịch sử và sinh ra bản Báo cáo 8D đạt chuẩn chất lượng quốc tế chỉ trong vòng 30 giây.
+* **Administrators / Lead Engineers**: Visually configure and verify AI behavior in each D step.
+* **Quality Engineers**: Enter incident information in a form. The AI system then performs layered analysis, compares historical precedents, and drafts an 8D report. The original example describes a 30-second report-generation target and alignment with international quality standards; these require validation and are not measured outcomes or certification claims.

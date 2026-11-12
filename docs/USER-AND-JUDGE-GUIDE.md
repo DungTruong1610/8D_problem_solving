@@ -1,11 +1,10 @@
-# 📖 User & Judge Guide — Autonomous 8D Problem Solving Copilot
+# 📖 User & Judge Guide - 8D Problem Solving Copilot
 
-> **AI4Biz 2026 — AI FOR BUSINESS INNOVATION**<br>
+> **AI4Biz 2026 - AI FOR BUSINESS INNOVATION**<br>
 > **Organizer:** LIKELION Vietnam · **Team:** UIT_4Lovpe<br>
 > **Competition requirements:** [Official AI4Biz challenge](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21)<br>
-> **Database:** PostgreSQL 16 + pgvector (`localhost:5432` via Docker, standalone with zero SAP HANA dependency)
+> **Database:** SQLite for the default local profile; PostgreSQL with pgvector is available through the `postgres` profile.
 
----
 
 ## 🧭 Table of Contents
 1. [Introduction & WalkMe Tour](#1-introduction--walkme-tour)
@@ -21,19 +20,18 @@
    - [Testing Arbitrary Judge Benchmark Test Cases](#testing-arbitrary-judge-benchmark-test-cases)
 6. [Quick Command-Line Reference (CLI)](#6-quick-command-line-reference-cli)
 
----
 
 ## 1. Introduction & WalkMe Tour
 
-The **8D Problem Solving Copilot** is a specialized AI assistant engineered for precision manufacturing and automotive production. It assists with evidence retrieval and D1–D8 drafting. Engineers validate the evidence, approve actions and decide when an incident can be closed; a generated draft is not a verified root cause or a resolved incident.
+The **8D Problem Solving Copilot** is a specialized AI assistant engineered for precision manufacturing and automotive production. It assists with evidence retrieval and D1-D8 drafting. Engineers validate the evidence, approve actions and decide when an incident can be closed; a generated draft is not a verified root cause or a resolved incident.
 
 ### 🚀 WalkMe Guided Tour (5-Minute Interactive Onboarding):
 From the Web UI (`/#/guide`), click **"Start WalkMe Tour (5 Min)"** to launch an interactive, step-by-step walkthrough covering 5 core operational stations:
-* **Station 1: 8D Incident Worklist (`/#/8d`)** — Filter active quality notifications and open reference case `8D-10048412`.
-* **Station 2: 8D Resolution Workspace (`/#/8d/:id`)** — Inspect step-by-step AI suggestions across D1 through D8 and view precedent history.
-* **Station 3: Blind Diagnosis & Physical Evidence** — Compare sensory inspection logs against operator statements to detect confirmation bias.
-* **Station 4: AI Workflow Configuration (`/#/workflow`)** — Switch LLM providers, edit prompt templates, and adjust multi-factor retrieval weights.
-* **Station 5: Test Authoring & 90s Verify Suite** — Download schema templates, validate custom JSON, and trigger the automated 90-second verify harness.
+* **Station 1: 8D Incident Worklist (`/#/8d`)** - Filter active quality notifications and open reference case `8D-10048412`.
+* **Station 2: 8D Resolution Workspace (`/#/8d/:id`)** - Inspect step-by-step AI suggestions across D1 through D8 and view precedent history.
+* **Station 3: Blind Diagnosis & Physical Evidence** - Compare sensory inspection logs against operator statements to detect confirmation bias.
+* **Station 4: AI Workflow Configuration (`/#/workflow`)** - Switch LLM providers, edit prompt templates, and adjust multi-factor retrieval weights.
+* **Station 5: Test Authoring & 90s Verify Suite** - Download schema templates, validate custom JSON, and trigger the automated 90-second verify harness.
 
 ### 🧭 Guided Tour (in-app spotlight walkthrough)
 *Added 2026-10-10.* Click **Guided Tour** in the left sidebar, directly below **User & Judge Guide**. Unlike the dialog tour above, it dims the screen and highlights the real controls one at a time, opening each screen, tab and dialog for you. The 51 steps run in this order:
@@ -41,13 +39,11 @@ From the Web UI (`/#/guide`), click **"Start WalkMe Tour (5 Min)"** to launch an
 1. **8D Reports**: the worklist with its compact (core) columns, the quick-filter chips, More/Fewer columns, Export Excel and Refresh. It then opens the **Create 8D Report** dialog and covers both entry paths: picking a recorded defect, and importing JSON (Upload file, sample issues, paste).
 2. **Master Data**: Inspection History, Defect Records (Record Defect, Start 8D / Open 8D), Closed Case Library (Import JSON) and the Value Help catalogues.
 3. **AI Configuration**: Where AI enters the chain, the Precedent Retrieval Engine, Model per processing step, Graph Retrieval Weights and Model Registry. The *8D Disciplines Configuration* tab is intentionally skipped.
-4. **Working a case**: the tour opens the reference case `8D-10048412` (or the first open case when that one is missing) and covers the header actions (Export Excel, AI Stops, Audit Log, Source JSON, Re-analyze). It then shows the D1–D8 stepper, the first step not yet complete (its single next-action button), D4 root cause with the AI Referee, the Evidence tab with precedents, and the Case Overview.
+4. **Working a case**: the tour opens the reference case `8D-10048412` (or the first open case when that one is missing) and covers the header actions (Export Excel, AI Stops, Audit Log, Source JSON, Re-analyze). It then shows the D1-D8 stepper, the first step not yet complete (its single next-action button), D4 root cause with the AI Referee, the Evidence tab with precedents, and the Case Overview.
 
 **Controls:** **Next** / **→**, **Back** / **←**, and **Esc** or **Skip tour** to leave. The tour only opens screens; it never saves anything. The page underneath cannot be clicked while the tour runs, but the mouse wheel still scrolls it. The tour expands a collapsed sidebar, and it positions itself from live measurements, so it lines up at any browser zoom (designed and checked at **90 %**).
 
 **For developers:** the script lives in `app/8D_hackathon_ui/src/components/walkthrough/walkthrough-steps.ts`. Each highlighted element carries a `data-tour="…"` attribute in its page, and a page lets the tour switch its tabs or dialogs through `useTourControl(...)`. If you rename a `data-tour` id, rename it in both places.
-
----
 
 ## 2. Module Purpose & Standard Operating Procedures
 
@@ -65,7 +61,7 @@ Running Benchmark Scenario: *Flange edge burr defect on CNC Milling Line 7 (`WC-
 * **Purpose:** Detailed step-by-step workbench guiding engineers through disciplines D1 through D8.
 * **Distinctive Capabilities:**
   * **Precedent Panel:** The AI engine scans the PostgreSQL vector database and recommends historical matching cases with exact similarity percentages.
-  * **Physical Evidence:** Cross-examines sensor and tool telemetry against operator statements to eliminate human bias.
+  * **Physical Evidence:** Cross-examines sensor and tool telemetry against operator statements to help identify confirmation bias.
 * **Standard 3-Step Procedure:**
   1. Review top historical precedent matches in the right sidebar.
   2. Step through D1 to D8, clicking AI suggestions to inspect, accept, or refine them.
@@ -83,9 +79,8 @@ Running Benchmark Scenario: *Flange edge burr defect on CNC Milling Line 7 (`WC-
 * **Application:** Lookup canonical SAP codes (`WC-MILL-07`, `MAT-10247`) when authoring new test cases or establishing the D1 containment team.
 
 ### 4. AI Workflow Configuration (`/#/workflow`)
-* **Purpose:** Control tower for system intelligence. Fine-tune system/user prompts for D1–D8, switch LLM providers, and calibrate retrieval scoring weights.
+* **Purpose:** Control tower for system intelligence. Fine-tune system/user prompts for D1-D8, switch LLM providers, and calibrate retrieval scoring weights.
 
----
 
 ## 3. AI Workflow & System Configuration (`/#/workflow`)
 
@@ -96,7 +91,7 @@ Engineers and administrators can configure system intelligence directly in the b
 * **Gemini 2.5 Flash:** High multimodal accuracy, multilingual technical text parsing, and complex entity extraction.
 * **Local Mock Mode (Offline / Zero-Cost):** 100% deterministic local execution without network access or API keys.
 
-### 2. D1–D8 Prompt Management
+### 2. D1-D8 Prompt Management
 Each discipline from D1 to D8 features independent System and User prompts. Prompts support dynamic parameter interpolation:
 * `{{symptomShortText}}`: Original symptom description.
 * `{{material}}`: Material code and product family.
@@ -108,14 +103,13 @@ Each discipline from D1 to D8 features independent System and User prompts. Prom
 * **Scoring Weights:** Adjust sliders to tune multi-factor matching priorities: Work Center match (default 40%), Material match (default 35%), Symptom vector similarity (default 25%).
 * **Safety Cutoff Threshold (Rule 3.b):** When maximum similarity falls below 0.60 (60%), the system automatically triggers **Safe Refusal** mode to prevent hallucinations.
 
----
 
 ## 4. Standard JSON Schema & Test Case Authoring Playground
 
 ### Schema Field Dictionary:
 
 | Field Name | Required? | Data Type | Role in 8D Methodology | Example Value |
-|---|---|---|---|---|
+| - | - | - | - | - |
 | `notificationId` | **Required** | string | Unique incident identifier | `"8D-10049001"` |
 | `symptomShortText` | **Required** | string | Defect symptom text (used for semantic embedding) | `"Rough edge felt on bracket flange after milling"` |
 | `material.materialId` | **Required** | string | Defective component / material code | `"MAT-10247"` |
@@ -165,7 +159,6 @@ Each test runs the **same code path the app runs for a real case**: `validateDat
 
 The D4 retrieval profile (`diagnosis`) requires **8 points** (Configuration → retrieval profiles): a matching work center and material alone is not enough to cite a root-cause precedent; the defect code or a semantically similar description must also match.
 
----
 
 ## 5. Sprint 1 Evaluation Suite & Defense Sandbox
 
@@ -193,13 +186,13 @@ If the backend cannot be reached, the Evaluation tab shows an error and **no res
   npm run verify:sprint1 -- --judge-input <file.json>
   ```
 
----
 
 ## 6. Quick Command-Line Reference (CLI)
 
 | Purpose | Execution Command |
-|---|---|
-| **Start Fullstack System (BE + FE)** | `npm run dev:pg` |
+| - | - |
+| **Start Local SQLite System (BE + FE)** | `npm run dev` |
+| **Start PostgreSQL System (BE + FE)** | `npm run dev:pg` |
 | **Run 90s Verify Harness (Sprint 1)** | `npm run verify:sprint1` |
 | **Test Judge Benchmark Case** | `npm run verify:sprint1 -- --judge-input <file.json>` |
 | **Export Verify Output as Raw JSON** | `npm run verify:sprint1 -- --json` |
@@ -207,5 +200,5 @@ If the backend cannot be reached, the Evaluation tab shows an error and **no res
 | **Run Automated Test Suite (count depends on revision)** | `npm test` |
 | **Perform Full TypeScript Verification** | `npm run typecheck && npx tsc -b app/8D_hackathon_ui` |
 
----
+
 *Maintained by UIT_4Lovpe for AI4Biz 2026. Run the checks to verify the version being demonstrated.*

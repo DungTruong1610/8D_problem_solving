@@ -1,6 +1,6 @@
 # D1-D4 Step Prompt Configuration
 
-> **Historical reference — not current competition rules.** Original dates, observations and results below belong to an earlier development stage. Current competition: [AI4Biz 2026 — LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21). These records are not a new verification run or an AI4Biz score.
+> **Competition reference:** [AI4Biz 2026 - LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21). Configuration details must be checked against the active application defaults.
 
 AI Settings provides configurable editor screens for D1, D2, D3, and D4 through `/ai-settings/step-prompts/:stepCode`. D5-D8 remain read-only/planned.
 

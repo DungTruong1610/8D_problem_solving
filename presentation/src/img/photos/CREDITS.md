@@ -5,7 +5,7 @@ All photos come from Wikimedia Commons. Each was downloaded as a Commons thumbna
 CC BY / CC BY-SA licences require attribution wherever the slides are shown or shared, for example: "Photo: <author>, <licence>, via Wikimedia Commons". CC BY-SA also requires that any adapted version of the photo be shared under the same licence.
 
 | File | What it shows | Author | License | Source |
-|------|---------------|--------|---------|--------|
+| - | - | - | - | - |
 | `assembly-line.jpg` | KUKA robots spot-welding BMW 3 Series car bodies in the body shop, BMW plant Leipzig (2005) | BMW Werk Leipzig | [CC BY-SA 2.0 DE](https://creativecommons.org/licenses/by-sa/2.0/de/deed.en) | [Commons](https://commons.wikimedia.org/wiki/File:BMW_Leipzig_MEDIA_050719_Download_Karosseriebau_max.jpg) |
 | `water-pump.jpg` | Automotive coolant (water) pump 6C1Q-8K500-AF, opened: cast aluminium housing with gasket and impeller, white background | Raimond Spekking | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | [Commons](https://commons.wikimedia.org/wiki/File:Automotive_coolant_pump_6C1Q-8K500-AF_-_opened-3868.jpg) |
 | `overheat.jpg` | Overheated Jeep with steam rising from the open bonnet while two men pour water on the engine, West Sikkim, India | Drashokk | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | [Commons](https://commons.wikimedia.org/wiki/File:Cooling_overheated_Jeep,_West_Sikkim.jpg) |

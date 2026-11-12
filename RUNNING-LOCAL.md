@@ -1,226 +1,175 @@
-# Chạy local
+# Running Locally
 
-> **Competition context:** [AI4Biz 2026 — LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21), team UIT_4Lovpe. Competition requirements and submission limits are maintained in that reference; technical examples below are not measured business outcomes unless explicitly documented.
+> **Competition context:** [AI4Biz 2026 - LIKELION Vietnam](https://app.notion.com/p/likelion/AI-FOR-BUSINESS-INNOVATION-3f744860a4f480ab920ddb3911a25c21), team UIT_4Lovpe. Technical examples are not measured business outcomes.
 
-Mọi lệnh trong file này đã chạy thử thật, không phải chép từ tài liệu.
+This guide follows the checked-in package scripts and local configuration. Provider access and available models depend on your environment. Translating this guide does not constitute a fresh runtime verification.
 
----
+## 1. Install dependencies
 
-## 1. Chuẩn bị — làm một lần
+Run these commands from the repository root:
 
-```bash
-# ở thư mục gốc 8d-copilot
+```powershell
 npm install
 npm install --prefix app/8D_hackathon_ui
+Copy-Item .env.example .env
 ```
 
-Cần đăng nhập được registry nội bộ `@cnma` — cấu hình đã có sẵn trong `.npmrc`, không phải làm gì thêm.
+The current package manifest resolves the project's `@cnma` packages from tarballs in `packages/`. Keep those files available. Resolve any registry authentication required by other dependencies through your local npm configuration.
 
-Rồi tạo file cấu hình:
+You can start without live AI credentials. See the provider modes below.
 
-```bash
-cp .env.example .env
-```
+## 2. Initialize the local database
 
-Chưa cần điền gì cũng chạy được — xem mục 4.
-
----
-
-## 2. Tạo database local
-
-```bash
+```powershell
 npm run deploy:sqlite
 ```
 
-Sinh ra file `sqlite.db` ngay trong thư mục dự án. **Không cần cài database server nào** — SQLite chỉ là một file.
+The checked-in SQLite configuration uses `db.sqlite` in the project root. SQLite does not require a separate database server.
 
-Lệnh này bắt buộc chạy một lần, vì trang cấu hình AI đọc bảng `AIModels`. Bảng không tồn tại thì trang mở ra báo lỗi.
+Initialize the database before opening pages that read model and configuration tables. Deployment creates or updates the schema and loads applicable seed data. Back up any local data you need before redeploying or replacing the database.
 
-Chạy lại lệnh này bất cứ lúc nào để xoá sạch và dựng lại từ đầu.
+For the project's sample-data seeder, run:
 
----
+```powershell
+npm run seed:sqlite
+```
 
-## 3. Chạy
+## 3. Start the application
 
-```bash
+```powershell
 npm run dev
 ```
 
-Một lệnh, chạy cả hai:
+This starts the backend and frontend together:
 
-| | Địa chỉ |
-|---|---|
-| Backend (CAP) | http://localhost:4004 |
-| Giao diện (Vite) | http://localhost:5544 |
-| **Trang cấu hình AI** | **http://localhost:5544/#/ai-settings** |
+| Component | Address |
+| - | - |
+| CAP backend | http://localhost:4008 |
+| Vite frontend | http://localhost:5544 |
+| AI settings | http://localhost:5544/#/ai-settings |
 
-Muốn chạy riêng từng bên:
+To start them separately:
 
-```bash
-npm run dev:backend                        # chỉ backend
-npm run dev --prefix app/8D_hackathon_ui   # chỉ UI
+```powershell
+npm run dev:backend
+npm run dev --prefix app/8D_hackathon_ui
 ```
 
-### Đăng nhập
+### Local authentication
 
-Local dùng auth giả, tài khoản `admin` / `123`.
+The local configuration uses mocked authentication with the development account `admin` and password `123`. The Vite proxy supplies this development authentication header to backend requests.
 
-Vite đã tự chèn sẵn header đăng nhập vào mọi request nên **mở UI không bị hỏi mật khẩu**. Chỉ khi gọi thẳng backend bằng curl hay Postman mới cần:
+When calling the backend directly, supply the same local credentials:
 
-```bash
-curl -u admin:123 http://localhost:4004/api/cnma/AI_SRV/AIModels
+```powershell
+curl.exe -u admin:123 http://localhost:4008/api/cnma/AI_SRV/AIModels
 ```
 
----
+## 4. AI provider modes
 
-## 4. Phần AI — bốn chế độ
+### Mode A - No live provider configured
 
-### Chế độ A — chưa cấu hình gì (mặc định sau khi clone)
+Without standalone chat settings or AI Core credentials, the application installs a mock chat provider. Startup messages identify `mock-chat` and indicate whether an embedding provider is available. The actual diagnostic messages may be localized.
 
-Chạy được ngay. Lúc khởi động sẽ thấy dòng này, **đây không phải lỗi**:
+AI settings remain accessible, but an empty model registry or a failed **Sync** does not establish a working live provider. This mode is useful for interface work that does not require real AI output.
 
-```
-[ai/llmClient] Chưa cấu hình nhà cung cấp AI nào trong .env — hệ thống tự động chạy Mock Mode...
-[ai/llmClient] Chat: mock-chat — Embedding: KHÔNG CÓ (tiêu chí ngữ nghĩa sẽ bị bỏ qua)
-```
+### Mode B - Explicit mock mode
 
-Trang cấu hình AI vẫn mở được, danh sách model rỗng. Bấm **Sync** sẽ hiện thông báo lỗi ngay trên màn hình chứ không làm sập gì.
+Set this in `.env`:
 
-Dùng chế độ này khi chỉ làm giao diện, không đụng tới AI.
-
-### Chế độ B — `MOCK_LLM=true`, test AI mà không cần credential
-
-Thêm vào `.env`:
-
-```
+```env
 MOCK_LLM=true
 ```
 
-Mọi lời gọi model trả kết quả giả, **không hề gọi mạng**:
+The mock provider returns synthetic responses without making model requests. Its completion response includes fields such as `mock`, `model` and `messageCount`. Its embedding methods return empty arrays, allowing the retrieval layer to distinguish missing vectors from valid embeddings.
 
-```
-complete   → {"mock":true,"model":"deepseek-v4.1-flash","messageCount":1}
-embed      → mảng rỗng (không có vector — tầng trên tự bỏ tiêu chí ngữ nghĩa)
-batchEmbed → mảng rỗng theo đúng số lượng đầu vào
-```
+Use this mode for local integration work. Mock output is not evidence of model quality or live provider availability. Check the active configuration before demonstrating or deploying the application.
 
-Chế độ này bị **chặn cứng khi `NODE_ENV=production`**, không sợ lỡ tay mang lên server.
+### Mode C - Standalone chat and embedding providers
 
-Dùng khi viết logic gọi AI và muốn chạy nhanh, không tốn tiền, không cần mạng.
+Chat and embedding providers are selected independently. The current chat selection order is DeepSeek, Gemini, a local OpenAI-compatible endpoint, then the AI Core fallback. Explicit mock mode takes precedence.
 
-### Chế độ C — DeepSeek (chính hãng hoặc OpenCode) + Jina (khuyến nghị)
+For a DeepSeek-compatible configuration, set `DEEPSEEK_API_KEY`, `DEEPSEEK_BASE_URL` and `DEEPSEEK_MODEL`. Use a model identifier supported by the selected endpoint. The repository includes examples for the official endpoint and an OpenCode-compatible endpoint; their availability depends on the provider account.
 
-Điền vào `.env`:
+Configure embeddings separately with `JINA_API_KEY` or the `EMBEDDING_API_KEY`, `EMBEDDING_BASE_URL` and `EMBEDDING_MODEL` settings. The current factory also supports Gemini embeddings when configured. `EMBEDDINGS_DISABLED=true` disables the embedding provider.
 
-**Lựa chọn 1: DeepSeek chính hãng (Platform API)**
-```env
-DEEPSEEK_API_KEY=sk-...
-DEEPSEEK_BASE_URL=https://api.deepseek.com
-DEEPSEEK_MODEL=deepseek-flash
-JINA_API_KEY=jina-...
+Restart the backend after changing provider settings. Check the startup diagnostics for the selected chat provider, embedding provider, model and vector dimension.
+
+To probe the configured provider explicitly:
+
+```powershell
+npx tsx scripts/probe-ai.ts
 ```
 
-**Lựa chọn 2: OpenCode Go / Zen**
-```env
-DEEPSEEK_API_KEY=sk-...
-DEEPSEEK_BASE_URL=https://opencode.ai/zen/go/v1
-DEEPSEEK_MODEL=deepseek-v4.1-flash
-JINA_API_KEY=jina-...
-```
+This probe can make live provider requests. It checks the configured provider's supported operations, including structured output and embedding behavior.
 
-Khởi động lại, log phải hiện đúng hai dòng:
+If no embedding backend is available, semantic matching cannot contribute a valid similarity score. The application may still run using other matching criteria; inspect the startup messages before interpreting results.
 
-```
-[ai/llmClient] Chat: deepseek — Embedding: openai-compatible-embedding
-[ai/llmClient] Embedding: "jina-embeddings-v5-text-small" (1536 chiều, nguồn: EMBEDDING_MODEL)
-```
+### Mode D - SAP AI Core
 
-Muốn chắc chắn trước khi mở app, chạy `npx tsx scripts/probe-ai.ts` — script kiểm tra JSON mode, tool calls, thinking và nhúng thử 2 câu.
+The legacy AI Core integration remains available when the standalone chat providers are not selected. Configure either a service key through `AICORE_SERVICE_KEY` or the separate settings:
 
-> DeepSeek không có API embedding. Bỏ `JINA_API_KEY` thì app vẫn chạy, nhưng tiêu chí "Similar description" cho 0 điểm mọi case mà không báo lỗi — log lúc boot sẽ có dòng `[AI] Không có nhà cung cấp embedding`.
+- `AICORE_AUTH_URL`
+- `AICORE_CLIENT_ID`
+- `AICORE_CLIENT_SECRET`
+- `AICORE_BASE_URL`
+- `AICORE_RESOURCE_GROUP`
 
-### Chế độ D — AI Core thật (đường cũ, vẫn dùng được)
+Use the values supplied by your AI Core service instance. The authentication variable is `AICORE_AUTH_URL`, not `AICORE_TOKEN_URL`.
 
-Điền vào `.env`. Cách nhanh nhất là dán nguyên service key AI Core dạng JSON một dòng:
+Restart the backend and inspect the startup diagnostics. Open AI settings and use **Sync** to retrieve the model catalog when the configured integration supports it.
 
-```
-AICORE_SERVICE_KEY={"clientid":"...","clientsecret":"...","url":"...","serviceurls":{"AI_API_URL":"..."}}
-AICORE_RESOURCE_GROUP=default
-```
+## 5. Sample data
 
-Hoặc điền rời:
+CAP loads applicable CSV seed files from `db/data/` during database deployment. Filenames follow the namespace/entity convention, for example:
 
-```
-AICORE_AUTH_URL=https://<subdomain>.authentication.<region>.hana.ondemand.com
-AICORE_CLIENT_ID=...
-AICORE_CLIENT_SECRET=...
-AICORE_BASE_URL=https://api.ai.prod.<region>.aws.ml.hana.ondemand.com
-AICORE_RESOURCE_GROUP=default
-```
-
-> ⚠️ Tên biến là **`AICORE_AUTH_URL`**, không phải `AICORE_TOKEN_URL`. Project procure ghi tên sau — đó là tên sai, CDK không đọc.
-
-AI Core chỉ được chọn khi KHÔNG có `DEEPSEEK_API_KEY`, `GEMINI_API_KEY` hay `LOCAL_LLM_URL`. Khởi động lại và kiểm tra dòng `[ai-startup]`.
-
-Vào trang cấu hình AI bấm **Sync** → danh mục model nạp về từ AI Core.
-
----
-
-## 5. Dữ liệu mẫu
-
-CAP tự nạp file **CSV** trong `db/data/` mỗi lần `npm run deploy:sqlite`. Tên file phải đúng dạng `<namespace>-<Entity>.csv`, ví dụ:
-
-```
+```text
 db/data/cnma.proresolve-SampleEntity.csv
 ```
 
-**CAP không tự nạp file JSON.** Muốn dùng JSON mock thì có hai đường:
+CAP does not automatically treat arbitrary JSON fixtures as seed files. Either convert the data to the expected CSV format or use a dedicated seeding script after initializing the database.
 
-**Cách 1 — chuyển JSON sang CSV** khi seed. Đơn giản nhất, và giữ được cơ chế nạp tự động của CAP.
-
-**Cách 2 — viết script seed riêng**, chạy sau khi deploy:
+A simplified custom seeder has this structure:
 
 ```ts
-// scratch/seed.ts   →  chạy: node node_modules/tsx/dist/cli.mjs scratch/seed.ts
+// Example only: adapt the entity and input file to the actual model.
 import cds from '@sap/cds';
 import data from './mockdata.json';
 
 (async () => {
   const db = await cds.connect.to('db');
-  await db.run(INSERT.into('cnma.proresolve.SampleEntity').entries(data));
-  console.log(`Đã nạp ${data.length} bản ghi`);
+  await db.run(cds.ql.INSERT.into('cnma.proresolve.SampleEntity').entries(data));
+  console.log(`Loaded ${data.length} records`);
 })();
 ```
 
-Cách 2 hợp khi dữ liệu mock có cấu trúc lồng nhau, thứ CSV diễn đạt vụng.
+A custom seeder is useful when the fixture contains nested data that does not map directly to CSV rows.
 
-### Đưa các case đang làm ở local lên bản deploy
+### Exporting local cases for a deployment
 
-Bản deploy (Render free) dựng DB mới từ `db/data/*.csv` ở mỗi lần build, nên dữ liệu nhập trên deploy không được giữ lại. Muốn deploy có đúng các case 8D đang có ở local (bản nháp AI, trạng thái từng D-step, nhật ký duyệt):
+The repository's seed-snapshot workflow can copy local 8D reports, discipline state and review events into CSV seed files:
 
-```bash
+```powershell
 npm run export:seed
 ```
 
-Lệnh này ghi đè `cnma.proresolve-Reports.csv`, `-Disciplines.csv` và `-ReviewEvents.csv` từ `db.sqlite` local. Commit và push để lần deploy sau có dữ liệu đó. Lúc khởi động, case đã đóng trong app được ghi bù vào kho tiền lệ. Bằng chứng upload (`TaskEvidences`) **không** được chở theo, vì là file nhị phân.
+This overwrites the `cnma.proresolve-Reports.csv`, `cnma.proresolve-Disciplines.csv` and `cnma.proresolve-ReviewEvents.csv` snapshots from the local `db.sqlite`. Review the generated data before committing it. A later deployment that loads these snapshots can reproduce the exported records.
 
----
+The existing deployment workflow may recreate its database from seed files. Do not assume that records entered into a deployed instance persist across a rebuild; persistence depends on its storage configuration. Closed application cases can be synchronized into the precedent library during startup. Uploaded `TaskEvidences` are not included in the CSV snapshot because their content is binary.
 
-## 6. Sự cố hay gặp
+## 6. Troubleshooting
 
-| Hiện tượng | Nguyên nhân | Cách xử lý |
-|---|---|---|
-| Trang AI báo lỗi khi tải | Chưa chạy `npm run deploy:sqlite` | Chạy lệnh đó |
-| Danh sách model rỗng dù đã Sync | Chưa điền `.env`, hoặc credential sai | Xem dòng `[ai-startup]` trong log |
-| Ô chọn model trống trơn | Registry của bundle UI chưa đăng ký | Kiểm tra `src/config/ai-registry.ts` có được gọi trong `main.tsx` |
-| `403` khi bấm Sync trên môi trường deploy | Thiếu CSRF token | Phải dùng `services/ai-model-service.ts`, không dùng `createAiModelApi()` của CDK |
-| Cổng 4004 hoặc 5544 bị chiếm | Còn tiến trình cũ | Tắt terminal cũ, hoặc kill process giữ cổng |
-| `npm install` báo lỗi peer dependency | Thiếu cờ | `.npmrc` đã có `legacy-peer-deps=true`, kiểm tra file còn nguyên không |
+| Symptom | Likely cause | What to check |
+| - | - | - |
+| AI settings fail to load | Database tables have not been initialized | Run `npm run deploy:sqlite` for the intended local database |
+| Model list is empty after Sync | Missing settings, invalid credentials or an unavailable provider | Inspect startup and provider diagnostics |
+| Model selector is empty | The frontend registry was not registered | Check that `src/config/ai-registry.ts` is called from `main.tsx` |
+| Sync returns HTTP 403 on deployment | Missing CSRF handling | Use `services/ai-model-service.ts`, rather than bypassing it with the CDK API factory |
+| Port 4008 or 5544 is occupied | Another process is listening | Stop the conflicting local process or update the backend and proxy together |
+| npm reports a peer-dependency conflict | Package or npm configuration mismatch | Inspect `.npmrc` and the actual dependency error |
 
----
+## 7. Configuration details that matter
 
-## 7. Hai điều dễ quên nhất
+**Register AI activities on both sides.** Backend registration lives in `srv/server.ts`; frontend registration lives in `app/8D_hackathon_ui/src/config/ai-registry.ts`. They run in separate processes. Adding an activity to only one side can leave a selector empty or prevent the backend from resolving its configuration.
 
-**Registry AI phải đăng ký ở CẢ HAI phía.** Backend đăng ký ở `srv/server.ts`, giao diện đăng ký ở `src/config/ai-registry.ts`. Đây là hai tiến trình khác nhau, không thấy nhau. Thêm một activity mới mà chỉ sửa một bên thì bên kia không biết gì — ô chọn trống hoặc backend không tra được model.
-
-**Đổi model embedding là làm hỏng mọi vector đã lưu.** Vector của hai model khác nhau không nằm chung một không gian, so sánh giữa chúng cho ra kết quả vô nghĩa — mà hệ thống vẫn chạy bình thường, không báo lỗi gì. Đổi thì phải nhúng lại toàn bộ kho.
+**Changing an embedding model requires rebuilding stored embeddings.** Vectors from different models do not necessarily share a comparable space, even when their dimensions match. Update the model configuration and regenerate the affected vectors together before relying on similarity results.
