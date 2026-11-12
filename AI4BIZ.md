@@ -94,4 +94,4 @@ Các file HTML, PDF, video, DOCX cũ chưa tự động trở thành bài nộp 
 - [Hướng dẫn giám khảo](docs/USER-AND-JUDGE-GUIDE.md): cách xem và thử MVP.
 - [Runbook kiểm thử](docs/SPRINT1-VERIFY-RUNBOOK.md): harness nội bộ, không phải thang điểm AI4Biz.
 
-“5 slide”, “video 3 phút”, “build log 1 trang”, “no login”, “harness 90 giây” và các điểm Sprint 1 là định dạng hoặc mục tiêu của giai đoạn trước, **không phải yêu cầu chính thức AI4Biz**. Nhóm có thể giữ mục tiêu trải nghiệm/kiểm thử phù hợp, nhưng phải ghi là mục tiêu nội bộ.
+“5 slide”, “video 3 phút”, “no login”, “harness 90 giây” và các điểm Sprint 1 là định dạng hoặc mục tiêu của giai đoạn trước, **không phải yêu cầu chính thức AI4Biz**. Nhóm có thể giữ mục tiêu trải nghiệm/kiểm thử phù hợp, nhưng phải ghi là mục tiêu nội bộ.

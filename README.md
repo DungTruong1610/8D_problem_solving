@@ -282,7 +282,7 @@ Record the code revision, environment and actual output when reporting a result.
 - `scripts/` - Development, database seeding, verification and export tools.
 - `mock-data/` - Demonstration fixtures and sample datasets.
 - `docs/` - Product requirements, user guides, verification guidance and archives.
-- `docs_sprint2/` - Development notes, technical plans and build history.
+- `docs_sprint2/` - Development notes, technical plans and implementation summaries.
 - `presentation/` - Presentation sources, research and rehearsal material.
 - `AI4BIZ.md` - Shared competition reference.
 - `.env.example` - Environment configuration template.
@@ -299,7 +299,6 @@ Record the code revision, environment and actual output when reporting a result.
 - [Discipline pipeline guide](docs/8D-DISCIPLINE-PIPELINE-AND-CREATE-DEFECT-GUIDE.md) - Step configuration and defect creation.
 - [Testing matrix](docs/8D-TESTING-PLAN-AND-VALIDATION-MATRIX.md) - Scenarios and validation coverage.
 - [Graph retrieval and reranking](docs/GRAPH-RETRIEVAL-AND-RERANK.vi.md) - Retrieval architecture and configuration.
-- [Build log](docs_sprint2/BUILD_LOG.md) - Historical development notes, not a required AI4Biz submission document.
 - [Archived documents](docs/archive/README.md) - Earlier plans, decisions and verification records.
 
 Some detailed guides are written in Vietnamese. Historical documents retain their original context. Use the current competition reference for submission requirements and the checked-in configuration for runtime commands.

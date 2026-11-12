@@ -27,7 +27,7 @@
 | [Testing matrix](8D-TESTING-PLAN-AND-VALIDATION-MATRIX.md) | Kịch bản kiểm chứng |
 | [Graph retrieval & rerank](GRAPH-RETRIEVAL-AND-RERANK.vi.md) | Thiết kế retrieval; đối chiếu engine thực tế khi demo |
 | [Rerank specification](RERANK-PRECEDENT-RETRIEVAL.md) | Xếp hạng lại tiền lệ D4/D5 |
-| [Danh mục phát triển](../docs_sprint2/README.md) | Thiết kế, build log và nghiên cứu kỹ thuật |
+| [Danh mục phát triển](../docs_sprint2/README.md) | Thiết kế, tổng kết triển khai và nghiên cứu kỹ thuật |
 
 ## Tài liệu sinh tự động và lịch sử
 

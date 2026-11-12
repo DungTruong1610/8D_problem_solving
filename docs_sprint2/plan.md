@@ -38,4 +38,3 @@
 - [GraphAI](GraphAI.md), [Stage 2](GraphAI_Stage2.md), [Implementation summary](GraphAI_Implementation_Summary.md): giữ thiết kế và trạng thái từng tài liệu; kế hoạch không đồng nghĩa tính năng đã chạy.
 - [Bản chất AI và DB](BAN_CHAT_LOGIC_AI_VA_DB.md): tài liệu giải thích nội bộ.
 - [Kế hoạch Sprint 2 cũ](../docs/archive/SPRINT2-PLAN-2026-10.md): giữ backlog chi tiết và quyết định giai đoạn trước; các mốc tháng 9–10, rubric và định dạng nộp ở đó không áp dụng cho AI4Biz.
-- [Build log](BUILD_LOG.md): lịch sử phát triển, không phải đầu ra bắt buộc một trang của AI4Biz.
